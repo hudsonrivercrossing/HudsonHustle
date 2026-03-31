@@ -6,6 +6,9 @@ This directory holds versioned game-design snapshots for Hudson Hustle.
 - `drafts/` for active experimentation
 - `releases/` for frozen, named snapshots
 - `current.json` as the only moving pointer to the active config
+- `pnpm config:switch <config-id>` to update `current.json` to an existing draft or release
+- `pnpm config:registry` to refresh the generated runtime registry
+- `pnpm config:export` to export the current runtime snapshot into `drafts/current-working` and refresh the registry
 
 ## Current Pointer
 - `current.json` currently points to:
@@ -27,6 +30,8 @@ This directory holds versioned game-design snapshots for Hudson Hustle.
 - `map.json`
 - `tickets.json`
 - `rules.json`
+- `visuals.json`
+  - theme, backdrop mode, board label mode, backdrop art, and palettes
 - `notes.md`
 
 ## Naming

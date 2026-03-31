@@ -11,7 +11,13 @@ import {
   type GameAction,
   type GameState
 } from "@hudson-hustle/game-core";
-import { cardColorPalette, hudsonHustleMap, playerColorPalette } from "@hudson-hustle/game-data";
+import {
+  cardColorPalette,
+  hudsonHustleCurrentConfigId,
+  hudsonHustleCurrentConfigMeta,
+  hudsonHustleMap,
+  playerColorPalette
+} from "@hudson-hustle/game-data";
 import { BoardMap } from "./components/BoardMap";
 import { OnboardingTutorial, type TutorialStep } from "./components/OnboardingTutorial";
 import { SetupScreen } from "./components/SetupScreen";
@@ -199,6 +205,41 @@ export default function App(): JSX.Element {
     );
   }, [currentPlayer, game]);
 
+  const currentRouteUnavailableReason = useMemo(() => {
+    if (!game || !selectedRouteId) {
+      return null;
+    }
+
+    const currentRoute = hudsonHustleMap.routes.find((route) => route.id === selectedRouteId);
+    if (!currentRoute) {
+      return null;
+    }
+
+    const currentRouteClaim = game.routeClaims.find((claim) => claim.routeId === currentRoute.id);
+    const currentRouteOwner = currentRouteClaim ? game.players.find((player) => player.id === currentRouteClaim.playerId) : null;
+
+    if (game.turn.stage !== "idle") {
+      return "Finish the current draw before claiming a route.";
+    }
+
+    if (currentRouteClaim && currentRouteOwner) {
+      return `This route is already claimed by ${currentRouteOwner.name}.`;
+    }
+
+    if (currentRoute.twinGroup && game.players.length <= 3) {
+      const twinIds = hudsonHustleMap.routes
+        .filter((route) => route.twinGroup === currentRoute.twinGroup && route.id !== currentRoute.id)
+        .map((route) => route.id);
+      const twinClaim = game.routeClaims.find((claim) => twinIds.includes(claim.routeId));
+      if (twinClaim) {
+        const twinOwner = game.players.find((player) => player.id === twinClaim.playerId);
+        return `This parallel route is unavailable in a ${game.players.length}-player game because its twin is already claimed${twinOwner ? ` by ${twinOwner.name}` : ""}.`;
+      }
+    }
+
+    return "No affordable claim options right now.";
+  }, [game, selectedRouteId]);
+
   function startNewGame(playerNames: string[]) {
     const nextGame = startGame(hudsonHustleMap, { playerNames });
     setGame(nextGame);
@@ -325,6 +366,8 @@ export default function App(): JSX.Element {
           canResume={hasSavedGame}
           onResume={resumeGame}
           onOpenTutorial={openTutorial}
+          configLabel={`${hudsonHustleCurrentConfigMeta.version} · ${hudsonHustleCurrentConfigId}`}
+          configSummary={hudsonHustleCurrentConfigMeta.summary}
         />
         {tutorial}
       </>
@@ -340,32 +383,6 @@ export default function App(): JSX.Element {
   const currentRoute = selectedRouteId ? hudsonHustleMap.routes.find((route) => route.id === selectedRouteId) : null;
   const currentRouteClaim = currentRoute ? game.routeClaims.find((claim) => claim.routeId === currentRoute.id) : null;
   const currentRouteOwner = currentRouteClaim ? game.players.find((player) => player.id === currentRouteClaim.playerId) : null;
-  const currentRouteUnavailableReason = useMemo(() => {
-    if (!game || !currentRoute) {
-      return null;
-    }
-
-    if (game.turn.stage !== "idle") {
-      return "Finish the current draw before claiming a route.";
-    }
-
-    if (currentRouteClaim && currentRouteOwner) {
-      return `This route is already claimed by ${currentRouteOwner.name}.`;
-    }
-
-    if (currentRoute.twinGroup && game.players.length <= 3) {
-      const twinIds = hudsonHustleMap.routes
-        .filter((route) => route.twinGroup === currentRoute.twinGroup && route.id !== currentRoute.id)
-        .map((route) => route.id);
-      const twinClaim = game.routeClaims.find((claim) => twinIds.includes(claim.routeId));
-      if (twinClaim) {
-        const twinOwner = game.players.find((player) => player.id === twinClaim.playerId);
-        return `This parallel route is unavailable in a ${game.players.length}-player game because its twin is already claimed${twinOwner ? ` by ${twinOwner.name}` : ""}.`;
-      }
-    }
-
-    return "No affordable claim options right now.";
-  }, [currentRoute, currentRouteClaim, currentRouteOwner, game]);
 
   return (
     <div className="app-shell">
@@ -373,6 +390,10 @@ export default function App(): JSX.Element {
         <div>
           <p className="eyebrow">Hudson Hustle</p>
           <h1>{hudsonHustleMap.name}</h1>
+          <div className="config-chip-group">
+            <span className="config-chip">Config: {hudsonHustleCurrentConfigMeta.version} · {hudsonHustleCurrentConfigId}</span>
+            <span className="config-summary">{hudsonHustleCurrentConfigMeta.summary}</span>
+          </div>
         </div>
         <div className="topbar-actions">
           <button className="secondary-button" onClick={openTutorial}>

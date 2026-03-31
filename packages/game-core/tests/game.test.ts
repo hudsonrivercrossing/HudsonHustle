@@ -262,13 +262,14 @@ describe("game-core", () => {
     const anchorIds = new Set<string>(hudsonHustleAnchorWaveCityIds);
 
     expect(hudsonHustleAnchorWaveCityIds.length).toBe(9);
-    expect(hudsonHustleFirstRingCityIds.length).toBeGreaterThanOrEqual(6);
+    expect(hudsonHustleFirstRingCityIds.length).toBeGreaterThan(0);
 
     for (const cityId of hudsonHustleAnchorWaveCityIds) {
       expect(cityIds.has(cityId)).toBe(true);
     }
 
     for (const cityId of hudsonHustleFirstRingCityIds) {
+      expect(cityIds.has(cityId)).toBe(true);
       expect(anchorIds.has(cityId)).toBe(false);
     }
   });

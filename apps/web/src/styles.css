@@ -98,6 +98,32 @@ button {
   color: var(--ink-soft);
 }
 
+.config-chip-group {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.config-chip {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(42, 111, 182, 0.24);
+  background: rgba(255, 251, 243, 0.86);
+  color: var(--accent-strong);
+  font-size: 0.82rem;
+  letter-spacing: 0.03em;
+}
+
+.config-summary {
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+  line-height: 1.4;
+  max-width: 70ch;
+}
+
 h1,
 h2,
 h3 {

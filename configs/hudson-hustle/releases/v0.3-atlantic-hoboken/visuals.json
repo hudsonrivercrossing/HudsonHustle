@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 1,
+  "visualSetId": "hudson-hustle-graph-prototype-visuals",
+  "boardStyle": "graph-first-transit-nostalgia",
+  "theme": "warm-transit-nostalgia",
+  "backdropMode": "minimal",
+  "boardLabelMode": "station-only",
+  "backdrop": {
+    "landAreas": [
+      {
+        "id": "manhattan-island",
+        "opacity": 0.74,
+        "points": [
+          { "x": 502, "y": 98 },
+          { "x": 546, "y": 106 },
+          { "x": 612, "y": 142 },
+          { "x": 670, "y": 202 },
+          { "x": 686, "y": 284 },
+          { "x": 674, "y": 382 },
+          { "x": 654, "y": 488 },
+          { "x": 636, "y": 590 },
+          { "x": 618, "y": 706 },
+          { "x": 598, "y": 818 },
+          { "x": 560, "y": 844 },
+          { "x": 520, "y": 816 },
+          { "x": 508, "y": 722 },
+          { "x": 502, "y": 612 },
+          { "x": 494, "y": 500 },
+          { "x": 486, "y": 388 },
+          { "x": 486, "y": 272 },
+          { "x": 492, "y": 180 }
+        ]
+      }
+    ],
+    "waterAreas": [
+      {
+        "id": "hudson-river",
+        "opacity": 0.9,
+        "points": [
+          { "x": 332, "y": 70 },
+          { "x": 424, "y": 84 },
+          { "x": 476, "y": 176 },
+          { "x": 488, "y": 306 },
+          { "x": 486, "y": 448 },
+          { "x": 494, "y": 654 },
+          { "x": 504, "y": 834 },
+          { "x": 452, "y": 862 },
+          { "x": 378, "y": 844 },
+          { "x": 362, "y": 664 },
+          { "x": 354, "y": 470 },
+          { "x": 342, "y": 300 }
+        ]
+      },
+      {
+        "id": "east-river",
+        "opacity": 0.84,
+        "points": [
+          { "x": 694, "y": 106 },
+          { "x": 812, "y": 118 },
+          { "x": 792, "y": 232 },
+          { "x": 764, "y": 334 },
+          { "x": 748, "y": 470 },
+          { "x": 742, "y": 618 },
+          { "x": 736, "y": 860 },
+          { "x": 680, "y": 860 },
+          { "x": 688, "y": 626 },
+          { "x": 700, "y": 470 },
+          { "x": 708, "y": 334 },
+          { "x": 714, "y": 226 }
+        ]
+      },
+      {
+        "id": "upper-bay",
+        "opacity": 0.88,
+        "points": [
+          { "x": 428, "y": 570 },
+          { "x": 520, "y": 558 },
+          { "x": 626, "y": 574 },
+          { "x": 728, "y": 650 },
+          { "x": 736, "y": 744 },
+          { "x": 690, "y": 816 },
+          { "x": 570, "y": 838 },
+          { "x": 466, "y": 812 },
+          { "x": 424, "y": 724 },
+          { "x": 422, "y": 622 }
+        ]
+      }
+    ],
+    "shorelines": [
+      {
+        "id": "new-jersey-edge",
+        "points": [
+          { "x": 330, "y": 82 },
+          { "x": 308, "y": 162 },
+          { "x": 294, "y": 250 },
+          { "x": 278, "y": 346 },
+          { "x": 248, "y": 476 },
+          { "x": 214, "y": 660 },
+          { "x": 204, "y": 820 }
+        ]
+      },
+      {
+        "id": "manhattan-west-edge",
+        "points": [
+          { "x": 494, "y": 112 },
+          { "x": 490, "y": 204 },
+          { "x": 486, "y": 306 },
+          { "x": 486, "y": 400 },
+          { "x": 492, "y": 500 },
+          { "x": 500, "y": 618 },
+          { "x": 508, "y": 806 }
+        ]
+      },
+      {
+        "id": "manhattan-east-edge",
+        "points": [
+          { "x": 676, "y": 204 },
+          { "x": 666, "y": 292 },
+          { "x": 654, "y": 402 },
+          { "x": 644, "y": 500 },
+          { "x": 632, "y": 610 },
+          { "x": 618, "y": 744 },
+          { "x": 598, "y": 822 }
+        ]
+      },
+      {
+        "id": "queens-brooklyn-edge",
+        "points": [
+          { "x": 812, "y": 126 },
+          { "x": 786, "y": 224 },
+          { "x": 762, "y": 336 },
+          { "x": 750, "y": 476 },
+          { "x": 746, "y": 620 },
+          { "x": 742, "y": 820 }
+        ]
+      }
+    ],
+    "regionLabels": [
+      { "id": "new-jersey", "text": "New Jersey", "point": { "x": 252, "y": 140 } },
+      { "id": "manhattan", "text": "Manhattan", "point": { "x": 596, "y": 320 }, "vertical": true },
+      { "id": "queens", "text": "Queens", "point": { "x": 920, "y": 126 } },
+      { "id": "brooklyn", "text": "Brooklyn", "point": { "x": 838, "y": 722 } }
+    ]
+  },
+  "palettes": {
+    "cards": {
+      "crimson": "#c95d72",
+      "amber": "#d6a436",
+      "emerald": "#2f988c",
+      "cobalt": "#4769d0",
+      "violet": "#8659c4",
+      "obsidian": "#39414f",
+      "ivory": "#efe2c7",
+      "rose": "#db82a5",
+      "locomotive": "#f5efe2"
+    },
+    "players": {
+      "harbor-blue": "#0f7b86",
+      "signal-red": "#c44c2d",
+      "path-green": "#2f8b57",
+      "ferry-gold": "#b58b1f"
+    }
+  },
+  "notes": [
+    "Frozen visual snapshot for v0.3-atlantic-hoboken."
+  ]
+}

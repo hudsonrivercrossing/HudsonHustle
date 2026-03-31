@@ -5,9 +5,11 @@ interface SetupScreenProps {
   canResume: boolean;
   onResume: () => void;
   onOpenTutorial: () => void;
+  configLabel: string;
+  configSummary: string;
 }
 
-export function SetupScreen({ onStart, canResume, onResume, onOpenTutorial }: SetupScreenProps): JSX.Element {
+export function SetupScreen({ onStart, canResume, onResume, onOpenTutorial, configLabel, configSummary }: SetupScreenProps): JSX.Element {
   const [playerCount, setPlayerCount] = useState(2);
   const [names, setNames] = useState(["Player 1", "Player 2", "Player 3", "Player 4"]);
 
@@ -22,6 +24,10 @@ export function SetupScreen({ onStart, canResume, onResume, onOpenTutorial }: Se
           Build your own route web across the core NYC/NJ transit map. Claim crossings, survive tunnel surprises,
           and hand the laptop to the next rival when your turn is done.
         </p>
+        <div className="config-chip-group">
+          <span className="config-chip">Running config: {configLabel}</span>
+          <span className="config-summary">{configSummary}</span>
+        </div>
 
         <label className="field">
           <span>Players</span>

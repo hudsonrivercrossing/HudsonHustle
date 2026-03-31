@@ -57,6 +57,7 @@
   - `map.json`
   - `tickets.json`
   - `rules.json`
+  - `visuals.json`
   - `notes.md`
 
 ### Release Layout
@@ -69,6 +70,7 @@
   - `map.json`
   - `tickets.json`
   - `rules.json`
+  - `visuals.json`
   - `notes.md`
 
 ### File Responsibilities
@@ -102,6 +104,11 @@
   - what changed from the parent version
   - known issues
   - what the next playtest or review should focus on
+- `visuals.json`
+  - backdrop art data
+  - card and player palettes
+  - visual style metadata for the active board snapshot
+  - explicit `theme`, `backdropMode`, and `boardLabelMode`
 
 ### JSON Shapes
 - `current.json`
@@ -263,6 +270,43 @@
 }
 ```
 
+- `visuals.json`
+  - purpose: board-level visual behavior and snapshot-specific theming
+  - required shape:
+
+```json
+{
+  "schemaVersion": 1,
+  "visualSetId": "hudson-hustle-working-visuals",
+  "boardStyle": "graph-first-transit-nostalgia",
+  "theme": "warm-transit-nostalgia",
+  "backdropMode": "minimal",
+  "boardLabelMode": "station-only",
+  "backdrop": {
+    "landAreas": [],
+    "waterAreas": [],
+    "shorelines": [],
+    "regionLabels": []
+  },
+  "palettes": {
+    "cards": {},
+    "players": {}
+  },
+  "notes": []
+}
+```
+
+  - `theme` names the overall visual direction for the snapshot.
+  - `backdropMode` controls how much geographic/base-art treatment the board should render:
+    - `full`
+    - `muted`
+    - `minimal`
+    - `none`
+  - `boardLabelMode` controls whether the board emphasizes only station labels or also larger region labels:
+    - `full-region-labels`
+    - `station-only`
+    - `minimal-region-labels`
+
 ### Naming Rules
 - station ids should stay stable once introduced
 - route ids should be endpoint-based where possible:
@@ -279,6 +323,9 @@
 - Once a release snapshot is created, treat it as frozen. Do not silently mutate it later.
 - New work should branch from a draft copied from the most relevant release or prior draft.
 - `current.json` should be the only moving pointer; release folders should not move.
+- Use `pnpm config:switch <config-id>` to move the active pointer between existing draft/release snapshots.
+- Use `pnpm config:registry` after adding or renaming snapshot folders.
+- Use `pnpm config:export` to refresh `drafts/current-working` from the current runtime data and regenerate the registry.
 
 ### Incremental Map Workflow
 - Config evolution should follow the same anchor-wave logic as the board design process.

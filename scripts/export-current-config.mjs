@@ -71,6 +71,7 @@ async function main() {
   const existingMap = (await readJsonIfPresent(path.join(draftDir, "map.json"))) ?? {};
   const existingTickets = (await readJsonIfPresent(path.join(draftDir, "tickets.json"))) ?? {};
   const existingRules = (await readJsonIfPresent(path.join(draftDir, "rules.json"))) ?? {};
+  const existingVisuals = (await readJsonIfPresent(path.join(draftDir, "visuals.json"))) ?? {};
 
   const existingStationsById = preserveById(existingMap.stations);
   const existingRoutesById = preserveById(existingMap.routes);
@@ -84,7 +85,10 @@ async function main() {
     hudsonHustleStationReferences,
     hudsonHustleBoardFrame,
     hudsonHustleAnchorWaveCityIds,
-    hudsonHustleFirstRingCityIds
+    hudsonHustleFirstRingCityIds,
+    hudsonHustleBackdrop,
+    cardColorPalette,
+    playerColorPalette
   } = data;
 
   const geoCitiesById = new Map(hudsonHustleGeoCities.map((city) => [city.id, city]));
@@ -217,10 +221,26 @@ async function main() {
     notes: existingRules.notes ?? []
   };
 
+  const nextVisuals = {
+    schemaVersion: 1,
+    visualSetId: existingVisuals.visualSetId ?? `${hudsonHustleMap.id}-visuals`,
+    boardStyle: existingVisuals.boardStyle ?? "graph-first-transit-nostalgia",
+    theme: existingVisuals.theme ?? "warm-transit-nostalgia",
+    backdropMode: existingVisuals.backdropMode ?? "minimal",
+    boardLabelMode: existingVisuals.boardLabelMode ?? "station-only",
+    backdrop: hudsonHustleBackdrop,
+    palettes: {
+      cards: cardColorPalette,
+      players: playerColorPalette
+    },
+    notes: existingVisuals.notes ?? []
+  };
+
   await writeFile(path.join(draftDir, "meta.json"), `${JSON.stringify(nextMeta, null, 2)}\n`);
   await writeFile(path.join(draftDir, "map.json"), `${JSON.stringify(nextMap, null, 2)}\n`);
   await writeFile(path.join(draftDir, "tickets.json"), `${JSON.stringify(nextTickets, null, 2)}\n`);
   await writeFile(path.join(draftDir, "rules.json"), `${JSON.stringify(nextRules, null, 2)}\n`);
+  await writeFile(path.join(draftDir, "visuals.json"), `${JSON.stringify(nextVisuals, null, 2)}\n`);
 
   console.log(
     JSON.stringify(
@@ -231,6 +251,7 @@ async function main() {
         routes: nextMap.routes.length,
         longTickets: nextTickets.long.length,
         regularTickets: nextTickets.regular.length,
+        visualSetId: nextVisuals.visualSetId,
         target: "configs/hudson-hustle/drafts/current-working"
       },
       null,
