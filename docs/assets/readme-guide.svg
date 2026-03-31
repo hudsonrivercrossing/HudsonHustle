@@ -1,0 +1,111 @@
+<svg viewBox="0 0 1200 640" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Hudson Hustle quick guide</title>
+  <desc id="desc">A premium board-game style quick guide with four elegant reference cards: draw cards, claim routes, complete tickets, and pass the laptop.</desc>
+  <defs>
+    <linearGradient id="bg" x1="70" y1="40" x2="1130" y2="600" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#233947"/>
+      <stop offset="1" stop-color="#172A34"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#F8EED7"/>
+      <stop offset="1" stop-color="#E7D2A9"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#DABB7A"/>
+      <stop offset="1" stop-color="#A57A39"/>
+    </linearGradient>
+    <filter id="shadow" x="-40" y="-40" width="1280" height="720" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#071015" flood-opacity="0.24"/>
+    </filter>
+    <style>
+      .serif { font-family: Georgia, "Times New Roman", serif; }
+      .sans { font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif; }
+      .ink { fill: #241A12; }
+      .soft { fill: #5D4932; }
+      .tag { fill: #765B3D; font-size: 13px; font-weight: 700; letter-spacing: 2.5px; }
+    </style>
+  </defs>
+
+  <rect x="20" y="20" width="1160" height="600" rx="30" fill="url(#bg)"/>
+  <rect x="20" y="20" width="1160" height="600" rx="30" fill="none" stroke="url(#accent)" stroke-width="4"/>
+  <rect x="34" y="34" width="1132" height="572" rx="22" fill="none" stroke="rgba(229,203,149,0.18)"/>
+
+  <g filter="url(#shadow)">
+    <rect x="64" y="86" width="250" height="468" rx="22" fill="url(#panel)" stroke="#C8A86C"/>
+    <rect x="76" y="98" width="226" height="444" rx="14" fill="none" stroke="rgba(110,82,42,0.16)"/>
+    <text x="94" y="126" class="sans tag">TURN OPTION I</text>
+    <text x="94" y="176" class="serif ink" font-size="30" font-weight="700">Gather Cards</text>
+    <rect x="106" y="220" width="60" height="98" rx="14" fill="#355F9C"/>
+    <rect x="176" y="220" width="60" height="98" rx="14" fill="#C89A44"/>
+    <rect x="141" y="246" width="60" height="98" rx="14" fill="#3E7D61"/>
+    <text x="94" y="382" class="sans soft" font-size="21">
+      <tspan x="94" dy="0">Draw from the</tspan>
+      <tspan x="94" dy="30">face-up market</tspan>
+      <tspan x="94" dy="30">or from the deck.</tspan>
+      <tspan x="94" dy="44">A face-up locomotive</tspan>
+      <tspan x="94" dy="30">ends the draw</tspan>
+      <tspan x="94" dy="30">immediately.</tspan>
+    </text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="338" y="86" width="250" height="468" rx="22" fill="url(#panel)" stroke="#C8A86C"/>
+    <rect x="350" y="98" width="226" height="444" rx="14" fill="none" stroke="rgba(110,82,42,0.16)"/>
+    <text x="368" y="126" class="sans tag">TURN OPTION II</text>
+    <text x="368" y="176" class="serif ink" font-size="30" font-weight="700">Claim Routes</text>
+    <circle cx="398" cy="264" r="12" fill="#F7EED8" stroke="#2B1C12" stroke-width="3"/>
+    <circle cx="544" cy="238" r="12" fill="#F7EED8" stroke="#2B1C12" stroke-width="3"/>
+    <rect x="418" y="248" width="54" height="14" rx="7" transform="rotate(8 418 248)" fill="#A2483D"/>
+    <rect x="474" y="240" width="54" height="14" rx="7" transform="rotate(-6 474 240)" fill="#A2483D"/>
+    <circle cx="534" cy="302" r="20" fill="#6E5A48"/>
+    <text x="534" y="309" text-anchor="middle" class="sans" fill="#FDF6EA" font-size="15" font-weight="700">T</text>
+    <text x="368" y="382" class="sans soft" font-size="21">
+      <tspan x="368" dy="0">Spend matching sets</tspan>
+      <tspan x="368" dy="30">to take a route.</tspan>
+      <tspan x="368" dy="44">Gray routes use one</tspan>
+      <tspan x="368" dy="30">color. Ferries need</tspan>
+      <tspan x="368" dy="30">locomotives. Tunnels</tspan>
+      <tspan x="368" dy="30">can cost extra.</tspan>
+    </text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="612" y="86" width="250" height="468" rx="22" fill="url(#panel)" stroke="#C8A86C"/>
+    <rect x="624" y="98" width="226" height="444" rx="14" fill="none" stroke="rgba(110,82,42,0.16)"/>
+    <text x="642" y="126" class="sans tag">TURN OPTION III</text>
+    <text x="642" y="176" class="serif ink" font-size="30" font-weight="700">Chase Tickets</text>
+    <rect x="644" y="224" width="184" height="126" rx="18" fill="#FBF5E7" stroke="#C8A86C"/>
+    <text x="662" y="250" class="sans tag" font-size="12">DESTINATION TICKET</text>
+    <text x="662" y="296" class="serif ink" font-size="24" font-weight="700">
+      <tspan x="662" dy="0">World Trade</tspan>
+      <tspan x="662" dy="28">to Jamaica</tspan>
+    </text>
+    <rect x="732" y="312" width="74" height="28" rx="14" fill="#E2CEA0"/>
+    <text x="769" y="331" text-anchor="middle" class="sans ink" font-size="15" font-weight="700">11 pts</text>
+    <text x="642" y="402" class="sans soft" font-size="21">
+      <tspan x="642" dy="0">Tickets are your</tspan>
+      <tspan x="642" dy="30">hidden goals.</tspan>
+      <tspan x="642" dy="44">Connect both ends</tspan>
+      <tspan x="642" dy="30">before the game ends</tspan>
+      <tspan x="642" dy="30">to score them.</tspan>
+    </text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="886" y="86" width="250" height="468" rx="22" fill="url(#panel)" stroke="#C8A86C"/>
+    <rect x="898" y="98" width="226" height="444" rx="14" fill="none" stroke="rgba(110,82,42,0.16)"/>
+    <text x="916" y="126" class="sans tag">TABLE RHYTHM</text>
+    <text x="916" y="176" class="serif ink" font-size="30" font-weight="700">Pass The Laptop</text>
+    <rect x="930" y="228" width="158" height="48" rx="16" fill="#28465A"/>
+    <text x="1009" y="259" text-anchor="middle" class="sans" fill="#FDF7EA" font-size="24" font-weight="700">I'm done</text>
+    <rect x="930" y="290" width="158" height="48" rx="16" fill="#FBF5E7" stroke="#C8A86C"/>
+    <text x="1009" y="321" text-anchor="middle" class="sans ink" font-size="24" font-weight="700">I'm ready</text>
+    <text x="916" y="402" class="sans soft" font-size="21">
+      <tspan x="916" dy="0">End your turn, hide</tspan>
+      <tspan x="916" dy="30">private information,</tspan>
+      <tspan x="916" dy="30">show the neutral</tspan>
+      <tspan x="916" dy="30">takeover screen, then</tspan>
+      <tspan x="916" dy="30">let the next player in.</tspan>
+    </text>
+  </g>
+</svg>

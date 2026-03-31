@@ -1,0 +1,17 @@
+{
+  "name": "hudson-hustle",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@9.12.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "pnpm --filter @hudson-hustle/web dev",
+    "build": "pnpm --filter @hudson-hustle/game-core build && pnpm --filter @hudson-hustle/game-data build && pnpm --filter @hudson-hustle/web build",
+    "test": "pnpm --filter @hudson-hustle/game-core test",
+    "test:e2e": "pnpm --filter @hudson-hustle/web test:e2e",
+    "config:export": "pnpm --filter @hudson-hustle/game-data build && node scripts/export-current-config.mjs"
+  }
+}

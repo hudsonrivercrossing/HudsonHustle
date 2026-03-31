@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "v0.3-atlantic-hoboken",
+  "gameId": "hudson-hustle",
+  "version": "v0.3",
+  "status": "released",
+  "basedOn": "configs/hudson-hustle/drafts/current-working",
+  "createdAt": "2026-03-30",
+  "updatedAt": "2026-03-30",
+  "sourceSync": {
+    "method": "release-freeze",
+    "sourceModule": "packages/game-data/src/index.ts",
+    "sourceBuildPath": "packages/game-data/dist/game-data/src/index.js",
+    "sourceExport": "hudsonHustleMap",
+    "syncedAt": "2026-03-30"
+  },
+  "summary": "Current 13-station anchor-wave prototype with Chelsea, Williamsburg, Atlantic Terminal, and Hoboken added as first-ring local expansions.",
+  "designGoals": [
+    "Keep the board graph-first and readable before expanding to the next wave.",
+    "Use local station additions to create strategic branching without collapsing into dense route overlap.",
+    "Preserve clear west-side, core-Manhattan, and Brooklyn/Queens identities."
+  ],
+  "changeSummary": [
+    "Expanded the original 9-station anchor set to 13 active stations.",
+    "Added first-ring local connectors: Chelsea, Williamsburg, Atlantic Terminal, and Hoboken.",
+    "Split the Brooklyn/Jamaica corridor through Atlantic Terminal and widened the west-side fan through Hoboken."
+  ],
+  "playtestFocus": [
+    "Check whether the west-side fan remains readable after the Hoboken addition.",
+    "Check whether Downtown Brooklyn, Atlantic Terminal, and Jamaica now create a clearer local decision cluster.",
+    "Confirm that current ticket values still feel fair with the 13-station graph."
+  ],
+  "releaseNotes": [
+    "First frozen release snapshot after local first-ring expansion beyond the 9-station anchor map.",
+    "Captures the playable state with Hoboken and Atlantic Terminal added to the current working graph."
+  ]
+}

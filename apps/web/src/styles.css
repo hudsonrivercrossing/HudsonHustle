@@ -1,0 +1,783 @@
+:root {
+  color-scheme: light;
+  --bg: #e4d7bf;
+  --bg-deep: #c5b18f;
+  --panel: rgba(250, 244, 233, 0.9);
+  --panel-strong: #fff8eb;
+  --ink: #2e2317;
+  --ink-soft: #5d4d3e;
+  --line: rgba(68, 51, 34, 0.18);
+  --accent: #2a6fb6;
+  --accent-strong: #1f5285;
+  --accent-soft: #7ea7cf;
+  --map-water: #77a8ba;
+  --map-shore: rgba(72, 54, 34, 0.28);
+  --danger: #a13d2f;
+  --shadow: 0 18px 38px rgba(67, 46, 24, 0.15);
+  --shadow-strong: 0 24px 56px rgba(62, 41, 20, 0.22);
+  --radius-lg: 24px;
+  --radius-md: 18px;
+  --radius-sm: 12px;
+  --font-display: "Avenir Next", "Trebuchet MS", sans-serif;
+  --font-body: "Avenir Next", "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(255, 244, 216, 0.88), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(123, 166, 189, 0.18), transparent 26%),
+    linear-gradient(180deg, #dfd0b3 0%, #c8b08b 100%);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app-shell {
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.setup-shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.setup-card,
+.panel,
+.overlay-card,
+.modal-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-strong);
+  backdrop-filter: blur(10px);
+}
+
+.setup-card {
+  width: min(880px, 100%);
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.setup-card::before,
+.panel::before,
+.overlay-card::before,
+.modal-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent 34%),
+    linear-gradient(180deg, rgba(142, 170, 187, 0.06), transparent 52%);
+  pointer-events: none;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--font-display);
+}
+
+.lead,
+.modal-copy,
+.hidden-panel p,
+.detail-card p,
+.overlay-card p {
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field span {
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+
+.field input,
+.field select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 251, 243, 0.96);
+}
+
+.setup-actions,
+.topbar-actions,
+.action-rail,
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.primary-button,
+.secondary-button,
+.chip-button,
+.market-card,
+.ticket-card {
+  border: 0;
+  border-radius: var(--radius-sm);
+  transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+}
+
+.primary-button:hover,
+.secondary-button:hover,
+.chip-button:hover,
+.market-card:hover,
+.ticket-card:hover {
+  transform: translateY(-1px);
+}
+
+.primary-button {
+  background: linear-gradient(180deg, #356fb0, #234d7a);
+  color: #f7f3ea;
+  padding: 12px 18px;
+}
+
+.secondary-button {
+  background: rgba(255, 252, 246, 0.88);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 12px 18px;
+}
+
+.secondary-button:disabled,
+.primary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.game-layout {
+  display: grid;
+  grid-template-columns: minmax(380px, 460px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.game-layout--tutorial .panel {
+  opacity: 0.68;
+}
+
+.game-layout--obscured {
+  filter: blur(12px);
+}
+
+.side-panel,
+.board-column {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+
+.panel {
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+}
+
+.panel--tutorial-focus {
+  opacity: 1 !important;
+  position: relative;
+  z-index: 1;
+  border-color: rgba(53, 111, 176, 0.46);
+  box-shadow:
+    0 0 0 3px rgba(53, 111, 176, 0.18),
+    var(--shadow);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.panel-header span,
+.muted-copy {
+  color: var(--ink-soft);
+}
+
+.scoreboard {
+  display: grid;
+  gap: 10px;
+}
+
+.player-strip {
+  display: grid;
+  grid-template-columns: 20px repeat(5, max-content);
+  gap: 12px;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 251, 243, 0.82);
+  border: 1px solid transparent;
+}
+
+.player-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px rgba(255, 250, 240, 0.92);
+}
+
+.player-strip--active {
+  border-color: rgba(53, 111, 176, 0.35);
+  box-shadow: inset 0 0 0 1px rgba(53, 111, 176, 0.14);
+}
+
+.card-grid,
+.market-grid,
+.ticket-stack,
+.ticket-list,
+.endgame-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.card-grid {
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+}
+
+.train-card,
+.market-card {
+  min-height: 92px;
+  display: grid;
+  align-content: space-between;
+  justify-items: start;
+  gap: 6px;
+  padding: 14px;
+  position: relative;
+  overflow: hidden;
+  color: var(--card-ink);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--card-fill) 90%, white 10%), var(--card-fill)),
+    repeating-linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.08) 0,
+      rgba(255, 255, 255, 0.08) 10px,
+      rgba(0, 0, 0, 0.05) 10px,
+      rgba(0, 0, 0, 0.05) 20px
+    );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  text-align: left;
+}
+
+.train-card::after,
+.market-card::after {
+  content: "";
+  position: absolute;
+  inset: auto 12px 10px 12px;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.36);
+}
+
+.market-grid {
+  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+  margin-bottom: 12px;
+}
+
+.card-kicker {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  opacity: 0.88;
+  line-height: 1.2;
+}
+
+.card-title {
+  font-size: 0.95rem;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.market-tag {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.ticket-row,
+.detail-card,
+.endgame-card {
+  background: rgba(255, 251, 243, 0.82);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 14px;
+}
+
+.ticket-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  background:
+    linear-gradient(180deg, rgba(255, 252, 247, 0.94), rgba(246, 238, 223, 0.88));
+}
+
+.ticket-row--done {
+  border-color: rgba(47, 139, 87, 0.32);
+  box-shadow: inset 0 0 0 1px rgba(47, 139, 87, 0.12);
+}
+
+.ticket-route {
+  display: grid;
+  gap: 6px;
+}
+
+.ticket-route__cities {
+  font-weight: 600;
+}
+
+.ticket-arrow {
+  color: var(--ink-soft);
+  font-size: 0.86rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.ticket-status {
+  display: inline-block;
+  min-width: 92px;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.ticket-status--done {
+  color: #2f8b57;
+}
+
+.ticket-points,
+.ticket-card__points {
+  display: inline-grid;
+  place-items: center;
+  min-width: 64px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(80, 57, 34, 0.08);
+}
+
+.board-panel {
+  padding-bottom: 10px;
+}
+
+.board-shell {
+  width: 100%;
+  overflow: auto;
+  border-radius: 20px;
+  box-shadow: inset 0 0 0 1px rgba(87, 64, 39, 0.12);
+}
+
+.board-map {
+  width: 100%;
+  min-width: 780px;
+  border-radius: 20px;
+  display: block;
+}
+
+.landform {
+  fill: rgba(247, 239, 223, 0.18);
+  stroke: rgba(122, 95, 60, 0.05);
+  stroke-width: 1;
+}
+
+.water-body {
+  stroke: rgba(255, 246, 230, 0.08);
+  stroke-width: 1;
+  opacity: 0.16;
+}
+
+.board-label {
+  font-size: 13px;
+  fill: #33281d;
+  font-family: var(--font-display);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  stroke: rgba(248, 242, 230, 0.92);
+  stroke-width: 5px;
+  paint-order: stroke;
+  pointer-events: none;
+}
+
+.route-hitbox,
+.city-hitbox {
+  cursor: pointer;
+}
+
+.route-track {
+  stroke: rgba(94, 73, 47, 0.18);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.route-track--claimed {
+  stroke-width: 20;
+  opacity: 0.24;
+}
+
+.route-track--self {
+  opacity: 0.3;
+}
+
+.route-track--opponent {
+  opacity: 0.18;
+}
+
+.route-selection {
+  stroke: rgba(42, 111, 182, 0.28);
+  stroke-width: 28;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.route-badge {
+  stroke: rgba(255, 248, 235, 0.9);
+  stroke-width: 2;
+}
+
+.route-badge--ferry {
+  fill: #4f92b3;
+}
+
+.route-badge--tunnel {
+  fill: #7c6a55;
+}
+
+.route-badge__label {
+  font-size: 10px;
+  font-weight: 800;
+  fill: #fff9ec;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+}
+
+.claim-badge {
+  stroke: rgba(255, 248, 235, 0.92);
+  stroke-width: 2;
+}
+
+.claim-badge--self {
+  fill: #d2a545;
+}
+
+.claim-badge--opponent {
+  fill: #433227;
+}
+
+.claim-badge__label {
+  font-size: 10px;
+  font-weight: 800;
+  fill: #fff9ec;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+}
+
+.shoreline {
+  fill: none;
+  stroke: rgba(72, 54, 34, 0.08);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.18;
+}
+
+.region-label {
+  display: none;
+  fill: rgba(88, 64, 38, 0.12);
+  font-family: var(--font-display);
+  font-size: 22px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.region-label--vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+.detail-card--tunnel {
+  border-style: dashed;
+}
+
+.chip-button {
+  padding: 10px 12px;
+  color: #fffaf0;
+}
+
+.error-banner {
+  background: rgba(161, 61, 47, 0.12);
+  border: 1px solid rgba(161, 61, 47, 0.3);
+  color: var(--danger);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+}
+
+.hidden-panel {
+  min-height: 120px;
+  display: grid;
+  align-content: center;
+}
+
+.overlay,
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(57, 42, 27, 0.38);
+}
+
+.overlay--tutorial,
+.overlay--tutorial-focus {
+  background: rgba(34, 24, 14, 0.58);
+}
+
+.overlay-card,
+.modal-card {
+  width: min(560px, 100%);
+  padding: 28px;
+  text-align: center;
+}
+
+.draw-reveal-card {
+  display: grid;
+  gap: 18px;
+  justify-items: center;
+}
+
+.draw-reveal-preview {
+  width: min(240px, 100%);
+}
+
+.tutorial-card {
+  width: min(980px, 100%);
+  text-align: left;
+}
+
+.tutorial-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  gap: 24px;
+}
+
+.tutorial-nav {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding-right: 8px;
+}
+
+.tutorial-step-list {
+  display: grid;
+  gap: 8px;
+}
+
+.tutorial-step-link {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 251, 243, 0.72);
+  color: var(--ink);
+  text-align: left;
+}
+
+.tutorial-step-link--active {
+  border-color: rgba(53, 111, 176, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(53, 111, 176, 0.14);
+  background: rgba(246, 249, 255, 0.8);
+}
+
+.tutorial-step-link__index {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(80, 57, 34, 0.08);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.tutorial-main {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.tutorial-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.tutorial-progress {
+  display: flex;
+  gap: 10px;
+  margin: 18px 0;
+}
+
+.tutorial-progress__dot {
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(92, 77, 62, 0.18);
+}
+
+.tutorial-progress__dot--active {
+  background: linear-gradient(90deg, #356fb0, #7aa7d6);
+}
+
+.tutorial-copy {
+  margin: 0 0 14px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.tutorial-target,
+.tutorial-tip,
+.tutorial-points {
+  background: rgba(255, 251, 243, 0.82);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 14px;
+}
+
+.tutorial-target {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.tutorial-tip {
+  margin-bottom: 18px;
+}
+
+.tutorial-tip p {
+  margin: 8px 0 0;
+  color: var(--ink-soft);
+}
+
+.tutorial-points strong {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.tutorial-point-list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--ink-soft);
+  display: grid;
+  gap: 8px;
+}
+
+.ticket-list {
+  margin: 18px 0;
+}
+
+.ticket-card {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  padding: 14px;
+  background:
+    linear-gradient(180deg, rgba(255, 251, 243, 0.96), rgba(244, 236, 218, 0.92));
+  border: 1px solid var(--line);
+  text-align: left;
+}
+
+.ticket-card--selected {
+  border-color: rgba(53, 111, 176, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(53, 111, 176, 0.15);
+}
+
+.ticket-card__route {
+  font-weight: 600;
+}
+
+.endgame-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.endgame-score {
+  font-size: 2rem;
+  margin: 8px 0 14px;
+}
+
+@media (max-width: 1040px) {
+  .game-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .market-grid {
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  }
+
+  .tutorial-layout {
+    grid-template-columns: 1fr;
+  }
+}

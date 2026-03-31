@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 1,
+  "ticketSetId": "hudson-hustle-anchor-prototype-tickets",
+  "long": [
+    {
+      "id": "t-newark-jamaica",
+      "from": "newark-penn",
+      "to": "jamaica",
+      "points": 15,
+      "notes": []
+    },
+    {
+      "id": "t-secaucus-downtown-brooklyn",
+      "from": "secaucus",
+      "to": "downtown-brooklyn",
+      "points": 14,
+      "notes": []
+    },
+    {
+      "id": "t-exchange-jamaica",
+      "from": "exchange-place",
+      "to": "jamaica",
+      "points": 14,
+      "notes": []
+    },
+    {
+      "id": "t-newark-downtown-brooklyn",
+      "from": "newark-penn",
+      "to": "downtown-brooklyn",
+      "points": 13,
+      "notes": []
+    },
+    {
+      "id": "t-secaucus-jamaica",
+      "from": "secaucus",
+      "to": "jamaica",
+      "points": 14,
+      "notes": []
+    }
+  ],
+  "regular": [
+    {
+      "id": "t-newark-penn-district",
+      "from": "newark-penn",
+      "to": "midtown-west",
+      "points": 8,
+      "notes": []
+    },
+    {
+      "id": "t-hoboken-chelsea",
+      "from": "hoboken",
+      "to": "chelsea",
+      "points": 6,
+      "notes": []
+    },
+    {
+      "id": "t-chelsea-world-trade",
+      "from": "chelsea",
+      "to": "world-trade",
+      "points": 5,
+      "notes": []
+    },
+    {
+      "id": "t-exchange-grand-central",
+      "from": "exchange-place",
+      "to": "grand-central",
+      "points": 8,
+      "notes": []
+    },
+    {
+      "id": "t-world-trade-long-island-city",
+      "from": "world-trade",
+      "to": "long-island-city",
+      "points": 8,
+      "notes": []
+    },
+    {
+      "id": "t-penn-district-long-island-city",
+      "from": "midtown-west",
+      "to": "long-island-city",
+      "points": 6,
+      "notes": []
+    },
+    {
+      "id": "t-grand-central-jamaica",
+      "from": "grand-central",
+      "to": "jamaica",
+      "points": 9,
+      "notes": []
+    },
+    {
+      "id": "t-world-trade-downtown-brooklyn",
+      "from": "world-trade",
+      "to": "downtown-brooklyn",
+      "points": 8,
+      "notes": []
+    },
+    {
+      "id": "t-long-island-city-jamaica",
+      "from": "long-island-city",
+      "to": "jamaica",
+      "points": 6,
+      "notes": []
+    },
+    {
+      "id": "t-long-island-city-downtown-brooklyn",
+      "from": "long-island-city",
+      "to": "downtown-brooklyn",
+      "points": 6,
+      "notes": []
+    },
+    {
+      "id": "t-world-trade-grand-central",
+      "from": "world-trade",
+      "to": "grand-central",
+      "points": 8,
+      "notes": []
+    },
+    {
+      "id": "t-exchange-place-downtown-brooklyn",
+      "from": "exchange-place",
+      "to": "downtown-brooklyn",
+      "points": 9,
+      "notes": []
+    },
+    {
+      "id": "t-secaucus-world-trade",
+      "from": "secaucus",
+      "to": "world-trade",
+      "points": 7,
+      "notes": []
+    },
+    {
+      "id": "t-newark-grand-central",
+      "from": "newark-penn",
+      "to": "grand-central",
+      "points": 10,
+      "notes": []
+    },
+    {
+      "id": "t-downtown-brooklyn-jamaica",
+      "from": "downtown-brooklyn",
+      "to": "jamaica",
+      "points": 8,
+      "notes": []
+    },
+    {
+      "id": "t-atlantic-terminal-jamaica",
+      "from": "atlantic-terminal",
+      "to": "jamaica",
+      "points": 5,
+      "notes": []
+    }
+  ]
+}
