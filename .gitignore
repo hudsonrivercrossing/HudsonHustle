@@ -9,3 +9,4 @@ test-results
 packages/*/src/*.js
 packages/*/src/*.d.ts
 packages/*/src/*.d.ts.map
+.local/*
