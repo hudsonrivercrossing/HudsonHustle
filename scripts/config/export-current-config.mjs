@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-const rootDir = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
+const rootDir = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../..");
 const compiledIndexPath = path.join(rootDir, "packages/game-data/dist/game-data/src/index.js");
 const compiledCartographyPath = path.join(rootDir, "packages/game-data/dist/game-data/src/cartography.js");
 const draftDir = path.join(rootDir, "configs/hudson-hustle/drafts/current-working");

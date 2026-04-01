@@ -11,7 +11,7 @@ It is intentionally reusable for other region maps, not just Hudson Hustle.
 ## Goal
 Turn Hudson Hustle into a readable board-game map that feels geographically grounded without letting real geography overrun gameplay readability.
 The route graph should remain understandable even if the base art is temporarily muted.
-For Hudson-specific map reviews, apply `docs/hudson-map-rubric.md`.
+For Hudson-specific map reviews, apply `docs/map/hudson-map-rubric.md`.
 
 ## Workflow
 1. Lock the game graph first:
@@ -158,6 +158,6 @@ When these appear:
 - Note whether the change altered reference `lat/lon`, board coordinates, or only route/base-art geometry.
 - List which routes now use `waypoints`.
 - State whether the graph still passes the muted-background readability check.
-- If the task is a Hudson layout review, evaluate it against `docs/hudson-map-rubric.md`.
+- If the task is a Hudson layout review, evaluate it against `docs/map/hudson-map-rubric.md`.
 - Suggest the next pressure-tested zone for refinement if the board is still dense.
 - If the process improved, note what should be copied into future region-map work.

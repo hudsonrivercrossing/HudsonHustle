@@ -1,5 +1,5 @@
 import type { GameState, MapConfig, RouteDef } from "@hudson-hustle/game-core";
-import { cardColorPalette, playerColorPalette } from "@hudson-hustle/game-data";
+import { cardColorPalette, playerColorPalette, type BoardBackdrop, type SnapshotVisuals } from "@hudson-hustle/game-data";
 
 interface PathPoint {
   x: number;
@@ -143,6 +143,9 @@ function getSegments(route: RouteDef, points: PathPoint[]): Array<{ pathD: strin
 
 interface BoardMapProps {
   config: MapConfig;
+  backdrop: BoardBackdrop;
+  backdropMode: SnapshotVisuals["backdropMode"];
+  boardLabelMode: SnapshotVisuals["boardLabelMode"];
   game: GameState;
   selectedRouteId: string | null;
   selectedCityId: string | null;
@@ -152,6 +155,9 @@ interface BoardMapProps {
 
 export function BoardMap({
   config,
+  backdrop,
+  backdropMode,
+  boardLabelMode,
   game,
   selectedRouteId,
   selectedCityId,
@@ -159,11 +165,81 @@ export function BoardMap({
   onSelectCity
 }: BoardMapProps): JSX.Element {
   const activePlayerId = game.players[game.activePlayerIndex]?.id;
+  const boardWidth = 1200;
+  const boardHeight = 900;
+  const backdropOpacityScale = {
+    full: 1,
+    muted: 0.58,
+    minimal: 0.32,
+    none: 0
+  }[backdropMode];
+  const shorelineOpacityScale = {
+    full: 1,
+    muted: 0.72,
+    minimal: 0.42,
+    none: 0
+  }[backdropMode];
+  const regionLabels =
+    boardLabelMode === "station-only"
+      ? []
+      : boardLabelMode === "minimal-region-labels"
+        ? backdrop.regionLabels.filter((label) => label.id !== "new-jersey")
+        : backdrop.regionLabels;
+  const regionLabelClassSuffix = boardLabelMode === "minimal-region-labels" ? " region-label--minimal" : "";
 
   return (
     <div className="board-shell">
-      <svg className="board-map" viewBox="0 0 1200 900" role="img" aria-label="Hudson Hustle board map">
-        <rect x="0" y="0" width="1200" height="900" rx="28" fill="#ebdfc8" />
+      <svg
+        className={`board-map board-map--${backdropMode}`}
+        viewBox={`0 0 ${boardWidth} ${boardHeight}`}
+        role="img"
+        aria-label="Hudson Hustle board map"
+      >
+        <rect x="0" y="0" width={boardWidth} height={boardHeight} rx="28" fill="#ebdfc8" />
+
+        {backdropOpacityScale > 0
+          ? backdrop.waterAreas.map((area) => (
+              <path
+                key={area.id}
+                d={buildPathD(area.points, true)}
+                className="water-body"
+                style={{ opacity: (area.opacity ?? 1) * backdropOpacityScale }}
+              />
+            ))
+          : null}
+
+        {backdropOpacityScale > 0
+          ? backdrop.landAreas.map((area) => (
+              <path
+                key={area.id}
+                d={buildPathD(area.points, true)}
+                className="landform"
+                style={{ opacity: (area.opacity ?? 1) * backdropOpacityScale }}
+              />
+            ))
+          : null}
+
+        {shorelineOpacityScale > 0
+          ? backdrop.shorelines.map((line) => (
+              <path
+                key={line.id}
+                d={buildPathD(line.points)}
+                className="shoreline"
+                style={{ opacity: shorelineOpacityScale }}
+              />
+            ))
+          : null}
+
+        {regionLabels.map((label) => (
+          <text
+            key={label.id}
+            x={label.point.x}
+            y={label.point.y}
+            className={`region-label${regionLabelClassSuffix} ${label.vertical ? "region-label--vertical" : ""}`.trim()}
+          >
+            {label.text}
+          </text>
+        ))}
 
         {config.routes.map((route) => {
           const pathPoints = getPathPoints(route, config);
@@ -186,6 +262,10 @@ export function BoardMap({
           const fillOpacity = claim ? 0.96 : 0.82;
           const ownerBadge = claimingPlayer?.name.trim().charAt(0).toUpperCase() ?? "";
           const backplateFill = claim ? (claimedByActive ? "#f3df9f" : "#4a3a2b") : "#f7f0e3";
+          const claimStitchStroke = claimedByActive ? "rgba(255, 251, 236, 0.98)" : "rgba(255, 247, 236, 0.22)";
+          const claimStitchWidth = claimedByActive ? 4.6 : 3;
+          const claimStitchDasharray = claimedByActive ? "3.4 5.6" : "2 8.2";
+          const claimStitchDashoffset = claimedByActive ? 0 : 1.4;
 
           return (
             <g key={route.id}>
@@ -212,15 +292,16 @@ export function BoardMap({
                     strokeLinejoin="round"
                     opacity={fillOpacity}
                   />
-                  {claim ? (
+                    {claim ? (
                     <path
                       d={segment.pathD}
                       fill="none"
-                      stroke={claimedByActive ? "rgba(255, 250, 230, 0.98)" : "rgba(255, 248, 238, 0.34)"}
-                      strokeWidth={3.5}
+                      stroke={claimStitchStroke}
+                      strokeWidth={claimStitchWidth}
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      strokeDasharray="3 7"
+                      strokeDasharray={claimStitchDasharray}
+                      strokeDashoffset={claimStitchDashoffset}
                     />
                   ) : null}
                 </g>

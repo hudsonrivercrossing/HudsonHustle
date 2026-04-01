@@ -1,0 +1,889 @@
+{
+  "schemaVersion": 1,
+  "mapId": "hudson-hustle-anchor-prototype",
+  "name": "Hudson Hustle Anchor Prototype",
+  "board": {
+    "width": 1200,
+    "height": 900,
+    "padX": 90,
+    "padY": 90
+  },
+  "stations": [
+    {
+      "id": "secaucus",
+      "name": "Secaucus",
+      "label": "Secaucus",
+      "active": true,
+      "tier": "anchor",
+      "lat": 40.789,
+      "lon": -74.0635,
+      "boardX": 168,
+      "boardY": 224,
+      "labelDx": -8,
+      "labelDy": -18,
+      "labelAnchor": "end",
+      "authorityRef": {
+        "source": "nj-transit-official",
+        "reference": "Secaucus Junction",
+        "sourceUrl": "https://www.njtransit.com/accessibility/System-Map",
+        "notes": "Normalized to the official NJ TRANSIT rail system map/station inventory."
+      },
+      "notes": [],
+      "labelPreset": "top-left-near"
+    },
+    {
+      "id": "hoboken",
+      "name": "Hoboken",
+      "label": "Hoboken",
+      "active": true,
+      "tier": "first-ring",
+      "lat": 40.7359,
+      "lon": -74.0303,
+      "boardX": 332,
+      "boardY": 286,
+      "labelDx": -16,
+      "labelDy": 8,
+      "labelAnchor": "end",
+      "authorityRef": {
+        "source": "nj-transit-hblr-map",
+        "reference": "Hoboken Terminal",
+        "sourceUrl": "https://www.njtransit.com/accessibility/System-Map",
+        "notes": "Backed by the official HBLR system map, which also shows PATH and ferry connections at Hoboken Terminal."
+      },
+      "notes": [],
+      "labelPreset": "left-near"
+    },
+    {
+      "id": "exchange-place",
+      "name": "Exchange Place",
+      "label": "Exchange Pl.",
+      "active": true,
+      "tier": "anchor",
+      "lat": 40.7168,
+      "lon": -74.0345,
+      "boardX": 402,
+      "boardY": 454,
+      "labelDx": 0,
+      "labelDy": -18,
+      "labelAnchor": "middle",
+      "authorityRef": {
+        "source": "nj-transit-hblr-map",
+        "reference": "Exchange Place",
+        "sourceUrl": "https://www.njtransit.com/accessibility/System-Map",
+        "notes": "Backed by the official HBLR system map and PATH layout."
+      },
+      "notes": [],
+      "labelPreset": "top-near"
+    },
+    {
+      "id": "grove-st",
+      "name": "Grove St",
+      "label": "Grove St",
+      "active": true,
+      "tier": "first-ring",
+      "lat": 40.719622,
+      "lon": -74.043151,
+      "boardX": 294,
+      "boardY": 576,
+      "labelDx": 14,
+      "labelDy": 6,
+      "labelAnchor": "start",
+      "authorityRef": {
+        "source": "panynj-path-official",
+        "reference": "Grove Street",
+        "notes": "Used as the Jersey mid-corridor PATH stop between Newark Penn and Exchange Place."
+      },
+      "notes": [],
+      "labelPreset": "right-near"
+    },
+    {
+      "id": "newark-penn",
+      "name": "Newark Penn",
+      "label": "Newark Penn",
+      "active": true,
+      "tier": "anchor",
+      "lat": 40.7347,
+      "lon": -74.1645,
+      "boardX": 148,
+      "boardY": 690,
+      "labelDx": 18,
+      "labelDy": 20,
+      "labelAnchor": "start",
+      "authorityRef": {
+        "source": "nj-transit-official",
+        "reference": "Newark Penn Station",
+        "sourceUrl": "https://www.njtransit.com/accessibility/System-Map",
+        "notes": "Normalized to the official NJ TRANSIT rail system map and used as the west-side intercity anchor."
+      },
+      "notes": [],
+      "labelPreset": "bottom-right-near"
+    },
+    {
+      "id": "newark-airport",
+      "name": "Newark Airport",
+      "label": "Newark Airpt.",
+      "active": true,
+      "tier": "first-ring",
+      "lat": 40.6895,
+      "lon": -74.1745,
+      "boardX": 204,
+      "boardY": 834,
+      "labelDx": 16,
+      "labelDy": 18,
+      "labelAnchor": "start",
+      "authorityRef": {
+        "source": "nj-transit-official",
+        "reference": "Newark Liberty International Airport Station",
+        "notes": "Used as the southwest airport ring node below Newark Penn."
+      },
+      "notes": [],
+      "labelPreset": "bottom-right-near"
+    },
+    {
+      "id": "world-trade",
+      "name": "World Trade",
+      "label": "World Trade",
+      "active": true,
+      "tier": "anchor",
+      "lat": 40.712603,
+      "lon": -74.0095515,
+      "boardX": 532,
+      "boardY": 430,
+      "labelDx": -20,
+      "labelDy": -16,
+      "labelAnchor": "end",
+      "authorityRef": {
+        "source": "panynj-path-official",
+        "reference": "World Trade Center PATH / Oculus",
+        "sourceUrl": "https://wtcstage.panynj.gov/en/local/plan-your-visit/getting-here.html",
+        "notes": "Normalized to the official Port Authority World Trade Center transit reference."
+      },
+      "notes": [],
+      "labelPreset": "top-left-near"
+    },
+    {
+      "id": "battery-park",
+      "name": "Battery Park",
+      "label": "Battery Pk.",
+      "active": true,
+      "tier": "first-ring",
+      "lat": 40.7104,
+      "lon": -74.0074,
+      "boardX": 654,
+      "boardY": 612,
+      "labelDx": -14,
+      "labelDy": 20,
+      "labelAnchor": "end",
+      "authorityRef": {
+        "source": "mta-subway-complexes",
+        "reference": "South Ferry / Whitehall St",
+        "notes": "Used as the Battery Park south-core proxy node at the southern tip of Manhattan."
+      },
+      "notes": [],
+      "labelPreset": "bottom-left-near"
+    },
+    {
+      "id": "chelsea",
+      "name": "Chelsea",
+      "label": "Chelsea",
+      "active": true,
+      "tier": "first-ring",
+      "lat": 40.745906,
+      "lon": -73.998041,
+      "boardX": 510,
+      "boardY": 334,
+      "labelDx": -18,
+      "labelDy": -10,
+      "labelAnchor": "end",
+      "authorityRef": {
+        "source": "mta-subway-complexes",
+        "reference": "23 St (C,E)",
+        "notes": "Used as the west-Chelsea proxy node."
+      },
+      "notes": [],
+      "labelPreset": "top-left-near"
+    },
+    {
+      "id": "midtown-west",
+      "name": "Penn District",
+      "label": "Penn Dist.",
+      "active": true,
+      "tier": "anchor",
+      "lat": 40.75058844,
+      "lon": -73.99358408,
+      "boardX": 544,
+      "boardY": 226,
+      "labelDx": 0,
+      "labelDy": -16,
+      "labelAnchor": "middle",
+      "authorityRef": {
+        "source": "mta-lirr-gtfs",
+        "reference": "Penn Station"
+      },
+      "notes": [],
+      "labelPreset": "top-near"
+    },
+    {
+      "id": "hudson-yards",
+      "name": "Hudson Yards",
+      "label": "Hudson Yds.",
+      "active": true,
+      "tier": "first-ring",
+      "lat": 40.7551,
+      "lon": -74.0016,
+      "boardX": 478,
+      "boardY": 116,
+      "labelDx": 0,
+      "labelDy": -16,
+      "labelAnchor": "middle",
+      "authorityRef": {
+        "source": "mta-subway-complexes",
+        "reference": "34 St-Hudson Yards",
+        "notes": "Used as the west-Manhattan Hudson Yards node above Chelsea and west of Penn District."
+      },
+      "notes": [],
+      "labelPreset": "top-near"
+    },
+    {
+      "id": "grand-central",
+      "name": "Grand Central",
+      "label": "Grand Central",
+      "active": true,
+      "tier": "anchor",
+      "lat": 40.755162,
+      "lon": -73.975455,
+      "boardX": 718,
+      "boardY": 176,
+      "labelDx": 0,
+      "labelDy": -18,
+      "labelAnchor": "middle",
+      "authorityRef": {
+        "source": "mta-lirr-gtfs",
+        "reference": "Grand Central"
+      },
+      "notes": [],
+      "labelPreset": "top-near"
+    },
+    {
+      "id": "flushing",
+      "name": "Flushing",
+      "label": "Flushing",
+      "active": true,
+      "tier": "first-ring",
+      "lat": 40.7596,
+      "lon": -73.8303,
+      "boardX": 1112,
+      "boardY": 204,
+      "labelDx": 0,
+      "labelDy": -16,
+      "labelAnchor": "middle",
+      "authorityRef": {
+        "source": "mta-subway-complexes",
+        "reference": "Flushing-Main St",
+        "notes": "Used as the first outer-Queens ring node above Jamaica."
+      },
+      "notes": [],
+      "labelPreset": "top-near"
+    },
+    {
+      "id": "union-square",
+      "name": "Union Square",
+      "label": "Union Sq.",
+      "active": true,
+      "tier": "first-ring",
+      "lat": 40.7359,
+      "lon": -73.9906,
+      "boardX": 650,
+      "boardY": 388,
+      "labelDx": 18,
+      "labelDy": 6,
+      "labelAnchor": "start",
+      "authorityRef": {
+        "source": "mta-subway-complexes",
+        "reference": "14 St-Union Sq",
+        "notes": "Used as the central Manhattan ring node between Chelsea, Battery Park, and Williamsburg."
+      },
+      "notes": [],
+      "labelPreset": "right-near"
+    },
+    {
+      "id": "long-island-city",
+      "name": "Long Island City",
+      "label": "Long Isl. City",
+      "active": true,
+      "tier": "anchor",
+      "lat": 40.74134343,
+      "lon": -73.95763922,
+      "boardX": 850,
+      "boardY": 404,
+      "labelDx": -18,
+      "labelDy": -16,
+      "labelAnchor": "end",
+      "authorityRef": {
+        "source": "mta-lirr-gtfs",
+        "reference": "Long Island City"
+      },
+      "notes": [],
+      "labelPreset": "top-left-near"
+    },
+    {
+      "id": "jamaica",
+      "name": "Jamaica",
+      "label": "Jamaica",
+      "active": true,
+      "tier": "anchor",
+      "lat": 40.69960817,
+      "lon": -73.80852987,
+      "boardX": 1116,
+      "boardY": 556,
+      "labelDx": 0,
+      "labelDy": 24,
+      "labelAnchor": "middle",
+      "authorityRef": {
+        "source": "mta-lirr-gtfs",
+        "reference": "Jamaica"
+      },
+      "notes": [],
+      "labelPreset": "bottom-near"
+    },
+    {
+      "id": "williamsburg",
+      "name": "Williamsburg",
+      "label": "Williamsburg",
+      "active": true,
+      "tier": "first-ring",
+      "lat": 40.717304,
+      "lon": -73.956872,
+      "boardX": 920,
+      "boardY": 586,
+      "labelDx": 18,
+      "labelDy": 4,
+      "labelAnchor": "start",
+      "authorityRef": {
+        "source": "mta-subway-complexes",
+        "reference": "Bedford Av",
+        "notes": "Used as the Williamsburg proxy node."
+      },
+      "notes": [],
+      "labelPreset": "right-near"
+    },
+    {
+      "id": "downtown-brooklyn",
+      "name": "Downtown Brooklyn",
+      "label": "Downtown Bklyn",
+      "active": true,
+      "tier": "anchor",
+      "lat": 40.692259,
+      "lon": -73.986642,
+      "boardX": 856,
+      "boardY": 752,
+      "labelDx": 18,
+      "labelDy": -16,
+      "labelAnchor": "start",
+      "authorityRef": {
+        "source": "mta-subway-complexes",
+        "reference": "Jay St-MetroTech"
+      },
+      "notes": [],
+      "labelPreset": "top-right-near"
+    },
+    {
+      "id": "atlantic-terminal",
+      "name": "Atlantic Terminal",
+      "label": "Atlantic Term.",
+      "active": true,
+      "tier": "first-ring",
+      "lat": 40.68359596,
+      "lon": -73.97567112,
+      "boardX": 936,
+      "boardY": 796,
+      "labelDx": 74,
+      "labelDy": 24,
+      "labelAnchor": "end",
+      "authorityRef": {
+        "source": "mta-lirr-gtfs",
+        "reference": "Atlantic Terminal"
+      },
+      "notes": [],
+      "labelPreset": "bottom-left-near"
+    },
+    {
+      "id": "red-hook",
+      "name": "Red Hook",
+      "label": "Red Hook",
+      "active": true,
+      "tier": "first-ring",
+      "lat": 40.6762,
+      "lon": -74.0126,
+      "boardX": 748,
+      "boardY": 838,
+      "labelDx": 0,
+      "labelDy": -16,
+      "labelAnchor": "middle",
+      "authorityRef": {
+        "source": "mta-subway-complexes",
+        "reference": "Smith-9 Sts",
+        "notes": "Used as the south-harbor Brooklyn waterfront proxy for the lower-bay branch."
+      },
+      "notes": [],
+      "labelPreset": "top-near"
+    }
+  ],
+  "routes": [
+    {
+      "id": "secaucus-newark-penn",
+      "from": "secaucus",
+      "to": "newark-penn",
+      "length": 3,
+      "color": "crimson",
+      "type": "normal",
+      "notes": []
+    },
+    {
+      "id": "secaucus-hoboken",
+      "from": "secaucus",
+      "to": "hoboken",
+      "length": 2,
+      "color": "amber",
+      "type": "normal",
+      "notes": []
+    },
+    {
+      "id": "secaucus-midtown-west",
+      "from": "secaucus",
+      "to": "midtown-west",
+      "length": 3,
+      "color": "cobalt",
+      "type": "tunnel",
+      "notes": [],
+      "waypoints": [
+        {
+          "x": 304,
+          "y": 160
+        },
+        {
+          "x": 438,
+          "y": 208
+        }
+      ]
+    },
+    {
+      "id": "newark-penn-grove-st",
+      "from": "newark-penn",
+      "to": "grove-st",
+      "length": 2,
+      "color": "obsidian",
+      "type": "normal",
+      "notes": []
+    },
+    {
+      "id": "newark-penn-newark-airport",
+      "from": "newark-penn",
+      "to": "newark-airport",
+      "length": 2,
+      "color": "gray",
+      "type": "normal",
+      "notes": []
+    },
+    {
+      "id": "grove-st-exchange-place",
+      "from": "grove-st",
+      "to": "exchange-place",
+      "length": 3,
+      "color": "obsidian",
+      "type": "normal",
+      "notes": []
+    },
+    {
+      "id": "hoboken-grove-st",
+      "from": "hoboken",
+      "to": "grove-st",
+      "length": 2,
+      "color": "emerald",
+      "type": "normal",
+      "notes": []
+    },
+    {
+      "id": "exchange-place-world-trade-a",
+      "from": "exchange-place",
+      "to": "world-trade",
+      "length": 2,
+      "color": "gray",
+      "type": "tunnel",
+      "notes": [],
+      "twinGroup": "exchange-world",
+      "waypoints": [
+        {
+          "x": 432,
+          "y": 446
+        },
+        {
+          "x": 470,
+          "y": 438
+        },
+        {
+          "x": 506,
+          "y": 430
+        }
+      ]
+    },
+    {
+      "id": "exchange-place-world-trade-b",
+      "from": "exchange-place",
+      "to": "world-trade",
+      "length": 2,
+      "color": "rose",
+      "type": "tunnel",
+      "notes": [],
+      "twinGroup": "exchange-world",
+      "waypoints": [
+        {
+          "x": 422,
+          "y": 470
+        },
+        {
+          "x": 460,
+          "y": 478
+        },
+        {
+          "x": 498,
+          "y": 456
+        }
+      ]
+    },
+    {
+      "id": "hoboken-chelsea",
+      "from": "hoboken",
+      "to": "chelsea",
+      "length": 3,
+      "color": "ivory",
+      "type": "normal",
+      "notes": [],
+      "waypoints": [
+        {
+          "x": 422,
+          "y": 302
+        }
+      ]
+    },
+    {
+      "id": "midtown-west-chelsea",
+      "from": "midtown-west",
+      "to": "chelsea",
+      "length": 2,
+      "color": "amber",
+      "type": "normal",
+      "notes": []
+    },
+    {
+      "id": "chelsea-world-trade",
+      "from": "chelsea",
+      "to": "world-trade",
+      "length": 2,
+      "color": "rose",
+      "type": "normal",
+      "notes": []
+    },
+    {
+      "id": "chelsea-union-square",
+      "from": "chelsea",
+      "to": "union-square",
+      "length": 2,
+      "color": "violet",
+      "type": "normal",
+      "notes": []
+    },
+    {
+      "id": "long-island-city-williamsburg",
+      "from": "long-island-city",
+      "to": "williamsburg",
+      "length": 2,
+      "color": "emerald",
+      "type": "normal",
+      "notes": []
+    },
+    {
+      "id": "union-square-williamsburg",
+      "from": "union-square",
+      "to": "williamsburg",
+      "length": 3,
+      "color": "cobalt",
+      "type": "normal",
+      "notes": [],
+      "waypoints": [
+        {
+          "x": 774,
+          "y": 478
+        }
+      ]
+    },
+    {
+      "id": "world-trade-battery-park",
+      "from": "world-trade",
+      "to": "battery-park",
+      "length": 2,
+      "color": "amber",
+      "type": "tunnel",
+      "notes": [],
+      "waypoints": [
+        {
+          "x": 590,
+          "y": 516
+        }
+      ]
+    },
+    {
+      "id": "union-square-battery-park",
+      "from": "union-square",
+      "to": "battery-park",
+      "length": 3,
+      "color": "emerald",
+      "type": "normal",
+      "notes": []
+    },
+    {
+      "id": "battery-park-downtown-brooklyn",
+      "from": "battery-park",
+      "to": "downtown-brooklyn",
+      "length": 2,
+      "color": "crimson",
+      "type": "tunnel",
+      "notes": [],
+      "waypoints": [
+        {
+          "x": 748,
+          "y": 676
+        }
+      ]
+    },
+    {
+      "id": "battery-park-red-hook",
+      "from": "battery-park",
+      "to": "red-hook",
+      "length": 2,
+      "color": "emerald",
+      "type": "ferry",
+      "notes": [],
+      "locomotiveCost": 1,
+      "waypoints": [
+        {
+          "x": 694,
+          "y": 720
+        }
+      ]
+    },
+    {
+      "id": "williamsburg-downtown-brooklyn",
+      "from": "williamsburg",
+      "to": "downtown-brooklyn",
+      "length": 2,
+      "color": "gray",
+      "type": "normal",
+      "notes": []
+    },
+    {
+      "id": "downtown-brooklyn-atlantic-terminal",
+      "from": "downtown-brooklyn",
+      "to": "atlantic-terminal",
+      "length": 2,
+      "color": "rose",
+      "type": "normal",
+      "notes": []
+    },
+    {
+      "id": "red-hook-atlantic-terminal",
+      "from": "red-hook",
+      "to": "atlantic-terminal",
+      "length": 2,
+      "color": "obsidian",
+      "type": "normal",
+      "notes": [],
+      "waypoints": [
+        {
+          "x": 840,
+          "y": 832
+        }
+      ]
+    },
+    {
+      "id": "midtown-west-grand-central",
+      "from": "midtown-west",
+      "to": "grand-central",
+      "length": 2,
+      "color": "rose",
+      "type": "normal",
+      "notes": []
+    },
+    {
+      "id": "hudson-yards-grand-central",
+      "from": "hudson-yards",
+      "to": "grand-central",
+      "length": 2,
+      "color": "amber",
+      "type": "normal",
+      "notes": [],
+      "waypoints": [
+        {
+          "x": 596,
+          "y": 122
+        }
+      ]
+    },
+    {
+      "id": "newark-airport-hudson-yards",
+      "from": "newark-airport",
+      "to": "hudson-yards",
+      "length": 6,
+      "color": "gray",
+      "type": "tunnel",
+      "notes": [
+        "Represents the difficult Newark Airport to Manhattan helicopter-style premium transfer."
+      ],
+      "waypoints": [
+
+        {
+          "x": 64,
+          "y": 834
+        },
+        
+        {
+          "x": 64,
+          "y": 96
+        },
+        {
+          "x": 100,
+          "y": 60
+        },
+        {
+          "x": 378,
+          "y": 60
+        },
+        {
+          "x": 446,
+          "y": 60
+        }
+      ]
+    },
+    {
+      "id": "midtown-west-long-island-city",
+      "from": "midtown-west",
+      "to": "long-island-city",
+      "length": 3,
+      "color": "gray",
+      "type": "tunnel",
+      "notes": [],
+      "waypoints": [
+        {
+          "x": 682,
+          "y": 296
+        },
+        {
+          "x": 782,
+          "y": 350
+        }
+      ]
+    },
+    {
+      "id": "grand-central-long-island-city",
+      "from": "grand-central",
+      "to": "long-island-city",
+      "length": 3,
+      "color": "ivory",
+      "type": "normal",
+      "notes": [],
+      "waypoints": [
+        {
+          "x": 788,
+          "y": 266
+        }
+      ]
+    },
+    {
+      "id": "grand-central-jamaica",
+      "from": "grand-central",
+      "to": "jamaica",
+      "length": 4,
+      "color": "violet",
+      "type": "normal",
+      "notes": [],
+      "waypoints": [
+        {
+          "x": 868,
+          "y": 220
+        },
+        {
+          "x": 1024,
+          "y": 336
+        }
+      ]
+    },
+    {
+      "id": "grand-central-flushing",
+      "from": "grand-central",
+      "to": "flushing",
+      "length": 4,
+      "color": "ivory",
+      "type": "normal",
+      "notes": [],
+      "waypoints": [
+        {
+          "x": 846,
+          "y": 154
+        },
+        {
+          "x": 1006,
+          "y": 158
+        }
+      ]
+    },
+    {
+      "id": "long-island-city-jamaica",
+      "from": "long-island-city",
+      "to": "jamaica",
+      "length": 3,
+      "color": "cobalt",
+      "type": "normal",
+      "notes": [],
+      "waypoints": [
+        {
+          "x": 972,
+          "y": 452
+        },
+        {
+          "x": 1040,
+          "y": 500
+        }
+      ]
+    },
+    {
+      "id": "atlantic-terminal-jamaica",
+      "from": "atlantic-terminal",
+      "to": "jamaica",
+      "length": 2,
+      "color": "cobalt",
+      "type": "normal",
+      "notes": [],
+      "waypoints": [
+        {
+          "x": 1018,
+          "y": 706
+        }
+      ]
+    },
+    {
+      "id": "flushing-jamaica",
+      "from": "flushing",
+      "to": "jamaica",
+      "length": 3,
+      "color": "amber",
+      "type": "normal",
+      "notes": [],
+      "waypoints": [
+        {
+          "x": 1130,
+          "y": 380
+        }
+      ]
+    }
+  ]
+}

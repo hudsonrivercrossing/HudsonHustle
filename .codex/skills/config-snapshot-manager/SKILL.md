@@ -26,6 +26,12 @@ Use this skill when the task touches Hudson Hustle config snapshots under `confi
   - `pnpm config:export`
 - Switch the active config pointer to an existing draft or release and refresh the registry first:
   - `pnpm config:switch <config-id>`
+- Inspect available draft/release ids:
+  - `pnpm config:switch --list`
+- Preview one snapshot without changing `current.json`:
+  - `pnpm config:preview <config-id>`
+- Freeze a draft into a release snapshot:
+  - `pnpm config:release <draft-id> <release-id> <version>`
 - After switching, validate the app/runtime state:
   - `pnpm build`
   - optionally `pnpm dev`
@@ -56,17 +62,21 @@ Use this skill when the task touches Hudson Hustle config snapshots under `confi
   - `status: "released"`
   - `basedOn`
   - release-specific summary and notes
-4. Refresh registry with `pnpm config:registry`.
-5. If the release should become active, run `pnpm config:switch <release-id>`.
+4. Prefer `pnpm config:release <draft-id> <release-id> <version>` over hand-copying folders.
+5. Refresh registry with `pnpm config:registry` if you changed folders manually.
+6. If the release should become active, run `pnpm config:switch <release-id>`.
 
 ## Guardrails
 - `current.json` should be the only moving pointer.
 - Release folders are frozen snapshots; do not silently mutate them.
 - If a new config folder is added, regenerate the registry before trying to switch to it.
 - If build/test fails after a switch, treat that as a config compatibility issue, not just a UI issue.
+- Snapshot-level visual settings are real runtime inputs:
+  - verify `backdropMode`
+  - verify `boardLabelMode`
 
 ## When To Update Docs
 - If the switching workflow changes, update:
   - `configs/hudson-hustle/README.md`
-  - `docs/tech-spec.md`
+  - `docs/product/tech-spec.md`
 - If snapshot schema changes, update both docs in the same task.

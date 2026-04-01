@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   getAffordableRouteColors,
   getAffordableStationColors,
@@ -13,8 +13,12 @@ import {
 } from "@hudson-hustle/game-core";
 import {
   cardColorPalette,
+  hudsonHustleBackdrop,
+  hudsonHustleCurrentBackdropMode,
+  hudsonHustleCurrentBoardLabelMode,
   hudsonHustleCurrentConfigId,
   hudsonHustleCurrentConfigMeta,
+  hudsonHustleCurrentTheme,
   hudsonHustleMap,
   playerColorPalette
 } from "@hudson-hustle/game-data";
@@ -22,9 +26,7 @@ import { BoardMap } from "./components/BoardMap";
 import { OnboardingTutorial, type TutorialStep } from "./components/OnboardingTutorial";
 import { SetupScreen } from "./components/SetupScreen";
 import { TicketPicker } from "./components/TicketPicker";
-
-const saveKey = "hudson-hustle-save-v1";
-const tutorialSeenKey = "hudson-hustle-onboarding-v1-1";
+import { TransitCard } from "./components/TransitCard";
 
 function formatFaceLabel(face: string): string {
   return face
@@ -33,12 +35,8 @@ function formatFaceLabel(face: string): string {
     .join(" ");
 }
 
-function getCardStyle(color: keyof typeof cardColorPalette): CSSProperties {
-  return {
-    "--card-fill": cardColorPalette[color],
-    "--card-ink": color === "locomotive" || color === "ivory" ? "#2a2318" : "#fffaf0"
-  } as CSSProperties;
-}
+const saveKey = "hudson-hustle-save-v1";
+const tutorialSeenKey = "hudson-hustle-onboarding-v1-1";
 
 const tutorialSteps: TutorialStep[] = [
   {
@@ -90,13 +88,37 @@ const tutorialSteps: TutorialStep[] = [
     target: "market"
   },
   {
+    id: "route-types",
+    title: "Route types change how you pay",
+    summary: "Not every route is just a normal color match. Some routes add risk or reserve locomotives before you can claim them.",
+    keyPoints: [
+      "Normal routes only care about length and color.",
+      "Tunnels can cost extra after the reveal, so claiming them with the exact minimum is risky.",
+      "Ferries require locomotives as part of the payment, not as an optional bonus."
+    ],
+    tip: "Before committing to a tunnel or ferry, check whether your hand can survive the special rule, not just the printed length.",
+    target: "action"
+  },
+  {
+    id: "stations",
+    title: "Stations are endgame rescue tools",
+    summary: "A station does not help you claim routes right now. It matters later, when the game checks whether your tickets connect at the end.",
+    keyPoints: [
+      "Your first station is cheap and your third is expensive.",
+      "Each station can borrow only one adjacent rival route for ticket scoring.",
+      "Unused stations are worth points, so building one is a tradeoff, not an automatic upgrade."
+    ],
+    tip: "Use a station when it saves a big ticket or bypasses a critical blockage, not just because you can afford it.",
+    target: "action"
+  },
+  {
     id: "action",
     title: "Commit through the action rail",
     summary: "The action rail is where your choice becomes a committed move. It explains what the selected route or city means and shows legal payments.",
     keyPoints: [
       "On your turn, choose one major action: draw cards, claim a route, draw tickets, or build a station.",
       "Gray routes still require cards of one color set.",
-      "Tunnel and ferry requirements surface here before you confirm."
+      "This is where tunnel risk, ferry locomotive requirements, and station payment colors become concrete."
     ],
     tip: "If a route or city is selected and you can afford it, the action rail will show the payment choices.",
     target: "action"
@@ -385,14 +407,16 @@ export default function App(): JSX.Element {
   const currentRouteOwner = currentRouteClaim ? game.players.find((player) => player.id === currentRouteClaim.playerId) : null;
 
   return (
-    <div className="app-shell">
+    <div className="app-shell" data-config-theme={hudsonHustleCurrentTheme}>
       <header className="topbar">
         <div>
           <p className="eyebrow">Hudson Hustle</p>
           <h1>{hudsonHustleMap.name}</h1>
           <div className="config-chip-group">
-            <span className="config-chip">Config: {hudsonHustleCurrentConfigMeta.version} · {hudsonHustleCurrentConfigId}</span>
-            <span className="config-summary">{hudsonHustleCurrentConfigMeta.summary}</span>
+            <div className="config-hover-card">
+              <span className="config-chip">Config: {hudsonHustleCurrentConfigMeta.version} · {hudsonHustleCurrentConfigId}</span>
+              <span className="config-summary-tooltip">{hudsonHustleCurrentConfigMeta.summary}</span>
+            </div>
           </div>
         </div>
         <div className="topbar-actions">
@@ -438,10 +462,7 @@ export default function App(): JSX.Element {
                 </div>
                 <div className="card-grid">
                   {activePlayer.hand.map((card) => (
-                    <div key={card.id} className="train-card" style={getCardStyle(card.color)}>
-                      <span className="card-kicker">{card.color === "locomotive" ? "Wildcard" : "Transit card"}</span>
-                      <strong className="card-title">{formatFaceLabel(card.color)}</strong>
-                    </div>
+                    <TransitCard key={card.id} color={card.color} context="hand" />
                   ))}
                 </div>
               </section>
@@ -485,17 +506,15 @@ export default function App(): JSX.Element {
             </div>
             <div className="market-grid">
               {game.market.map((card, index) => (
-                <button
+                <TransitCard
                   key={card.id}
                   className="market-card"
-                  style={getCardStyle(card.color)}
+                  color={card.color}
+                  context="market"
                   disabled={marketDisabled}
                   onClick={() => applyAction({ type: "draw_card", source: "market", marketIndex: index })}
-                >
-                  <span className="card-kicker">Face-up</span>
-                  <strong className="card-title">{formatFaceLabel(card.color)}</strong>
-                  {card.color === "locomotive" ? <span className="market-tag">Ends draw</span> : null}
-                </button>
+                  tag={card.color === "locomotive" ? "Ends draw" : undefined}
+                />
               ))}
             </div>
             <button className="secondary-button" disabled={marketDisabled} onClick={() => applyAction({ type: "draw_card", source: "deck" })}>
@@ -512,6 +531,9 @@ export default function App(): JSX.Element {
             </div>
             <BoardMap
               config={hudsonHustleMap}
+              backdrop={hudsonHustleBackdrop}
+              backdropMode={hudsonHustleCurrentBackdropMode}
+              boardLabelMode={hudsonHustleCurrentBoardLabelMode}
               game={game}
               selectedRouteId={selectedRouteId}
               selectedCityId={selectedCityId}
@@ -684,10 +706,7 @@ export default function App(): JSX.Element {
           <div className="modal-card draw-reveal-card">
             <p className="eyebrow">Deck draw</p>
             <h2>You drew {formatFaceLabel(revealedDeckCard)}</h2>
-            <div className="draw-reveal-preview train-card" style={getCardStyle(revealedDeckCard)}>
-              <span className="card-kicker">{revealedDeckCard === "locomotive" ? "Wildcard" : "Transit card"}</span>
-              <strong className="card-title">{formatFaceLabel(revealedDeckCard)}</strong>
-            </div>
+            <TransitCard className="draw-reveal-preview" color={revealedDeckCard} context="hand" />
             <button className="primary-button" onClick={() => setRevealedDeckCard(null)}>
               Continue
             </button>

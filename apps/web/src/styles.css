@@ -20,6 +20,14 @@
   --radius-sm: 12px;
   --font-display: "Avenir Next", "Trebuchet MS", sans-serif;
   --font-body: "Avenir Next", "Segoe UI", sans-serif;
+  --card-radius: 16px;
+  --card-border: #5a4636;
+  --card-paper: #f3ead8;
+  --card-paper-shadow: #e2d3b9;
+  --card-brass: #b08a43;
+  --card-rule: rgba(90, 70, 54, 0.28);
+  --card-highlight: rgba(255, 255, 255, 0.35);
+  --card-shadow: 0 10px 24px rgba(74, 53, 33, 0.18);
 }
 
 * {
@@ -99,9 +107,15 @@ button {
 }
 
 .config-chip-group {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   margin-top: 10px;
+}
+
+.config-hover-card {
+  position: relative;
+  width: fit-content;
 }
 
 .config-chip {
@@ -117,11 +131,30 @@ button {
   letter-spacing: 0.03em;
 }
 
-.config-summary {
+.config-summary-tooltip {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 10px);
+  z-index: 10;
+  width: min(460px, 70vw);
+  padding: 10px 12px;
+  border: 1px solid rgba(68, 51, 34, 0.18);
+  border-radius: 14px;
+  background: rgba(255, 248, 235, 0.98);
+  box-shadow: 0 14px 32px rgba(62, 41, 20, 0.18);
   color: var(--ink-soft);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   line-height: 1.4;
-  max-width: 70ch;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.config-hover-card:hover .config-summary-tooltip,
+.config-hover-card:focus-within .config-summary-tooltip {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 h1,
@@ -305,74 +338,323 @@ h3 {
 .ticket-list,
 .endgame-grid {
   display: grid;
-  gap: 10px;
+  gap: 8px;
 }
 
 .card-grid {
-  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
 }
 
-.train-card,
-.market-card {
-  min-height: 92px;
+.transit-card {
+  min-height: 98px;
   display: grid;
-  align-content: space-between;
-  justify-items: start;
-  gap: 6px;
-  padding: 14px;
+  grid-template-rows: auto 1fr auto;
+  gap: 2px;
+  padding: 12px;
   position: relative;
   overflow: hidden;
-  color: var(--card-ink);
+  isolation: isolate;
+  border-radius: var(--card-radius);
+  border: 1.5px solid var(--card-border);
   background:
-    linear-gradient(180deg, color-mix(in srgb, var(--card-fill) 90%, white 10%), var(--card-fill)),
-    repeating-linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.08) 0,
-      rgba(255, 255, 255, 0.08) 10px,
-      rgba(0, 0, 0, 0.05) 10px,
-      rgba(0, 0, 0, 0.05) 20px
-    );
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24);
+    linear-gradient(180deg, #f5e9d4, #e5d1ad);
+  box-shadow: 0 9px 22px rgba(74, 53, 33, 0.16);
   text-align: left;
+  color: var(--transit-card-ink);
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    border-color 140ms ease;
 }
 
-.train-card::after,
-.market-card::after {
+.transit-card::before {
   content: "";
   position: absolute;
-  inset: auto 12px 10px 12px;
-  height: 2px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.36);
+  inset: 10px;
+  border-radius: 11px;
+  border: 1px solid rgba(176, 138, 67, 0.14);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.transit-card::after {
+  content: none;
 }
 
 .market-grid {
-  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
-  margin-bottom: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+  margin-bottom: 10px;
 }
 
-.card-kicker {
-  font-size: 0.72rem;
+.transit-card--interactive {
+  cursor: pointer;
+}
+
+.transit-card--interactive:hover {
+  transform: translateY(-1px);
+  border-color: rgba(176, 138, 67, 0.72);
+  box-shadow: 0 14px 28px rgba(74, 53, 33, 0.24);
+}
+
+.transit-card--interactive:focus-visible {
+  outline: 2px solid rgba(176, 138, 67, 0.75);
+  outline-offset: 2px;
+}
+
+.transit-card--interactive:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.transit-card__frame,
+.transit-card__top-band,
+.transit-card__field,
+.transit-card__bottom-band,
+.transit-card__tag {
+  position: relative;
+  z-index: 1;
+}
+
+.transit-card__top-band,
+.transit-card__bottom-band {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.transit-card__top-band {
+  min-height: 9px;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.transit-card__bottom-band {
+  min-height: 8px;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.transit-card__kicker,
+.transit-card__serial,
+.transit-card__footer,
+.transit-card__stamp {
+  font-family: var(--font-body);
+  font-size: 0.47rem;
+  line-height: 1;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  opacity: 0.88;
-  line-height: 1.2;
 }
 
-.card-title {
-  font-size: 0.95rem;
-  line-height: 1.15;
+.transit-card__serial,
+.transit-card__stamp {
+  color: color-mix(in srgb, var(--transit-card-ink) 58%, white 42%);
+}
+
+.transit-card__footer:empty,
+.transit-card__stamp:empty,
+.transit-card__kicker:empty,
+.transit-card__serial:empty {
+  display: none;
+}
+
+.transit-card__field {
+  min-height: 58px;
+  display: grid;
+  align-items: stretch;
+  padding: 0;
+  border-radius: 14px;
+  background:
+    linear-gradient(180deg, var(--transit-card-route-light), var(--transit-card-route));
+  border: 1px solid rgba(62, 49, 40, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 1px 0 rgba(0, 0, 0, 0.05);
+}
+
+.transit-card__watermark {
+  position: absolute;
+  inset: 8px 10px auto auto;
+  width: 54%;
+  height: auto;
+  opacity: var(--transit-card-watermark-opacity, 0.03);
+  overflow: visible;
+}
+
+.transit-card__watermark-stroke,
+.transit-card__watermark-dot {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 7;
+}
+
+.transit-card__watermark-dot {
+  fill: currentColor;
+  stroke: none;
+}
+
+.transit-card__watermark-stroke--thin {
+  stroke-width: 4.5;
+}
+
+.transit-card__watermark-ring {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 6;
+}
+
+.transit-card__seal-ring,
+.transit-card__seal-core,
+.transit-card__seal-mark {
+  fill: none;
+  stroke: var(--transit-card-metal);
+  stroke-width: 4;
+}
+
+.transit-card__seal-ring--outer {
+  stroke: color-mix(in srgb, var(--transit-card-metal) 78%, white 22%);
+}
+
+.transit-card__seal-ring--inner {
+  stroke: color-mix(in srgb, var(--transit-card-metal) 90%, var(--transit-card-smoke) 10%);
+}
+
+.transit-card__seal-core {
+  fill: rgba(255, 249, 236, 0.46);
+  stroke-width: 3;
+}
+
+.transit-card__seal-mark {
+  stroke: var(--transit-card-smoke);
+  stroke-width: 3.5;
+}
+
+.transit-card__seal-cross {
+  fill: none;
+  stroke: color-mix(in srgb, var(--transit-card-smoke) 85%, white 15%);
+  stroke-width: 2.8;
+  stroke-linecap: round;
+}
+
+.transit-card__title-stack {
+  position: relative;
+  min-height: 100%;
+  display: grid;
+  place-items: center start;
+  padding: 0 14px;
+}
+
+.transit-card__title {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.94rem;
+  line-height: 1;
   letter-spacing: 0.01em;
-  word-break: break-word;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
+  color: var(--transit-card-field-ink);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-.market-tag {
-  padding: 4px 8px;
+.transit-card__title--medium {
+  font-size: 0.86rem;
+}
+
+.transit-card__title--compact {
+  font-size: 0.78rem;
+  letter-spacing: 0;
+}
+
+.transit-card__tag {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  transform: none;
+  padding: 2px 6px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.22);
-  font-size: 0.72rem;
-  font-weight: 600;
+  border: 1px solid rgba(90, 70, 54, 0.12);
+  background: rgba(255, 248, 236, 0.82);
+  box-shadow: 0 2px 8px rgba(74, 53, 33, 0.08);
+  font-family: var(--font-body);
+  font-size: 0.43rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--transit-card-ink) 72%, white 28%);
+  z-index: 2;
+}
+
+.transit-card--market .transit-card__tag {
+  top: 10px;
+  right: 10px;
+}
+
+.transit-card--locomotive .transit-card__field {
+  background:
+    radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.22), transparent 34%),
+    linear-gradient(180deg, var(--transit-card-route-light), var(--transit-card-route));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 1px 0 rgba(120, 92, 48, 0.08);
+  border: 1px solid rgba(176, 138, 67, 0.28);
+}
+
+.transit-card--locomotive .transit-card__watermark {
+  width: 50%;
+}
+
+.transit-card--locomotive::before {
+  inset: 8px;
+  border-color: rgba(176, 138, 67, 0.36);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 247, 228, 0.42),
+    inset 0 0 0 5px rgba(176, 138, 67, 0.06);
+}
+
+.transit-card--locomotive .transit-card__top-band,
+.transit-card--locomotive .transit-card__bottom-band {
+  color: color-mix(in srgb, var(--transit-card-ink) 64%, var(--card-brass) 36%);
+}
+
+.transit-card--locomotive .transit-card__title {
+  font-size: 0.82rem;
+  letter-spacing: 0;
+}
+
+.transit-card[data-color="amber"] .transit-card__field,
+.transit-card[data-color="ivory"] .transit-card__field,
+.transit-card[data-color="locomotive"] .transit-card__field {
+  border-color: rgba(62, 49, 40, 0.14);
+}
+
+.transit-card[data-color="amber"] .transit-card__title,
+.transit-card[data-color="ivory"] .transit-card__title,
+.transit-card[data-color="locomotive"] .transit-card__title {
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.transit-card--hand {
+  min-height: 98px;
+}
+
+.transit-card--market {
+  min-height: 102px;
+}
+
+.transit-card--market .transit-card__field {
+  min-height: 62px;
+}
+
+.transit-card--market.transit-card--interactive {
+  background:
+    linear-gradient(180deg, #f8efe0, #eadcc1);
+}
+
+.transit-card--market.transit-card--interactive .transit-card__top-band::after {
+  content: none;
 }
 
 .ticket-row,
@@ -461,10 +743,26 @@ h3 {
   stroke-width: 1;
 }
 
+.board-map--full .landform {
+  fill: rgba(247, 239, 223, 0.32);
+}
+
+.board-map--minimal .landform {
+  fill: rgba(247, 239, 223, 0.12);
+}
+
 .water-body {
   stroke: rgba(255, 246, 230, 0.08);
   stroke-width: 1;
   opacity: 0.16;
+}
+
+.board-map--full .water-body {
+  stroke-width: 1.4;
+}
+
+.board-map--minimal .water-body {
+  stroke-width: 0.8;
 }
 
 .board-label {
@@ -562,14 +860,28 @@ h3 {
   opacity: 0.18;
 }
 
+.board-map--full .shoreline {
+  stroke-width: 2.4;
+}
+
+.board-map--minimal .shoreline {
+  stroke-width: 1.4;
+}
+
 .region-label {
-  display: none;
+  display: block;
   fill: rgba(88, 64, 38, 0.12);
   font-family: var(--font-display);
   font-size: 22px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   pointer-events: none;
+}
+
+.region-label--minimal {
+  fill: rgba(88, 64, 38, 0.08);
+  font-size: 18px;
+  letter-spacing: 0.14em;
 }
 
 .region-label--vertical {

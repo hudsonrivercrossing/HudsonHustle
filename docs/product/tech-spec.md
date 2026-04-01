@@ -306,6 +306,7 @@
     - `full-region-labels`
     - `station-only`
     - `minimal-region-labels`
+  - runtime UI should consume these values directly rather than treating them as passive metadata
 
 ### Naming Rules
 - station ids should stay stable once introduced
@@ -324,6 +325,9 @@
 - New work should branch from a draft copied from the most relevant release or prior draft.
 - `current.json` should be the only moving pointer; release folders should not move.
 - Use `pnpm config:switch <config-id>` to move the active pointer between existing draft/release snapshots.
+- Use `pnpm config:switch --list` to inspect available config ids and the current active pointer.
+- Use `pnpm config:preview <config-id>` to inspect one snapshot without changing `current.json`.
+- Use `pnpm config:release <draft-id> <release-id> <version>` to promote a draft into a frozen release snapshot.
 - Use `pnpm config:registry` after adding or renaming snapshot folders.
 - Use `pnpm config:export` to refresh `drafts/current-working` from the current runtime data and regenerate the registry.
 
@@ -363,12 +367,15 @@
 - Region maps should start from real station coordinates, but final boards are graph-first and may distort heavily for readability.
 - Use anchor waves and local rebalance before adding first-ring and outer stations.
 - If map bounds or station inventory change, update the local anchor cluster first, then revisit route geometry and labels.
-- See `docs/cartography-workflow.md` for the reusable region-map process.
+- See `docs/map/cartography-workflow.md` for the reusable region-map process.
 
 ## Rendering
 - Use SVG for the board and route hit targets.
 - Keep route geometry and labels in data instead of hardcoding them in components.
 - Use CSS tokens for colors, spacing, radius, shadows, and typography hooks.
+- Board rendering should respond to snapshot-level visual config:
+  - `backdropMode` controls how much backdrop land/water/shoreline art is rendered
+  - `boardLabelMode` controls whether region labels are hidden, reduced, or fully rendered
 - Visible routes should be rendered as segmented path slices, not a continuous visible rail underlay.
 - Each segment should reuse one canonical route slice for all visible layers:
   backplate, color fill, and claim highlight.

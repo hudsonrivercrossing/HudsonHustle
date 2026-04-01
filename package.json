@@ -12,8 +12,10 @@
     "build": "pnpm --filter @hudson-hustle/game-core build && pnpm --filter @hudson-hustle/game-data build && pnpm --filter @hudson-hustle/web build",
     "test": "pnpm --filter @hudson-hustle/game-core test",
     "test:e2e": "pnpm --filter @hudson-hustle/web test:e2e",
-    "config:registry": "node scripts/generate-config-registry.mjs",
-    "config:switch": "node scripts/config-switch.mjs",
-    "config:export": "pnpm --filter @hudson-hustle/game-data build && node scripts/export-current-config.mjs && node scripts/generate-config-registry.mjs"
+    "config:registry": "node scripts/config/generate-config-registry.mjs",
+    "config:switch": "node scripts/config/config-switch.mjs",
+    "config:preview": "node scripts/config/config-preview.mjs",
+    "config:release": "node scripts/config/config-release.mjs",
+    "config:export": "pnpm --filter @hudson-hustle/game-data build && node scripts/config/export-current-config.mjs && node scripts/config/generate-config-registry.mjs"
   }
 }

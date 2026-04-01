@@ -2,7 +2,7 @@
 
 ## Purpose
 Use this rubric to review any Hudson Hustle board-layout change.
-It is a project-specific acceptance check for map revisions, not a replacement for `docs/cartography-workflow.md`.
+It is a project-specific acceptance check for map revisions, not a replacement for `docs/map/cartography-workflow.md`.
 
 The standard is simple:
 - the map is a game board first
@@ -75,7 +75,7 @@ Approve each wave only if the current graph is already readable before the next 
 ## Hudson Hustle Pressure Zones
 These zones should be reviewed first because they are the most likely to fail.
 
-### Lower Manhattan And Hudson Crossings
+### Battery Park And Hudson Crossings
 - `Penn District`, `World Trade`, and nearby Hudson approaches should read as contested but not tangled.
 - Jersey-to-Manhattan links should feel deliberate and separable, not like a knot.
 

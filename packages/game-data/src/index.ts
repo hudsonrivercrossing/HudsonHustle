@@ -10,6 +10,9 @@ export const hudsonHustleCurrentConfigId = hudsonHustleCurrentPointer.activeConf
 export const hudsonHustleCurrentConfigPath = hudsonHustleCurrentPointer.activeConfigPath;
 export const hudsonHustleAvailableConfigIds = Object.keys(hudsonHustleConfigRegistry);
 export const hudsonHustleCurrentConfigMeta: SnapshotMeta = activeHudsonHustleConfig.meta;
+export const hudsonHustleCurrentTheme = activeHudsonHustleConfig.visuals.theme;
+export const hudsonHustleCurrentBackdropMode = activeHudsonHustleConfig.visuals.backdropMode;
+export const hudsonHustleCurrentBoardLabelMode = activeHudsonHustleConfig.visuals.boardLabelMode;
 
 export const hudsonHustleBoardFrame = {
   width: activeHudsonHustleConfig.map.board.width,

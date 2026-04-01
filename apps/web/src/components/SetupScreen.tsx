@@ -25,8 +25,10 @@ export function SetupScreen({ onStart, canResume, onResume, onOpenTutorial, conf
           and hand the laptop to the next rival when your turn is done.
         </p>
         <div className="config-chip-group">
-          <span className="config-chip">Running config: {configLabel}</span>
-          <span className="config-summary">{configSummary}</span>
+          <div className="config-hover-card">
+            <span className="config-chip">Running config: {configLabel}</span>
+            <span className="config-summary-tooltip">{configSummary}</span>
+          </div>
         </div>
 
         <label className="field">

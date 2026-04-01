@@ -40,4 +40,4 @@ This file is the source of truth for humans and agents working in this repo.
 ## 7. Safety
 - Do not copy official art, rulebook text, logos, or trademarks from Ticket to Ride.
 - Avoid introducing passwords, facial recognition, or other security theater into `v1` handoff flow.
-- Treat `docs/player-guide.md` as a user-facing artifact: tone, sequencing, and clarity matter.
+- Treat `docs/gameplay/player-guide.md` as a user-facing artifact: tone, sequencing, and clarity matter.

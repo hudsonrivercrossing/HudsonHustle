@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "id": "v0.4-next-wave",
+  "gameId": "hudson-hustle",
+  "version": "draft-v0.4",
+  "status": "draft",
+  "basedOn": "configs/hudson-hustle/releases/v0.3-atlantic-hoboken",
+  "createdAt": "2026-03-31",
+  "updatedAt": "2026-03-31",
+  "sourceSync": {
+    "method": "release-copy",
+    "sourceModule": "packages/game-data/src/index.ts",
+    "sourceBuildPath": "packages/game-data/dist/game-data/src/index.js",
+    "sourceExport": "hudsonHustleMap",
+    "syncedAt": "2026-03-31"
+  },
+  "summary": "Draft next-wave map built from v0.3, now testing Battery Park, Grove St, Hudson Yards, Flushing, Newark Airport, Red Hook, and Union Square while tightening central overlap and removing a few realism-breaking direct shortcuts.",
+  "designGoals": [
+    "Preserve v0.3 as the stable 13-station baseline while the next wave explores new Manhattan, Queens, and Jersey nodes.",
+    "Keep the board graph-first and readable while testing west-Manhattan and outer-ring additions without collapsing into central overlap.",
+    "Prefer board-game compression over literal geography, but remove direct links that break real-world transit intuition too sharply.",
+    "Use controlled station waves so each addition justifies its strategy and space on the board."
+  ],
+  "changeSummary": [
+    "Branched a new draft from the frozen v0.3-atlantic-hoboken release.",
+    "Added Battery Park as the first south-core next-wave station.",
+    "Split the old World Trade to Downtown Brooklyn corridor into World Trade -> Battery Park -> Downtown Brooklyn.",
+    "Added Grove St as the first Jersey-side next-wave station and split Newark Penn -> Exchange Place into Newark Penn -> Grove St -> Exchange Place.",
+    "Recast the former Columbus Circle slot as Hudson Yards, a west-Manhattan ring node linked to Grand Central.",
+    "Added Hoboken -> Grove St to make the west-side graph read as a more coherent Jersey corridor.",
+    "Added Flushing as the first outer-Queens ring node, linked to Grand Central and Jamaica.",
+    "Added Newark Airport as a southwest outer node linked to Newark Penn, then extended it with a difficult Hudson Yards helicopter-style tunnel route.",
+    "Added Red Hook as a lower-bay Brooklyn node linked to Battery Park and Atlantic Terminal.",
+    "Added Union Square as a central Manhattan node linked to Chelsea, Battery Park, and Williamsburg.",
+    "Removed the direct Newark Penn -> World Trade route because it overstated a real-world one-seat corridor.",
+    "Removed the Newark Airport -> Battery Park route because it read more like a gameplay shortcut than a believable board compression.",
+    "Removed t-exchange-grand-central and increased t-grand-central-flushing to strengthen outer-Queens ticket value while easing central-trunk overlap.",
+    "Recolored several formerly gray routes so the route palette is less over-concentrated in neutral edges.",
+    "Expanded the regular ticket deck from 23 to 28 by adding more outer-node and non-central split objectives around Newark Airport, Flushing, Red Hook, and Hudson Yards.",
+    "Collapsed Secaucus -> Penn District from a double route into a single tunnel trunk.",
+    "Removed the LIC -> Downtown Brooklyn ferry edge and added Union Square -> Williamsburg as the direct L-train-inspired Manhattan/Brooklyn connector."
+  ],
+  "playtestFocus": [
+    "Check whether Battery Park improves the south-core decision space instead of just subdividing one route.",
+    "Check whether Grove St improves Jersey-side route identity instead of making the west corridor feel over-segmented.",
+    "Check whether Hoboken -> Grove St clarifies west-side choice or over-connects the Jersey cluster.",
+    "Check whether Hudson Yards creates a credible west-Manhattan layer without collapsing back into the same Penn District core.",
+    "Check whether Flushing adds useful outer-Queens strategy instead of just duplicating the direct Grand Central -> Jamaica corridor.",
+    "Check whether Newark Airport still justifies its place once the helicopter-style Hudson Yards tunnel is available but intentionally hard to complete.",
+    "Check whether Red Hook improves the south-harbor branch instead of only adding another Brooklyn leaf.",
+    "Check whether Union Square adds central decision-making without creating a dense Manhattan knot, and whether its new higher placement reads more clearly than the old south-heavy version.",
+    "Preserve good board-space usage while adding west-Manhattan and east-side options.",
+    "Avoid adding nodes whose routes only increase congestion without improving strategy.",
+    "Review whether the newer, less-gray route palette improves readability without making route color logic feel arbitrary."
+  ]
+}

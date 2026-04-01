@@ -49,18 +49,62 @@ Your private ticket panel also acts as a live checklist:
 - Spend cards that match the route length and color.
 - Gray routes can be claimed with any one color set.
 - Longer routes score more points.
+- If a route is already claimed, it is gone for the rest of the game unless it is a still-open parallel route.
+- In `2-3` player games, if one side of a double route is claimed, the twin side is locked too.
 
 ### Tunnels
-Tunnel routes can cost more than they first appear. After you try to claim one, extra reveal cards are checked. Matching reveals raise the final price for that claim.
+Tunnel routes are risky.
+
+How they work:
+1. First make sure you can pay the printed route cost.
+2. When you try to claim the route, the game reveals extra cards.
+3. Every revealed card that matches your chosen color, or is a locomotive, raises the cost by `1`.
+4. If you can cover the surcharge, you claim the route normally.
+5. If you cannot cover the surcharge, the claim fails and your turn is spent.
+
+Practical advice:
+- Do not enter a tunnel with the exact minimum unless you are willing to gamble.
+- Locomotives are the safest tunnel insurance.
 
 ### Ferries
-Ferries require locomotives. The route display tells you the minimum number needed.
+Ferries require locomotives as part of the payment.
+
+How they work:
+- The route still has a normal length and color.
+- But the route also shows a minimum locomotive requirement.
+- You must include at least that many locomotives in your payment.
+
+Example:
+- A length `3` ferry with `1` locomotive requirement means:
+  - at least `1` card must be a locomotive
+  - the other `2` cards follow the route's normal color rules
 
 ## Building Stations
 - Each player has three stations.
-- Your first station is cheap, your third is expensive.
-- A station helps you borrow one connection from another player's network when checking destination tickets at the end of the game.
-- Every station you never place is worth bonus points, so use them carefully.
+- Station cost increases as you build more:
+  - first station: `1` card
+  - second station: `2` cards
+  - third station: `3` cards
+- A city can only hold one station total.
+- A station does not help you claim routes during play.
+- Its value is at endgame ticket scoring.
+
+How borrowing works:
+- Each station may borrow exactly `1` adjacent route that another player already claimed.
+- It does not borrow that player's whole network.
+- It does not give you route points for that borrowed route.
+- It only helps when the game checks whether your destination tickets connect.
+
+Example:
+- You connect into `World Trade`.
+- Another player owns `World Trade -> Exchange Pl.`.
+- If you built a station at `World Trade`, the game may use that one borrowed adjacent route when scoring your tickets.
+- It will not also give you the rest of that player's Jersey network.
+
+Why stations are a tradeoff:
+- They rescue ticket plans.
+- But every station you do not build is worth bonus points at the end.
+- So a station is usually strongest when it saves a big ticket or bypasses a critical blockage.
 
 ## End Of The Game
 The final round starts when a player ends a turn with two or fewer trains remaining. Every other player gets one last turn.
@@ -75,4 +119,6 @@ Then the game scores:
 - Taking too many tickets too early.
 - Saving locomotives for too long instead of securing a critical route.
 - Ignoring stations until every crossing is blocked.
+- Treating tunnels like normal routes and forgetting they can suddenly cost more.
+- Forgetting that ferries reserve locomotives before the rest of the payment.
 - Forgetting that gray routes still need cards of a single color.
