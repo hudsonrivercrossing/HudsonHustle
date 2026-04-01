@@ -12,7 +12,7 @@ Use this skill when the task touches project planning, milestone reshaping, or d
 2. State which milestone or scope boundary the request affects.
 3. Prefer updating existing docs instead of creating new planning files.
 4. Keep v1 focused on same-laptop play unless the user explicitly changes scope.
-5. When implementation changes behavior, reflect that in `docs/prd.md`, `docs/tech-spec.md`, and `docs/player-guide.md` if needed.
+5. When implementation changes behavior, reflect that in `docs/product/prd.md`, `docs/product/tech-spec.md`, and `docs/gameplay/player-guide.md` if needed.
 
 ## Hudson Hustle Defaults
 - `V1`: local pass-and-play web app.

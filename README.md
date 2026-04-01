@@ -96,30 +96,54 @@ packages/
   game-core/     deterministic rules engine
   game-data/     cities, routes, tickets, balance data
 docs/
-  prd.md
-  tech-spec.md
-  player-guide.md
-  onboarding-script.md
-  design-system.md
-  map-balance-notes.md
+  README.md
+  product/
+    prd.md
+    tech-spec.md
+    design-system.md
+  gameplay/
+    player-guide.md
+    onboarding-script.md
+    agent-vs-agent-playtest.md
+  map/
+    cartography-workflow.md
+    hudson-map-rubric.md
+    map-balance-notes.md
+  config/
+    config-snapshot-guide.md
+  planning/
+    v1-status.md
+  playtests/
+    v0.4/
+  assets/
+scripts/
+  config/        snapshot switching, preview, export, release tooling
+  playtests/     seeded playtest and simulation harnesses
 .codex/skills/
   roadmap-manager/
   game-balance/
+  transit-cartography/
+  config-snapshot-manager/
+  how-to-win-hudson-hustle/
 ```
 
 ## Key Docs
-- [Product Requirements](docs/prd.md)
-- [Tech Spec](docs/tech-spec.md)
-- [Player Guide](docs/player-guide.md)
-- [Onboarding Script](docs/onboarding-script.md)
-- [Design System](docs/design-system.md)
-- [Map And Balance Notes](docs/map-balance-notes.md)
+- [Docs Index](docs/README.md)
+- [Product Requirements](docs/product/prd.md)
+- [Tech Spec](docs/product/tech-spec.md)
+- [V1 Status](docs/planning/v1-status.md)
+- [Player Guide](docs/gameplay/player-guide.md)
+- [Onboarding Script](docs/gameplay/onboarding-script.md)
+- [Config Snapshot Guide](docs/config/config-snapshot-guide.md)
+- [Design System](docs/product/design-system.md)
+- [Map And Balance Notes](docs/map/map-balance-notes.md)
 - [Agent Operating Guide](AGENTS.md)
 
 ## Current Product Status
-- Local `v1` foundation is playable.
-- `v1.1` includes a first-time onboarding flow, tutorial overlay, and map/visual polish.
-- The board and ticket balance are still expected to evolve through playtests.
+- The current active config is the frozen release `v0.4-flushing-newark-airport`.
+- Same-laptop `v1` is playable and documented.
+- The first playable small-map station set and the first full balance/playtest pass are complete.
+- Remaining iteration is mainly future playtesting, tuning, and presentation polish, not core `v1` foundation work.
 
 ## Working In This Repo
 - Keep game rules in shared code, not in React components.

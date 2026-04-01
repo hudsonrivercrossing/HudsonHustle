@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "gameId": "hudson-hustle",
-  "activeConfigId": "current-working",
-  "activeConfigPath": "configs/hudson-hustle/drafts/current-working",
-  "mode": "draft"
+  "activeConfigId": "v0.4-flushing-newark-airport",
+  "activeConfigPath": "configs/hudson-hustle/releases/v0.4-flushing-newark-airport",
+  "mode": "release"
 }

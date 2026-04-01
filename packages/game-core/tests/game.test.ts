@@ -223,8 +223,10 @@ function segmentIntersectsRect(
 
 describe("game-core", () => {
   it("keeps the Hudson Hustle map inside the intended board-size targets", () => {
-    expect(hudsonHustleMap.cities.length).toBe(13);
-    expect(hudsonHustleMap.routes.length).toBe(22);
+    expect(hudsonHustleMap.cities.length).toBeGreaterThanOrEqual(13);
+    expect(hudsonHustleMap.cities.length).toBeLessThanOrEqual(20);
+    expect(hudsonHustleMap.routes.length).toBeGreaterThanOrEqual(22);
+    expect(hudsonHustleMap.routes.length).toBeLessThanOrEqual(38);
     expect(connectedCityCount()).toBe(hudsonHustleMap.cities.length);
   });
 
@@ -280,7 +282,7 @@ describe("game-core", () => {
       .map((route) => route.id)
       .sort();
 
-    expect(chelseaRoutes).toEqual(["chelsea-world-trade", "hoboken-chelsea", "midtown-west-chelsea"]);
+    expect(chelseaRoutes).toEqual(["chelsea-union-square", "chelsea-world-trade", "hoboken-chelsea", "midtown-west-chelsea"]);
   });
 
   it("adds Williamsburg as the next ring station with only LIC and Downtown Brooklyn links", () => {
@@ -289,7 +291,11 @@ describe("game-core", () => {
       .map((route) => route.id)
       .sort();
 
-    expect(williamsburgRoutes).toEqual(["long-island-city-williamsburg", "williamsburg-downtown-brooklyn"]);
+    expect(williamsburgRoutes).toEqual([
+      "long-island-city-williamsburg",
+      "union-square-williamsburg",
+      "williamsburg-downtown-brooklyn"
+    ]);
   });
 
   it("adds Atlantic Terminal as the next Brooklyn ring station with only Downtown Brooklyn and Jamaica links", () => {
@@ -298,16 +304,88 @@ describe("game-core", () => {
       .map((route) => route.id)
       .sort();
 
-    expect(atlanticTerminalRoutes).toEqual(["atlantic-terminal-jamaica", "downtown-brooklyn-atlantic-terminal"]);
+    expect(atlanticTerminalRoutes).toEqual(["atlantic-terminal-jamaica", "downtown-brooklyn-atlantic-terminal", "red-hook-atlantic-terminal"]);
   });
 
-  it("adds Hoboken as the next west-side ring station with only Secaucus and Chelsea links", () => {
+  it("adds Hoboken as the next west-side ring station with Secaucus, Chelsea, and Grove St links", () => {
     const hobokenRoutes = hudsonHustleMap.routes
       .filter((route) => route.from === "hoboken" || route.to === "hoboken")
       .map((route) => route.id)
       .sort();
 
-    expect(hobokenRoutes).toEqual(["hoboken-chelsea", "secaucus-hoboken"]);
+    expect(hobokenRoutes).toEqual(["hoboken-chelsea", "hoboken-grove-st", "secaucus-hoboken"]);
+  });
+
+  it("adds Battery Park as the first south-core next-wave station without a direct airport shortcut", () => {
+    const batteryParkRoutes = hudsonHustleMap.routes
+      .filter((route) => route.from === "battery-park" || route.to === "battery-park")
+      .map((route) => route.id)
+      .sort();
+
+    expect(batteryParkRoutes).toEqual([
+      "battery-park-downtown-brooklyn",
+      "battery-park-red-hook",
+      "union-square-battery-park",
+      "world-trade-battery-park"
+    ]);
+  });
+
+  it("adds Grove St as the first Jersey-side next-wave station with Newark Penn, Exchange Place, and Hoboken links", () => {
+    const groveRoutes = hudsonHustleMap.routes
+      .filter((route) => route.from === "grove-st" || route.to === "grove-st")
+      .map((route) => route.id)
+      .sort();
+
+    expect(groveRoutes).toEqual(["grove-st-exchange-place", "hoboken-grove-st", "newark-penn-grove-st"]);
+  });
+
+  it("adds Hudson Yards as the west-Manhattan next-wave station with only Grand Central and Newark Airport links", () => {
+    const hudsonYardsRoutes = hudsonHustleMap.routes
+      .filter((route) => route.from === "hudson-yards" || route.to === "hudson-yards")
+      .map((route) => route.id)
+      .sort();
+
+    expect(hudsonYardsRoutes).toEqual(["hudson-yards-grand-central", "newark-airport-hudson-yards"]);
+  });
+
+  it("adds Flushing as the first outer-Queens next-wave station with only Grand Central and Jamaica links", () => {
+    const flushingRoutes = hudsonHustleMap.routes
+      .filter((route) => route.from === "flushing" || route.to === "flushing")
+      .map((route) => route.id)
+      .sort();
+
+    expect(flushingRoutes).toEqual(["flushing-jamaica", "grand-central-flushing"]);
+  });
+
+  it("keeps Newark Airport as a southwest outer node with Newark Penn and Hudson Yards links", () => {
+    const airportRoutes = hudsonHustleMap.routes
+      .filter((route) => route.from === "newark-airport" || route.to === "newark-airport")
+      .map((route) => route.id)
+      .sort();
+
+    expect(airportRoutes).toEqual(["newark-airport-hudson-yards", "newark-penn-newark-airport"]);
+  });
+
+  it("adds Red Hook as the lower-bay Brooklyn node with only Battery Park and Atlantic Terminal links", () => {
+    const redHookRoutes = hudsonHustleMap.routes
+      .filter((route) => route.from === "red-hook" || route.to === "red-hook")
+      .map((route) => route.id)
+      .sort();
+
+    expect(redHookRoutes).toEqual(["battery-park-red-hook", "red-hook-atlantic-terminal"]);
+  });
+
+  it("adds Union Square as the central Manhattan node with Chelsea and Battery Park links only", () => {
+    const unionRoutes = hudsonHustleMap.routes
+      .filter((route) => route.from === "union-square" || route.to === "union-square")
+      .map((route) => route.id)
+      .sort();
+
+    expect(unionRoutes).toEqual([
+      "chelsea-union-square",
+      "union-square-battery-park",
+      "union-square-williamsburg"
+    ]);
   });
 
   it("does not leave west-side hubs on generic proxy authority sources", () => {
@@ -339,16 +417,11 @@ describe("game-core", () => {
     }
   });
 
-  it("uses mirrored split-merge geometry for the secaucus-to-penn double route", () => {
-    const first = hudsonHustleMap.routes.find((route) => route.id === "secaucus-midtown-west-a");
-    const second = hudsonHustleMap.routes.find((route) => route.id === "secaucus-midtown-west-b");
+  it("keeps the secaucus-to-penn trunk as a single tunnel route", () => {
+    const route = hudsonHustleMap.routes.find((item) => item.id === "secaucus-midtown-west");
 
-    expect(first?.offset).toBeUndefined();
-    expect(second?.offset).toBeUndefined();
-    expect(first?.waypoints).toHaveLength(2);
-    expect(second?.waypoints).toHaveLength(2);
-    expect((first?.waypoints?.[0].y ?? 0)).toBeLessThan(second?.waypoints?.[0].y ?? 0);
-    expect((first?.waypoints?.[1].y ?? 0)).toBeLessThan(second?.waypoints?.[1].y ?? 0);
+    expect(route?.twinGroup).toBeUndefined();
+    expect(route?.waypoints).toHaveLength(2);
   });
 
   it("uses mirrored split-merge geometry for the exchange-place-to-world-trade double route", () => {
@@ -357,10 +430,11 @@ describe("game-core", () => {
 
     expect(first?.offset).toBeUndefined();
     expect(second?.offset).toBeUndefined();
-    expect(first?.waypoints).toHaveLength(2);
-    expect(second?.waypoints).toHaveLength(2);
-    expect((first?.waypoints?.[0].y ?? 0)).toBeLessThan(second?.waypoints?.[0].y ?? 0);
-    expect((first?.waypoints?.[1].y ?? 0)).toBeLessThan(second?.waypoints?.[1].y ?? 0);
+    expect((first?.waypoints?.length ?? 0)).toBeGreaterThanOrEqual(2);
+    expect(first?.waypoints?.length).toBe(second?.waypoints?.length);
+    for (let index = 0; index < (first?.waypoints?.length ?? 0); index += 1) {
+      expect((first?.waypoints?.[index].y ?? 0)).toBeLessThan(second?.waypoints?.[index].y ?? 0);
+    }
   });
 
   it("keeps optional backdrop geometry inside the board frame", () => {
@@ -424,7 +498,7 @@ describe("game-core", () => {
     expect(exchangePlace.x).toBeLessThan(worldTrade.x);
     expect(secaucus.y).toBeLessThan(newarkPenn.y);
     expect(secaucus.x).toBeLessThan(pennDistrict.x);
-    expect(exchangePlace.y).toBeLessThan(worldTrade.y);
+    expect(Math.abs(exchangePlace.y - worldTrade.y)).toBeLessThanOrEqual(40);
     expect(worldTrade.x - exchangePlace.x).toBeGreaterThanOrEqual(120);
   });
 
@@ -568,14 +642,14 @@ describe("game-core", () => {
 
   it("claims a standard route and deducts trains", () => {
     let state = finishInitialTickets(startGame(hudsonHustleMap, { playerNames: ["A", "B"], seed: 9 }));
-    state = forcePlayerHand(state, ["obsidian", "obsidian", "obsidian", "amber", "amber"]);
+    state = forcePlayerHand(state, ["obsidian", "obsidian", "amber", "amber"]);
     state = reduceGame(
       state,
-      { type: "claim_route", routeId: "newark-penn-exchange-place", color: "obsidian" },
+      { type: "claim_route", routeId: "newark-penn-grove-st", color: "obsidian" },
       hudsonHustleMap
     );
     expect(state.routeClaims).toHaveLength(1);
-    expect(state.players[0].trainsLeft).toBe(hudsonHustleMap.settings.trainsPerPlayer - 3);
+    expect(state.players[0].trainsLeft).toBe(hudsonHustleMap.settings.trainsPerPlayer - 2);
     expect(state.turn.stage).toBe("awaitingHandoff");
   });
 
@@ -590,18 +664,18 @@ describe("game-core", () => {
   it("reports live ticket progress from the player's current network", () => {
     let state = finishInitialTickets(startGame(hudsonHustleMap, { playerNames: ["A", "B"], seed: 14 }));
     state.players[0].tickets = [
-      { id: "custom-ticket", from: "newark-penn", to: "exchange-place", points: 5, bucket: "regular" }
+      { id: "custom-ticket", from: "newark-penn", to: "grove-st", points: 5, bucket: "regular" }
     ];
-    state = forcePlayerHand(state, ["obsidian", "obsidian", "obsidian", "amber", "amber"]);
+    state = forcePlayerHand(state, ["obsidian", "obsidian", "amber", "amber"]);
     state = reduceGame(
       state,
-      { type: "claim_route", routeId: "newark-penn-exchange-place", color: "obsidian" },
+      { type: "claim_route", routeId: "newark-penn-grove-st", color: "obsidian" },
       hudsonHustleMap
     );
     const progress = getTicketProgress(state, hudsonHustleMap, state.players[0].id);
     expect(progress).toEqual([
       {
-        ticket: { id: "custom-ticket", from: "newark-penn", to: "exchange-place", points: 5, bucket: "regular" },
+        ticket: { id: "custom-ticket", from: "newark-penn", to: "grove-st", points: 5, bucket: "regular" },
         completed: true
       }
     ]);

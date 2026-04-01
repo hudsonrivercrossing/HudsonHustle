@@ -3,7 +3,7 @@
 ## Goal
 Build Hudson Hustle like a board-game map, not a strict transit diagram.
 The board should feel recognizably NYC/NJ, but the real priority is route readability, clean spacing, and non-intersecting track geometry.
-Use `docs/hudson-map-rubric.md` when judging whether a candidate layout is actually ready.
+Use `docs/map/hudson-map-rubric.md` when judging whether a candidate layout is actually ready.
 
 ## Core Principle
 - `stations and tracks define the board`
@@ -97,7 +97,7 @@ Anchor rules:
 ### Wave 2: First-Ring Neighbors
 Add only the nearest, most structurally important neighbors next.
 Examples:
-- after `World Trade`, add `Exchange Place`, `Lower Manhattan`, or a nearby Brooklyn connection
+- after `World Trade`, add `Exchange Place`, `Battery Park`, or a nearby Brooklyn connection
 - after `Penn District`, add `Chelsea` and the main east-river connector
 - after `Long Island City`, add `Queens Plaza`, `Court Square`, or `Williamsburg`
 
@@ -191,7 +191,7 @@ Route-length guidance:
 - Letting scenic background detail reduce contrast around routes, station symbols, or labels.
 
 ## Acceptance Checks
-Apply the full Hudson-specific review in `docs/hudson-map-rubric.md`.
+Apply the full Hudson-specific review in `docs/map/hudson-map-rubric.md`.
 - The graph stays readable if the background art is muted or hidden.
 - No unintended route intersections remain.
 - Parallel/shared corridors keep a stable visual gap through the shared run.
