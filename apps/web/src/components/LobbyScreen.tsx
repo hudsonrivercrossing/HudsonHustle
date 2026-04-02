@@ -4,7 +4,7 @@ import { Button } from "./system/Button";
 import { Chip } from "./system/Chip";
 import { Panel } from "./system/Panel";
 import { SectionHeader } from "./system/SectionHeader";
-import { StatusBanner } from "./system/StatusBanner";
+import { StateSurface } from "./system/StateSurface";
 
 interface LobbyScreenProps {
   room: RoomSummary;
@@ -57,12 +57,12 @@ export function LobbyScreen({
             <p className="lead">
               Share the room code, let everyone claim a seat, and start once the full table is ready.
             </p>
-            <StatusBanner
+            <StateSurface
               tone={lobbyTone}
               eyebrow={canStart ? "Ready to start" : localSeat?.isHost ? "Host status" : "Lobby status"}
               headline={lobbyHeadline}
               copy={lobbyCopy}
-              timerLabel={room.turnTimeLimitSeconds === 0 ? "Untimed" : `${room.turnTimeLimitSeconds}s turns`}
+              rightSlot={room.turnTimeLimitSeconds === 0 ? "Untimed" : `${room.turnTimeLimitSeconds}s turns`}
               testId="lobby-status-banner"
             />
           </div>

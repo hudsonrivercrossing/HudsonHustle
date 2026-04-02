@@ -16,7 +16,10 @@ Fallbacks:
 Use `Fraunces` for:
 - page titles
 - major status headlines
-- rare hero moments in setup and lobby
+- ceremony moments in setup, lobby, and modals
+- the `Round table` section family
+- endgame summary titles
+- state-surface headlines for setup, lobby, reconnect, and empty-detail moments
 
 Do not use `Fraunces` for:
 - ordinary panel titles
@@ -37,6 +40,10 @@ Use `Inter` for:
 - ticket metadata
 - scoreboard rows
 - detailed gameplay information
+
+Rule of thumb:
+- `Inter` handles work
+- `Fraunces` handles ceremony
 
 ## Hierarchy
 
@@ -67,6 +74,11 @@ Stable layout rhythm now lives in:
 - primary status banner sits near the title block, not buried in side content
 - timer stays attached to the status banner family
 - do not duplicate the same status message in multiple regions
+
+### State Surfaces
+- larger state surfaces may pair a Fraunces headline with Inter body text
+- keep the headline declarative and short
+- reserve this treatment for setup, lobby, reconnect, empty-detail, and failure moments
 
 ## Validation Rule
 

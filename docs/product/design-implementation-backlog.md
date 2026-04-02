@@ -107,6 +107,19 @@ Extraction allowed during this slice:
 - `UtilityPill`
 - reuse existing `Button`
 
+### Eighth Slice
+- `state surface system`
+
+Scope:
+- setup, lobby, reconnect, and action-failure messaging share one larger state surface family
+- empty detail states in the action rail use the same surface/copy rhythm
+- state blocks feel like deliberate product moments instead of ad hoc error boxes
+
+Extraction allowed during this slice:
+- `StateSurface`
+- reuse existing `Button`
+- reuse existing `SectionHeader`
+
 ## Deferred
 
 Not for this phase:

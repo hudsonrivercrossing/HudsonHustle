@@ -22,6 +22,9 @@ Locked decisions:
 - active font pair:
   - display: `Fraunces`
   - body / operational UI: `Inter`
+- typography rule:
+  - `Inter` handles work
+  - `Fraunces` handles ceremony
 - first implementation slice:
   - `status/banner system`
 - map remains conservative and map-first during this phase
@@ -71,8 +74,10 @@ When design implementation is in progress, code should organize around:
 
 Only extract primitives proven necessary by the current slice:
 - `StatusBanner`
+- `StateSurface`
 - `Panel`
 - optional `Chip/Badge`
 - optional `SectionHeader`
+- `UtilityPill`
 
 Do not build a broad component library ahead of proof.

@@ -41,8 +41,9 @@ import { Chip } from "./components/system/Chip";
 import { ChoiceChipButton } from "./components/system/ChoiceChipButton";
 import { Panel } from "./components/system/Panel";
 import { SectionHeader } from "./components/system/SectionHeader";
-import { StatusBanner } from "./components/system/StatusBanner";
 import { SurfaceCard } from "./components/system/SurfaceCard";
+import { StateSurface } from "./components/system/StateSurface";
+import { StatusBanner } from "./components/system/StatusBanner";
 import { UtilityPill } from "./components/system/UtilityPill";
 import { decodeReconnectToken, encodeReconnectToken, readReconnectCredentials, type ReconnectCredentials } from "./reconnect-token";
 
@@ -687,8 +688,13 @@ export default function App(): JSX.Element {
 
       <div className="game-layout">
         <aside className="side-panel">
-          <Panel variant="status">
-            <SectionHeader eyebrow="Table status" title="Round table" meta={`${activePlayer?.name ?? "Unknown"} active`} />
+          <Panel variant="status" className="round-table-panel">
+            <SectionHeader
+              className="section-header--ceremony"
+              eyebrow="Table status"
+              title="Round table"
+              meta={`${activePlayer?.name ?? "Unknown"} active`}
+            />
             <div className="scoreboard">
               {snapshot.game.players.map((player, index) => (
                 <article key={player.id} className={`player-strip ${index === snapshot.game?.activePlayerIndex ? "player-strip--active" : ""}`}>
@@ -791,19 +797,28 @@ export default function App(): JSX.Element {
           </Panel>
 
           <Panel variant="status" className="action-panel">
-              <SectionHeader
-                eyebrow="Turn controls"
-                title="Action rail"
-                meta={publicGame.turn.summary ?? "Choose a route, city, or ticket action."}
+            <SectionHeader
+              eyebrow="Turn controls"
+              title="Action rail"
+              meta={publicGame.turn.summary ?? "Choose a route, city, or ticket action."}
+            />
+            {multiplayerError ? (
+              <StateSurface
+                tone="failure"
+                eyebrow="Action issue"
+                headline="This move could not complete."
+                copy={multiplayerError}
               />
-              {multiplayerError ? (
-                <StatusBanner
-                  tone="failure"
-                  eyebrow="Action issue"
-                  headline="This move could not complete."
-                  copy={multiplayerError}
-                />
-              ) : null}
+            ) : null}
+
+            {publicGame.phase === "main" && !currentRoute && !currentCity ? (
+              <StateSurface
+                tone="neutral"
+                eyebrow="Inspect the board"
+                headline="Select a route or city."
+                copy="The action rail will show payment choices, tunnel reveals, and build options once you inspect a board element."
+              />
+            ) : null}
 
             {publicGame.phase === "gameOver" ? (
               <div className="endgame-grid">

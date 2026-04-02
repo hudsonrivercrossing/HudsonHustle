@@ -5,7 +5,7 @@ import { Button } from "./system/Button";
 import { FormField } from "./system/FormField";
 import { Panel } from "./system/Panel";
 import { SectionHeader } from "./system/SectionHeader";
-import { StatusBanner } from "./system/StatusBanner";
+import { StateSurface } from "./system/StateSurface";
 
 interface CreateRoomForm {
   hostName: string;
@@ -78,7 +78,7 @@ export function MultiplayerSetupScreen({
         <p className="lead">
           Create a room, share a code, and play the released NYC/NJ maps from separate devices with server-owned game state.
         </p>
-        <StatusBanner
+        <StateSurface
           tone={setupBannerTone}
           eyebrow={setupBannerEyebrow}
           headline={setupBannerHeadline}

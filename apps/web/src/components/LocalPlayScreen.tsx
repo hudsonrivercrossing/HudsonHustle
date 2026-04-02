@@ -33,8 +33,9 @@ import { ChoiceChipButton } from "./system/ChoiceChipButton";
 import { ModalShell } from "./system/ModalShell";
 import { Panel } from "./system/Panel";
 import { SectionHeader } from "./system/SectionHeader";
-import { StatusBanner } from "./system/StatusBanner";
 import { SurfaceCard } from "./system/SurfaceCard";
+import { StateSurface } from "./system/StateSurface";
+import { StatusBanner } from "./system/StatusBanner";
 import { UtilityPill } from "./system/UtilityPill";
 
 const saveKey = "hudson-hustle-save-v1";
@@ -481,6 +482,7 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
             eyebrow={localBannerEyebrow}
             headline={localBannerHeadline}
             copy={localBannerCopy}
+            timerLabel={game.phase === "gameOver" ? "Final" : visibility === "handoff" ? "Hidden" : null}
           />
         </div>
         <div className="topbar-actions">
@@ -497,6 +499,7 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
         <aside className="side-panel">
           <Panel variant="status" className={tutorialTarget === "scoreboard" ? "panel--tutorial-focus" : ""}>
             <SectionHeader
+              className="section-header--ceremony"
               eyebrow="Table status"
               title="Round table"
               meta={game.phase === "gameOver" ? "Final score" : `${activePlayer.name}'s turn`}
@@ -612,17 +615,22 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
           </Panel>
 
           <Panel variant="status" className={`action-panel ${tutorialTarget === "action" ? "panel--tutorial-focus" : ""}`}>
-            <SectionHeader
-              eyebrow="Turn controls"
-              title="Action rail"
-              meta={game.turn.summary ?? "Choose one action for this turn."}
-            />
+            <SectionHeader eyebrow="Turn controls" title="Action rail" meta={game.turn.summary ?? "Choose one action for this turn."} />
             {error ? (
-              <StatusBanner
+              <StateSurface
                 tone="failure"
                 eyebrow="Action issue"
                 headline="This move could not complete."
                 copy={error}
+              />
+            ) : null}
+
+            {game.phase === "main" && visibility === "visible" && !currentRoute && !currentCity ? (
+              <StateSurface
+                tone="neutral"
+                eyebrow="Inspect the board"
+                headline="Select a route or city."
+                copy="The action rail will show legal payments and build options once you inspect a board element."
               />
             ) : null}
 

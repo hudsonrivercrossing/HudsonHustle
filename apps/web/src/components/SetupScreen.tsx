@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Button } from "./system/Button";
 import { FormField } from "./system/FormField";
 import { SectionHeader } from "./system/SectionHeader";
-import { StatusBanner } from "./system/StatusBanner";
+import { StateSurface } from "./system/StateSurface";
 import { UtilityPill } from "./system/UtilityPill";
 
 interface SetupScreenProps {
@@ -44,7 +44,7 @@ export function SetupScreen({
             <span className="config-summary-tooltip">{configSummary}</span>
           </div>
         </div>
-        <StatusBanner
+        <StateSurface
           tone="neutral"
           eyebrow="Shared laptop session"
           headline="Pass the board between rivals."

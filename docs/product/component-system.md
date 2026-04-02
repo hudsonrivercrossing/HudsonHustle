@@ -18,7 +18,8 @@ Minimum system layer:
 - `SurfaceCard`
 - `ChoiceChipButton`
 - `ModalShell`
- - `UtilityPill`
+- `UtilityPill`
+- `StateSurface`
 
 These primitives now also govern:
 - active game side-panel headers
@@ -27,6 +28,7 @@ These primitives now also govern:
 - ticket status medallions
 - action-detail nested surfaces
 - in-action payment choice chips
+- setup/lobby/reconnect state surfaces
 
 ## Surface Card
 
@@ -37,6 +39,7 @@ Use `SurfaceCard` for nested authored surfaces inside a larger panel:
 - endgame summary cards
 
 It should not replace the outer `Panel` layer.
+Summary variant titles may use the ceremony typography treatment when they represent endgame moments.
 
 ## Choice Chip Button
 
@@ -59,6 +62,8 @@ It unifies:
 - width presets
 - text alignment
 - shared card framing
+
+Its interior titles can use the ceremony typography treatment because modal content is a moment, not a work surface.
 
 ## Button
 
@@ -89,6 +94,17 @@ Use `UtilityPill` for compact chrome metadata and session affordances such as:
 - small authored utility markers in shell chrome
 
 It belongs to the topbar and shell-utility layer, not the gameplay action layer.
+
+## State Surface
+
+Use `StateSurface` for larger state blocks that need a headline, copy, and optional action or right-side slot:
+- setup guidance
+- lobby readiness
+- reconnect status
+- action failure
+- empty detail states
+
+It is the more expansive sibling of `StatusBanner`.
 
 Do not start by building:
 - full button library

@@ -15,6 +15,7 @@ export function UtilityPill({
 }: UtilityPillProps): JSX.Element {
   const classes = [
     "utility-pill",
+    label ? "utility-pill--stacked" : "utility-pill--single",
     `utility-pill--${tone}`,
     interactive ? "utility-pill--interactive" : "",
     className
