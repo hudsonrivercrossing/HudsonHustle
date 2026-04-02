@@ -8,11 +8,22 @@ interface LobbyScreenProps {
   onReadyChange: (ready: boolean) => void;
   onStart: () => void;
   timer: TimerUpdate | null;
+  realtimeReady: boolean;
+  realtimeMessage: string | null;
 }
 
-export function LobbyScreen({ room, localSeatId, playerSecret, onReadyChange, onStart, timer }: LobbyScreenProps): JSX.Element {
+export function LobbyScreen({
+  room,
+  localSeatId,
+  playerSecret,
+  onReadyChange,
+  onStart,
+  timer,
+  realtimeReady,
+  realtimeMessage
+}: LobbyScreenProps): JSX.Element {
   const localSeat = room.seats.find((seat) => seat.seatId === localSeatId);
-  const canStart = localSeat?.isHost && room.seats.every((seat) => seat.playerName) && room.seats.every((seat) => seat.ready);
+  const canStart = realtimeReady && localSeat?.isHost && room.seats.every((seat) => seat.playerName) && room.seats.every((seat) => seat.ready);
   const joinedCount = room.seats.filter((seat) => seat.playerName).length;
   const readyCount = room.seats.filter((seat) => seat.ready).length;
   const lobbyTone = canStart ? "ready" : localSeat?.isHost ? "host" : "waiting";
@@ -37,6 +48,7 @@ export function LobbyScreen({ room, localSeatId, playerSecret, onReadyChange, on
             <p className="lead">
               Share the room code, let everyone claim a seat, and start once the full table is ready.
             </p>
+            {realtimeMessage ? <p className="error-banner">{realtimeMessage}</p> : null}
             <div className={`status-banner status-banner--${lobbyTone}`} data-testid="lobby-status-banner">
               <div>
                 <span className="status-banner__eyebrow">
@@ -100,7 +112,7 @@ export function LobbyScreen({ room, localSeatId, playerSecret, onReadyChange, on
         </div>
 
         <div className="setup-actions">
-          <button className="secondary-button" onClick={() => onReadyChange(!localSeat?.ready)}>
+          <button className="secondary-button" disabled={!realtimeReady} onClick={() => onReadyChange(!localSeat?.ready)}>
             {localSeat?.ready ? "Mark not ready" : "Mark ready"}
           </button>
           {localSeat?.isHost ? (

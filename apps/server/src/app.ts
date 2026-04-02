@@ -16,22 +16,45 @@ import { PostgresRoomRepository } from "./persistence/postgres-room-repository.j
 import type { RoomRepository } from "./persistence/types.js";
 import { RoomService, RoomServiceError } from "./room-service.js";
 
+interface OriginRules {
+  exactOrigins: string[];
+  wildcardOrigins: RegExp[];
+}
+
+function buildOriginRules(configuredOrigins: string[]): OriginRules {
+  return {
+    exactOrigins: configuredOrigins.filter((origin) => !origin.includes("*")),
+    wildcardOrigins: configuredOrigins
+      .filter((origin) => origin.includes("*"))
+      .map((pattern) => new RegExp(`^${pattern.split("*").map(escapeRegexForPattern).join(".*")}$`))
+  };
+}
+
+function isOriginAllowed(rules: OriginRules, origin: string | undefined) {
+  if (!origin) {
+    return true;
+  }
+
+  return rules.exactOrigins.includes(origin) || rules.wildcardOrigins.some((pattern) => pattern.test(origin));
+}
+
 export function createCorsOriginMatcher(configuredOrigins: string[]) {
-  const exactOrigins = configuredOrigins.filter((origin) => !origin.includes("*"));
-  const wildcardOrigins = configuredOrigins
-    .filter((origin) => origin.includes("*"))
-    .map((pattern) => new RegExp(`^${pattern.split("*").map(escapeRegexForPattern).join(".*")}$`));
+  const rules = buildOriginRules(configuredOrigins);
 
   if (configuredOrigins.length === 0) {
     return true;
   }
 
   return async (origin: string | undefined) => {
-    if (!origin) {
-      return true;
-    }
+    return isOriginAllowed(rules, origin) ? origin ?? true : false;
+  };
+}
 
-    return exactOrigins.includes(origin) || wildcardOrigins.some((pattern) => pattern.test(origin)) ? origin : false;
+export function createSocketIoCorsOriginMatcher(configuredOrigins: string[]) {
+  const rules = buildOriginRules(configuredOrigins);
+
+  return (origin: string | undefined, callback: (error: Error | null, allow?: boolean) => void) => {
+    callback(null, configuredOrigins.length === 0 ? true : isOriginAllowed(rules, origin));
   };
 }
 
@@ -47,6 +70,7 @@ export async function createServerApp() {
     .map((origin) => origin.trim())
     .filter(Boolean);
   const corsOriginMatcher = createCorsOriginMatcher(corsOrigins);
+  const socketIoCorsOriginMatcher = createSocketIoCorsOriginMatcher(corsOrigins);
 
   await app.register(cors, {
     origin: corsOriginMatcher,
@@ -141,9 +165,25 @@ export async function createServerApp() {
   await app.ready();
   io = new SocketIOServer<ClientToServerEvents, ServerToClientEvents>(app.server, {
     cors: {
-      origin: corsOriginMatcher,
+      origin: socketIoCorsOriginMatcher,
       credentials: true
     }
+  });
+
+  io.engine.on("connection_error", (error) => {
+    app.log.warn(
+      {
+        code: error.code,
+        message: error.message,
+        context: error.context,
+        req: {
+          url: error.req?.url,
+          origin: error.req?.headers.origin,
+          host: error.req?.headers.host
+        }
+      },
+      "Engine.IO connection error"
+    );
   });
 
   io.on("connection", (socket) => {
