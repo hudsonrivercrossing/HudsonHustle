@@ -126,22 +126,26 @@ export class PostgresRoomRepository implements RoomRepository {
       );
     }
 
-    await this.db
-      .insert(gameSnapshotsTable)
-      .values({
-        roomCode: record.roomCode,
-        snapshotVersion: record.snapshotVersion,
-        snapshot: record.game,
-        updatedAt
-      })
-      .onConflictDoUpdate({
-        target: gameSnapshotsTable.roomCode,
-        set: {
+    if (record.game) {
+      await this.db
+        .insert(gameSnapshotsTable)
+        .values({
+          roomCode: record.roomCode,
           snapshotVersion: record.snapshotVersion,
           snapshot: record.game,
           updatedAt
-        }
-      });
+        })
+        .onConflictDoUpdate({
+          target: gameSnapshotsTable.roomCode,
+          set: {
+            snapshotVersion: record.snapshotVersion,
+            snapshot: record.game,
+            updatedAt
+          }
+        });
+    } else {
+      await this.db.delete(gameSnapshotsTable).where(eq(gameSnapshotsTable.roomCode, record.roomCode));
+    }
 
     await this.db.insert(gameEventsTable).values({
       roomCode: record.roomCode,
