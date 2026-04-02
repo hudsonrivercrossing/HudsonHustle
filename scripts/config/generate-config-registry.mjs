@@ -52,11 +52,11 @@ async function main() {
     const importBase = toImportBase(entry.configPath);
     const varBase = `${entry.mode}${pascalCase(entry.id)}`;
 
-    importLines.push(`import ${varBase}Map from "${importBase}/map.json" assert { type: "json" };`);
-    importLines.push(`import ${varBase}Meta from "${importBase}/meta.json" assert { type: "json" };`);
-    importLines.push(`import ${varBase}Rules from "${importBase}/rules.json" assert { type: "json" };`);
-    importLines.push(`import ${varBase}Tickets from "${importBase}/tickets.json" assert { type: "json" };`);
-    importLines.push(`import ${varBase}Visuals from "${importBase}/visuals.json" assert { type: "json" };`);
+    importLines.push(`import ${varBase}Map from "${importBase}/map.json" with { type: "json" };`);
+    importLines.push(`import ${varBase}Meta from "${importBase}/meta.json" with { type: "json" };`);
+    importLines.push(`import ${varBase}Rules from "${importBase}/rules.json" with { type: "json" };`);
+    importLines.push(`import ${varBase}Tickets from "${importBase}/tickets.json" with { type: "json" };`);
+    importLines.push(`import ${varBase}Visuals from "${importBase}/visuals.json" with { type: "json" };`);
 
     objectEntries.push(`  "${entry.id}": {
     configId: "${entry.id}",

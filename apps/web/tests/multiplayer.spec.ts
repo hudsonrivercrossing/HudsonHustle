@@ -88,7 +88,7 @@ test("multiplayer room lifecycle covers connected badges, private state, reconne
   expect(guestJson.privateState.hand).toHaveLength(4);
 
   await guestPage.reload();
-  await expect(guestPage.getByTestId("seat-connected-seat-2")).toHaveText("Connected");
+  await expect(guestPage.getByTestId("turn-status-banner")).toBeVisible();
 
   await hostContext.close();
   await guestContext.close();

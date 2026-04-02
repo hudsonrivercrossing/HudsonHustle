@@ -20,6 +20,7 @@ interface MultiplayerSetupScreenProps {
   reconnectState: ReconnectState;
   roomPreview: RoomSummary | null;
   error: string | null;
+  onOpenLocal?: () => void;
   onPreviewRoom: (roomCode: string) => void;
   onCreateRoom: (form: CreateRoomForm) => void;
   onJoinRoom: (form: { roomCode: string; playerName: string; preferredSeatId?: string }) => void;
@@ -31,6 +32,7 @@ export function MultiplayerSetupScreen({
   reconnectState,
   roomPreview,
   error,
+  onOpenLocal,
   onPreviewRoom,
   onCreateRoom,
   onJoinRoom,
@@ -63,6 +65,13 @@ export function MultiplayerSetupScreen({
         <p className="lead">
           Create a room, share a code, and play the released NYC/NJ maps from separate devices with server-owned game state.
         </p>
+        {onOpenLocal ? (
+          <div className="setup-actions">
+            <button className="secondary-button" onClick={onOpenLocal}>
+              Local pass-and-play
+            </button>
+          </div>
+        ) : null}
         {error ? <p className="error-banner">{error}</p> : null}
         {reconnectState === "attempting-reconnect" ? <p className="muted-copy">Attempting silent reconnect…</p> : null}
         {reconnectState === "reconnect-failed" ? <p className="muted-copy">Saved room credentials failed. Use manual reconnect below.</p> : null}

@@ -1,4 +1,4 @@
-import currentPointer from "../../../configs/hudson-hustle/current.json" assert { type: "json" };
+import currentPointer from "../../../configs/hudson-hustle/current.json" with { type: "json" };
 import type { CurrentConfigPointer, RegisteredConfigBundle } from "./config-types.js";
 import { generatedHudsonHustleConfigRegistry } from "./generated-config-registry.js";
 

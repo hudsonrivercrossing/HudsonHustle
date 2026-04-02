@@ -5,11 +5,20 @@ interface SetupScreenProps {
   canResume: boolean;
   onResume: () => void;
   onOpenTutorial: () => void;
+  onOpenMultiplayer?: () => void;
   configLabel: string;
   configSummary: string;
 }
 
-export function SetupScreen({ onStart, canResume, onResume, onOpenTutorial, configLabel, configSummary }: SetupScreenProps): JSX.Element {
+export function SetupScreen({
+  onStart,
+  canResume,
+  onResume,
+  onOpenTutorial,
+  onOpenMultiplayer,
+  configLabel,
+  configSummary
+}: SetupScreenProps): JSX.Element {
   const [playerCount, setPlayerCount] = useState(2);
   const [names, setNames] = useState(["Player 1", "Player 2", "Player 3", "Player 4"]);
 
@@ -72,6 +81,11 @@ export function SetupScreen({ onStart, canResume, onResume, onOpenTutorial, conf
           {canResume ? (
             <button className="secondary-button" onClick={onResume}>
               Resume saved game
+            </button>
+          ) : null}
+          {onOpenMultiplayer ? (
+            <button className="secondary-button" onClick={onOpenMultiplayer}>
+              Separate-device multiplayer
             </button>
           ) : null}
         </div>

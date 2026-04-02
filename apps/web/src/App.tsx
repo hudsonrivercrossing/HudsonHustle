@@ -21,8 +21,7 @@ import {
   type ServerToClientEvents,
   type StartRoomRequest,
   type TicketDef,
-  type TimerUpdate,
-  trainCardColors
+  type TimerUpdate
 } from "@hudson-hustle/game-core";
 import {
   getHudsonHustleMapByConfigId,
@@ -32,15 +31,17 @@ import {
 } from "@hudson-hustle/game-data";
 import { BoardMap } from "./components/BoardMap";
 import { IdentityChip } from "./components/IdentityChip";
+import { LocalPlayScreen } from "./components/LocalPlayScreen";
 import { LobbyScreen } from "./components/LobbyScreen";
 import { MultiplayerSetupScreen } from "./components/MultiplayerSetupScreen";
 import { TicketPicker } from "./components/TicketPicker";
 import { TransitCard } from "./components/TransitCard";
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8787";
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8787";
 const wsUrl = import.meta.env.VITE_WS_URL ?? apiBaseUrl;
 const sessionKey = "hudson-hustle-multiplayer-session-v2";
 type RealtimeStatus = "idle" | "connecting" | "subscribed" | "failed";
+type SetupMode = "local" | "multiplayer";
 
 interface SessionCredentials {
   roomCode: string;
@@ -151,12 +152,13 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export default function App(): JSX.Element {
+  const [setupMode, setSetupMode] = useState<SetupMode>("multiplayer");
   const [releasedConfigs, setReleasedConfigs] = useState<HudsonHustleReleasedConfigSummary[]>(hudsonHustleReleasedConfigs);
   const [snapshot, setSnapshot] = useState<RoomSnapshot | null>(null);
   const [credentials, setCredentials] = useState<SessionCredentials | null>(null);
   const [roomPreview, setRoomPreview] = useState<RoomSnapshot["room"] | null>(null);
   const [reconnectState, setReconnectState] = useState<ReconnectState>("fresh");
-  const [error, setError] = useState<string | null>(null);
+  const [multiplayerError, setMultiplayerError] = useState<string | null>(null);
   const [timer, setTimer] = useState<TimerUpdate | null>(null);
   const [timerNow, setTimerNow] = useState(() => Date.now());
   const [realtimeStatus, setRealtimeStatus] = useState<RealtimeStatus>("idle");
@@ -179,6 +181,7 @@ export default function App(): JSX.Element {
     if (!saved) {
       return;
     }
+    setSetupMode("multiplayer");
     setReconnectState("attempting-reconnect");
     awaitingSocketHandshakeRef.current = true;
     void requestJson<RejoinRoomResponse>(`/rooms/${saved.roomCode}/rejoin`, {
@@ -204,7 +207,7 @@ export default function App(): JSX.Element {
         }
         awaitingSocketHandshakeRef.current = false;
         setReconnectState("reconnect-failed");
-        setError(caught instanceof Error ? caught.message : "Reconnect failed.");
+        setMultiplayerError(caught instanceof Error ? caught.message : "Reconnect failed.");
       });
   }, []);
 
@@ -226,7 +229,7 @@ export default function App(): JSX.Element {
       }
       awaitingSocketHandshakeRef.current = false;
       setRealtimeStatus("failed");
-      setError("Realtime connection timed out before the room subscription was confirmed.");
+      setMultiplayerError("Realtime connection timed out before the room subscription was confirmed.");
       setReconnectState("reconnect-failed");
       socket.disconnect();
     }, 8000);
@@ -273,14 +276,14 @@ export default function App(): JSX.Element {
         awaitingSocketHandshakeRef.current = false;
         setReconnectState("reconnect-failed");
       }
-      setError(payload.message);
+      setMultiplayerError(payload.message);
     });
 
     socket.on("connect_error", (connectError) => {
       resolveHandshake();
       awaitingSocketHandshakeRef.current = false;
       setRealtimeStatus("failed");
-      setError(connectError.message || "Could not connect to the room.");
+      setMultiplayerError(connectError.message || "Could not connect to the room.");
       setReconnectState("reconnect-failed");
     });
 
@@ -291,7 +294,7 @@ export default function App(): JSX.Element {
         return;
       }
       setRealtimeStatus("failed");
-      setError("Connection lost. Reconnect using your saved session details.");
+      setMultiplayerError("Connection lost. Reconnect using your saved session details.");
       setReconnectState("reconnect-failed");
     });
 
@@ -443,12 +446,13 @@ export default function App(): JSX.Element {
         playerSecret: response.playerSecret
       };
       awaitingSocketHandshakeRef.current = true;
+      setSetupMode("multiplayer");
       setCredentials(nextCredentials);
       saveSession(nextCredentials);
       setSnapshot(response.snapshot);
-      setError(null);
+      setMultiplayerError(null);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Could not create the room.");
+      setMultiplayerError(caught instanceof Error ? caught.message : "Could not create the room.");
     }
   }
 
@@ -456,10 +460,10 @@ export default function App(): JSX.Element {
     try {
       const room = await requestJson<RoomSnapshot>(`/rooms/${roomCode}`);
       setRoomPreview(room.room);
-      setError(null);
+      setMultiplayerError(null);
     } catch (caught) {
       setRoomPreview(null);
-      setError(caught instanceof Error ? caught.message : "Could not preview that room.");
+      setMultiplayerError(caught instanceof Error ? caught.message : "Could not preview that room.");
     }
   }
 
@@ -478,12 +482,13 @@ export default function App(): JSX.Element {
         playerSecret: response.playerSecret
       };
       awaitingSocketHandshakeRef.current = true;
+      setSetupMode("multiplayer");
       setCredentials(nextCredentials);
       saveSession(nextCredentials);
       setSnapshot(response.snapshot);
-      setError(null);
+      setMultiplayerError(null);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Could not join that room.");
+      setMultiplayerError(caught instanceof Error ? caught.message : "Could not join that room.");
     }
   }
 
@@ -502,16 +507,17 @@ export default function App(): JSX.Element {
         playerSecret: response.playerSecret
       };
       awaitingSocketHandshakeRef.current = true;
+      setSetupMode("multiplayer");
       setCredentials(nextCredentials);
       saveSession(nextCredentials);
       setSnapshot(response.snapshot);
-      setError(null);
+      setMultiplayerError(null);
     } catch (caught) {
       if (caught instanceof ApiError && (caught.status === 403 || caught.status === 404)) {
         saveSession(null);
       }
       setReconnectState("reconnect-failed");
-      setError(caught instanceof Error ? caught.message : "Could not reconnect.");
+      setMultiplayerError(caught instanceof Error ? caught.message : "Could not reconnect.");
     }
   }
 
@@ -527,9 +533,9 @@ export default function App(): JSX.Element {
         } satisfies StartRoomRequest)
       });
       setSnapshot(response.snapshot);
-      setError(null);
+      setMultiplayerError(null);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Could not start the room.");
+      setMultiplayerError(caught instanceof Error ? caught.message : "Could not start the room.");
     }
   }
 
@@ -547,7 +553,7 @@ export default function App(): JSX.Element {
     if (!credentials) {
       return;
     }
-    setError(null);
+    setMultiplayerError(null);
     socketRef.current?.emit("game:action", {
       ...credentials,
       action
@@ -561,17 +567,26 @@ export default function App(): JSX.Element {
     setSnapshot(null);
     setRoomPreview(null);
     setTimer(null);
-    setError(null);
+    setMultiplayerError(null);
     setReconnectState("fresh");
+    setSetupMode("multiplayer");
   }
 
   if (!snapshot || !credentials) {
+    if (setupMode === "local") {
+      return <LocalPlayScreen onOpenMultiplayer={() => setSetupMode("multiplayer")} />;
+    }
+
     return (
       <MultiplayerSetupScreen
         releasedConfigs={releasedConfigs}
         reconnectState={reconnectState}
         roomPreview={roomPreview}
-        error={error}
+        error={multiplayerError}
+        onOpenLocal={() => {
+          setSetupMode("local");
+          setMultiplayerError(null);
+        }}
         onPreviewRoom={(roomCode) => void previewRoom(roomCode)}
         onCreateRoom={(form) => void createRoom(form)}
         onJoinRoom={(form) => void joinRoom(form)}
@@ -782,7 +797,7 @@ export default function App(): JSX.Element {
                 <h2>Action rail</h2>
                 <span>{publicGame.turn.summary ?? "Choose a route, city, or ticket action."}</span>
               </div>
-              {error ? <p className="error-banner">{error}</p> : null}
+              {multiplayerError ? <p className="error-banner">{multiplayerError}</p> : null}
 
             {publicGame.phase === "gameOver" ? (
               <div className="endgame-grid">
