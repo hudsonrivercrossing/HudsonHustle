@@ -1,5 +1,5 @@
-import type { GameState, MapConfig, RouteDef } from "@hudson-hustle/game-core";
-import { cardColorPalette, playerColorPalette, type BoardBackdrop, type SnapshotVisuals } from "@hudson-hustle/game-data";
+import type { MapConfig, RouteDef } from "@hudson-hustle/game-core";
+import type { BoardBackdrop, SnapshotVisuals } from "@hudson-hustle/game-data";
 
 interface PathPoint {
   x: number;
@@ -146,7 +146,14 @@ interface BoardMapProps {
   backdrop: BoardBackdrop;
   backdropMode: SnapshotVisuals["backdropMode"];
   boardLabelMode: SnapshotVisuals["boardLabelMode"];
-  game: GameState;
+  cardPalette: Record<string, string>;
+  playerPalette: Record<string, string>;
+  game: {
+    players: Array<{ id: string; name: string; color: string }>;
+    activePlayerIndex: number;
+    routeClaims: Array<{ routeId: string; playerId: string }>;
+    stations: Array<{ cityId: string; playerId: string }>;
+  };
   selectedRouteId: string | null;
   selectedCityId: string | null;
   onSelectRoute: (routeId: string) => void;
@@ -158,6 +165,8 @@ export function BoardMap({
   backdrop,
   backdropMode,
   boardLabelMode,
+  cardPalette,
+  playerPalette,
   game,
   selectedRouteId,
   selectedCityId,
@@ -250,10 +259,10 @@ export function BoardMap({
           const claimedByActive = claim?.playerId === activePlayerId;
           const claimingPlayer = claim ? game.players.find((player) => player.id === claim.playerId) : null;
           const stroke = claim
-            ? playerColorPalette[game.players.find((player) => player.id === claim.playerId)?.color ?? "harbor-blue"]
+            ? playerPalette[game.players.find((player) => player.id === claim.playerId)?.color ?? "harbor-blue"]
             : route.color === "gray"
               ? "#7e7463"
-              : cardColorPalette[route.color];
+              : cardPalette[route.color];
           const selected = selectedRouteId === route.id;
           const middlePoint = getPointAlongPath(pathPoints, totalLength / 2);
           const direction = getPathDirection(pathPoints, totalLength / 2);
@@ -353,7 +362,7 @@ export function BoardMap({
                   width="16"
                   height="16"
                   rx="4"
-                  fill={playerColorPalette[game.players.find((player) => player.id === station.playerId)?.color ?? "harbor-blue"]}
+                  fill={playerPalette[game.players.find((player) => player.id === station.playerId)?.color ?? "harbor-blue"]}
                   stroke="#fff8ec"
                   strokeWidth="2"
                 />

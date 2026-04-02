@@ -1,5 +1,9 @@
 # v0.4 Next Wave Balance Review
 
+Historical note:
+- this document records the draft-phase review before the frozen release was named `v0.4-flushing-newark-airport`
+- `v0.4-next-wave` here is intentional historical naming, not the current active release id
+
 ## Scope
 - Snapshot reviewed:
   - `configs/hudson-hustle/drafts/v0.4-next-wave`

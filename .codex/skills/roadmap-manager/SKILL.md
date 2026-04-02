@@ -14,6 +14,18 @@ Use this skill when the task touches project planning, milestone reshaping, or d
 4. Keep v1 focused on same-laptop play unless the user explicitly changes scope.
 5. When implementation changes behavior, reflect that in `docs/product/prd.md`, `docs/product/tech-spec.md`, and `docs/gameplay/player-guide.md` if needed.
 
+## Use This Instead Of `hudson-hustle-engineering-manager` When
+- the task is primarily milestone planning or scope control
+- the work is mostly about PRD, roadmap, sequencing, or status docs
+- you are shaping future work rather than debugging current runtime behavior
+
+Use `hudson-hustle-engineering-manager` instead when the task is about:
+- delivery readiness
+- debugging
+- testing strategy
+- merge gates
+- deploy verification
+
 ## Hudson Hustle Defaults
 - `V1`: local pass-and-play web app.
 - `V2`: authoritative backend for separate-device multiplayer.

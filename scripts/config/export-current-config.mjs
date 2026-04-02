@@ -45,7 +45,9 @@ async function loadCurrentMapModule() {
   const indexText = await readFile(compiledIndexPath, "utf8");
   const cartographyText = await readFile(compiledCartographyPath, "utf8");
 
-  const patchedIndexText = indexText.replaceAll('from "./cartography";', 'from "./cartography.mjs";');
+  const patchedIndexText = indexText
+    .replaceAll('from "./cartography";', 'from "./cartography.mjs";')
+    .replaceAll('from "./cartography.js";', 'from "./cartography.mjs";');
   const tempIndexPath = path.join(tempDir, "index.mjs");
   const tempCartographyPath = path.join(tempDir, "cartography.mjs");
 

@@ -1,5 +1,5 @@
 import type { MapConfig } from "@hudson-hustle/game-core";
-import type { BoardPoint } from "./cartography";
+import type { BoardPoint } from "./cartography.js";
 
 export interface BoardBackdropArea {
   id: string;
