@@ -15,6 +15,7 @@ Minimum system layer:
 - optional `SectionHeader`
 - `SurfaceCard`
 - `ChoiceChipButton`
+- `ModalShell`
 
 These primitives now also govern:
 - active game side-panel headers
@@ -41,6 +42,20 @@ Use `ChoiceChipButton` for compact action choices inside a detail surface, such 
 - build station with a specific color
 
 It belongs to the action/detail family, not the global button family.
+
+## Modal Shell
+
+Use `ModalShell` for:
+- ticket choice overlays
+- handoff overlays
+- draw reveal moments
+- tutorial overlays
+
+It unifies:
+- backdrop tone
+- width presets
+- text alignment
+- shared card framing
 
 Do not start by building:
 - full button library

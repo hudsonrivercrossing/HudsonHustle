@@ -29,6 +29,7 @@ import { TicketPicker } from "./TicketPicker";
 import { TransitCard } from "./TransitCard";
 import { Chip } from "./system/Chip";
 import { ChoiceChipButton } from "./system/ChoiceChipButton";
+import { ModalShell } from "./system/ModalShell";
 import { Panel } from "./system/Panel";
 import { SectionHeader } from "./system/SectionHeader";
 import { StatusBanner } from "./system/StatusBanner";
@@ -711,29 +712,23 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
       </div>
 
       {visibility === "postTurn" && game.phase !== "gameOver" ? (
-        <div className={`overlay ${tutorialTarget === "handoff" ? "overlay--tutorial-focus" : ""}`}>
-          <div className="overlay-card">
-            <p className="eyebrow">Turn complete</p>
-            <h2>{activePlayer.name}, pass the laptop.</h2>
+        <ModalShell tone={tutorialTarget === "handoff" ? "tutorial" : "default"} width="md" align="center">
+            <SectionHeader eyebrow="Turn complete" title={`${activePlayer.name}, pass the laptop.`} />
             <p>{game.turn.summary ?? "Your action is locked in."}</p>
             <button className="primary-button" onClick={() => applyAction({ type: "advance_turn" })}>
               I&apos;m done
             </button>
-          </div>
-        </div>
+        </ModalShell>
       ) : null}
 
       {visibility === "handoff" && game.phase !== "gameOver" ? (
-        <div className={`overlay ${tutorialTarget === "handoff" ? "overlay--tutorial-focus" : ""}`}>
-          <div className="overlay-card">
-            <p className="eyebrow">Next player</p>
-            <h2>{activePlayer.name}, take over.</h2>
+        <ModalShell tone={tutorialTarget === "handoff" ? "tutorial" : "default"} width="md" align="center">
+            <SectionHeader eyebrow="Next player" title={`${activePlayer.name}, take over.`} />
             <p>The board is safe to look at. Private cards and tickets stay hidden until you are ready.</p>
             <button className="primary-button" onClick={() => setVisibility("visible")}>
               I&apos;m ready
             </button>
-          </div>
-        </div>
+        </ModalShell>
       ) : null}
 
       {pendingTickets.length > 0 && visibility === "visible" ? (
@@ -765,16 +760,13 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
       ) : null}
 
       {revealedDeckCard ? (
-        <div className="modal-backdrop">
-          <div className="modal-card draw-reveal-card">
-            <p className="eyebrow">Deck draw</p>
-            <h2>You drew {formatFaceLabel(revealedDeckCard)}</h2>
+        <ModalShell width="md" align="center" cardClassName="draw-reveal-card">
+            <SectionHeader eyebrow="Deck draw" title={`You drew ${formatFaceLabel(revealedDeckCard)}`} />
             <TransitCard className="draw-reveal-preview" color={revealedDeckCard} context="hand" />
             <button className="primary-button" onClick={() => setRevealedDeckCard(null)}>
               Continue
             </button>
-          </div>
-        </div>
+        </ModalShell>
       ) : null}
 
       {tutorial}

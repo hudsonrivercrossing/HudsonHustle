@@ -1,4 +1,5 @@
 import { getCityName, type MapConfig, type TicketDef } from "@hudson-hustle/game-core";
+import { ModalShell } from "./system/ModalShell";
 import { SectionHeader } from "./system/SectionHeader";
 
 interface TicketPickerProps {
@@ -25,8 +26,7 @@ export function TicketPicker({
   onCancel
 }: TicketPickerProps): JSX.Element {
   return (
-    <div className="modal-backdrop">
-      <div className="modal-card">
+    <ModalShell width="md" align="center">
         <SectionHeader eyebrow="Private choice" title={title} meta={`Keep at least ${minimumKeep}`} />
         <p className="modal-copy">{subtitle}</p>
         <div className="ticket-list">
@@ -56,7 +56,6 @@ export function TicketPicker({
             Keep {selectedIds.length} ticket{selectedIds.length === 1 ? "" : "s"}
           </button>
         </div>
-      </div>
-    </div>
+    </ModalShell>
   );
 }

@@ -72,6 +72,17 @@ Extraction allowed during this slice:
 - `SurfaceCard`
 - `ChoiceChipButton`
 
+### Fifth Slice
+- `overlay / modal / tutorial surfaces`
+
+Scope:
+- ticket picker, handoff overlays, draw reveal, and tutorial shells share one modal container family
+- tutorial helper blocks use the same nested surface language as the rest of the shell
+
+Extraction allowed during this slice:
+- `ModalShell`
+- reuse `SurfaceCard` inside guided/tutorial flows
+
 ## Deferred
 
 Not for this phase:

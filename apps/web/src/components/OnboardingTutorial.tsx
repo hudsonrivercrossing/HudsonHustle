@@ -1,3 +1,7 @@
+import { ModalShell } from "./system/ModalShell";
+import { SectionHeader } from "./system/SectionHeader";
+import { SurfaceCard } from "./system/SurfaceCard";
+
 export type TutorialTarget = "setup" | "scoreboard" | "hand" | "market" | "board" | "action" | "handoff";
 
 export interface TutorialStep {
@@ -41,8 +45,7 @@ export function OnboardingTutorial({
   const isLast = stepIndex === steps.length - 1;
 
   return (
-    <div className="overlay overlay--tutorial">
-      <div className="overlay-card tutorial-card">
+    <ModalShell tone="tutorial" width="lg" align="left" cardClassName="tutorial-card">
         <div className="tutorial-layout">
           <aside className="tutorial-nav">
             <p className="eyebrow">First game guide</p>
@@ -66,10 +69,7 @@ export function OnboardingTutorial({
 
           <div className="tutorial-main">
             <div className="tutorial-header">
-              <div>
-                <p className="eyebrow">Guided Tutorial</p>
-                <h2>{step.title}</h2>
-              </div>
+              <SectionHeader eyebrow="Guided tutorial" title={step.title} />
               <button className="secondary-button" onClick={onClose}>
                 Skip tutorial
               </button>
@@ -86,24 +86,21 @@ export function OnboardingTutorial({
 
             <p className="tutorial-copy">{step.summary}</p>
 
-            <div className="tutorial-target">
-              <strong>Look at:</strong>
-              <span>{targetLabels[step.target]}</span>
-            </div>
+            <SurfaceCard variant="detail" className="tutorial-target" eyebrow="Focus" title="Look at">
+              <p>{targetLabels[step.target]}</p>
+            </SurfaceCard>
 
-            <div className="tutorial-points">
-              <strong>Key points</strong>
+            <SurfaceCard variant="detail" className="tutorial-points" eyebrow="Guide" title="Key points">
               <ul className="tutorial-point-list">
                 {step.keyPoints.map((point) => (
                   <li key={point}>{point}</li>
                 ))}
               </ul>
-            </div>
+            </SurfaceCard>
 
-            <div className="tutorial-tip">
-              <strong>Try this:</strong>
+            <SurfaceCard variant="detail" className="tutorial-tip" eyebrow="Try this" title="Suggested move">
               <p>{step.tip}</p>
-            </div>
+            </SurfaceCard>
 
             <div className="setup-actions">
               <button className="secondary-button" disabled={isFirst} onClick={onPrevious}>
@@ -121,7 +118,6 @@ export function OnboardingTutorial({
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    </ModalShell>
   );
 }
