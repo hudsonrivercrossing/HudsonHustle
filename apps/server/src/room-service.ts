@@ -1,3 +1,4 @@
+import { randomBytes, randomUUID } from "node:crypto";
 import {
   getCurrentPlayer,
   type GameActionPayload,
@@ -64,15 +65,11 @@ function nowIso(): string {
 
 function randomToken(length: number): string {
   const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let value = "";
-  for (let index = 0; index < length; index += 1) {
-    value += alphabet[Math.floor(Math.random() * alphabet.length)];
-  }
-  return value;
+  return Array.from(randomBytes(length), (byte) => alphabet[byte % alphabet.length]).join("");
 }
 
 function createPlayerSecret(): string {
-  return `${randomToken(6)}-${randomToken(6)}-${randomToken(6)}`;
+  return randomUUID();
 }
 
 function buildPublicGameState(game: GameState): PublicGameState {
@@ -169,6 +166,7 @@ function toStoredRecord(room: ServerRoom): StoredRoomRecord {
     turnTimeLimitSeconds: room.turnTimeLimitSeconds,
     createdAt: room.createdAt,
     updatedAt: room.updatedAt,
+    deadlineAt: room.deadlineAt ? new Date(room.deadlineAt).toISOString() : null,
     snapshotVersion: room.snapshotVersion,
     game: room.game,
     seats: room.seats
@@ -178,8 +176,12 @@ function toStoredRecord(room: ServerRoom): StoredRoomRecord {
 function fromStoredRecord(record: StoredRoomRecord): ServerRoom {
   return {
     ...record,
-    deadlineAt: null
+    deadlineAt: record.deadlineAt ? Date.parse(record.deadlineAt) : null
   };
+}
+
+function hasEnoughBlindCardsForTimedAutoDraw(game: GameState): boolean {
+  return game.trainDeck.length + game.discardPile.length >= 2;
 }
 
 export class RoomService {
@@ -296,10 +298,6 @@ export class RoomService {
   async rejoinRoom(roomCode: string, request: RejoinRoomRequest): Promise<RejoinRoomResponse> {
     const room = await this.getRoomOrThrow(roomCode);
     const seat = this.getAuthorizedSeat(room, request);
-    seat.connected = true;
-    seat.updatedAt = nowIso();
-    room.updatedAt = seat.updatedAt;
-    await this.saveRoom(room);
     return {
       roomCode: room.roomCode,
       seatId: seat.seatId,
@@ -337,8 +335,8 @@ export class RoomService {
       seat.updatedAt = room.updatedAt;
     });
 
-    await this.saveRoom(room);
     this.scheduleTimer(room);
+    await this.saveRoom(room);
     return {
       snapshot: this.buildSnapshot(room, hostSeat.seatId)
     };
@@ -395,31 +393,41 @@ export class RoomService {
     room.status = nextGame.phase === "gameOver" ? "finished" : room.status;
     room.updatedAt = nowIso();
     room.snapshotVersion += 1;
-    await this.saveRoom(room);
     this.scheduleTimer(room);
+    await this.saveRoom(room);
     return this.buildSnapshot(room, seat.seatId);
   }
 
   private async handleTimeout(roomCode: string): Promise<void> {
-    const room = await this.getRoomOrThrow(roomCode);
-    if (!room.game || room.status !== "active") {
-      return;
-    }
-    if (room.turnTimeLimitSeconds <= 0 || room.game.phase !== "main" || room.game.turn.stage !== "idle") {
-      return;
-    }
+    try {
+      const room = await this.getRoomOrThrow(roomCode);
+      if (!room.game || room.status !== "active") {
+        return;
+      }
+      if (room.turnTimeLimitSeconds <= 0 || room.game.phase !== "main" || room.game.turn.stage !== "idle") {
+        return;
+      }
+      if (!hasEnoughBlindCardsForTimedAutoDraw(room.game)) {
+        this.scheduleTimer(room);
+        await this.saveRoom(room);
+        return;
+      }
 
-    let nextGame = reduceGame(room.game, { type: "draw_card", source: "deck" }, getHudsonHustleMapByConfigId(room.configId));
-    nextGame = reduceGame(nextGame, { type: "draw_card", source: "deck" }, getHudsonHustleMapByConfigId(room.configId));
-    if (nextGame.turn.stage === "awaitingHandoff") {
-      nextGame = reduceGame(nextGame, { type: "advance_turn" }, getHudsonHustleMapByConfigId(room.configId));
-    }
+      let nextGame = reduceGame(room.game, { type: "draw_card", source: "deck" }, getHudsonHustleMapByConfigId(room.configId));
+      nextGame = reduceGame(nextGame, { type: "draw_card", source: "deck" }, getHudsonHustleMapByConfigId(room.configId));
+      if (nextGame.turn.stage === "awaitingHandoff") {
+        nextGame = reduceGame(nextGame, { type: "advance_turn" }, getHudsonHustleMapByConfigId(room.configId));
+      }
 
-    room.game = nextGame;
-    room.updatedAt = nowIso();
-    room.snapshotVersion += 1;
-    await this.saveRoom(room);
-    this.scheduleTimer(room);
+      room.game = nextGame;
+      room.updatedAt = nowIso();
+      room.snapshotVersion += 1;
+      this.scheduleTimer(room);
+      await this.saveRoom(room);
+    } catch {
+      this.timeouts.delete(roomCode);
+      this.onTimerChanged?.(roomCode, null);
+    }
   }
 
   private async getRoomOrThrow(roomCode: string): Promise<ServerRoom> {
@@ -429,6 +437,7 @@ export class RoomService {
       if (stored) {
         room = fromStoredRecord(stored);
         this.rooms.set(roomCode, room);
+        this.scheduleTimer(room, room.deadlineAt);
       }
     }
     invariant(room, "Unknown room code.");
@@ -457,7 +466,7 @@ export class RoomService {
     this.onRoomChanged?.(room.roomCode);
   }
 
-  private scheduleTimer(room: ServerRoom): void {
+  private scheduleTimer(room: ServerRoom, requestedDeadlineAt: number | null = null): void {
     const existing = this.timeouts.get(room.roomCode);
     if (existing) {
       clearTimeout(existing);
@@ -470,17 +479,18 @@ export class RoomService {
       return;
     }
 
-    if (room.game.phase !== "main" || room.game.turn.stage !== "idle") {
+    if (room.game.phase !== "main" || room.game.turn.stage !== "idle" || !hasEnoughBlindCardsForTimedAutoDraw(room.game)) {
       room.deadlineAt = null;
       this.onTimerChanged?.(room.roomCode, null);
       return;
     }
 
-    room.deadlineAt = Date.now() + room.turnTimeLimitSeconds * 1000;
+    const now = Date.now();
+    room.deadlineAt = requestedDeadlineAt && requestedDeadlineAt > now ? requestedDeadlineAt : now + room.turnTimeLimitSeconds * 1000;
     this.onTimerChanged?.(room.roomCode, room.deadlineAt);
     const timeout = setTimeout(() => {
       void this.handleTimeout(room.roomCode);
-    }, room.turnTimeLimitSeconds * 1000);
+    }, Math.max(0, room.deadlineAt - now));
     this.timeouts.set(room.roomCode, timeout);
   }
 }

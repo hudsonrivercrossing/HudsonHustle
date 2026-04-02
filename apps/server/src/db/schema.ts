@@ -11,7 +11,8 @@ export const roomsTable = pgTable("rooms", {
   mapName: text("map_name").notNull(),
   turnTimeLimitSeconds: integer("turn_time_limit_seconds").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull()
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull(),
+  deadlineAt: timestamp("deadline_at", { withTimezone: true })
 });
 
 export const roomSeatsTable = pgTable(

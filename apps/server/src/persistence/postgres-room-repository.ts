@@ -17,9 +17,11 @@ async function ensureSchema(sql: postgres.Sql): Promise<void> {
       map_name text not null,
       turn_time_limit_seconds integer not null,
       created_at timestamptz not null,
-      updated_at timestamptz not null
+      updated_at timestamptz not null,
+      deadline_at timestamptz
     )
   `;
+  await sql`alter table rooms add column if not exists deadline_at timestamptz`;
   await sql`
     create table if not exists room_seats (
       room_code text not null,
@@ -72,6 +74,7 @@ export class PostgresRoomRepository implements RoomRepository {
     await this.ready;
     const updatedAt = new Date(record.updatedAt);
     const createdAt = new Date(record.createdAt);
+    const deadlineAt = record.deadlineAt ? new Date(record.deadlineAt) : null;
 
     await this.db
       .insert(roomsTable)
@@ -86,7 +89,8 @@ export class PostgresRoomRepository implements RoomRepository {
         mapName: record.mapName,
         turnTimeLimitSeconds: record.turnTimeLimitSeconds,
         createdAt,
-        updatedAt
+        updatedAt,
+        deadlineAt
       })
       .onConflictDoUpdate({
         target: roomsTable.roomCode,
@@ -99,7 +103,8 @@ export class PostgresRoomRepository implements RoomRepository {
           configSummary: record.configSummary,
           mapName: record.mapName,
           turnTimeLimitSeconds: record.turnTimeLimitSeconds,
-          updatedAt
+          updatedAt,
+          deadlineAt
         }
       });
 
@@ -173,6 +178,7 @@ export class PostgresRoomRepository implements RoomRepository {
       turnTimeLimitSeconds: room.turnTimeLimitSeconds,
       createdAt: room.createdAt.toISOString(),
       updatedAt: room.updatedAt.toISOString(),
+      deadlineAt: room.deadlineAt ? room.deadlineAt.toISOString() : null,
       snapshotVersion: snapshot?.snapshotVersion ?? 0,
       game: (snapshot?.snapshot ?? null) as StoredRoomRecord["game"],
       seats: seats.map((seat) => ({

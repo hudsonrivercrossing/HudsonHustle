@@ -18,6 +18,7 @@ export interface StoredRoomRecord {
   turnTimeLimitSeconds: number;
   createdAt: string;
   updatedAt: string;
+  deadlineAt: string | null;
   snapshotVersion: number;
   game: GameState | null;
   seats: StoredSeatRecord[];

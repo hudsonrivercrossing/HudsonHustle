@@ -147,6 +147,7 @@ export default function App(): JSX.Element {
   const [reconnectState, setReconnectState] = useState<ReconnectState>("fresh");
   const [error, setError] = useState<string | null>(null);
   const [timer, setTimer] = useState<TimerUpdate | null>(null);
+  const [timerNow, setTimerNow] = useState(() => Date.now());
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
   const [selectedTicketIds, setSelectedTicketIds] = useState<string[]>([]);
@@ -237,6 +238,21 @@ export default function App(): JSX.Element {
       socketRef.current = null;
     };
   }, [credentials]);
+
+  useEffect(() => {
+    if (!timer?.deadlineAt) {
+      return;
+    }
+
+    setTimerNow(Date.now());
+    const interval = window.setInterval(() => {
+      setTimerNow(Date.now());
+    }, 1000);
+
+    return () => {
+      window.clearInterval(interval);
+    };
+  }, [timer?.deadlineAt]);
 
   const mapConfig = useMemo(() => {
     if (!snapshot) {
@@ -504,8 +520,8 @@ export default function App(): JSX.Element {
         ? "Your action is complete. End your turn to pass play to the next seat."
         : "Claim a route, build a station, or draw cards before the timer runs out.";
   const timerCopy =
-    timer?.secondsRemaining !== null && timer?.secondsRemaining !== undefined
-      ? `${timer.secondsRemaining}s left`
+    timer?.deadlineAt
+      ? `${Math.max(0, Math.ceil((timer.deadlineAt - timerNow) / 1000))}s left`
       : snapshot.room.turnTimeLimitSeconds === 0
         ? "Untimed room"
         : `Timer ${snapshot.room.turnTimeLimitSeconds}s`;
