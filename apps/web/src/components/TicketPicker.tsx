@@ -1,4 +1,5 @@
 import { getCityName, type MapConfig, type TicketDef } from "@hudson-hustle/game-core";
+import { Button } from "./system/Button";
 import { ModalShell } from "./system/ModalShell";
 import { SectionHeader } from "./system/SectionHeader";
 
@@ -48,13 +49,13 @@ export function TicketPicker({
         </div>
         <div className="setup-actions">
           {onCancel ? (
-            <button className="secondary-button" onClick={onCancel}>
+            <Button onClick={onCancel}>
               Back
-            </button>
+            </Button>
           ) : null}
-          <button className="primary-button" disabled={selectedIds.length < minimumKeep} onClick={onConfirm}>
+          <Button variant="primary" disabled={selectedIds.length < minimumKeep} onClick={onConfirm}>
             Keep {selectedIds.length} ticket{selectedIds.length === 1 ? "" : "s"}
-          </button>
+          </Button>
         </div>
     </ModalShell>
   );

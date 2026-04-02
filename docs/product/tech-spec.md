@@ -427,7 +427,8 @@
   - per-turn timer in seconds
 - The default turn timer is `0`, meaning no timer.
 - Released config ids should be the only multiplayer map choices exposed in MVP2.
-- A player's own `roomCode`, `seatId`, and `playerSecret` should be visible through a low-prominence reveal control, not permanent full-screen chrome.
+- A player's own reconnect token should be visible through a low-prominence reveal control, not permanent full-screen chrome.
+- The reconnect token should be versioned and opaque-ish, for example `hh1.<base64url(json)>`, so the client can recover room code, seat id, and player secret without exposing each field in the UI.
 
 ### V2 Seat / Controller Model
 Seats and controllers should be modeled separately from the beginning.

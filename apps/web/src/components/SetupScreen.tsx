@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import { Button } from "./system/Button";
+import { FormField } from "./system/FormField";
 import { SectionHeader } from "./system/SectionHeader";
 import { StatusBanner } from "./system/StatusBanner";
 
@@ -49,19 +51,17 @@ export function SetupScreen({
         />
 
         <SectionHeader eyebrow="Table setup" title="Players" meta={`${playerCount} seated`} />
-        <label className="field">
-          <span>Players</span>
+        <FormField label="Players">
           <select value={playerCount} onChange={(event) => setPlayerCount(Number(event.target.value))}>
             <option value={2}>2 players</option>
             <option value={3}>3 players</option>
             <option value={4}>4 players</option>
           </select>
-        </label>
+        </FormField>
 
         <div className="field-grid">
           {activeNames.map((name, index) => (
-            <label className="field" key={index}>
-              <span>Player {index + 1}</span>
+            <FormField label={`Player ${index + 1}`} key={index}>
               <input
                 value={name}
                 maxLength={24}
@@ -73,29 +73,26 @@ export function SetupScreen({
                   })
                 }
               />
-            </label>
+            </FormField>
           ))}
         </div>
 
         <div className="setup-actions">
-          <button
-            className="primary-button"
-            onClick={() => onStart(activeNames.map((name, index) => name.trim() || `Player ${index + 1}`))}
-          >
+          <Button variant="primary" onClick={() => onStart(activeNames.map((name, index) => name.trim() || `Player ${index + 1}`))}>
             Start new game
-          </button>
-          <button className="secondary-button" onClick={onOpenTutorial}>
+          </Button>
+          <Button onClick={onOpenTutorial}>
             How to play
-          </button>
+          </Button>
           {canResume ? (
-            <button className="secondary-button" onClick={onResume}>
+            <Button onClick={onResume}>
               Resume saved game
-            </button>
+            </Button>
           ) : null}
           {onOpenMultiplayer ? (
-            <button className="secondary-button" onClick={onOpenMultiplayer}>
+            <Button onClick={onOpenMultiplayer}>
               Separate-device multiplayer
-            </button>
+            </Button>
           ) : null}
         </div>
         <p className="muted-copy">

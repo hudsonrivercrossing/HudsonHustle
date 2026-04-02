@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { decodeReconnectToken } from "../src/reconnect-token";
 
 const SESSION_KEY = "hudson-hustle-multiplayer-session-v2";
 const API_BASE_URL = "http://127.0.0.1:8787";
@@ -23,8 +24,7 @@ async function createRoom(page: Page): Promise<{ roomCode: string; seatId: strin
 
   const session = await page.evaluate((key) => window.localStorage.getItem(key), SESSION_KEY);
   expect(session).not.toBeNull();
-  const parsed = JSON.parse(session ?? "{}") as { roomCode: string; seatId: string; playerSecret: string };
-  return parsed;
+  return decodeReconnectToken(session ?? "");
 }
 
 async function joinRoom(page: Page, roomCode: string): Promise<{ roomCode: string; seatId: string; playerSecret: string }> {
@@ -40,7 +40,7 @@ async function joinRoom(page: Page, roomCode: string): Promise<{ roomCode: strin
 
   const session = await page.evaluate((key) => window.localStorage.getItem(key), SESSION_KEY);
   expect(session).not.toBeNull();
-  return JSON.parse(session ?? "{}") as { roomCode: string; seatId: string; playerSecret: string };
+  return decodeReconnectToken(session ?? "");
 }
 
 test("multiplayer room lifecycle covers connected badges, private state, reconnect, and timer display", async ({ browser }) => {

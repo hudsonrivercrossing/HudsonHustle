@@ -27,6 +27,7 @@ import { OnboardingTutorial, type TutorialStep } from "./OnboardingTutorial";
 import { SetupScreen } from "./SetupScreen";
 import { TicketPicker } from "./TicketPicker";
 import { TransitCard } from "./TransitCard";
+import { Button } from "./system/Button";
 import { Chip } from "./system/Chip";
 import { ChoiceChipButton } from "./system/ChoiceChipButton";
 import { ModalShell } from "./system/ModalShell";
@@ -478,12 +479,12 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
           />
         </div>
         <div className="topbar-actions">
-          <button className="secondary-button" onClick={openTutorial}>
+          <Button onClick={openTutorial}>
             Tutorial
-          </button>
-          <button className="secondary-button" onClick={resetGame}>
+          </Button>
+          <Button onClick={resetGame}>
             Back to setup
-          </button>
+          </Button>
         </div>
       </header>
 
@@ -565,9 +566,9 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
                 />
               ))}
             </div>
-            <button className="secondary-button" disabled={marketDisabled} onClick={() => applyAction({ type: "draw_card", source: "deck" })}>
+            <Button disabled={marketDisabled} onClick={() => applyAction({ type: "draw_card", source: "deck" })}>
               Draw from deck
-            </button>
+            </Button>
           </Panel>
         </aside>
 
@@ -635,12 +636,12 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
 
             {game.phase === "main" && visibility === "visible" ? (
               <div className="action-rail">
-                <button className="secondary-button" disabled={!canTakeTurnAction} onClick={() => applyAction({ type: "draw_tickets" })}>
+                <Button disabled={!canTakeTurnAction} onClick={() => applyAction({ type: "draw_tickets" })}>
                   Draw tickets
-                </button>
-                <button className="secondary-button" disabled>
+                </Button>
+                <Button disabled>
                   Score updates automatically
-                </button>
+                </Button>
               </div>
             ) : null}
 
@@ -715,9 +716,9 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
         <ModalShell tone={tutorialTarget === "handoff" ? "tutorial" : "default"} width="md" align="center">
             <SectionHeader eyebrow="Turn complete" title={`${activePlayer.name}, pass the laptop.`} />
             <p>{game.turn.summary ?? "Your action is locked in."}</p>
-            <button className="primary-button" onClick={() => applyAction({ type: "advance_turn" })}>
+            <Button variant="primary" onClick={() => applyAction({ type: "advance_turn" })}>
               I&apos;m done
-            </button>
+            </Button>
         </ModalShell>
       ) : null}
 
@@ -725,9 +726,9 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
         <ModalShell tone={tutorialTarget === "handoff" ? "tutorial" : "default"} width="md" align="center">
             <SectionHeader eyebrow="Next player" title={`${activePlayer.name}, take over.`} />
             <p>The board is safe to look at. Private cards and tickets stay hidden until you are ready.</p>
-            <button className="primary-button" onClick={() => setVisibility("visible")}>
+            <Button variant="primary" onClick={() => setVisibility("visible")}>
               I&apos;m ready
-            </button>
+            </Button>
         </ModalShell>
       ) : null}
 
@@ -763,9 +764,9 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
         <ModalShell width="md" align="center" cardClassName="draw-reveal-card">
             <SectionHeader eyebrow="Deck draw" title={`You drew ${formatFaceLabel(revealedDeckCard)}`} />
             <TransitCard className="draw-reveal-preview" color={revealedDeckCard} context="hand" />
-            <button className="primary-button" onClick={() => setRevealedDeckCard(null)}>
+            <Button variant="primary" onClick={() => setRevealedDeckCard(null)}>
               Continue
-            </button>
+            </Button>
         </ModalShell>
       ) : null}
 

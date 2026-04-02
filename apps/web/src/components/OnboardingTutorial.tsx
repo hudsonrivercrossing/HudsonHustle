@@ -1,3 +1,4 @@
+import { Button } from "./system/Button";
 import { ModalShell } from "./system/ModalShell";
 import { SectionHeader } from "./system/SectionHeader";
 import { SurfaceCard } from "./system/SurfaceCard";
@@ -55,14 +56,14 @@ export function OnboardingTutorial({
             </p>
             <div className="tutorial-step-list">
               {steps.map((entry, index) => (
-                <button
+                <Button
                   key={entry.id}
                   className={`tutorial-step-link ${index === stepIndex ? "tutorial-step-link--active" : ""}`}
                   onClick={() => onJumpTo(index)}
                 >
                   <span className="tutorial-step-link__index">{index + 1}</span>
                   <span>{entry.title}</span>
-                </button>
+                </Button>
               ))}
             </div>
           </aside>
@@ -70,9 +71,9 @@ export function OnboardingTutorial({
           <div className="tutorial-main">
             <div className="tutorial-header">
               <SectionHeader eyebrow="Guided tutorial" title={step.title} />
-              <button className="secondary-button" onClick={onClose}>
+              <Button onClick={onClose}>
                 Skip tutorial
-              </button>
+              </Button>
             </div>
 
             <div className="tutorial-progress" aria-hidden="true">
@@ -103,17 +104,17 @@ export function OnboardingTutorial({
             </SurfaceCard>
 
             <div className="setup-actions">
-              <button className="secondary-button" disabled={isFirst} onClick={onPrevious}>
+              <Button disabled={isFirst} onClick={onPrevious}>
                 Previous
-              </button>
+              </Button>
               {isLast ? (
-                <button className="primary-button" onClick={onClose}>
+                <Button variant="primary" onClick={onClose}>
                   Finish tutorial
-                </button>
+                </Button>
               ) : (
-                <button className="primary-button" onClick={onNext}>
+                <Button variant="primary" onClick={onNext}>
                   Next
-                </button>
+                </Button>
               )}
             </div>
           </div>

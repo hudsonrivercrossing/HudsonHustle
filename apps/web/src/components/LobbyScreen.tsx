@@ -1,5 +1,6 @@
 import type { RoomSummary, TimerUpdate } from "@hudson-hustle/game-core";
 import { IdentityChip } from "./IdentityChip";
+import { Button } from "./system/Button";
 import { Chip } from "./system/Chip";
 import { Panel } from "./system/Panel";
 import { SectionHeader } from "./system/SectionHeader";
@@ -8,7 +9,7 @@ import { StatusBanner } from "./system/StatusBanner";
 interface LobbyScreenProps {
   room: RoomSummary;
   localSeatId: string;
-  playerSecret: string;
+  reconnectToken: string;
   onReadyChange: (ready: boolean) => void;
   onStart: () => void;
   timer: TimerUpdate | null;
@@ -19,7 +20,7 @@ interface LobbyScreenProps {
 export function LobbyScreen({
   room,
   localSeatId,
-  playerSecret,
+  reconnectToken,
   onReadyChange,
   onStart,
   timer,
@@ -65,7 +66,7 @@ export function LobbyScreen({
               testId="lobby-status-banner"
             />
           </div>
-          <IdentityChip roomCode={room.roomCode} seatId={localSeatId} playerSecret={playerSecret} />
+          <IdentityChip reconnectToken={reconnectToken} />
         </div>
 
         <div className="lobby-grid">
@@ -113,13 +114,13 @@ export function LobbyScreen({
         </div>
 
         <div className="setup-actions">
-          <button className="secondary-button" disabled={!realtimeReady} onClick={() => onReadyChange(!localSeat?.ready)}>
+          <Button disabled={!realtimeReady} onClick={() => onReadyChange(!localSeat?.ready)}>
             {localSeat?.ready ? "Mark not ready" : "Mark ready"}
-          </button>
+          </Button>
           {localSeat?.isHost ? (
-            <button className="primary-button" disabled={!canStart} onClick={onStart}>
+            <Button variant="primary" disabled={!canStart} onClick={onStart}>
               Start game
-            </button>
+            </Button>
           ) : null}
         </div>
       </section>

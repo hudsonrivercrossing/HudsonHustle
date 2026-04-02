@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import type { HudsonHustleReleasedConfigSummary } from "@hudson-hustle/game-data";
 import type { ReconnectState, RoomSummary } from "@hudson-hustle/game-core";
+import { Button } from "./system/Button";
+import { FormField } from "./system/FormField";
 import { Panel } from "./system/Panel";
 import { SectionHeader } from "./system/SectionHeader";
 import { StatusBanner } from "./system/StatusBanner";
@@ -12,12 +14,6 @@ interface CreateRoomForm {
   turnTimeLimitSeconds: number;
 }
 
-interface ManualReconnectForm {
-  roomCode: string;
-  seatId: string;
-  playerSecret: string;
-}
-
 interface MultiplayerSetupScreenProps {
   releasedConfigs: HudsonHustleReleasedConfigSummary[];
   reconnectState: ReconnectState;
@@ -27,7 +23,7 @@ interface MultiplayerSetupScreenProps {
   onPreviewRoom: (roomCode: string) => void;
   onCreateRoom: (form: CreateRoomForm) => void;
   onJoinRoom: (form: { roomCode: string; playerName: string; preferredSeatId?: string }) => void;
-  onManualReconnect: (form: ManualReconnectForm) => void;
+  onManualReconnect: (reconnectToken: string) => void;
 }
 
 export function MultiplayerSetupScreen({
@@ -51,9 +47,7 @@ export function MultiplayerSetupScreen({
   const [joinPlayerName, setJoinPlayerName] = useState("Player");
   const [preferredSeatId, setPreferredSeatId] = useState<string | undefined>(undefined);
 
-  const [manualRoomCode, setManualRoomCode] = useState("");
-  const [manualSeatId, setManualSeatId] = useState("");
-  const [manualSecret, setManualSecret] = useState("");
+  const [manualReconnectToken, setManualReconnectToken] = useState("");
 
   const openSeats = useMemo(
     () => roomPreview?.seats.filter((seat) => seat.playerName === null) ?? [],
@@ -71,9 +65,9 @@ export function MultiplayerSetupScreen({
   const setupBannerCopy = error
     ? error
     : reconnectState === "reconnect-failed"
-      ? "Saved room credentials could not reconnect. Use the manual reconnect form below."
+      ? "Saved reconnect token could not reconnect. Use the manual reconnect token below."
       : reconnectState === "attempting-reconnect"
-        ? "Checking saved room credentials before showing the normal join flow."
+        ? "Checking the saved reconnect token before showing the normal join flow."
         : "Host a released map, share the room code, and move the game state to the server-owned multiplayer flow.";
 
   return (
@@ -92,29 +86,26 @@ export function MultiplayerSetupScreen({
         />
         {onOpenLocal ? (
           <div className="setup-actions">
-            <button className="secondary-button" onClick={onOpenLocal}>
+            <Button onClick={onOpenLocal}>
               Local pass-and-play
-            </button>
+            </Button>
           </div>
         ) : null}
 
         <div className="multiplayer-setup-grid">
           <Panel variant="status" data-testid="create-room-panel">
             <SectionHeader eyebrow="Host flow" title="Create room" meta="Host a new table" />
-            <label className="field">
-              <span>Your name</span>
+            <FormField label="Your name">
               <input value={hostName} maxLength={24} onChange={(event) => setHostName(event.target.value)} />
-            </label>
-            <label className="field">
-              <span>Players</span>
+            </FormField>
+            <FormField label="Players">
               <select value={playerCount} onChange={(event) => setPlayerCount(Number(event.target.value) as 2 | 3 | 4)}>
                 <option value={2}>2 players</option>
                 <option value={3}>3 players</option>
                 <option value={4}>4 players</option>
               </select>
-            </label>
-            <label className="field">
-              <span>Released map</span>
+            </FormField>
+            <FormField label="Released map">
               <select value={configId} onChange={(event) => setConfigId(event.target.value)}>
                 {releasedConfigs.map((config) => (
                   <option key={config.configId} value={config.configId}>
@@ -122,21 +113,21 @@ export function MultiplayerSetupScreen({
                   </option>
                 ))}
               </select>
-            </label>
+            </FormField>
             <div className="field">
               <span>Turn timer</span>
               <div className="timer-picker">
-                <button className="secondary-button" onClick={() => setTurnTimeLimitSeconds((current) => Math.max(0, current - 15))}>
+                <Button onClick={() => setTurnTimeLimitSeconds((current) => Math.max(0, current - 15))}>
                   −15
-                </button>
+                </Button>
                 <strong>{turnTimeLimitSeconds}s</strong>
-                <button className="secondary-button" onClick={() => setTurnTimeLimitSeconds((current) => current + 15)}>
+                <Button onClick={() => setTurnTimeLimitSeconds((current) => current + 15)}>
                   +15
-                </button>
+                </Button>
               </div>
             </div>
-            <button
-              className="primary-button"
+            <Button
+              variant="primary"
               onClick={() =>
                 onCreateRoom({
                   hostName: hostName.trim() || "Host",
@@ -147,18 +138,17 @@ export function MultiplayerSetupScreen({
               }
             >
               Create room
-            </button>
+            </Button>
           </Panel>
 
           <Panel variant="neutral" data-testid="join-room-panel">
             <SectionHeader eyebrow="Guest flow" title="Join room" meta="Pick an open seat" />
-            <label className="field">
-              <span>Room code</span>
+            <FormField label="Room code">
               <input value={joinRoomCode} onChange={(event) => setJoinRoomCode(event.target.value.toUpperCase())} maxLength={6} />
-            </label>
-            <button className="secondary-button" onClick={() => onPreviewRoom(joinRoomCode)}>
+            </FormField>
+            <Button onClick={() => onPreviewRoom(joinRoomCode)}>
               Preview room
-            </button>
+            </Button>
             {roomPreview ? (
               <div className="room-preview">
                 <p className="muted-copy">
@@ -166,23 +156,22 @@ export function MultiplayerSetupScreen({
                 </p>
                 <div className="seat-choice-row">
                   {openSeats.map((seat) => (
-                    <button
+                    <Button
                       key={seat.seatId}
                       className={`chip-button ${preferredSeatId === seat.seatId ? "chip-button--selected" : ""}`}
                       onClick={() => setPreferredSeatId(seat.seatId)}
                     >
                       {seat.seatId}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
             ) : null}
-            <label className="field">
-              <span>Your name</span>
+            <FormField label="Your name">
               <input value={joinPlayerName} maxLength={24} onChange={(event) => setJoinPlayerName(event.target.value)} />
-            </label>
-            <button
-              className="primary-button"
+            </FormField>
+            <Button
+              variant="primary"
               onClick={() =>
                 onJoinRoom({
                   roomCode: joinRoomCode,
@@ -192,38 +181,28 @@ export function MultiplayerSetupScreen({
               }
             >
               Join room
-            </button>
+            </Button>
           </Panel>
         </div>
 
         <Panel variant={reconnectState === "reconnect-failed" ? "alert" : "neutral"} className="reconnect-panel">
-          <SectionHeader eyebrow="Recovery" title="Manual reconnect" meta="Use your hidden session chip" />
-          <div className="field-grid">
-            <label className="field">
-              <span>Room code</span>
-              <input value={manualRoomCode} onChange={(event) => setManualRoomCode(event.target.value.toUpperCase())} />
-            </label>
-            <label className="field">
-              <span>Seat id</span>
-              <input value={manualSeatId} onChange={(event) => setManualSeatId(event.target.value)} />
-            </label>
-            <label className="field">
-              <span>Player secret</span>
-              <input value={manualSecret} onChange={(event) => setManualSecret(event.target.value)} />
-            </label>
-          </div>
-          <button
-            className="secondary-button"
-            onClick={() =>
-              onManualReconnect({
-                roomCode: manualRoomCode,
-                seatId: manualSeatId,
-                playerSecret: manualSecret
-              })
-            }
+          <SectionHeader eyebrow="Recovery" title="Manual reconnect" meta="Paste one reconnect token" />
+          <FormField label="Reconnect token">
+            <input
+              value={manualReconnectToken}
+              onChange={(event) => setManualReconnectToken(event.target.value)}
+              placeholder="hh1."
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck={false}
+            />
+          </FormField>
+          <Button
+            disabled={!manualReconnectToken.trim()}
+            onClick={() => onManualReconnect(manualReconnectToken)}
           >
             Reconnect
-          </button>
+          </Button>
         </Panel>
       </section>
     </main>

@@ -13,6 +13,8 @@ Minimum system layer:
 - `Panel`
 - optional `Chip/Badge`
 - optional `SectionHeader`
+- `Button`
+- `FormField`
 - `SurfaceCard`
 - `ChoiceChipButton`
 - `ModalShell`
@@ -56,6 +58,27 @@ It unifies:
 - width presets
 - text alignment
 - shared card framing
+
+## Button
+
+Use `Button` for the primary and secondary shell button family:
+- setup actions
+- modal actions
+- turn controls
+- copy/share controls
+
+Do not use it for:
+- action-detail color chips
+- ticket-card selection buttons
+
+## Form Field
+
+Use `FormField` for labeled inputs and selects in:
+- local setup
+- multiplayer setup
+- reconnect forms
+
+It provides the stable label/control wrapper. It does not replace every custom control container.
 
 Do not start by building:
 - full button library

@@ -36,24 +36,20 @@ import { LobbyScreen } from "./components/LobbyScreen";
 import { MultiplayerSetupScreen } from "./components/MultiplayerSetupScreen";
 import { TicketPicker } from "./components/TicketPicker";
 import { TransitCard } from "./components/TransitCard";
+import { Button } from "./components/system/Button";
 import { Chip } from "./components/system/Chip";
 import { ChoiceChipButton } from "./components/system/ChoiceChipButton";
 import { Panel } from "./components/system/Panel";
 import { SectionHeader } from "./components/system/SectionHeader";
 import { StatusBanner } from "./components/system/StatusBanner";
 import { SurfaceCard } from "./components/system/SurfaceCard";
+import { decodeReconnectToken, encodeReconnectToken, readReconnectCredentials, type ReconnectCredentials } from "./reconnect-token";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8787";
 const wsUrl = import.meta.env.VITE_WS_URL ?? apiBaseUrl;
 const sessionKey = "hudson-hustle-multiplayer-session-v2";
 type RealtimeStatus = "idle" | "connecting" | "subscribed" | "failed";
 type SetupMode = "local" | "multiplayer";
-
-interface SessionCredentials {
-  roomCode: string;
-  seatId: string;
-  playerSecret: string;
-}
 
 class ApiError extends Error {
   constructor(
@@ -65,25 +61,23 @@ class ApiError extends Error {
   }
 }
 
-function readSession(): SessionCredentials | null {
+function readSession(): ReconnectCredentials | null {
   const raw = window.localStorage.getItem(sessionKey);
-  if (!raw) {
-    return null;
+  const credentials = readReconnectCredentials(raw);
+  if (!raw || !credentials || raw.trim().startsWith("hh1.")) {
+    return credentials;
   }
 
-  try {
-    return JSON.parse(raw) as SessionCredentials;
-  } catch {
-    return null;
-  }
+  window.localStorage.setItem(sessionKey, encodeReconnectToken(credentials));
+  return credentials;
 }
 
-function saveSession(credentials: SessionCredentials | null): void {
+function saveSession(credentials: ReconnectCredentials | null): void {
   if (!credentials) {
     window.localStorage.removeItem(sessionKey);
     return;
   }
-  window.localStorage.setItem(sessionKey, JSON.stringify(credentials));
+  window.localStorage.setItem(sessionKey, encodeReconnectToken(credentials));
 }
 
 function placeholderHand(playerId: string, count: number): GameState["players"][number]["hand"] {
@@ -161,7 +155,7 @@ export default function App(): JSX.Element {
   const [setupMode, setSetupMode] = useState<SetupMode>("multiplayer");
   const [releasedConfigs, setReleasedConfigs] = useState<HudsonHustleReleasedConfigSummary[]>(hudsonHustleReleasedConfigs);
   const [snapshot, setSnapshot] = useState<RoomSnapshot | null>(null);
-  const [credentials, setCredentials] = useState<SessionCredentials | null>(null);
+  const [credentials, setCredentials] = useState<ReconnectCredentials | null>(null);
   const [roomPreview, setRoomPreview] = useState<RoomSnapshot["room"] | null>(null);
   const [reconnectState, setReconnectState] = useState<ReconnectState>("fresh");
   const [multiplayerError, setMultiplayerError] = useState<string | null>(null);
@@ -368,6 +362,13 @@ export default function App(): JSX.Element {
     return snapshot.game.players[snapshot.game.activePlayerIndex]?.id === snapshot.privateState.playerId;
   }, [snapshot]);
 
+  const reconnectToken = useMemo(() => {
+    if (!credentials) {
+      return "";
+    }
+    return encodeReconnectToken(credentials);
+  }, [credentials]);
+
   useEffect(() => {
     const pending = snapshot?.privateState?.pendingTickets ?? [];
     if (pending.length === 0) {
@@ -498,8 +499,9 @@ export default function App(): JSX.Element {
     }
   }
 
-  async function manualReconnect(form: SessionCredentials) {
+  async function manualReconnect(reconnectToken: string) {
     try {
+      const form = decodeReconnectToken(reconnectToken);
       const response = await requestJson<RejoinRoomResponse>(`/rooms/${form.roomCode}/rejoin`, {
         method: "POST",
         body: JSON.stringify({
@@ -519,6 +521,11 @@ export default function App(): JSX.Element {
       setSnapshot(response.snapshot);
       setMultiplayerError(null);
     } catch (caught) {
+      if (caught instanceof Error && caught.message.startsWith("Reconnect token")) {
+        setReconnectState("reconnect-failed");
+        setMultiplayerError(caught.message);
+        return;
+      }
       if (caught instanceof ApiError && (caught.status === 403 || caught.status === 404)) {
         saveSession(null);
       }
@@ -596,7 +603,7 @@ export default function App(): JSX.Element {
         onPreviewRoom={(roomCode) => void previewRoom(roomCode)}
         onCreateRoom={(form) => void createRoom(form)}
         onJoinRoom={(form) => void joinRoom(form)}
-        onManualReconnect={(form) => void manualReconnect(form)}
+        onManualReconnect={(reconnectToken) => void manualReconnect(reconnectToken)}
       />
     );
   }
@@ -606,7 +613,7 @@ export default function App(): JSX.Element {
       <LobbyScreen
         room={snapshot.room}
         localSeatId={credentials.seatId}
-        playerSecret={credentials.playerSecret}
+        reconnectToken={reconnectToken}
         onReadyChange={sendReady}
         onStart={() => void startRoom()}
         timer={timer}
@@ -670,10 +677,10 @@ export default function App(): JSX.Element {
           />
         </div>
         <div className="topbar-actions">
-          <IdentityChip roomCode={credentials.roomCode} seatId={credentials.seatId} playerSecret={credentials.playerSecret} />
-          <button className="secondary-button" onClick={leaveRoom}>
+          <IdentityChip reconnectToken={reconnectToken} />
+          <Button onClick={leaveRoom}>
             Leave room
-          </button>
+          </Button>
         </div>
       </header>
 
@@ -742,9 +749,9 @@ export default function App(): JSX.Element {
                 />
               ))}
             </div>
-            <button className="secondary-button" disabled={!canContinueDrawing} onClick={() => sendGameAction({ type: "draw_card", source: "deck" })}>
+            <Button disabled={!canContinueDrawing} onClick={() => sendGameAction({ type: "draw_card", source: "deck" })}>
               Draw from deck
-            </button>
+            </Button>
           </Panel>
         </aside>
 
@@ -812,15 +819,15 @@ export default function App(): JSX.Element {
 
             {publicGame.phase === "main" ? (
               <div className="action-rail">
-                <button className="secondary-button" disabled={!canTakeTurnAction} onClick={() => sendGameAction({ type: "draw_tickets" })}>
+                <Button disabled={!canTakeTurnAction} onClick={() => sendGameAction({ type: "draw_tickets" })}>
                   Draw tickets
-                </button>
-                <button className="primary-button" disabled={!canAdvanceTurn} onClick={() => sendGameAction({ type: "advance_turn" })}>
+                </Button>
+                <Button variant="primary" disabled={!canAdvanceTurn} onClick={() => sendGameAction({ type: "advance_turn" })}>
                   End turn
-                </button>
-                <button className="secondary-button" disabled>
+                </Button>
+                <Button disabled>
                   {snapshot.room.turnTimeLimitSeconds === 0 ? "Untimed room" : `Timer ${snapshot.room.turnTimeLimitSeconds}s`}
-                </button>
+                </Button>
               </div>
             ) : null}
 

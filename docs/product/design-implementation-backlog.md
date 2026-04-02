@@ -83,6 +83,18 @@ Extraction allowed during this slice:
 - `ModalShell`
 - reuse `SurfaceCard` inside guided/tutorial flows
 
+### Sixth Slice
+- `button / form control system`
+
+Scope:
+- primary and secondary buttons use one reusable component
+- setup and reconnect fields use one reusable label/control wrapper
+- local, multiplayer, modal, and utility button usage stay aligned
+
+Extraction allowed during this slice:
+- `Button`
+- `FormField`
+
 ## Deferred
 
 Not for this phase:
