@@ -213,9 +213,7 @@ export default function App(): JSX.Element {
       return;
     }
 
-    const socket = io(wsUrl, {
-      transports: ["websocket"]
-    });
+    const socket = io(wsUrl);
     socketRef.current = socket;
 
     socket.on("connect", () => {
