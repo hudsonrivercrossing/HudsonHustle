@@ -121,7 +121,7 @@ scripts/
   config/        snapshot switching, preview, export, release tooling
   playtests/     seeded playtest and simulation harnesses
 .github/
-  workflows/     CI and branch-based deployment automation
+  workflows/     CI automation
 .codex/skills/
   roadmap-manager/
   game-balance/
@@ -154,10 +154,10 @@ scripts/
 ## Branch Strategy
 - `main`
   - stable production branch
-  - deploys production frontend and backend
+  - deploys production frontend and backend through platform-native Git integration
 - `develop`
   - shared integration branch
-  - deploys preview frontend and staging backend
+  - deploys preview frontend and staging backend through platform-native Git integration
 - working branches
   - branch off `develop`
   - open PRs into `develop`

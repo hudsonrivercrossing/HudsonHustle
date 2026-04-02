@@ -30,7 +30,7 @@ This folder now separates long-lived product docs from versioned playtest artifa
 - `main`: stable production branch
 - `develop`: shared staging and integration branch
 - working branches: short-lived branches off `develop`
-- deployment automation details live in [V2 Deployment](/Users/djfan/Workspace/HudsonHustle/docs/product/v2-deployment.md)
+- deployment details live in [V2 Deployment](/Users/djfan/Workspace/HudsonHustle/docs/product/v2-deployment.md)
 
 ## Playtests
 
