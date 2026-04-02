@@ -39,27 +39,25 @@ export function SetupScreen({
             <p className="eyebrow">Local mode</p>
             <h1>Local pass-and-play</h1>
             <p className="setup-mode-lead">One shared laptop. Enter the table, keep hands hidden during handoff, and start a match without extra setup chrome.</p>
+            <div className="config-hover-card">
+              <UtilityPill label="Running config" value={configLabel} tone="accent" />
+              <span className="config-summary-tooltip">{configSummary}</span>
+            </div>
           </div>
           <div className="setup-mode-switches">
             {onBack ? <Button onClick={onBack}>All modes</Button> : null}
             {onOpenMultiplayer ? <Button onClick={onOpenMultiplayer}>Online</Button> : null}
           </div>
         </div>
-        <div className="setup-mode-toolbar">
-          <div className="config-hover-card">
-            <UtilityPill label="Running config" value={configLabel} tone="accent" />
-            <span className="config-summary-tooltip">{configSummary}</span>
-          </div>
-          <StateSurface
-            tone="neutral"
-            eyebrow="Shared laptop session"
-            headline="Pass the board between rivals."
-            copy="Keep private hands hidden during handoff. The public board stays visible throughout the match."
-          />
-        </div>
+        <StateSurface
+          tone="neutral"
+          eyebrow="Shared laptop session"
+          headline="Pass the board between rivals."
+          copy="Keep private hands hidden during handoff. The public board stays visible throughout the match."
+        />
 
         <div className="setup-mode-grid">
-          <div className="setup-mode-panel">
+          <div className="setup-mode-panel setup-mode-panel--form">
             <SectionHeader eyebrow="Table setup" title="Players" meta={`${playerCount} seated`} />
             <FormField label="Players">
               <select value={playerCount} onChange={(event) => setPlayerCount(Number(event.target.value))}>
@@ -89,8 +87,8 @@ export function SetupScreen({
           </div>
 
           <div className="setup-mode-panel setup-mode-panel--actions">
-            <SectionHeader eyebrow="Start" title="Ready to begin" meta="No gameplay changes here" density="compact" />
-            <p className="muted-copy">New players can open the guided walkthrough first. Returning players can start immediately or resume the saved table.</p>
+            <SectionHeader eyebrow="Start" title="Ready to begin" meta={`${playerCount} seated`} density="compact" />
+            <p className="muted-copy">Open the guide first if this table is new. Otherwise start immediately or resume the saved match.</p>
             <div className="setup-actions">
               <Button variant="primary" onClick={() => onStart(activeNames.map((name, index) => name.trim() || `Player ${index + 1}`))}>
                 Start new game

@@ -39,6 +39,7 @@ Stable design-system docs:
 - [Component System](/Users/djfan/Workspace/HudsonHustle/docs/product/component-system.md)
 - [Map Language Boundary](/Users/djfan/Workspace/HudsonHustle/docs/product/map-language-boundary.md)
 - [Design Implementation Backlog](/Users/djfan/Workspace/HudsonHustle/docs/product/design-implementation-backlog.md)
+- [Design Showcases](/Users/djfan/Workspace/HudsonHustle/docs/product/showcase/README.md)
 
 Versioned rationale and decision trail:
 - [V2.1 Design Lock](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.1-design-lock.md)
