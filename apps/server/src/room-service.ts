@@ -30,6 +30,17 @@ import type { RoomRepository, StoredRoomRecord, StoredSeatRecord } from "./persi
 
 type RoomTimerCallback = (roomCode: string, deadlineAt: number | null) => void;
 
+export class RoomServiceError extends Error {
+  constructor(
+    message: string,
+    public readonly statusCode: number,
+    public readonly code: string
+  ) {
+    super(message);
+    this.name = "RoomServiceError";
+  }
+}
+
 interface ServerRoom {
   roomCode: string;
   status: RoomStatus;
@@ -53,9 +64,9 @@ interface RoomAuth {
   playerSecret: string;
 }
 
-function invariant(condition: unknown, message: string): asserts condition {
+function invariant(condition: unknown, message: string, statusCode = 400, code = "bad_request"): asserts condition {
   if (!condition) {
-    throw new Error(message);
+    throw new RoomServiceError(message, statusCode, code);
   }
 }
 
@@ -273,10 +284,15 @@ export class RoomService {
     const room = await this.getRoomOrThrow(roomCode);
     invariant(room.status === "lobby", "The room has already started.");
 
-    const targetSeat =
-      (request.preferredSeatId
-        ? room.seats.find((seat) => seat.seatId === request.preferredSeatId && !seat.playerName)
-        : null) ?? room.seats.find((seat) => !seat.playerName);
+    let targetSeat = null as StoredSeatRecord | null;
+    if (request.preferredSeatId) {
+      const preferredSeat = room.seats.find((seat) => seat.seatId === request.preferredSeatId);
+      invariant(preferredSeat, "That seat does not exist.", 404, "seat_not_found");
+      invariant(!preferredSeat.playerName, "That seat is already taken.", 409, "seat_taken");
+      targetSeat = preferredSeat;
+    } else {
+      targetSeat = room.seats.find((seat) => !seat.playerName) ?? null;
+    }
 
     invariant(targetSeat, "No open seats are left in this room.");
 
@@ -440,13 +456,13 @@ export class RoomService {
         this.scheduleTimer(room, room.deadlineAt);
       }
     }
-    invariant(room, "Unknown room code.");
+    invariant(room, "Unknown room code.", 404, "room_not_found");
     return room;
   }
 
   private getAuthorizedSeat(room: ServerRoom, auth: RoomAuth): StoredSeatRecord {
     const seat = room.seats.find((entry) => entry.seatId === auth.seatId);
-    invariant(seat && seat.playerSecret && seat.playerSecret === auth.playerSecret, "Room credentials do not match.");
+    invariant(seat && seat.playerSecret && seat.playerSecret === auth.playerSecret, "Room credentials do not match.", 403, "invalid_credentials");
     return seat;
   }
 
@@ -486,7 +502,17 @@ export class RoomService {
     }
 
     const now = Date.now();
-    room.deadlineAt = requestedDeadlineAt && requestedDeadlineAt > now ? requestedDeadlineAt : now + room.turnTimeLimitSeconds * 1000;
+    if (requestedDeadlineAt !== null && requestedDeadlineAt <= now) {
+      room.deadlineAt = requestedDeadlineAt;
+      this.onTimerChanged?.(room.roomCode, room.deadlineAt);
+      const timeout = setTimeout(() => {
+        void this.handleTimeout(room.roomCode);
+      }, 0);
+      this.timeouts.set(room.roomCode, timeout);
+      return;
+    }
+
+    room.deadlineAt = requestedDeadlineAt ?? now + room.turnTimeLimitSeconds * 1000;
     this.onTimerChanged?.(room.roomCode, room.deadlineAt);
     const timeout = setTimeout(() => {
       void this.handleTimeout(room.roomCode);

@@ -37,7 +37,7 @@ export function LobbyScreen({ room, localSeatId, playerSecret, onReadyChange, on
             <p className="lead">
               Share the room code, let everyone claim a seat, and start once the full table is ready.
             </p>
-            <div className={`status-banner status-banner--${lobbyTone}`}>
+            <div className={`status-banner status-banner--${lobbyTone}`} data-testid="lobby-status-banner">
               <div>
                 <span className="status-banner__eyebrow">
                   {canStart ? "Ready to start" : localSeat?.isHost ? "Host status" : "Lobby status"}
@@ -72,7 +72,11 @@ export function LobbyScreen({ room, localSeatId, playerSecret, onReadyChange, on
             </div>
             <div className="seat-stack">
               {room.seats.map((seat) => (
-                <article key={seat.seatId} className={`seat-row ${seat.seatId === localSeatId ? "seat-row--self" : ""}`}>
+                <article
+                  key={seat.seatId}
+                  className={`seat-row ${seat.seatId === localSeatId ? "seat-row--self" : ""}`}
+                  data-testid={`seat-row-${seat.seatId}`}
+                >
                   <div>
                     <strong>{seat.playerName ?? "Open seat"}</strong>
                     <p className="muted-copy">
@@ -81,9 +85,14 @@ export function LobbyScreen({ room, localSeatId, playerSecret, onReadyChange, on
                       {seat.connected ? " · connected" : ""}
                     </p>
                   </div>
-                  <span className={`seat-ready ${seat.ready ? "seat-ready--yes" : "seat-ready--no"}`}>
-                    {seat.ready ? "Ready" : "Waiting"}
-                  </span>
+                  <div className="seat-status-stack">
+                    <span className={`seat-ready ${seat.ready ? "seat-ready--yes" : "seat-ready--no"}`}>
+                      {seat.ready ? "Ready" : "Waiting"}
+                    </span>
+                    <span className={`seat-ready ${seat.connected ? "seat-ready--yes" : "seat-ready--no"}`} data-testid={`seat-connected-${seat.seatId}`}>
+                      {seat.connected ? "Connected" : "Offline"}
+                    </span>
+                  </div>
                 </article>
               ))}
             </div>

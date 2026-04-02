@@ -68,7 +68,7 @@ export function MultiplayerSetupScreen({
         {reconnectState === "reconnect-failed" ? <p className="muted-copy">Saved room credentials failed. Use manual reconnect below.</p> : null}
 
         <div className="multiplayer-setup-grid">
-          <section className="panel">
+          <section className="panel" data-testid="create-room-panel">
             <div className="panel-header">
               <h2>Create room</h2>
               <span>Host a new table</span>
@@ -122,7 +122,7 @@ export function MultiplayerSetupScreen({
             </button>
           </section>
 
-          <section className="panel">
+          <section className="panel" data-testid="join-room-panel">
             <div className="panel-header">
               <h2>Join room</h2>
               <span>Pick an open seat</span>

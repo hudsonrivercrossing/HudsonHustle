@@ -102,6 +102,10 @@ docs/
     prd.md
     tech-spec.md
     design-system.md
+    v2/
+      v2-mvp-architecture.md
+      v2-multiplayer-flow.md
+      v2-deployment.md
   gameplay/
     player-guide.md
     onboarding-script.md
@@ -134,10 +138,11 @@ scripts/
 - [Docs Index](docs/README.md)
 - [Product Requirements](docs/product/prd.md)
 - [Tech Spec](docs/product/tech-spec.md)
-- [V2 MVP Architecture](docs/product/v2-mvp-architecture.md)
-- [V2 Multiplayer Flow](docs/product/v2-multiplayer-flow.md)
-- [V2 Deployment](docs/product/v2-deployment.md)
+- [V2 MVP Architecture](docs/product/v2/v2-mvp-architecture.md)
+- [V2 Multiplayer Flow](docs/product/v2/v2-multiplayer-flow.md)
+- [V2 Deployment](docs/product/v2/v2-deployment.md)
 - [V1 Status](docs/planning/v1-status.md)
+- [V2 Status](docs/planning/v2-status.md)
 - [Player Guide](docs/gameplay/player-guide.md)
 - [Onboarding Script](docs/gameplay/onboarding-script.md)
 - [Config Snapshot Guide](docs/config/config-snapshot-guide.md)
@@ -149,7 +154,8 @@ scripts/
 - The current active config is the frozen release `v0.4-flushing-newark-airport`.
 - Same-laptop `v1` is playable and documented.
 - The first playable small-map station set and the first full balance/playtest pass are complete.
-- Remaining iteration is mainly future playtesting, tuning, and presentation polish, not core `v1` foundation work.
+- `v2` multiplayer foundation exists but is not yet complete.
+- The main remaining `v2.0` work is staging validation, browser/E2E hardening, and merge/promotion through `develop`.
 
 ## Branch Strategy
 - `main`

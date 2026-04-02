@@ -323,6 +323,12 @@ h3 {
   box-shadow: inset 0 0 0 2px rgba(42, 111, 182, 0.18);
 }
 
+.seat-status-stack {
+  display: grid;
+  gap: 6px;
+  justify-items: end;
+}
+
 .seat-ready {
   font-size: 0.85rem;
   padding: 6px 10px;

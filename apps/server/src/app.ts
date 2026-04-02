@@ -14,7 +14,7 @@ import { readServerEnv } from "./env.js";
 import { MemoryRoomRepository } from "./persistence/memory-room-repository.js";
 import { PostgresRoomRepository } from "./persistence/postgres-room-repository.js";
 import type { RoomRepository } from "./persistence/types.js";
-import { RoomService } from "./room-service.js";
+import { RoomService, RoomServiceError } from "./room-service.js";
 
 export function createCorsOriginMatcher(configuredOrigins: string[]) {
   const exactOrigins = configuredOrigins.filter((origin) => !origin.includes("*"));
@@ -51,6 +51,14 @@ export async function createServerApp() {
   await app.register(cors, {
     origin: corsOriginMatcher,
     credentials: true
+  });
+
+  app.setErrorHandler((error, _request, reply) => {
+    if (error instanceof RoomServiceError) {
+      return reply.status(error.statusCode).send({ message: error.message, code: error.code });
+    }
+    app.log.error(error);
+    return reply.status(500).send({ message: "Internal server error." });
   });
 
   const repository: RoomRepository = env.databaseUrl ? new PostgresRoomRepository(env.databaseUrl) : new MemoryRoomRepository();

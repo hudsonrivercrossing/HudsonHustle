@@ -47,6 +47,16 @@ interface SessionCredentials {
   playerSecret: string;
 }
 
+class ApiError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number
+  ) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
+
 function readSession(): SessionCredentials | null {
   const raw = window.localStorage.getItem(sessionKey);
   if (!raw) {
@@ -133,7 +143,7 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (!response.ok) {
     const payload = (await response.json().catch(() => null)) as { message?: string } | null;
-    throw new Error(payload?.message ?? `Request failed: ${response.status}`);
+    throw new ApiError(payload?.message ?? `Request failed: ${response.status}`, response.status);
   }
 
   return (await response.json()) as T;
@@ -152,6 +162,7 @@ export default function App(): JSX.Element {
   const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
   const [selectedTicketIds, setSelectedTicketIds] = useState<string[]>([]);
   const socketRef = useRef<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null);
+  const awaitingSocketHandshakeRef = useRef(false);
 
   useEffect(() => {
     void requestJson<HudsonHustleReleasedConfigSummary[]>("/released-configs")
@@ -167,6 +178,7 @@ export default function App(): JSX.Element {
       return;
     }
     setReconnectState("attempting-reconnect");
+    awaitingSocketHandshakeRef.current = true;
     void requestJson<RejoinRoomResponse>(`/rooms/${saved.roomCode}/rejoin`, {
       method: "POST",
       body: JSON.stringify({
@@ -183,10 +195,12 @@ export default function App(): JSX.Element {
         setCredentials(nextCredentials);
         saveSession(nextCredentials);
         setSnapshot(response.snapshot);
-        setReconnectState("reconnected");
       })
       .catch((caught) => {
-        saveSession(null);
+        if (caught instanceof ApiError && (caught.status === 403 || caught.status === 404)) {
+          saveSession(null);
+        }
+        awaitingSocketHandshakeRef.current = false;
         setReconnectState("reconnect-failed");
         setError(caught instanceof Error ? caught.message : "Reconnect failed.");
       });
@@ -221,6 +235,7 @@ export default function App(): JSX.Element {
     });
 
     socket.on("game:reconnected", (nextSnapshot) => {
+      awaitingSocketHandshakeRef.current = false;
       setSnapshot(nextSnapshot);
       setReconnectState("reconnected");
     });
@@ -230,7 +245,26 @@ export default function App(): JSX.Element {
     });
 
     socket.on("game:error", (payload) => {
+      if (awaitingSocketHandshakeRef.current) {
+        awaitingSocketHandshakeRef.current = false;
+        setReconnectState("reconnect-failed");
+      }
       setError(payload.message);
+    });
+
+    socket.on("connect_error", (connectError) => {
+      awaitingSocketHandshakeRef.current = false;
+      setError(connectError.message || "Could not connect to the room.");
+      setReconnectState("reconnect-failed");
+    });
+
+    socket.on("disconnect", (reason) => {
+      awaitingSocketHandshakeRef.current = false;
+      if (reason === "io client disconnect") {
+        return;
+      }
+      setError("Connection lost. Reconnect using your saved session details.");
+      setReconnectState("reconnect-failed");
     });
 
     return () => {
@@ -362,77 +396,105 @@ export default function App(): JSX.Element {
   }, [localIsActive, mapConfig, selectedRouteId, snapshot]);
 
   async function createRoom(form: CreateRoomRequest) {
-    const response = await requestJson<CreateRoomResponse>("/rooms", {
-      method: "POST",
-      body: JSON.stringify(form)
-    });
-    const nextCredentials = {
-      roomCode: response.roomCode,
-      seatId: response.seatId,
-      playerSecret: response.playerSecret
-    };
-    setCredentials(nextCredentials);
-    saveSession(nextCredentials);
-    setSnapshot(response.snapshot);
-    setError(null);
+    try {
+      const response = await requestJson<CreateRoomResponse>("/rooms", {
+        method: "POST",
+        body: JSON.stringify(form)
+      });
+      const nextCredentials = {
+        roomCode: response.roomCode,
+        seatId: response.seatId,
+        playerSecret: response.playerSecret
+      };
+      awaitingSocketHandshakeRef.current = true;
+      setCredentials(nextCredentials);
+      saveSession(nextCredentials);
+      setSnapshot(response.snapshot);
+      setError(null);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not create the room.");
+    }
   }
 
   async function previewRoom(roomCode: string) {
-    const room = await requestJson<RoomSnapshot>(`/rooms/${roomCode}`);
-    setRoomPreview(room.room);
+    try {
+      const room = await requestJson<RoomSnapshot>(`/rooms/${roomCode}`);
+      setRoomPreview(room.room);
+      setError(null);
+    } catch (caught) {
+      setRoomPreview(null);
+      setError(caught instanceof Error ? caught.message : "Could not preview that room.");
+    }
   }
 
   async function joinRoom(form: JoinRoomRequest & { roomCode: string }) {
-    const response = await requestJson<JoinRoomResponse>(`/rooms/${form.roomCode}/join`, {
-      method: "POST",
-      body: JSON.stringify({
-        playerName: form.playerName,
-        preferredSeatId: form.preferredSeatId
-      } satisfies JoinRoomRequest)
-    });
-    const nextCredentials = {
-      roomCode: response.roomCode,
-      seatId: response.seatId,
-      playerSecret: response.playerSecret
-    };
-    setCredentials(nextCredentials);
-    saveSession(nextCredentials);
-    setSnapshot(response.snapshot);
-    setError(null);
+    try {
+      const response = await requestJson<JoinRoomResponse>(`/rooms/${form.roomCode}/join`, {
+        method: "POST",
+        body: JSON.stringify({
+          playerName: form.playerName,
+          preferredSeatId: form.preferredSeatId
+        } satisfies JoinRoomRequest)
+      });
+      const nextCredentials = {
+        roomCode: response.roomCode,
+        seatId: response.seatId,
+        playerSecret: response.playerSecret
+      };
+      awaitingSocketHandshakeRef.current = true;
+      setCredentials(nextCredentials);
+      saveSession(nextCredentials);
+      setSnapshot(response.snapshot);
+      setError(null);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not join that room.");
+    }
   }
 
   async function manualReconnect(form: SessionCredentials) {
-    const response = await requestJson<RejoinRoomResponse>(`/rooms/${form.roomCode}/rejoin`, {
-      method: "POST",
-      body: JSON.stringify({
-        seatId: form.seatId,
-        playerSecret: form.playerSecret
-      } satisfies RejoinRoomRequest)
-    });
-    const nextCredentials = {
-      roomCode: response.roomCode,
-      seatId: response.seatId,
-      playerSecret: response.playerSecret
-    };
-    setCredentials(nextCredentials);
-    saveSession(nextCredentials);
-    setSnapshot(response.snapshot);
-    setReconnectState("reconnected");
-    setError(null);
+    try {
+      const response = await requestJson<RejoinRoomResponse>(`/rooms/${form.roomCode}/rejoin`, {
+        method: "POST",
+        body: JSON.stringify({
+          seatId: form.seatId,
+          playerSecret: form.playerSecret
+        } satisfies RejoinRoomRequest)
+      });
+      const nextCredentials = {
+        roomCode: response.roomCode,
+        seatId: response.seatId,
+        playerSecret: response.playerSecret
+      };
+      awaitingSocketHandshakeRef.current = true;
+      setCredentials(nextCredentials);
+      saveSession(nextCredentials);
+      setSnapshot(response.snapshot);
+      setError(null);
+    } catch (caught) {
+      if (caught instanceof ApiError && (caught.status === 403 || caught.status === 404)) {
+        saveSession(null);
+      }
+      setReconnectState("reconnect-failed");
+      setError(caught instanceof Error ? caught.message : "Could not reconnect.");
+    }
   }
 
   async function startRoom() {
     if (!credentials || !snapshot) {
       return;
     }
-    const response = await requestJson<{ snapshot: RoomSnapshot }>(`/rooms/${snapshot.room.roomCode}/start`, {
-      method: "POST",
-      body: JSON.stringify({
-        playerSecret: credentials.playerSecret
-      } satisfies StartRoomRequest)
-    });
-    setSnapshot(response.snapshot);
-    setError(null);
+    try {
+      const response = await requestJson<{ snapshot: RoomSnapshot }>(`/rooms/${snapshot.room.roomCode}/start`, {
+        method: "POST",
+        body: JSON.stringify({
+          playerSecret: credentials.playerSecret
+        } satisfies StartRoomRequest)
+      });
+      setSnapshot(response.snapshot);
+      setError(null);
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Could not start the room.");
+    }
   }
 
   function sendReady(ready: boolean) {
@@ -457,6 +519,7 @@ export default function App(): JSX.Element {
   }
 
   function leaveRoom() {
+    awaitingSocketHandshakeRef.current = false;
     saveSession(null);
     setCredentials(null);
     setSnapshot(null);
@@ -538,7 +601,7 @@ export default function App(): JSX.Element {
               <span className="config-summary-tooltip">{snapshot.room.configSummary}</span>
             </div>
           </div>
-          <div className={`status-banner status-banner--${turnBannerTone}`}>
+          <div className={`status-banner status-banner--${turnBannerTone}`} data-testid="turn-status-banner">
             <div>
               <span className="status-banner__eyebrow">{turnBannerLabel}</span>
               <strong className="status-banner__headline">
@@ -546,7 +609,9 @@ export default function App(): JSX.Element {
               </strong>
               <span className="status-banner__copy">{turnBannerCopy}</span>
             </div>
-            <span className="status-banner__timer">{timerCopy}</span>
+            <span className="status-banner__timer" data-testid="turn-timer-badge">
+              {timerCopy}
+            </span>
           </div>
         </div>
         <div className="topbar-actions">

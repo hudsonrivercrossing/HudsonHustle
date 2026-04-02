@@ -482,5 +482,5 @@ Rules by phase:
   - `game:timer`
   - `game:reconnected`
 
-- See `docs/product/v2-mvp-architecture.md` for the fuller phase plan.
-- See `docs/product/v2-multiplayer-flow.md` for the room UX, reconnect model, and initial API examples.
+- See `docs/product/v2/v2-mvp-architecture.md` for the fuller phase plan.
+- See `docs/product/v2/v2-multiplayer-flow.md` for the room UX, reconnect model, and initial API examples.
