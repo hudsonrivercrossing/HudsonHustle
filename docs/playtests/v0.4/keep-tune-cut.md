@@ -1,5 +1,9 @@
 # v0.4 Keep / Tune / Cut
 
+Historical note:
+- this triage uses the draft-era name `v0.4-next-wave`
+- it documents the tuning phase that led toward the later frozen `v0.4-flushing-newark-airport` release
+
 ## Purpose
 - Turn the current `v0.4-next-wave` review into a concrete triage list.
 - Separate what already feels right from what should be tuned next and what is most expendable.

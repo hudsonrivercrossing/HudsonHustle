@@ -1,5 +1,9 @@
 # v0.4 2-Player Central Choke Checklist
 
+Historical note:
+- this checklist was written for the `v0.4-next-wave` draft-phase review
+- keep that naming as a historical reference point, not as the current release label
+
 ## Purpose
 - Run one focused `2-player` manual playtest.
 - Check whether too many game plans collapse into the same central Manhattan core.

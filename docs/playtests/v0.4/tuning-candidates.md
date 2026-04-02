@@ -1,5 +1,9 @@
 # v0.4 Tuning Candidate List
 
+Historical note:
+- the applied tests below were recorded during the `v0.4-next-wave` draft cycle
+- keep this wording as draft-phase history, not as the name of the shipped release
+
 ## Purpose
 - Turn the high-level balance review into concrete tuning candidates.
 - Keep these as candidate changes, not committed balance decisions.

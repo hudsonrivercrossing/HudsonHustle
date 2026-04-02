@@ -1,5 +1,9 @@
 # v0.4 Agent Vs Agent Playtest
 
+Historical note:
+- this seeded report was captured during the `v0.4-next-wave` draft cycle
+- keep that draft name as historical context rather than current release naming
+
 This document captures seeded self-play runs on the active `v0.4-next-wave` draft using the `how-to-win-hudson-hustle` strategy skill.
 
 Artifacts:

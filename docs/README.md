@@ -7,15 +7,11 @@ This folder now separates long-lived product docs from versioned playtest artifa
 - [Tech Spec](/Users/djfan/Workspace/HudsonHustle/docs/product/tech-spec.md)
 - [Design System](/Users/djfan/Workspace/HudsonHustle/docs/product/design-system.md)
 - [V2 Docs Index](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/README.md)
-- V2
-  - [V2 MVP Architecture](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2-mvp-architecture.md)
-  - [V2 Multiplayer Flow](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2-multiplayer-flow.md)
-  - [V2 Deployment](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2-deployment.md)
 
 ## Gameplay
 - [Player Guide](/Users/djfan/Workspace/HudsonHustle/docs/gameplay/player-guide.md)
 - [Onboarding Script](/Users/djfan/Workspace/HudsonHustle/docs/gameplay/onboarding-script.md)
-- [General Agent-vs-Agent Playtest Notes](/Users/djfan/Workspace/HudsonHustle/docs/gameplay/agent-vs-agent-playtest.md)
+- [Agent-vs-Agent Playtesting Guide](/Users/djfan/Workspace/HudsonHustle/docs/gameplay/agent-vs-agent-playtest.md)
 
 ## Map
 - [Cartography Workflow](/Users/djfan/Workspace/HudsonHustle/docs/map/cartography-workflow.md)
@@ -47,9 +43,9 @@ This folder now separates long-lived product docs from versioned playtest artifa
   - [Seed 42](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v0.4/raw/seed-42-raw.md)
   - [Seed 1337](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v0.4/raw/seed-1337-raw.md)
 
-### MVP2
-- [MVP2 Playtests Index](/Users/djfan/Workspace/HudsonHustle/docs/playtests/mvp2/README.md)
-- [Staging Smoke Checklist](/Users/djfan/Workspace/HudsonHustle/docs/playtests/mvp2/staging-smoke-checklist.md)
+### V2.0
+- [V2.0 Playtests Index](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v2.0/README.md)
+- [Staging Smoke Checklist](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v2.0/staging-smoke-checklist.md)
 
 ## Assets
 - `docs/assets/` stores README and docs illustration assets.
