@@ -769,6 +769,7 @@ export default function App(): JSX.Element {
               boardLabelMode={visuals.boardLabelMode}
               cardPalette={visuals.palettes.cards}
               playerPalette={visuals.palettes.players}
+              viewerPlayerId={snapshot.privateState?.playerId ?? null}
               game={{
                 players: projectedGame.players.map((player) => ({
                   id: player.id,

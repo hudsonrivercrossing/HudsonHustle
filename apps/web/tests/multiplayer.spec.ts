@@ -64,6 +64,7 @@ test("multiplayer room lifecycle covers connected badges, private state, reconne
   await hostPage.getByRole("button", { name: "Start game" }).click();
 
   await expect(hostPage.getByTestId("turn-status-banner")).toContainText("Your turn");
+
   const hostTimerBadge = hostPage.getByTestId("turn-timer-badge");
   await expect(hostTimerBadge).toHaveText(/^(Timer 30s|\d+s left)$/);
   await hostPage.waitForTimeout(1500);

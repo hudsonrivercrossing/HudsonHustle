@@ -550,6 +550,7 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
               boardLabelMode={hudsonHustleCurrentBoardLabelMode}
               cardPalette={cardColorPalette}
               playerPalette={playerColorPalette}
+              viewerPlayerId={game.players[game.activePlayerIndex]?.id}
               game={{
                 players: game.players.map((player) => ({
                   id: player.id,
