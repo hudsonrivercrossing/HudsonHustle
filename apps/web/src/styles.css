@@ -75,7 +75,7 @@ button {
   color: var(--ink-soft);
 }
 
-.config-chip-group {
+.utility-pill-group {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-stack-xs);
@@ -87,17 +87,40 @@ button {
   width: fit-content;
 }
 
-.config-chip {
+.utility-pill {
   display: inline-flex;
   width: fit-content;
   align-items: center;
-  padding: 6px 10px;
+  gap: 8px;
+  padding: 7px 12px;
   border-radius: 999px;
-  border: 1px solid rgba(42, 111, 182, 0.24);
-  background: rgba(255, 251, 243, 0.86);
+  border: 1px solid rgba(68, 51, 34, 0.14);
+  background: rgba(255, 251, 243, 0.88);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.36);
+  color: var(--ink-soft);
+  font-size: var(--type-body-sm);
+  letter-spacing: 0.01em;
+}
+
+.utility-pill--accent {
+  border-color: rgba(42, 111, 182, 0.24);
   color: var(--accent-strong);
-  font-size: 0.82rem;
-  letter-spacing: 0.03em;
+}
+
+.utility-pill--interactive {
+  cursor: default;
+}
+
+.utility-pill__label {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: var(--type-utility-xs);
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.utility-pill__value {
+  font-weight: 600;
 }
 
 .section-header {
@@ -277,6 +300,11 @@ h3 {
   margin-bottom: 18px;
 }
 
+.topbar-actions {
+  justify-content: flex-end;
+  align-items: start;
+}
+
 .game-layout {
   display: grid;
   grid-template-columns: minmax(380px, 460px) minmax(0, 1fr);
@@ -409,14 +437,6 @@ h3 {
 }
 
 .identity-chip__pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(68, 51, 34, 0.16);
-  background: rgba(255, 250, 242, 0.9);
-  color: var(--ink-soft);
-  font-size: 0.82rem;
   cursor: default;
 }
 

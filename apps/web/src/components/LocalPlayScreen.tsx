@@ -35,6 +35,7 @@ import { Panel } from "./system/Panel";
 import { SectionHeader } from "./system/SectionHeader";
 import { StatusBanner } from "./system/StatusBanner";
 import { SurfaceCard } from "./system/SurfaceCard";
+import { UtilityPill } from "./system/UtilityPill";
 
 const saveKey = "hudson-hustle-save-v1";
 const tutorialSeenKey = "hudson-hustle-onboarding-v1-1";
@@ -465,9 +466,13 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
         <div>
           <p className="eyebrow">Hudson Hustle</p>
           <h1>{hudsonHustleMap.name}</h1>
-          <div className="config-chip-group">
+          <div className="utility-pill-group">
             <div className="config-hover-card">
-              <span className="config-chip">Config: {hudsonHustleCurrentConfigMeta.version} · {hudsonHustleCurrentConfigId}</span>
+              <UtilityPill
+                label="Config"
+                value={`${hudsonHustleCurrentConfigMeta.version} · ${hudsonHustleCurrentConfigId}`}
+                tone="accent"
+              />
               <span className="config-summary-tooltip">{hudsonHustleCurrentConfigMeta.summary}</span>
             </div>
           </div>

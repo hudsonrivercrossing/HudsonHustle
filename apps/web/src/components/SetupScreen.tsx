@@ -3,6 +3,7 @@ import { Button } from "./system/Button";
 import { FormField } from "./system/FormField";
 import { SectionHeader } from "./system/SectionHeader";
 import { StatusBanner } from "./system/StatusBanner";
+import { UtilityPill } from "./system/UtilityPill";
 
 interface SetupScreenProps {
   onStart: (playerNames: string[]) => void;
@@ -37,9 +38,9 @@ export function SetupScreen({
           Build your own route web across the core NYC/NJ transit map. Claim crossings, survive tunnel surprises,
           and hand the laptop to the next rival when your turn is done.
         </p>
-        <div className="config-chip-group">
+        <div className="utility-pill-group">
           <div className="config-hover-card">
-            <span className="config-chip">Running config: {configLabel}</span>
+            <UtilityPill label="Running config" value={configLabel} tone="accent" />
             <span className="config-summary-tooltip">{configSummary}</span>
           </div>
         </div>

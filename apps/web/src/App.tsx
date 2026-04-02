@@ -43,6 +43,7 @@ import { Panel } from "./components/system/Panel";
 import { SectionHeader } from "./components/system/SectionHeader";
 import { StatusBanner } from "./components/system/StatusBanner";
 import { SurfaceCard } from "./components/system/SurfaceCard";
+import { UtilityPill } from "./components/system/UtilityPill";
 import { decodeReconnectToken, encodeReconnectToken, readReconnectCredentials, type ReconnectCredentials } from "./reconnect-token";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8787";
@@ -661,9 +662,9 @@ export default function App(): JSX.Element {
         <div>
           <p className="eyebrow">Hudson Hustle Multiplayer</p>
           <h1>{mapConfig.name}</h1>
-          <div className="config-chip-group">
+          <div className="utility-pill-group">
             <div className="config-hover-card">
-              <span className="config-chip">Config: {snapshot.room.configVersion} · {snapshot.room.configId}</span>
+              <UtilityPill label="Config" value={`${snapshot.room.configVersion} · ${snapshot.room.configId}`} tone="accent" />
               <span className="config-summary-tooltip">{snapshot.room.configSummary}</span>
             </div>
           </div>

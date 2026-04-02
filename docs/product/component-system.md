@@ -18,6 +18,7 @@ Minimum system layer:
 - `SurfaceCard`
 - `ChoiceChipButton`
 - `ModalShell`
+ - `UtilityPill`
 
 These primitives now also govern:
 - active game side-panel headers
@@ -79,6 +80,15 @@ Use `FormField` for labeled inputs and selects in:
 - reconnect forms
 
 It provides the stable label/control wrapper. It does not replace every custom control container.
+
+## Utility Pill
+
+Use `UtilityPill` for compact chrome metadata and session affordances such as:
+- active config labels
+- reconnect/session entry points
+- small authored utility markers in shell chrome
+
+It belongs to the topbar and shell-utility layer, not the gameplay action layer.
 
 Do not start by building:
 - full button library

@@ -95,6 +95,18 @@ Extraction allowed during this slice:
 - `Button`
 - `FormField`
 
+### Seventh Slice
+- `navigation / utility chrome`
+
+Scope:
+- topbar config/session affordances move into one compact chrome language
+- local and multiplayer shell utility clusters stop drifting apart
+- reconnect/session entry surfaces feel like shell metadata, not ad hoc pills
+
+Extraction allowed during this slice:
+- `UtilityPill`
+- reuse existing `Button`
+
 ## Deferred
 
 Not for this phase:
