@@ -63,6 +63,10 @@ That means:
 - map iteration is not trapped inside one giant source file
 
 ## Standard Commands
+Historical note:
+- the example commands below intentionally use older draft ids to show the workflow shape
+- the current released small-map build is `v0.4-flushing-newark-airport`
+
 List available configs:
 
 ```bash

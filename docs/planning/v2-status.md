@@ -1,7 +1,7 @@
 # V2 Status
 
 ## Summary
-`V2` is now in active implementation, but `v2.0 / MVP2` is not finished yet.
+`V2` is now in active implementation, and `v2.0` has cleared its first manual staging validation pass.
 
 The core architecture is in place:
 - separate-device multiplayer shell exists
@@ -39,51 +39,47 @@ The remaining work is mostly validation and hardening, not first-principles arch
   - `develop`
   - working branches
 - CI is active
+- `develop` manual staging validation completed on `2026-04-02`:
+  - deployed preview loaded
+  - room create / join / ready / start worked
+  - realtime lobby presence recovered in manual browser testing
+  - multiplayer game flow was playable on deployed staging
 
 ## V2.0 Still Missing
-These are the main gates before `v2.0 / MVP2` should be treated as complete.
+These are the main gates before `v2.0` should be treated as complete.
 
-### 1. Staging Smoke Pass
-- run a full `develop` multiplayer smoke pass on deployed staging
-- validate:
-  - create room
-  - join from second client
-  - ready / start
-  - private info isolation
-  - draw-two-card flow
-  - end turn handoff
-  - reconnect after refresh
-  - timer behavior
-  - both released maps
+### 1. Promote Toward Main
+- prepare `develop -> main` promotion once the current staging result is accepted
+- after merge to `main`, confirm:
+  - `Vercel` production updated
+  - `Railway` `api` updated
+  - production `/health` is healthy
 
-### 2. Merge / Promotion
-- merge the current MVP2 PR into `develop`
-- confirm:
-  - `develop` preview frontend deploys correctly
-  - `api-develop` staging backend deploys from `develop`
-- only after staging is trusted should MVP2 promotion toward `main` happen
-
-### 3. Browser-Level Regression Coverage
-- current automated coverage is still mostly service-level
-- add browser/E2E coverage for:
-  - reconnect UX
-  - private/public state separation
-  - timer display and timeout behavior
-  - lobby connected badge behavior
-
-### 4. Remote Multi-Device Validation
+### 2. Remote Multi-Device Validation
 - complete at least one real remote game flow with:
   - two browsers on separate devices
   - deployed frontend + deployed backend
 - confirm there is no environment-only desync or CORS/session issue
 
-### 5. Multiplayer Hardening
+### 3. Multiplayer Hardening
 - improve error states and UX around:
   - invalid room code
   - wrong credentials
   - seat already taken
   - socket failure after HTTP rejoin
   - backend restart / reconnect recovery
+
+### 4. Production-Side Observation
+- watch the first production deploy for:
+  - realtime handshake regressions
+  - preview/prod env drift
+  - unexpected platform-only behavior
+
+## Current Interpretation
+- staging confidence is now materially better than before
+- manual staging testing has passed
+- final production promotion is still pending
+- `v2.0` should be treated as late-stage integration work, not fully closed
 
 ## Explicitly Not In V2.0
 - public bot seats
@@ -95,8 +91,8 @@ These are the main gates before `v2.0 / MVP2` should be treated as complete.
 - matchmaking
 
 ## Recommended Next Order
-1. Merge current MVP2 work into `develop`
-2. Run the staging smoke checklist
-3. Fix any staging-only regressions
-4. Add targeted E2E coverage for the highest-risk multiplayer flows
-5. Only then decide whether to promote MVP2 toward `main`
+1. Record the successful staging smoke result
+2. Decide whether to promote `develop -> main`
+3. After merge to `main`, run production deploy checks
+4. Complete one more real remote multiplayer session on production
+5. Only then decide whether `v2.0` should be called complete

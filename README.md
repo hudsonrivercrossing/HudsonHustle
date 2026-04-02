@@ -81,7 +81,7 @@ pnpm --filter @hudson-hustle/web exec playwright install chromium
 - Shared deterministic rules engine in `packages/game-core`
 - Shared map and balance data in `packages/game-data`
 
-Planned for `v2`:
+Used in `v2`:
 - `Node.js`
 - `Fastify`
 - `Socket.IO`
@@ -121,7 +121,7 @@ docs/
     v1-status.md
   playtests/
     v0.4/
-    mvp2/
+    v2.0/
   assets/
 scripts/
   config/        snapshot switching, preview, export, release tooling
@@ -130,6 +130,7 @@ scripts/
   workflows/     CI automation
 .codex/skills/
   roadmap-manager/
+  hudson-hustle-engineering-manager/
   game-balance/
   transit-cartography/
   config-snapshot-manager/
@@ -151,7 +152,7 @@ scripts/
 - [Config Snapshot Guide](docs/config/config-snapshot-guide.md)
 - [Design System](docs/product/design-system.md)
 - [Map And Balance Notes](docs/map/map-balance-notes.md)
-- [MVP2 Staging Smoke Checklist](docs/playtests/mvp2/staging-smoke-checklist.md)
+- [V2.0 Staging Smoke Checklist](docs/playtests/v2.0/staging-smoke-checklist.md)
 - [Agent Operating Guide](AGENTS.md)
 
 ## Current Product Status
@@ -159,7 +160,7 @@ scripts/
 - Same-laptop `v1` is playable and documented.
 - The first playable small-map station set and the first full balance/playtest pass are complete.
 - `v2` multiplayer foundation exists but is not yet complete.
-- The main remaining `v2.0` work is staging validation, browser/E2E hardening, and merge/promotion through `develop`.
+- The main remaining `v2.0` work is promotion to `main`, one more remote multiplayer validation pass, and post-promotion observation.
 
 ## Branch Strategy
 - `main`

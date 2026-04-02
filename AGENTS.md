@@ -36,6 +36,9 @@ This file is the source of truth for humans and agents working in this repo.
 - Run targeted tests for `game-core` whenever rules or scoring logic changes.
 - Prefer deterministic tests with fixed seeds.
 - If you cannot run installs or tests because of environment restrictions, say so explicitly.
+- Before any merge into `develop` or `main`, do a code review pass with findings-first reporting.
+- Before any merge into `develop` or `main`, review whether affected docs in `docs/` also need updates.
+- Before promoting a branch, prefer the smallest real browser or staging smoke that can catch environment-only regressions.
 - After merging to `develop`, verify staging deployment health with platform CLIs:
   - check `Vercel` preview / `develop`
   - check `Railway` `api-develop`

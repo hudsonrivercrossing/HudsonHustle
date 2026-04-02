@@ -1,10 +1,16 @@
 # Hudson Hustle Tech Spec
 
 ## Architecture
-- `apps/web`: React + TypeScript + Vite client.
-- `packages/game-core`: pure rules engine with deterministic reducers and seeded randomness.
-- `packages/game-data`: NYC/NJ board layout, routes, tickets, and tuning constants.
-- `apps/server`: deferred until v2.
+- `apps/web`: React + TypeScript + Vite client for same-laptop play and separate-device multiplayer UI.
+- `apps/server`: Fastify + Socket.IO authoritative backend for rooms, reconnect, realtime sync, and multiplayer validation.
+- `packages/game-core`: pure rules engine with deterministic reducers, shared multiplayer transport types, and seeded randomness.
+- `packages/game-data`: NYC/NJ board layout, routes, tickets, tuning constants, and released-config registry data.
+
+## Runtime Split
+- `V1` runs entirely through `apps/web`, using the shared rules engine locally.
+- `V2` keeps gameplay rules in `packages/game-core`, but moves room lifecycle and authoritative state ownership into `apps/server`.
+- Clients submit intent; the server validates and broadcasts resulting public/private projections.
+- `packages/game-data` remains the shared source for released maps and balance data across both `web` and `server`.
 
 ## State Model
 - `GameState` contains players, route claims, station placements, public market, decks, score state, turn state, RNG state, and final-round bookkeeping.

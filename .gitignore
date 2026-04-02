@@ -12,3 +12,4 @@ packages/*/src/*.d.ts.map
 .local/*
 .vercel
 .railway
+tmp/
