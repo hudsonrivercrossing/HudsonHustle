@@ -26,11 +26,26 @@ export function TicketPicker({
   onConfirm,
   onCancel
 }: TicketPickerProps): JSX.Element {
+  const selectedCount = selectedIds.length;
+
   return (
     <ModalShell width="md" align="center">
-        <SectionHeader eyebrow="Private choice" title={title} meta={`Keep at least ${minimumKeep}`} density="ceremony" />
-        <p className="modal-copy">{subtitle}</p>
-        <div className="ticket-list">
+      <div className="ticket-picker">
+        <div className="ticket-picker__header">
+          <SectionHeader eyebrow="Private choice" title={title} density="ceremony" />
+          <div className="ticket-picker__rule">
+            <span className="ticket-picker__rule-label">Selection rule</span>
+            <strong className="ticket-picker__rule-value">Keep at least {minimumKeep}</strong>
+            <span className="ticket-picker__rule-note">
+              {selectedCount} of {tickets.length} selected
+            </span>
+          </div>
+        </div>
+
+        <p className="modal-copy ticket-picker__intro">{subtitle}</p>
+
+        <div className="ticket-picker__tray">
+          <div className="ticket-list">
           {tickets.map((ticket) => {
             const selected = selectedIds.includes(ticket.id);
             return (
@@ -48,16 +63,22 @@ export function TicketPicker({
             );
           })}
         </div>
-        <div className="setup-actions">
+        </div>
+
+        <div className="ticket-picker__footer">
+          <p className="ticket-picker__hint">Ticket picks lock once you confirm. Review the map pairings before you keep.</p>
+          <div className="setup-actions">
           {onCancel ? (
             <Button onClick={onCancel}>
               Back
             </Button>
           ) : null}
-          <Button variant="primary" disabled={selectedIds.length < minimumKeep} onClick={onConfirm}>
-            Keep {selectedIds.length} ticket{selectedIds.length === 1 ? "" : "s"}
+          <Button variant="primary" disabled={selectedCount < minimumKeep} onClick={onConfirm}>
+            Keep {selectedCount} ticket{selectedCount === 1 ? "" : "s"}
           </Button>
         </div>
+        </div>
+      </div>
     </ModalShell>
   );
 }

@@ -8,7 +8,7 @@ export function ChoiceChipButton({ className, children, type = "button", ...rest
   const classes = ["choice-chip-button", className].filter(Boolean).join(" ");
   return (
     <button type={type} className={classes} {...rest}>
-      {children}
+      <span className="choice-chip-button__content">{children}</span>
     </button>
   );
 }

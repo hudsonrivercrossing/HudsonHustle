@@ -130,6 +130,7 @@ Use `UtilityPill` for compact chrome metadata and session affordances such as:
 - small authored utility markers in shell chrome
 
 It belongs to the topbar and shell-utility layer, not the gameplay action layer.
+It should read like a metadata plate or session artifact, not like an inline state tag.
 
 ## State Surface
 
@@ -257,6 +258,16 @@ Chips and badges should:
 - stay compact
 - remain highly legible
 - reinforce status, ownership, and metadata without becoming primary visual events
+
+Boundary with `UtilityPill`:
+- `UtilityPill` = shell chrome metadata, session identity, utility entry points
+- `Chip` = object-level compact state, ownership, readiness, or row metadata
+
+Relationship:
+- they should feel like near relatives inside the same material system
+- they should not collapse into one family distinguished only by size
+- `UtilityPill` should feel calmer and more plate-like
+- `Chip` should feel tighter and more status-mark-like
 
 Likely use cases:
 - seat state

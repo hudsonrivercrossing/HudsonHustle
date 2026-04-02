@@ -3,6 +3,7 @@ import { decodeReconnectToken } from "../src/reconnect-token";
 
 const SESSION_KEY = "hudson-hustle-multiplayer-session-v2";
 const API_BASE_URL = "http://127.0.0.1:8787";
+const TUTORIAL_SEEN_KEY = "hudson-hustle-onboarding-v1-1";
 
 async function waitForApi(page: Page): Promise<void> {
   await expect
@@ -34,6 +35,16 @@ async function openMultiplayerSetup(page: Page): Promise<void> {
   await expect(page.getByRole("button", { name: "Create room" })).toBeVisible();
   await expect(page.getByTestId("create-room-panel")).toBeVisible();
   await expect(page.getByTestId("join-room-panel")).toBeVisible();
+}
+
+async function openLocalSetup(page: Page, options?: { resetTutorial?: boolean }): Promise<void> {
+  await page.goto("/");
+  await waitForApi(page);
+  if (options?.resetTutorial) {
+    await page.evaluate((key) => window.localStorage.removeItem(key), TUTORIAL_SEEN_KEY);
+  }
+  await page.getByRole("button", { name: "Local pass-and-play" }).click();
+  await expect(page.getByRole("heading", { name: "Hudson Hustle" })).toBeVisible();
 }
 
 async function createRoom(page: Page): Promise<{ roomCode: string; seatId: string; playerSecret: string }> {
@@ -149,5 +160,36 @@ test("timer display counts down from the lobby-selected timeout", async ({ brows
   await expect(timerBadge).toHaveText(/^(Timer 30s|\d+s left)$/);
 
   await guestContext.close();
+  await context.close();
+});
+
+test("local tutorial and shell hierarchy keep ceremony and work roles distinct", async ({ browser }) => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+
+  await openLocalSetup(page, { resetTutorial: true });
+  await expect(page.getByText("First game guide")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Learn the board in a few minutes" })).toBeVisible();
+  await expect(page.locator(".tutorial-body .surface-card")).toHaveCount(2);
+
+  const tutorialFontFamily = await page.locator(".tutorial-hero .section-header__title").evaluate((node) => {
+    return window.getComputedStyle(node).fontFamily;
+  });
+  expect(tutorialFontFamily).toContain("Fraunces");
+
+  await page.evaluate((key) => window.localStorage.setItem(key, "seen"), TUTORIAL_SEEN_KEY);
+  await openLocalSetup(page);
+  await expect(page.getByRole("heading", { name: "Hudson Hustle" })).toBeVisible();
+
+  const setupHeadingFontFamily = await page.locator("main.setup-shell h1").evaluate((node) => {
+    return window.getComputedStyle(node).fontFamily;
+  });
+  expect(setupHeadingFontFamily).toContain("Fraunces");
+
+  const playersSectionFontFamily = await page.locator(".setup-card .section-header__title").evaluate((node) => {
+    return window.getComputedStyle(node).fontFamily;
+  });
+  expect(playersSectionFontFamily).not.toContain("Fraunces");
+
   await context.close();
 });

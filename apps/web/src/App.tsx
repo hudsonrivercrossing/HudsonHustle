@@ -840,10 +840,22 @@ export default function App(): JSX.Element {
               <div className="endgame-grid">
                 {projectedGame.players.map((player) => (
                   <SurfaceCard key={player.id} as="article" variant="summary" eyebrow="Final score" title={player.name} className="endgame-card">
-                    <p className="endgame-score">{player.score} pts</p>
-                    {summarizeEndgame(player, mapConfig).map((line) => (
-                      <p key={line}>{line}</p>
-                    ))}
+                    <div className="endgame-card__hero">
+                      <p className="endgame-score">{player.score}</p>
+                      <span className="endgame-score__label">points</span>
+                    </div>
+                    <div className="endgame-breakdown">
+                      {summarizeEndgame(player, mapConfig).map((line) => {
+                        const [label, ...valueParts] = line.split(":");
+                        const value = valueParts.join(":").trim();
+                        return (
+                          <div key={line} className="endgame-breakdown__row">
+                            <span className="endgame-breakdown__label">{label}</span>
+                            <span className="endgame-breakdown__value">{value || line}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </SurfaceCard>
                 ))}
               </div>
@@ -871,12 +883,17 @@ export default function App(): JSX.Element {
                 title={`${getCityName(mapConfig, currentRoute.from)} → ${getCityName(mapConfig, currentRoute.to)}`}
               >
                 <div className="detail-card__summary">
-                  <p>
-                    {currentRoute.length} train{currentRoute.length === 1 ? "" : "s"} · {currentRoute.type}
-                    {currentRoute.color === "gray" ? " · gray route" : ` · ${currentRoute.color}`}
-                    {currentRoute.locomotiveCost ? ` · ${currentRoute.locomotiveCost} locomotives` : ""}
+                  <div className="detail-card__facts">
+                    <span className="detail-card__fact">{currentRoute.length} train{currentRoute.length === 1 ? "" : "s"}</span>
+                    <span className="detail-card__fact">{currentRoute.type}</span>
+                    <span className="detail-card__fact">{currentRoute.color === "gray" ? "gray route" : currentRoute.color}</span>
+                    {currentRoute.locomotiveCost ? (
+                      <span className="detail-card__fact">{currentRoute.locomotiveCost} locomotive{currentRoute.locomotiveCost === 1 ? "" : "s"}</span>
+                    ) : null}
+                  </div>
+                  <p className="detail-card__prompt">
+                    {currentRouteOwner ? `Claimed by ${currentRouteOwner.name}.` : "Choose a payment color to claim this segment."}
                   </p>
-                  {currentRouteOwner ? <p className="muted-copy">Claimed by {currentRouteOwner.name}.</p> : null}
                 </div>
                 <div className="detail-card__decision-shelf chip-row">
                   {routeOptions.length > 0 ? (
@@ -900,7 +917,12 @@ export default function App(): JSX.Element {
             {currentCity && publicGame.phase === "main" ? (
               <SurfaceCard variant="detail" className="detail-card" eyebrow="City detail" title={currentCity.name}>
                 <div className="detail-card__summary">
-                  <p>Build a station here to borrow one rival connection during final scoring.</p>
+                  <div className="detail-card__facts">
+                    <span className="detail-card__fact">station city</span>
+                    <span className="detail-card__fact">borrow 1 rival link</span>
+                    <span className="detail-card__fact">endgame only</span>
+                  </div>
+                  <p className="detail-card__prompt">Choose a payment color to build a station here.</p>
                 </div>
                 <div className="detail-card__decision-shelf chip-row">
                   {currentCityOccupied ? (
