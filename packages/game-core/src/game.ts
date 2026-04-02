@@ -1,4 +1,4 @@
-import { shuffleWithSeed } from "./random";
+import { shuffleWithSeed } from "./random.js";
 import {
   type CityDef,
   type GameAction,
@@ -14,7 +14,7 @@ import {
   type TrainCardColor,
   type TrainCardFace,
   trainCardColors
-} from "./types";
+} from "./types.js";
 
 const playerColors: PlayerState["color"][] = [
   "harbor-blue",

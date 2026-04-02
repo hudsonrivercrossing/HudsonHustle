@@ -1,3 +1,4 @@
-export * from "./game";
-export * from "./random";
-export * from "./types";
+export * from "./game.js";
+export * from "./multiplayer.js";
+export * from "./random.js";
+export * from "./types.js";

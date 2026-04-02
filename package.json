@@ -9,8 +9,10 @@
   ],
   "scripts": {
     "dev": "pnpm --filter @hudson-hustle/web dev",
-    "build": "pnpm --filter @hudson-hustle/game-core build && pnpm --filter @hudson-hustle/game-data build && pnpm --filter @hudson-hustle/web build",
-    "test": "pnpm --filter @hudson-hustle/game-core test",
+    "dev:web": "pnpm --filter @hudson-hustle/web dev",
+    "dev:server": "pnpm --filter @hudson-hustle/server dev",
+    "build": "pnpm --filter @hudson-hustle/game-core build && pnpm --filter @hudson-hustle/game-data build && pnpm --filter @hudson-hustle/server build && pnpm --filter @hudson-hustle/web build",
+    "test": "pnpm --filter @hudson-hustle/game-core test && pnpm --filter @hudson-hustle/server test",
     "test:e2e": "pnpm --filter @hudson-hustle/web test:e2e",
     "config:registry": "node scripts/config/generate-config-registry.mjs",
     "config:switch": "node scripts/config/config-switch.mjs",

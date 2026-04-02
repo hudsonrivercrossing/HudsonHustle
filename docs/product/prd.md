@@ -45,10 +45,42 @@ Hudson Hustle is an original transit strategy game for laptop play, set on a cus
 - Authoritative backend for hidden information, room lifecycle, reconnect, and saved matches.
 - Shared rules engine reused between client and server.
 
+## V2 MVP Scope
+- `2-4` human players on separate devices.
+- One room per game with explicit create / join / ready / start flow.
+- Room setup supports choosing from released map snapshots, starting with:
+  - `v0.3-atlantic-hoboken`
+  - `v0.4-flushing-newark-airport`
+- Room setup supports an optional per-turn timer:
+  - default `0` meaning no timer
+  - host can increase or decrease before game start
+- Authoritative server validates all actions and owns the full game state.
+- Clients receive public board state plus only their own private hand and ticket state.
+- Reconnect support through room code plus player secret.
+- Resume an in-progress room after refresh or brief disconnect.
+- Hosted frontend on `Vercel` and backend on `Railway`.
+- Each player can reveal their own `roomCode`, `seatId`, and `playerSecret` through a low-prominence hover/click affordance instead of always exposing them in the main UI.
+
+## V2.x Scope
+- Keep the server-side seat/controller model open to non-human controllers.
+- Preserve an internal bot interface for testing and future feature work.
+- Do not promise bots as a public-facing product feature yet.
+
+## MVP3 Direction
+- Support mixed controller modes at the seat level:
+  - `human`
+  - `bot`
+  - `agent`
+  - `human+agent`
+- Prioritize `human+agent` before full autonomous agents:
+  - the player still confirms moves
+  - the agent provides observation, suggestions, tradeoff analysis, and direct dialogue
+- Treat external or user-provided agents as a later extension after the core multiplayer service is stable.
+
 ## Out Of Scope
 - Password-protected handoff.
 - Facial recognition.
-- AI opponents.
+- Public AI opponents in `V2 MVP`.
 - Public monetization.
 - Direct reuse of Ticket to Ride art, text, or branding.
 

@@ -5,9 +5,16 @@ export default defineConfig({
   use: {
     baseURL: "http://127.0.0.1:4173"
   },
-  webServer: {
-    command: "pnpm --filter @hudson-hustle/web dev --host 127.0.0.1 --port 4173",
-    port: 4173,
-    reuseExistingServer: true
-  }
+  webServer: [
+    {
+      command: "pnpm --filter @hudson-hustle/server dev",
+      port: 8787,
+      reuseExistingServer: true
+    },
+    {
+      command: "pnpm --filter @hudson-hustle/web dev --host 127.0.0.1 --port 4173",
+      port: 4173,
+      reuseExistingServer: true
+    }
+  ]
 });

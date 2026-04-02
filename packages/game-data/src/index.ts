@@ -1,8 +1,114 @@
 import type { MapConfig } from "@hudson-hustle/game-core";
-import { projectGeoDiagramCities } from "./cartography";
-import type { BoardPoint, GeoDiagramCitySeed } from "./cartography";
-import { activeHudsonHustleConfig, hudsonHustleConfigRegistry, hudsonHustleCurrentPointer } from "./config-registry";
-import type { BoardBackdrop, SnapshotMeta, StationAuthorityRef } from "./config-types";
+import { projectGeoDiagramCities } from "./cartography.js";
+import type { BoardPoint, GeoDiagramCitySeed } from "./cartography.js";
+import { activeHudsonHustleConfig, hudsonHustleConfigRegistry, hudsonHustleCurrentPointer } from "./config-registry.js";
+import type { BoardBackdrop, SnapshotMeta, StationAuthorityRef } from "./config-types.js";
+
+export interface HudsonHustleReleasedConfigSummary {
+  configId: string;
+  version: string;
+  summary: string;
+  mapName: string;
+}
+
+function buildHudsonHustleMap(bundle: typeof activeHudsonHustleConfig): MapConfig {
+  const activeStations = bundle.map.stations.filter((station) => station.active);
+  const boardFrame = {
+    width: bundle.map.board.width,
+    height: bundle.map.board.height,
+    padX: bundle.map.board.padX,
+    padY: bundle.map.board.padY
+  } as const;
+  const geoCities: GeoDiagramCitySeed[] = activeStations.map((station) => ({
+    id: station.id,
+    name: station.name,
+    label: station.label,
+    lat: station.lat,
+    lon: station.lon,
+    boardX: station.boardX,
+    boardY: station.boardY,
+    labelDx: station.labelDx,
+    labelDy: station.labelDy,
+    labelAnchor: station.labelAnchor
+  }));
+  const { cities } = projectGeoDiagramCities(geoCities, boardFrame);
+
+  return {
+    id: bundle.map.mapId,
+    name: bundle.map.name,
+    settings: {
+      trainsPerPlayer: bundle.rules.trainsPerPlayer,
+      stationsPerPlayer: bundle.rules.stationsPerPlayer,
+      longestRouteBonus: bundle.rules.longestRouteBonus,
+      stationValue: bundle.rules.stationValue
+    },
+    cities,
+    routes: bundle.map.routes.map((route) => ({
+      id: route.id,
+      from: route.from,
+      to: route.to,
+      length: route.length,
+      color: route.color,
+      type: route.type,
+      ...(route.locomotiveCost !== undefined ? { locomotiveCost: route.locomotiveCost } : {}),
+      ...(route.twinGroup ? { twinGroup: route.twinGroup } : {}),
+      ...(route.waypoints ? { waypoints: route.waypoints } : {})
+    })),
+    tickets: [
+      ...bundle.tickets.long.map((ticket) => ({
+        id: ticket.id,
+        from: ticket.from,
+        to: ticket.to,
+        points: ticket.points,
+        bucket: "long" as const
+      })),
+      ...bundle.tickets.regular.map((ticket) => ({
+        id: ticket.id,
+        from: ticket.from,
+        to: ticket.to,
+        points: ticket.points,
+        bucket: "regular" as const
+      }))
+    ]
+  };
+}
+
+export function getHudsonHustleRegisteredConfig(configId: string) {
+  return hudsonHustleConfigRegistry[configId];
+}
+
+export function getHudsonHustleReleasedConfigBundle(configId: string) {
+  const bundle = hudsonHustleConfigRegistry[configId];
+  if (!bundle || bundle.mode !== "release") {
+    return null;
+  }
+  return bundle;
+}
+
+export const hudsonHustleReleasedConfigs: HudsonHustleReleasedConfigSummary[] = Object.values(hudsonHustleConfigRegistry)
+  .filter((bundle) => bundle.mode === "release")
+  .map((bundle) => ({
+    configId: bundle.configId,
+    version: bundle.meta.version,
+    summary: bundle.meta.summary,
+    mapName: bundle.map.name
+  }));
+
+export function getHudsonHustleMapByConfigId(configId: string): MapConfig {
+  const bundle = getHudsonHustleRegisteredConfig(configId);
+  if (!bundle) {
+    throw new Error(`Unknown Hudson Hustle config: ${configId}`);
+  }
+  return buildHudsonHustleMap(bundle);
+}
+
+export function getHudsonHustleVisualsByConfigId(configId: string) {
+  const bundle = getHudsonHustleRegisteredConfig(configId);
+  if (!bundle) {
+    throw new Error(`Unknown Hudson Hustle config: ${configId}`);
+  }
+  return bundle.visuals;
+}
 
 const activeStations = activeHudsonHustleConfig.map.stations.filter((station) => station.active);
 
@@ -60,55 +166,14 @@ const { cities: hudsonHustleCities, bounds: hudsonHustleGeoBounds } = projectGeo
 export { hudsonHustleGeoBounds };
 export const hudsonHustleBackdrop: BoardBackdrop = activeHudsonHustleConfig.visuals.backdrop;
 
-const hudsonHustleRoutes: MapConfig["routes"] = activeHudsonHustleConfig.map.routes.map((route) => ({
-  id: route.id,
-  from: route.from,
-  to: route.to,
-  length: route.length,
-  color: route.color,
-  type: route.type,
-  ...(route.locomotiveCost !== undefined ? { locomotiveCost: route.locomotiveCost } : {}),
-  ...(route.twinGroup ? { twinGroup: route.twinGroup } : {}),
-  ...(route.waypoints ? { waypoints: route.waypoints } : {})
-}));
-
-const hudsonHustleTickets: MapConfig["tickets"] = [
-  ...activeHudsonHustleConfig.tickets.long.map((ticket) => ({
-    id: ticket.id,
-    from: ticket.from,
-    to: ticket.to,
-    points: ticket.points,
-    bucket: "long" as const
-  })),
-  ...activeHudsonHustleConfig.tickets.regular.map((ticket) => ({
-    id: ticket.id,
-    from: ticket.from,
-    to: ticket.to,
-    points: ticket.points,
-    bucket: "regular" as const
-  }))
-];
-
-export const hudsonHustleMap: MapConfig = {
-  id: activeHudsonHustleConfig.map.mapId,
-  name: activeHudsonHustleConfig.map.name,
-  settings: {
-    trainsPerPlayer: activeHudsonHustleConfig.rules.trainsPerPlayer,
-    stationsPerPlayer: activeHudsonHustleConfig.rules.stationsPerPlayer,
-    longestRouteBonus: activeHudsonHustleConfig.rules.longestRouteBonus,
-    stationValue: activeHudsonHustleConfig.rules.stationValue
-  },
-  cities: hudsonHustleCities,
-  routes: hudsonHustleRoutes,
-  tickets: hudsonHustleTickets
-};
+export const hudsonHustleMap: MapConfig = buildHudsonHustleMap(activeHudsonHustleConfig);
 
 export const cardColorPalette: Record<string, string> = activeHudsonHustleConfig.visuals.palettes.cards;
 
 export const playerColorPalette: Record<string, string> = activeHudsonHustleConfig.visuals.palettes.players;
 
-export { createGeoProjector, projectGeoDiagramCities } from "./cartography";
-export { activeHudsonHustleConfig, hudsonHustleConfigRegistry, hudsonHustleCurrentPointer } from "./config-registry";
+export { createGeoProjector, projectGeoDiagramCities } from "./cartography.js";
+export { activeHudsonHustleConfig, hudsonHustleConfigRegistry, hudsonHustleCurrentPointer } from "./config-registry.js";
 export type {
   BoardBackdrop,
   BoardBackdropArea,
@@ -125,5 +190,5 @@ export type {
   SnapshotTickets,
   SnapshotVisuals,
   StationAuthorityRef
-} from "./config-types";
-export type { BoardPoint, GeoDiagramCitySeed, GeoPoint, GeoProjectionBounds, GeoProjectionOptions, GeoProjectionResult } from "./cartography";
+} from "./config-types.js";
+export type { BoardPoint, GeoDiagramCitySeed, GeoPoint, GeoProjectionBounds, GeoProjectionOptions, GeoProjectionResult } from "./cartography.js";
