@@ -6,6 +6,11 @@ This folder now separates long-lived product docs from versioned playtest artifa
 - [PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/prd.md)
 - [Tech Spec](/Users/djfan/Workspace/HudsonHustle/docs/product/tech-spec.md)
 - [Design System](/Users/djfan/Workspace/HudsonHustle/docs/product/design-system.md)
+- [Design Principles](/Users/djfan/Workspace/HudsonHustle/docs/product/design-principles.md)
+- [Typography And Layout](/Users/djfan/Workspace/HudsonHustle/docs/product/typography-and-layout.md)
+- [Component System](/Users/djfan/Workspace/HudsonHustle/docs/product/component-system.md)
+- [Map Language Boundary](/Users/djfan/Workspace/HudsonHustle/docs/product/map-language-boundary.md)
+- [Design Implementation Backlog](/Users/djfan/Workspace/HudsonHustle/docs/product/design-implementation-backlog.md)
 - [V2 Docs Index](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/README.md)
 
 ## Gameplay
@@ -52,7 +57,7 @@ This folder now separates long-lived product docs from versioned playtest artifa
 
 ## Structure
 - `docs/product/` stores long-lived product and engineering references.
-- `docs/product/v2/` stores multiplayer-specific architecture, flow, and deployment references.
+- `docs/product/v2/` stores multiplayer-specific architecture, flow, deployment references, and versioned design rationale.
 - `docs/gameplay/` stores player-facing and strategy-facing rules guides.
 - `docs/map/` stores map-design process and rubric docs.
 - `docs/config/` stores snapshot/versioning workflow docs.

@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import type { HudsonHustleReleasedConfigSummary } from "@hudson-hustle/game-data";
 import type { ReconnectState, RoomSummary } from "@hudson-hustle/game-core";
+import { Panel } from "./system/Panel";
+import { StatusBanner } from "./system/StatusBanner";
 
 interface CreateRoomForm {
   hostName: string;
@@ -56,6 +58,22 @@ export function MultiplayerSetupScreen({
     () => roomPreview?.seats.filter((seat) => seat.playerName === null) ?? [],
     [roomPreview]
   );
+  const setupBannerTone = error || reconnectState === "reconnect-failed" ? "failure" : reconnectState === "attempting-reconnect" ? "waiting" : "neutral";
+  const setupBannerEyebrow =
+    error || reconnectState === "reconnect-failed" ? "Connection issue" : reconnectState === "attempting-reconnect" ? "Reconnect" : "Separate-device multiplayer";
+  const setupBannerHeadline =
+    error || reconnectState === "reconnect-failed"
+      ? "Multiplayer setup needs attention."
+      : reconnectState === "attempting-reconnect"
+        ? "Attempting to restore your room."
+        : "Create a room or join a table.";
+  const setupBannerCopy = error
+    ? error
+    : reconnectState === "reconnect-failed"
+      ? "Saved room credentials could not reconnect. Use the manual reconnect form below."
+      : reconnectState === "attempting-reconnect"
+        ? "Checking saved room credentials before showing the normal join flow."
+        : "Host a released map, share the room code, and move the game state to the server-owned multiplayer flow.";
 
   return (
     <main className="setup-shell">
@@ -65,6 +83,12 @@ export function MultiplayerSetupScreen({
         <p className="lead">
           Create a room, share a code, and play the released NYC/NJ maps from separate devices with server-owned game state.
         </p>
+        <StatusBanner
+          tone={setupBannerTone}
+          eyebrow={setupBannerEyebrow}
+          headline={setupBannerHeadline}
+          copy={setupBannerCopy}
+        />
         {onOpenLocal ? (
           <div className="setup-actions">
             <button className="secondary-button" onClick={onOpenLocal}>
@@ -72,12 +96,9 @@ export function MultiplayerSetupScreen({
             </button>
           </div>
         ) : null}
-        {error ? <p className="error-banner">{error}</p> : null}
-        {reconnectState === "attempting-reconnect" ? <p className="muted-copy">Attempting silent reconnect…</p> : null}
-        {reconnectState === "reconnect-failed" ? <p className="muted-copy">Saved room credentials failed. Use manual reconnect below.</p> : null}
 
         <div className="multiplayer-setup-grid">
-          <section className="panel" data-testid="create-room-panel">
+          <Panel variant="status" data-testid="create-room-panel">
             <div className="panel-header">
               <h2>Create room</h2>
               <span>Host a new table</span>
@@ -129,9 +150,9 @@ export function MultiplayerSetupScreen({
             >
               Create room
             </button>
-          </section>
+          </Panel>
 
-          <section className="panel" data-testid="join-room-panel">
+          <Panel variant="neutral" data-testid="join-room-panel">
             <div className="panel-header">
               <h2>Join room</h2>
               <span>Pick an open seat</span>
@@ -177,10 +198,10 @@ export function MultiplayerSetupScreen({
             >
               Join room
             </button>
-          </section>
+          </Panel>
         </div>
 
-        <section className="panel reconnect-panel">
+        <Panel variant={reconnectState === "reconnect-failed" ? "alert" : "neutral"} className="reconnect-panel">
           <div className="panel-header">
             <h2>Manual reconnect</h2>
             <span>Use your hidden session chip</span>
@@ -211,7 +232,7 @@ export function MultiplayerSetupScreen({
           >
             Reconnect
           </button>
-        </section>
+        </Panel>
       </section>
     </main>
   );

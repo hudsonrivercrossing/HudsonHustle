@@ -1,5 +1,7 @@
 import type { RoomSummary, TimerUpdate } from "@hudson-hustle/game-core";
 import { IdentityChip } from "./IdentityChip";
+import { Panel } from "./system/Panel";
+import { StatusBanner } from "./system/StatusBanner";
 
 interface LobbyScreenProps {
   room: RoomSummary;
@@ -26,13 +28,17 @@ export function LobbyScreen({
   const canStart = realtimeReady && localSeat?.isHost && room.seats.every((seat) => seat.playerName) && room.seats.every((seat) => seat.ready);
   const joinedCount = room.seats.filter((seat) => seat.playerName).length;
   const readyCount = room.seats.filter((seat) => seat.ready).length;
-  const lobbyTone = canStart ? "ready" : localSeat?.isHost ? "host" : "waiting";
-  const lobbyHeadline = canStart
+  const lobbyTone = realtimeMessage ? "failure" : canStart ? "active" : "waiting";
+  const lobbyHeadline = realtimeMessage
+    ? "Realtime connection needs attention."
+    : canStart
     ? "Table is ready to start."
     : localSeat?.isHost
       ? "Waiting for the full table."
       : "Waiting for host.";
-  const lobbyCopy = canStart
+  const lobbyCopy = realtimeMessage
+    ? realtimeMessage
+    : canStart
     ? "Everyone is seated and ready. Start the game when you want."
     : localSeat?.isHost
       ? `Seats joined: ${joinedCount}/${room.playerCount}. Ready: ${readyCount}/${room.playerCount}.`
@@ -48,25 +54,20 @@ export function LobbyScreen({
             <p className="lead">
               Share the room code, let everyone claim a seat, and start once the full table is ready.
             </p>
-            {realtimeMessage ? <p className="error-banner">{realtimeMessage}</p> : null}
-            <div className={`status-banner status-banner--${lobbyTone}`} data-testid="lobby-status-banner">
-              <div>
-                <span className="status-banner__eyebrow">
-                  {canStart ? "Ready to start" : localSeat?.isHost ? "Host status" : "Lobby status"}
-                </span>
-                <strong className="status-banner__headline">{lobbyHeadline}</strong>
-                <span className="status-banner__copy">{lobbyCopy}</span>
-              </div>
-              <span className="status-banner__timer">
-                {room.turnTimeLimitSeconds === 0 ? "Untimed" : `${room.turnTimeLimitSeconds}s turns`}
-              </span>
-            </div>
+            <StatusBanner
+              tone={lobbyTone}
+              eyebrow={canStart ? "Ready to start" : localSeat?.isHost ? "Host status" : "Lobby status"}
+              headline={lobbyHeadline}
+              copy={lobbyCopy}
+              timerLabel={room.turnTimeLimitSeconds === 0 ? "Untimed" : `${room.turnTimeLimitSeconds}s turns`}
+              testId="lobby-status-banner"
+            />
           </div>
           <IdentityChip roomCode={room.roomCode} seatId={localSeatId} playerSecret={playerSecret} />
         </div>
 
         <div className="lobby-grid">
-          <section className="panel">
+          <Panel variant="status">
             <div className="panel-header">
               <h2>Room</h2>
               <span>{room.roomCode}</span>
@@ -75,9 +76,9 @@ export function LobbyScreen({
             <p className="muted-copy">Config: {room.configVersion} · {room.configId}</p>
             <p className="muted-copy">Turn timer: {room.turnTimeLimitSeconds === 0 ? "Untimed" : `${room.turnTimeLimitSeconds}s`}</p>
             {timer?.deadlineAt ? <p className="muted-copy">Next timer activates after game start.</p> : null}
-          </section>
+          </Panel>
 
-          <section className="panel">
+          <Panel variant="neutral">
             <div className="panel-header">
               <h2>Seats</h2>
               <span>{room.seats.filter((seat) => seat.playerName).length}/{room.playerCount} joined</span>
@@ -108,7 +109,7 @@ export function LobbyScreen({
                 </article>
               ))}
             </div>
-          </section>
+          </Panel>
         </div>
 
         <div className="setup-actions">

@@ -36,6 +36,8 @@ import { LobbyScreen } from "./components/LobbyScreen";
 import { MultiplayerSetupScreen } from "./components/MultiplayerSetupScreen";
 import { TicketPicker } from "./components/TicketPicker";
 import { TransitCard } from "./components/TransitCard";
+import { Panel } from "./components/system/Panel";
+import { StatusBanner } from "./components/system/StatusBanner";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8787";
 const wsUrl = import.meta.env.VITE_WS_URL ?? apiBaseUrl;
@@ -654,18 +656,14 @@ export default function App(): JSX.Element {
               <span className="config-summary-tooltip">{snapshot.room.configSummary}</span>
             </div>
           </div>
-          <div className={`status-banner status-banner--${turnBannerTone}`} data-testid="turn-status-banner">
-            <div>
-              <span className="status-banner__eyebrow">{turnBannerLabel}</span>
-              <strong className="status-banner__headline">
-                {localIsActive ? "Make your move." : `${activePlayer?.name ?? "Another player"} is acting.`}
-              </strong>
-              <span className="status-banner__copy">{turnBannerCopy}</span>
-            </div>
-            <span className="status-banner__timer" data-testid="turn-timer-badge">
-              {timerCopy}
-            </span>
-          </div>
+          <StatusBanner
+            tone={turnBannerTone}
+            eyebrow={turnBannerLabel}
+            headline={localIsActive ? "Make your move." : `${activePlayer?.name ?? "Another player"} is acting.`}
+            copy={turnBannerCopy}
+            timerLabel={timerCopy}
+            testId="turn-status-banner"
+          />
         </div>
         <div className="topbar-actions">
           <IdentityChip roomCode={credentials.roomCode} seatId={credentials.seatId} playerSecret={credentials.playerSecret} />
@@ -677,7 +675,7 @@ export default function App(): JSX.Element {
 
       <div className="game-layout">
         <aside className="side-panel">
-          <section className="panel">
+          <Panel variant="status">
             <div className="panel-header">
               <h2>Round table</h2>
               <span>{activePlayer?.name ?? "Unknown"} active</span>
@@ -694,9 +692,9 @@ export default function App(): JSX.Element {
                 </article>
               ))}
             </div>
-          </section>
+          </Panel>
 
-          <section className="panel">
+          <Panel variant="private-info">
             <div className="panel-header">
               <h2>Your hand</h2>
               <span>{localPlayer.hand.length} cards</span>
@@ -706,9 +704,9 @@ export default function App(): JSX.Element {
                 <TransitCard key={card.id} color={card.color} context="hand" />
               ))}
             </div>
-          </section>
+          </Panel>
 
-          <section className="panel">
+          <Panel variant="private-info">
             <div className="panel-header">
               <h2>Your tickets</h2>
               <span>
@@ -730,9 +728,9 @@ export default function App(): JSX.Element {
                 </div>
               ))}
             </div>
-          </section>
+          </Panel>
 
-          <section className="panel">
+          <Panel variant="neutral">
             <div className="panel-header">
               <h2>Market</h2>
               <span>{publicGame.trainDeckCount} deck</span>
@@ -753,11 +751,11 @@ export default function App(): JSX.Element {
             <button className="secondary-button" disabled={!canContinueDrawing} onClick={() => sendGameAction({ type: "draw_card", source: "deck" })}>
               Draw from deck
             </button>
-          </section>
+          </Panel>
         </aside>
 
         <main className="board-column">
-          <section className="panel board-panel">
+          <Panel variant="neutral" className="board-panel">
             <div className="panel-header">
               <h2>Board</h2>
               <span>All players see the same public network state.</span>
@@ -791,14 +789,21 @@ export default function App(): JSX.Element {
                 setSelectedRouteId(null);
               }}
             />
-          </section>
+          </Panel>
 
-          <section className="panel action-panel">
+          <Panel variant="status" className="action-panel">
               <div className="panel-header">
                 <h2>Action rail</h2>
                 <span>{publicGame.turn.summary ?? "Choose a route, city, or ticket action."}</span>
               </div>
-              {multiplayerError ? <p className="error-banner">{multiplayerError}</p> : null}
+              {multiplayerError ? (
+                <StatusBanner
+                  tone="failure"
+                  eyebrow="Action issue"
+                  headline="This move could not complete."
+                  copy={multiplayerError}
+                />
+              ) : null}
 
             {publicGame.phase === "gameOver" ? (
               <div className="endgame-grid">
@@ -884,7 +889,7 @@ export default function App(): JSX.Element {
                 </div>
               </div>
             ) : null}
-          </section>
+          </Panel>
         </main>
       </div>
 

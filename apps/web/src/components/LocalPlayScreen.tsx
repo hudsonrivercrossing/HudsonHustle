@@ -27,6 +27,8 @@ import { OnboardingTutorial, type TutorialStep } from "./OnboardingTutorial";
 import { SetupScreen } from "./SetupScreen";
 import { TicketPicker } from "./TicketPicker";
 import { TransitCard } from "./TransitCard";
+import { Panel } from "./system/Panel";
+import { StatusBanner } from "./system/StatusBanner";
 
 const saveKey = "hudson-hustle-save-v1";
 const tutorialSeenKey = "hudson-hustle-onboarding-v1-1";
@@ -423,6 +425,33 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
   const currentRoute = selectedRouteId ? hudsonHustleMap.routes.find((route) => route.id === selectedRouteId) : null;
   const currentRouteClaim = currentRoute ? game.routeClaims.find((claim) => claim.routeId === currentRoute.id) : null;
   const currentRouteOwner = currentRouteClaim ? game.players.find((player) => player.id === currentRouteClaim.playerId) : null;
+  const localBannerTone =
+    error ? "failure" : game.phase === "gameOver" ? "neutral" : visibility === "postTurn" ? "warning" : visibility === "handoff" ? "waiting" : "active";
+  const localBannerEyebrow =
+    game.phase === "gameOver" ? "Final scores" : visibility === "postTurn" ? "Turn complete" : visibility === "handoff" ? "Next player" : "Local turn";
+  const localBannerHeadline =
+    error
+      ? "Local game needs attention."
+      : game.phase === "gameOver"
+        ? "Match complete."
+        : visibility === "postTurn"
+          ? `${activePlayer.name}, pass the laptop.`
+          : visibility === "handoff"
+            ? `${activePlayer.name}, take over.`
+            : `${activePlayer.name}, make your move.`;
+  const localBannerCopy = error
+    ? error
+    : game.phase === "gameOver"
+      ? "Review the final table, then head back to setup when you are ready for another match."
+      : visibility === "postTurn"
+        ? game.turn.summary ?? "Your action is locked in. End the handoff once the next player is ready."
+        : visibility === "handoff"
+          ? "The board is safe to view. Private hands and tickets remain hidden until the next player continues."
+          : game.turn.stage === "drawing"
+            ? "Finish the current draw before taking another action."
+            : game.turn.stage === "awaitingHandoff"
+              ? "Your action is complete. End the turn to pass the laptop."
+              : "Claim a route, build a station, or draw tickets on this turn.";
 
   return (
     <div className="app-shell" data-config-theme={hudsonHustleCurrentTheme}>
@@ -436,6 +465,12 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
               <span className="config-summary-tooltip">{hudsonHustleCurrentConfigMeta.summary}</span>
             </div>
           </div>
+          <StatusBanner
+            tone={localBannerTone}
+            eyebrow={localBannerEyebrow}
+            headline={localBannerHeadline}
+            copy={localBannerCopy}
+          />
         </div>
         <div className="topbar-actions">
           <button className="secondary-button" onClick={openTutorial}>
@@ -449,7 +484,7 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
 
       <div className={`game-layout ${visibility !== "visible" ? "game-layout--obscured" : ""} ${tutorialTarget ? "game-layout--tutorial" : ""}`}>
         <aside className="side-panel">
-          <section className={`panel ${tutorialTarget === "scoreboard" ? "panel--tutorial-focus" : ""}`}>
+          <Panel variant="status" className={tutorialTarget === "scoreboard" ? "panel--tutorial-focus" : ""}>
             <div className="panel-header">
               <h2>Round table</h2>
               <span>{game.phase === "gameOver" ? "Final score" : `${activePlayer.name}'s turn`}</span>
@@ -466,11 +501,11 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
                 </article>
               ))}
             </div>
-          </section>
+          </Panel>
 
           {visibility === "visible" ? (
             <>
-              <section className={`panel ${tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}`}>
+              <Panel variant="private-info" className={tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}>
                 <div className="panel-header">
                   <h2>Hand</h2>
                   <span>{activePlayer.hand.length} cards</span>
@@ -480,9 +515,9 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
                     <TransitCard key={card.id} color={card.color} context="hand" />
                   ))}
                 </div>
-              </section>
+              </Panel>
 
-              <section className={`panel ${tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}`}>
+              <Panel variant="private-info" className={tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}>
                 <div className="panel-header">
                   <h2>Tickets</h2>
                   <span>
@@ -504,16 +539,16 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
                     </div>
                   ))}
                 </div>
-              </section>
+              </Panel>
             </>
           ) : (
-            <section className="panel hidden-panel">
+            <Panel variant="alert" className="hidden-panel">
               <h2>Private info hidden</h2>
               <p>The next player should only see the public board until they click `I'm ready`.</p>
-            </section>
+            </Panel>
           )}
 
-          <section className={`panel ${tutorialTarget === "market" ? "panel--tutorial-focus" : ""}`}>
+          <Panel variant="neutral" className={tutorialTarget === "market" ? "panel--tutorial-focus" : ""}>
             <div className="panel-header">
               <h2>Market</h2>
               <span>{game.trainDeck.length} deck</span>
@@ -534,11 +569,11 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
             <button className="secondary-button" disabled={marketDisabled} onClick={() => applyAction({ type: "draw_card", source: "deck" })}>
               Draw from deck
             </button>
-          </section>
+          </Panel>
         </aside>
 
         <main className="board-column">
-          <section className={`panel board-panel ${tutorialTarget === "board" ? "panel--tutorial-focus" : ""}`}>
+          <Panel variant="neutral" className={`board-panel ${tutorialTarget === "board" ? "panel--tutorial-focus" : ""}`}>
             <div className="panel-header">
               <h2>Board</h2>
               <span>Click a route or city to inspect actions</span>
@@ -572,14 +607,21 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
                 setSelectedRouteId(null);
               }}
             />
-          </section>
+          </Panel>
 
-          <section className={`panel action-panel ${tutorialTarget === "action" ? "panel--tutorial-focus" : ""}`}>
+          <Panel variant="status" className={`action-panel ${tutorialTarget === "action" ? "panel--tutorial-focus" : ""}`}>
             <div className="panel-header">
               <h2>Action rail</h2>
               <span>{game.turn.summary ?? "Choose one action for this turn."}</span>
             </div>
-            {error ? <p className="error-banner">{error}</p> : null}
+            {error ? (
+              <StatusBanner
+                tone="failure"
+                eyebrow="Action issue"
+                headline="This move could not complete."
+                copy={error}
+              />
+            ) : null}
 
             {game.phase === "gameOver" ? (
               <div className="endgame-grid">
@@ -669,7 +711,7 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
                 <p>{game.turn.latestTunnelReveal.join(", ")}</p>
               </div>
             ) : null}
-          </section>
+          </Panel>
         </main>
       </div>
 

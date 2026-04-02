@@ -4,6 +4,8 @@
 
 Hudson Hustle does not need a giant component-library-first redesign yet. It needs a shell-first design system that makes the product feel intentional, original, and scalable while protecting the map as the core play surface.
 
+This document is a research synthesis and strategy memo, not the canonical final design-system home. Stable design-system decisions are being promoted into `docs/product/`, while `docs/product/v2/` keeps the versioned rationale and experiment trail.
+
 This recommendation assumes an AI-agent-era workflow:
 - coding is not the expensive part
 - design judgment and direction-setting are the expensive parts
@@ -111,15 +113,21 @@ Recommendation:
 - use a more distinctive display face for headings and hero moments
 - keep body text practical and highly legible
 - define a strict scale before broader UI restyling
+- current `v2.1` working choice:
+  - display: `Fraunces`
+  - body / operational UI: `Inter`
+- current backup directions:
+  - `Space Grotesk + IBM Plex Sans` for a stronger sans-led shell
+  - `Archivo Black + DM Sans` for a more brutalist brand experiment
 
 Typography TODO:
-- choose 2-3 serious font pair candidates
-- test them in:
+- test the chosen `Fraunces + Inter` pair in:
   - setup screen
   - lobby
   - action rail
   - player panel
   - ticket card
+- keep `Space Grotesk + IBM Plex Sans` as the fallback if `Fraunces` feels too soft in implementation
 - reject any pair that weakens map labels or timer/status readability
 
 ### Layout

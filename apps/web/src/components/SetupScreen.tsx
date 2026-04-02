@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { StatusBanner } from "./system/StatusBanner";
 
 interface SetupScreenProps {
   onStart: (playerNames: string[]) => void;
@@ -39,6 +40,12 @@ export function SetupScreen({
             <span className="config-summary-tooltip">{configSummary}</span>
           </div>
         </div>
+        <StatusBanner
+          tone="neutral"
+          eyebrow="Shared laptop session"
+          headline="Pass the board between rivals."
+          copy="Use one computer, hand off between turns, and keep private hands hidden during player changes."
+        />
 
         <label className="field">
           <span>Players</span>
