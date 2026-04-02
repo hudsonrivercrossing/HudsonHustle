@@ -91,15 +91,15 @@ export function LobbyScreen({
                   className={`seat-row ${seat.seatId === localSeatId ? "seat-row--self" : ""}`}
                   data-testid={`seat-row-${seat.seatId}`}
                 >
-                  <div>
-                    <strong>{seat.playerName ?? "Open seat"}</strong>
-                    <p className="muted-copy">
+                  <div className="row-object__main">
+                    <strong className="row-object__title">{seat.playerName ?? "Open seat"}</strong>
+                    <p className="row-object__meta">
                       {seat.seatId}
                       {seat.isHost ? " · host" : ""}
                       {seat.connected ? " · connected" : ""}
                     </p>
                   </div>
-                  <div className="seat-status-stack">
+                  <div className="row-object__stats seat-status-stack">
                     <Chip tone={seat.ready ? "success" : "warning"} className="seat-ready">
                       {seat.ready ? "Ready" : "Waiting"}
                     </Chip>

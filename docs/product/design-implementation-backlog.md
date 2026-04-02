@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-`v2.1` should validate one strong slice before broad system rollout.
+`v2.1` is in final shell/system hardening and freeze.
 
 ## Landed
 
@@ -30,8 +30,6 @@ Extraction allowed during this slice:
 - `Panel`
 - optional `Chip/Badge`
 - semantic tokens reused in at least two places
-
-## In Progress
 
 ### Second Slice
 - `lobby shell + panel/card family`
@@ -120,21 +118,82 @@ Extraction allowed during this slice:
 - reuse existing `Button`
 - reuse existing `SectionHeader`
 
+### Ninth Slice
+- `row / roster object system`
+
+Scope:
+- scoreboard rows
+- seat rows
+- ticket rows
+- compact metadata row anatomy across setup, lobby, and active shells
+
+Extraction allowed during this slice:
+- CSS object family first
+- no broad React primitive by default
+
+### Tenth Slice
+- `artifact / inventory family`
+
+Scope:
+- hand cards
+- market cards
+- ticket selection cards
+- ticket and printed artifact framing
+
+Extraction allowed during this slice:
+- artifact tokens and CSS family
+- no structural replacement for `Panel`
+
+### Eleventh Slice
+- `motion / transition language`
+
+Scope:
+- modal open/close
+- state-surface/banner transitions
+- utility hover/focus states
+- tutorial/navigation emphasis
+
+Extraction allowed during this slice:
+- system-level motion rules only
+
+### Twelfth Slice
+- `responsive density pass`
+
+Scope:
+- tighter narrow-width spacing
+- utility chrome wrapping
+- side-panel and row density under compressed widths
+- setup/lobby/modal readability at smaller widths
+
+Extraction allowed during this slice:
+- breakpoint refinement only
+
+### Thirteenth Slice
+- `system hardening + freeze`
+
+Scope:
+- align docs with shipped primitives and CSS object families
+- keep showcase current
+- add browser verification for utility chrome, state surfaces, and ceremony typography
+- reject new primitive creep
+
+Extraction allowed during this slice:
+- no new major primitives
+
 ## Deferred
 
-Not for this phase:
-- broad map redesign
-- full component-library push
-- form-system redesign
-- button-system redesign
-- full modal-system redesign
+Not for `v2.1`:
+- map-adjacent framing refinements
+- board label rhythm work
+- map visual polish
+- design-tooling infrastructure
+- broader `v2.2` design evolution
 
 ## Review Gates
 
-Before widening beyond the second slice, confirm:
-- `Fraunces + Inter` feels right in real UI
-- status hierarchy is stronger
-- timer readability improved
+Freeze checks:
+- `Fraunces + Inter` still feels right in dense play states
+- utility chrome remains distinct from chips and gameplay controls
+- `StatusBanner` and `StateSurface` do not drift into the same job
+- row/object and artifact families feel governed without becoming generic cards
 - gameplay affordances did not regress
-- extracted primitives were actually reusable
-- lobby and card surfaces feel more like one family than isolated utility blocks

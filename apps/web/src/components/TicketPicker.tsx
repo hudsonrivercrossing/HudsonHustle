@@ -28,7 +28,7 @@ export function TicketPicker({
 }: TicketPickerProps): JSX.Element {
   return (
     <ModalShell width="md" align="center">
-        <SectionHeader eyebrow="Private choice" title={title} meta={`Keep at least ${minimumKeep}`} />
+        <SectionHeader eyebrow="Private choice" title={title} meta={`Keep at least ${minimumKeep}`} density="ceremony" />
         <p className="modal-copy">{subtitle}</p>
         <div className="ticket-list">
           {tickets.map((ticket) => {
@@ -36,9 +36,10 @@ export function TicketPicker({
             return (
               <button
                 key={ticket.id}
-                className={`ticket-card ${selected ? "ticket-card--selected" : ""}`}
+                className={`ticket-card artifact-card artifact-card--ticket ${selected ? "ticket-card--selected artifact-card--selected" : ""}`}
                 onClick={() => onToggle(ticket.id)}
               >
+                <span className="ticket-card__kicker">Destination ticket</span>
                 <span className="ticket-card__route">
                   {getCityName(config, ticket.from)} <span className="ticket-arrow">to</span> {getCityName(config, ticket.to)}
                 </span>

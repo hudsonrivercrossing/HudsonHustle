@@ -16,7 +16,7 @@ Do not use this file for exploratory notes or version-specific rationale. Those 
 
 ## Current Phase
 
-Hudson Hustle is in `v2.1` design-system definition and first-slice implementation.
+Hudson Hustle is in late `v2.1` shell/system hardening and freeze.
 
 Locked decisions:
 - active font pair:
@@ -25,8 +25,8 @@ Locked decisions:
 - typography rule:
   - `Inter` handles work
   - `Fraunces` handles ceremony
-- first implementation slice:
-  - `status/banner system`
+- current freeze target:
+  - near-complete shell/system consistency across setup, lobby, active play, and overlays
 - map remains conservative and map-first during this phase
 
 ## Structure
@@ -76,8 +76,13 @@ Only extract primitives proven necessary by the current slice:
 - `StatusBanner`
 - `StateSurface`
 - `Panel`
-- optional `Chip/Badge`
-- optional `SectionHeader`
+- `Chip`
+- `SectionHeader`
+- `Button`
+- `FormField`
+- `SurfaceCard`
+- `ChoiceChipButton`
+- `ModalShell`
 - `UtilityPill`
 
 Do not build a broad component library ahead of proof.

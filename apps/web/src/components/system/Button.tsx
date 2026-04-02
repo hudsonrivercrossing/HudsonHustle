@@ -8,10 +8,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export function Button({ variant = "secondary", className, children, type = "button", ...rest }: ButtonProps): JSX.Element {
-  const classes = [`${variant}-button`, className].filter(Boolean).join(" ");
+  const classes = ["system-button", `${variant}-button`, className].filter(Boolean).join(" ");
   return (
     <button type={type} className={classes} {...rest}>
-      {children}
+      <span className="system-button__content">{children}</span>
     </button>
   );
 }

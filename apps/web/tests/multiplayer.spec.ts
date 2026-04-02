@@ -4,8 +4,32 @@ import { decodeReconnectToken } from "../src/reconnect-token";
 const SESSION_KEY = "hudson-hustle-multiplayer-session-v2";
 const API_BASE_URL = "http://127.0.0.1:8787";
 
+async function waitForApi(page: Page): Promise<void> {
+  await expect
+    .poll(async () => {
+      const response = await page.request.get(`${API_BASE_URL}/health`).catch(() => null);
+      return response?.ok() ?? false;
+    })
+    .toBe(true);
+}
+
+async function clearInitialTicketChoice(page: Page): Promise<void> {
+  const keepTicketsButton = page.getByRole("button", { name: /Keep 2 tickets/ });
+  const ticketPickerVisible = await keepTicketsButton
+    .waitFor({ state: "visible", timeout: 2500 })
+    .then(() => true)
+    .catch(() => false);
+
+  if (!ticketPickerVisible) {
+    return;
+  }
+
+  await keepTicketsButton.click();
+}
+
 async function openMultiplayerSetup(page: Page): Promise<void> {
   await page.goto("/");
+  await waitForApi(page);
   await expect(page.getByRole("heading", { name: "Hudson Hustle" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Create room" })).toBeVisible();
   await expect(page.getByTestId("create-room-panel")).toBeVisible();
@@ -62,8 +86,15 @@ test("multiplayer room lifecycle covers connected badges, private state, reconne
   await guestPage.getByRole("button", { name: "Mark ready" }).click();
   await expect(hostPage.getByRole("button", { name: "Start game" })).toBeEnabled();
   await hostPage.getByRole("button", { name: "Start game" }).click();
+  await clearInitialTicketChoice(hostPage);
 
   await expect(hostPage.getByTestId("turn-status-banner")).toContainText("Your turn");
+  await expect(hostPage.getByTestId("config-utility-pill")).toBeVisible();
+
+  const roundTableFontFamily = await hostPage.locator(".round-table-panel .section-header__title").evaluate((node) => {
+    return window.getComputedStyle(node).fontFamily;
+  });
+  expect(roundTableFontFamily).toContain("Fraunces");
 
   const hostTimerBadge = hostPage.getByTestId("turn-timer-badge");
   await expect(hostTimerBadge).toHaveText(/^(Timer 30s|\d+s left)$/);
@@ -110,6 +141,7 @@ test("timer display counts down from the lobby-selected timeout", async ({ brows
   await page.getByRole("button", { name: "Mark ready" }).click();
   await guestPage.getByRole("button", { name: "Mark ready" }).click();
   await page.getByRole("button", { name: "Start game" }).click();
+  await clearInitialTicketChoice(page);
 
   const timerBadge = page.getByTestId("turn-timer-badge");
   await expect(timerBadge).toHaveText(/^(Timer 30s|\d+s left)$/);

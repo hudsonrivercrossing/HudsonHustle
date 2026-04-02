@@ -54,6 +54,9 @@ export function OnboardingTutorial({
             <p className="tutorial-copy">
               This walkthrough covers the key rules, where to look on screen, and what new players should notice first.
             </p>
+            <p className="tutorial-progress-note">
+              Step {stepIndex + 1} of {steps.length}
+            </p>
             <div className="tutorial-step-list">
               {steps.map((entry, index) => (
                 <Button
@@ -69,11 +72,14 @@ export function OnboardingTutorial({
           </aside>
 
           <div className="tutorial-main">
-            <div className="tutorial-header">
-              <SectionHeader eyebrow="Guided tutorial" title={step.title} />
-              <Button onClick={onClose}>
-                Skip tutorial
-              </Button>
+            <div className="tutorial-hero">
+              <div className="tutorial-header">
+                <SectionHeader eyebrow="Guided tutorial" title={step.title} density="ceremony" />
+                <Button onClick={onClose}>
+                  Skip tutorial
+                </Button>
+              </div>
+              <p className="tutorial-copy tutorial-copy--hero">{step.summary}</p>
             </div>
 
             <div className="tutorial-progress" aria-hidden="true">
@@ -85,23 +91,22 @@ export function OnboardingTutorial({
               ))}
             </div>
 
-            <p className="tutorial-copy">{step.summary}</p>
+            <div className="tutorial-body">
+              <SurfaceCard variant="detail" className="tutorial-lesson" eyebrow="Focus" title={targetLabels[step.target]}>
+                <div className="tutorial-lesson__section">
+                  <span className="tutorial-lesson__label">What to notice</span>
+                  <ul className="tutorial-point-list">
+                    {step.keyPoints.map((point) => (
+                      <li key={point}>{point}</li>
+                    ))}
+                  </ul>
+                </div>
+              </SurfaceCard>
 
-            <SurfaceCard variant="detail" className="tutorial-target" eyebrow="Focus" title="Look at">
-              <p>{targetLabels[step.target]}</p>
-            </SurfaceCard>
-
-            <SurfaceCard variant="detail" className="tutorial-points" eyebrow="Guide" title="Key points">
-              <ul className="tutorial-point-list">
-                {step.keyPoints.map((point) => (
-                  <li key={point}>{point}</li>
-                ))}
-              </ul>
-            </SurfaceCard>
-
-            <SurfaceCard variant="detail" className="tutorial-tip" eyebrow="Try this" title="Suggested move">
-              <p>{step.tip}</p>
-            </SurfaceCard>
+              <SurfaceCard variant="detail" className="tutorial-tip" eyebrow="Try this" title="Suggested move">
+                <p>{step.tip}</p>
+              </SurfaceCard>
+            </div>
 
             <div className="setup-actions">
               <Button disabled={isFirst} onClick={onPrevious}>

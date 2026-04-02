@@ -4,6 +4,7 @@ interface UtilityPillProps {
   tone?: "neutral" | "accent";
   interactive?: boolean;
   className?: string;
+  testId?: string;
 }
 
 export function UtilityPill({
@@ -11,7 +12,8 @@ export function UtilityPill({
   label,
   tone = "neutral",
   interactive = false,
-  className
+  className,
+  testId
 }: UtilityPillProps): JSX.Element {
   const classes = [
     "utility-pill",
@@ -24,7 +26,7 @@ export function UtilityPill({
     .join(" ");
 
   return (
-    <span className={classes}>
+    <span className={classes} data-testid={testId}>
       {label ? <span className="utility-pill__label">{label}</span> : null}
       <span className="utility-pill__value">{value}</span>
     </span>

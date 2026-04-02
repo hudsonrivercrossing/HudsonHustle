@@ -499,20 +499,24 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
         <aside className="side-panel">
           <Panel variant="status" className={tutorialTarget === "scoreboard" ? "panel--tutorial-focus" : ""}>
             <SectionHeader
-              className="section-header--ceremony"
               eyebrow="Table status"
               title="Round table"
               meta={game.phase === "gameOver" ? "Final score" : `${activePlayer.name}'s turn`}
+              density="ceremony"
             />
             <div className="scoreboard">
               {game.players.map((player, index) => (
                 <article key={player.id} className={`player-strip ${index === game.activePlayerIndex ? "player-strip--active" : ""}`}>
-                  <span className="player-swatch" style={{ background: playerColorPalette[player.color] }} />
-                  <strong>{player.name}</strong>
-                  <span>{player.score} pts</span>
-                  <span>{player.trainsLeft} trains</span>
-                  <span>{player.stationsLeft} stations</span>
-                  <span>{player.tickets.length} tickets</span>
+                  <span className="player-swatch row-object__lead" style={{ background: playerColorPalette[player.color] }} />
+                  <div className="row-object__main">
+                    <strong className="row-object__title">{player.name}</strong>
+                    <span className="row-object__meta">{player.tickets.length} tickets</span>
+                  </div>
+                  <div className="row-object__stats">
+                    <span className="row-object__stat row-object__stat--strong">{player.score} pts</span>
+                    <span className="row-object__stat">{player.trainsLeft} trains</span>
+                    <span className="row-object__stat">{player.stationsLeft} stations</span>
+                  </div>
                 </article>
               ))}
             </div>
@@ -520,52 +524,58 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
 
           {visibility === "visible" ? (
             <>
-              <Panel variant="private-info" className={tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}>
-                <SectionHeader eyebrow="Private info" title="Hand" meta={`${activePlayer.hand.length} cards`} />
-                <div className="card-grid">
-                  {activePlayer.hand.map((card) => (
-                    <TransitCard key={card.id} color={card.color} context="hand" />
-                  ))}
-                </div>
-              </Panel>
+              <div className="side-panel__private-stack">
+                <Panel variant="private-info" className={tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}>
+                  <SectionHeader title="Hand" meta={`${activePlayer.hand.length} cards`} density="compact" />
+                  <div className="card-grid">
+                    {activePlayer.hand.map((card) => (
+                      <TransitCard key={card.id} className="artifact-card artifact-card--hand" color={card.color} context="hand" />
+                    ))}
+                  </div>
+                </Panel>
 
-              <Panel variant="private-info" className={tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}>
-                <SectionHeader
-                  eyebrow="Private info"
-                  title="Tickets"
-                  meta={`${ticketProgress.filter((entry) => entry.completed).length}/${ticketProgress.length} connected`}
-                />
-                <div className="ticket-stack">
-                  {ticketProgress.map(({ ticket, completed }) => (
-                    <div key={ticket.id} className={`ticket-row ${completed ? "ticket-row--done" : ""}`}>
-                      <div className="ticket-route">
-                        <Chip className={`ticket-status ${completed ? "ticket-status--done" : ""}`} tone={completed ? "success" : "warning"}>
-                          {completed ? "Connected" : "Pending"}
-                        </Chip>
-                        <span className="ticket-route__cities">
-                          {getCityName(hudsonHustleMap, ticket.from)} <span className="ticket-arrow">to</span> {getCityName(hudsonHustleMap, ticket.to)}
-                        </span>
+                <Panel variant="private-info" className={tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}>
+                  <SectionHeader
+                    title="Tickets"
+                    meta={`${ticketProgress.filter((entry) => entry.completed).length}/${ticketProgress.length} connected`}
+                    density="compact"
+                  />
+                  <div className="ticket-stack">
+                    {ticketProgress.map(({ ticket, completed }) => (
+                      <div key={ticket.id} className={`ticket-row ${completed ? "ticket-row--done" : ""}`}>
+                        <div className="row-object__lead">
+                          <Chip className={`ticket-status ${completed ? "ticket-status--done" : ""}`} tone={completed ? "success" : "warning"}>
+                            {completed ? "Connected" : "Pending"}
+                          </Chip>
+                        </div>
+                        <div className="row-object__main">
+                          <span className="row-object__title ticket-route__cities">
+                            {getCityName(hudsonHustleMap, ticket.from)} <span className="ticket-arrow">to</span> {getCityName(hudsonHustleMap, ticket.to)}
+                          </span>
+                        </div>
+                        <div className="row-object__stats">
+                          <strong className="ticket-points row-object__stat row-object__stat--strong">{ticket.points}</strong>
+                        </div>
                       </div>
-                      <strong className="ticket-points">{ticket.points}</strong>
-                    </div>
-                  ))}
-                </div>
-              </Panel>
+                    ))}
+                  </div>
+                </Panel>
+              </div>
             </>
           ) : (
             <Panel variant="alert" className="hidden-panel">
-              <SectionHeader eyebrow="Privacy shield" title="Private info hidden" />
+              <SectionHeader eyebrow="Privacy shield" title="Private info hidden" density="standard" />
               <p>The next player should only see the public board until they click `I'm ready`.</p>
             </Panel>
           )}
 
-          <Panel variant="neutral" className={tutorialTarget === "market" ? "panel--tutorial-focus" : ""}>
-            <SectionHeader eyebrow="Transit supply" title="Market" meta={`${game.trainDeck.length} deck`} />
+          <Panel variant="neutral" className={`side-panel__supply-panel ${tutorialTarget === "market" ? "panel--tutorial-focus" : ""}`}>
+            <SectionHeader title="Market" meta={`${game.trainDeck.length} deck`} density="compact" />
             <div className="market-grid">
               {game.market.map((card, index) => (
                 <TransitCard
                   key={card.id}
-                  className="market-card"
+                  className="market-card artifact-card artifact-card--market"
                   color={card.color}
                   context="market"
                   disabled={marketDisabled}
@@ -631,6 +641,7 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
                 eyebrow="Inspect the board"
                 headline="Select a route or city."
                 copy="The action rail will show legal payments and build options once you inspect a board element."
+                testId="action-empty-state"
               />
             ) : null}
 
@@ -665,18 +676,20 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
                 eyebrow="Route detail"
                 title={`${getCityName(hudsonHustleMap, currentRoute.from)} → ${getCityName(hudsonHustleMap, currentRoute.to)}`}
               >
-                <p>
-                  {currentRoute.length} train{currentRoute.length === 1 ? "" : "s"} · {currentRoute.type}
-                  {currentRoute.color === "gray" ? " · gray route" : ` · ${currentRoute.color}`}
-                  {currentRoute.locomotiveCost ? ` · ${currentRoute.locomotiveCost} locomotives` : ""}
-                </p>
-                {currentRouteOwner ? <p className="muted-copy">Claimed by {currentRouteOwner.name}.</p> : null}
-                <div className="chip-row">
+                <div className="detail-card__summary">
+                  <p>
+                    {currentRoute.length} train{currentRoute.length === 1 ? "" : "s"} · {currentRoute.type}
+                    {currentRoute.color === "gray" ? " · gray route" : ` · ${currentRoute.color}`}
+                    {currentRoute.locomotiveCost ? ` · ${currentRoute.locomotiveCost} locomotives` : ""}
+                  </p>
+                  {currentRouteOwner ? <p className="muted-copy">Claimed by {currentRouteOwner.name}.</p> : null}
+                </div>
+                <div className="detail-card__decision-shelf chip-row">
                   {routeOptions.length > 0 ? (
                     routeOptions.map((color) => (
                       <ChoiceChipButton
                         key={color}
-                        style={{ background: cardColorPalette[color] }}
+                        style={{ ["--choice-chip-accent" as string]: cardColorPalette[color] }}
                         disabled={!canTakeTurnAction}
                         onClick={() => applyAction({ type: "claim_route", routeId: currentRoute.id, color })}
                       >
@@ -692,15 +705,17 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
 
             {currentCity && game.phase === "main" && visibility === "visible" ? (
               <SurfaceCard variant="detail" className="detail-card" eyebrow="City detail" title={currentCity.name}>
-                <p>Build a station here to borrow one rival connection at endgame.</p>
-                <div className="chip-row">
+                <div className="detail-card__summary">
+                  <p>Build a station here to borrow one rival connection at endgame.</p>
+                </div>
+                <div className="detail-card__decision-shelf chip-row">
                   {currentCityOccupied ? (
                     <span className="muted-copy">A station is already built in this city.</span>
                   ) : stationOptions.length > 0 ? (
                     stationOptions.map((color) => (
                       <ChoiceChipButton
                         key={color}
-                        style={{ background: cardColorPalette[color] }}
+                        style={{ ["--choice-chip-accent" as string]: cardColorPalette[color] }}
                         disabled={!canTakeTurnAction}
                         onClick={() => applyAction({ type: "build_station", cityId: currentCity.id, color })}
                       >
@@ -727,7 +742,7 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
 
       {visibility === "postTurn" && game.phase !== "gameOver" ? (
         <ModalShell tone={tutorialTarget === "handoff" ? "tutorial" : "default"} width="md" align="center">
-            <SectionHeader eyebrow="Turn complete" title={`${activePlayer.name}, pass the laptop.`} />
+            <SectionHeader eyebrow="Turn complete" title={`${activePlayer.name}, pass the laptop.`} density="ceremony" />
             <p>{game.turn.summary ?? "Your action is locked in."}</p>
             <Button variant="primary" onClick={() => applyAction({ type: "advance_turn" })}>
               I&apos;m done
@@ -737,7 +752,7 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
 
       {visibility === "handoff" && game.phase !== "gameOver" ? (
         <ModalShell tone={tutorialTarget === "handoff" ? "tutorial" : "default"} width="md" align="center">
-            <SectionHeader eyebrow="Next player" title={`${activePlayer.name}, take over.`} />
+            <SectionHeader eyebrow="Next player" title={`${activePlayer.name}, take over.`} density="ceremony" />
             <p>The board is safe to look at. Private cards and tickets stay hidden until you are ready.</p>
             <Button variant="primary" onClick={() => setVisibility("visible")}>
               I&apos;m ready
@@ -775,7 +790,7 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
 
       {revealedDeckCard ? (
         <ModalShell width="md" align="center" cardClassName="draw-reveal-card">
-            <SectionHeader eyebrow="Deck draw" title={`You drew ${formatFaceLabel(revealedDeckCard)}`} />
+            <SectionHeader eyebrow="Deck draw" title={`You drew ${formatFaceLabel(revealedDeckCard)}`} density="ceremony" />
             <TransitCard className="draw-reveal-preview" color={revealedDeckCard} context="hand" />
             <Button variant="primary" onClick={() => setRevealedDeckCard(null)}>
               Continue

@@ -29,6 +29,42 @@ These primitives now also govern:
 - action-detail nested surfaces
 - in-action payment choice chips
 - setup/lobby/reconnect state surfaces
+- shell utility chrome
+- modal and tutorial framing
+
+Alongside the React primitives, `v2.1` now also treats two CSS object families as system-level contracts:
+- `row / roster object family`
+- `artifact / inventory family`
+
+These are not broad React primitives. They are shared anatomy and token rules reused across several surfaces.
+
+## Row / Roster Object Family
+
+Use the row object family to align repeated stacked data rows such as:
+- scoreboard entries
+- lobby seat rows
+- ticket rows
+- compact metadata rows inside side panels
+
+Stable anatomy:
+- optional `lead` marker, swatch, or chip
+- main label block
+- secondary metadata line
+- trailing stat cluster
+
+This family should stay CSS-first unless a later phase proves a reusable React primitive is necessary.
+
+## Artifact / Inventory Family
+
+Use the artifact family for tactile game objects such as:
+- hand cards
+- market entries
+- destination tickets
+- ticket-picker cards
+- printed-feel selection artifacts
+
+This family should stay distinct from structural `Panel` surfaces.
+Artifacts should feel printed, collectible, or table-native rather than like generic application cards.
 
 ## Surface Card
 
@@ -106,6 +142,17 @@ Use `StateSurface` for larger state blocks that need a headline, copy, and optio
 
 It is the more expansive sibling of `StatusBanner`.
 
+## Hardening Boundary
+
+`v2.1` freeze boundaries:
+- `StatusBanner` = horizontal shared-state strip
+- `StateSurface` = larger state block
+- `Panel` = structural shell surface
+- `SurfaceCard` = nested authored detail surface
+- `UtilityPill` = shell chrome only
+- `Inter` = work
+- `Fraunces` = ceremony
+
 Do not start by building:
 - full button library
 - full form library
@@ -153,6 +200,12 @@ Use panel differentiation through:
 
 Do not differentiate panels through radically different shapes or unrelated visual languages.
 
+Variant intent:
+- `neutral` = quiet structural container for board-adjacent or general shell content
+- `status` = authored public status surface with slightly stronger hierarchy and emphasis
+- `private-info` = warmer, slightly more intimate shell for hidden hand, tickets, and seat-private data
+- `alert` = recovery or attention state, visually separate but still inside the same family
+
 ## Section Header
 
 Use `SectionHeader` when a shell or panel section needs:
@@ -164,6 +217,28 @@ It should be used to strengthen hierarchy in:
 - lobby sections
 - setup sections
 - modal/picker headers
+
+Density rules:
+- `ceremony`
+  - major table status
+  - modal/tutorial main titles
+  - reveal moments
+- `standard`
+  - normal board and action shell sections
+  - standard setup and lobby sections
+- `compact`
+  - supporting inventory and supply sections such as hand, tickets, and market
+
+Do not use the full eyebrow/title/meta stack everywhere.
+The same anatomy repeated at equal weight will make the shell feel templated.
+
+## Detail Decision Shelf
+
+Within `SurfaceCard`, route and city detail should separate:
+- summary / information
+- decision shelf
+
+The action choices should feel like a dedicated payment or build tray, not a row of appended pills after body text.
 
 It should not replace every inline heading in the product.
 

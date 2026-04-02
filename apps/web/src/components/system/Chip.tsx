@@ -10,7 +10,7 @@ interface ChipProps extends HTMLAttributes<HTMLSpanElement> {
 export function Chip({ tone = "neutral", className, children, ...rest }: ChipProps): JSX.Element {
   const classes = ["system-chip", `system-chip--${tone}`, className].filter(Boolean).join(" ");
   return (
-    <span className={classes} {...rest}>
+    <span className={classes} data-tone={tone} {...rest}>
       {children}
     </span>
   );

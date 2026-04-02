@@ -665,7 +665,12 @@ export default function App(): JSX.Element {
           <h1>{mapConfig.name}</h1>
           <div className="utility-pill-group">
             <div className="config-hover-card">
-              <UtilityPill label="Config" value={`${snapshot.room.configVersion} · ${snapshot.room.configId}`} tone="accent" />
+              <UtilityPill
+                label="Config"
+                value={`${snapshot.room.configVersion} · ${snapshot.room.configId}`}
+                tone="accent"
+                testId="config-utility-pill"
+              />
               <span className="config-summary-tooltip">{snapshot.room.configSummary}</span>
             </div>
           </div>
@@ -690,64 +695,74 @@ export default function App(): JSX.Element {
         <aside className="side-panel">
           <Panel variant="status" className="round-table-panel">
             <SectionHeader
-              className="section-header--ceremony"
               eyebrow="Table status"
               title="Round table"
               meta={`${activePlayer?.name ?? "Unknown"} active`}
+              density="ceremony"
             />
             <div className="scoreboard">
               {snapshot.game.players.map((player, index) => (
                 <article key={player.id} className={`player-strip ${index === snapshot.game?.activePlayerIndex ? "player-strip--active" : ""}`}>
-                  <span className="player-swatch" style={{ background: visuals.palettes.players[player.color] }} />
-                  <strong>{player.name}</strong>
-                  <span>{player.score} pts</span>
-                  <span>{player.trainsLeft} trains</span>
-                  <span>{player.stationsLeft} stations</span>
-                  <span>{player.ticketCount} tickets</span>
+                  <span className="player-swatch row-object__lead" style={{ background: visuals.palettes.players[player.color] }} />
+                  <div className="row-object__main">
+                    <strong className="row-object__title">{player.name}</strong>
+                    <span className="row-object__meta">{player.ticketCount} tickets</span>
+                  </div>
+                  <div className="row-object__stats">
+                    <span className="row-object__stat row-object__stat--strong">{player.score} pts</span>
+                    <span className="row-object__stat">{player.trainsLeft} trains</span>
+                    <span className="row-object__stat">{player.stationsLeft} stations</span>
+                  </div>
                 </article>
               ))}
             </div>
           </Panel>
 
-          <Panel variant="private-info">
-            <SectionHeader eyebrow="Private info" title="Your hand" meta={`${localPlayer.hand.length} cards`} />
-            <div className="card-grid">
-              {localPlayer.hand.map((card) => (
-                <TransitCard key={card.id} color={card.color} context="hand" />
-              ))}
-            </div>
-          </Panel>
+          <div className="side-panel__private-stack">
+            <Panel variant="private-info">
+              <SectionHeader title="Your hand" meta={`${localPlayer.hand.length} cards`} density="compact" />
+              <div className="card-grid">
+                    {localPlayer.hand.map((card) => (
+                  <TransitCard key={card.id} className="artifact-card artifact-card--hand" color={card.color} context="hand" />
+                    ))}
+              </div>
+            </Panel>
 
-          <Panel variant="private-info">
-            <SectionHeader
-              eyebrow="Private info"
-              title="Your tickets"
-              meta={`${ticketProgress.filter((entry) => entry.completed).length}/${ticketProgress.length} connected`}
-            />
-            <div className="ticket-stack">
-              {ticketProgress.map(({ ticket, completed }) => (
-                <div key={ticket.id} className={`ticket-row ${completed ? "ticket-row--done" : ""}`}>
-                  <div className="ticket-route">
-                    <Chip className={`ticket-status ${completed ? "ticket-status--done" : ""}`} tone={completed ? "success" : "warning"}>
-                      {completed ? "Connected" : "Pending"}
-                    </Chip>
-                    <span className="ticket-route__cities">
-                      {getCityName(mapConfig, ticket.from)} <span className="ticket-arrow">to</span> {getCityName(mapConfig, ticket.to)}
-                    </span>
+            <Panel variant="private-info">
+              <SectionHeader
+                title="Your tickets"
+                meta={`${ticketProgress.filter((entry) => entry.completed).length}/${ticketProgress.length} connected`}
+                density="compact"
+              />
+              <div className="ticket-stack">
+                {ticketProgress.map(({ ticket, completed }) => (
+                  <div key={ticket.id} className={`ticket-row ${completed ? "ticket-row--done" : ""}`}>
+                    <div className="row-object__lead">
+                      <Chip className={`ticket-status ${completed ? "ticket-status--done" : ""}`} tone={completed ? "success" : "warning"}>
+                        {completed ? "Connected" : "Pending"}
+                      </Chip>
+                    </div>
+                    <div className="row-object__main">
+                      <span className="row-object__title ticket-route__cities">
+                        {getCityName(mapConfig, ticket.from)} <span className="ticket-arrow">to</span> {getCityName(mapConfig, ticket.to)}
+                      </span>
+                    </div>
+                    <div className="row-object__stats">
+                      <strong className="ticket-points row-object__stat row-object__stat--strong">{ticket.points}</strong>
+                    </div>
                   </div>
-                  <strong className="ticket-points">{ticket.points}</strong>
-                </div>
-              ))}
-            </div>
-          </Panel>
+                ))}
+              </div>
+            </Panel>
+          </div>
 
-          <Panel variant="neutral">
-            <SectionHeader eyebrow="Transit supply" title="Market" meta={`${publicGame.trainDeckCount} deck`} />
+          <Panel variant="neutral" className="side-panel__supply-panel">
+            <SectionHeader title="Market" meta={`${publicGame.trainDeckCount} deck`} density="compact" />
             <div className="market-grid">
               {publicGame.market.map((card, index) => (
                 <TransitCard
                   key={card.id}
-                  className="market-card"
+                  className="market-card artifact-card artifact-card--market"
                   color={card.color}
                   context="market"
                   disabled={!canContinueDrawing || (publicGame.turn.drawsTaken === 1 && card.color === "locomotive")}
@@ -817,6 +832,7 @@ export default function App(): JSX.Element {
                 eyebrow="Inspect the board"
                 headline="Select a route or city."
                 copy="The action rail will show payment choices, tunnel reveals, and build options once you inspect a board element."
+                testId="action-empty-state"
               />
             ) : null}
 
@@ -854,18 +870,20 @@ export default function App(): JSX.Element {
                 eyebrow="Route detail"
                 title={`${getCityName(mapConfig, currentRoute.from)} → ${getCityName(mapConfig, currentRoute.to)}`}
               >
-                <p>
-                  {currentRoute.length} train{currentRoute.length === 1 ? "" : "s"} · {currentRoute.type}
-                  {currentRoute.color === "gray" ? " · gray route" : ` · ${currentRoute.color}`}
-                  {currentRoute.locomotiveCost ? ` · ${currentRoute.locomotiveCost} locomotives` : ""}
-                </p>
-                {currentRouteOwner ? <p className="muted-copy">Claimed by {currentRouteOwner.name}.</p> : null}
-                <div className="chip-row">
+                <div className="detail-card__summary">
+                  <p>
+                    {currentRoute.length} train{currentRoute.length === 1 ? "" : "s"} · {currentRoute.type}
+                    {currentRoute.color === "gray" ? " · gray route" : ` · ${currentRoute.color}`}
+                    {currentRoute.locomotiveCost ? ` · ${currentRoute.locomotiveCost} locomotives` : ""}
+                  </p>
+                  {currentRouteOwner ? <p className="muted-copy">Claimed by {currentRouteOwner.name}.</p> : null}
+                </div>
+                <div className="detail-card__decision-shelf chip-row">
                   {routeOptions.length > 0 ? (
                     routeOptions.map((color) => (
                       <ChoiceChipButton
                         key={color}
-                        style={{ background: visuals.palettes.cards[color] }}
+                        style={{ ["--choice-chip-accent" as string]: visuals.palettes.cards[color] }}
                         disabled={!canTakeTurnAction}
                         onClick={() => sendGameAction({ type: "claim_route", routeId: currentRoute.id, color })}
                       >
@@ -881,15 +899,17 @@ export default function App(): JSX.Element {
 
             {currentCity && publicGame.phase === "main" ? (
               <SurfaceCard variant="detail" className="detail-card" eyebrow="City detail" title={currentCity.name}>
-                <p>Build a station here to borrow one rival connection during final scoring.</p>
-                <div className="chip-row">
+                <div className="detail-card__summary">
+                  <p>Build a station here to borrow one rival connection during final scoring.</p>
+                </div>
+                <div className="detail-card__decision-shelf chip-row">
                   {currentCityOccupied ? (
                     <span className="muted-copy">A station already exists in this city.</span>
                   ) : stationOptions.length > 0 ? (
                     stationOptions.map((color) => (
                       <ChoiceChipButton
                         key={color}
-                        style={{ background: visuals.palettes.cards[color] }}
+                        style={{ ["--choice-chip-accent" as string]: visuals.palettes.cards[color] }}
                         disabled={!canTakeTurnAction}
                         onClick={() => sendGameAction({ type: "build_station", cityId: currentCity.id, color })}
                       >
