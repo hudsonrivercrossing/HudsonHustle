@@ -40,6 +40,7 @@ import { TransitCard } from "./components/TransitCard";
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8787";
 const wsUrl = import.meta.env.VITE_WS_URL ?? apiBaseUrl;
 const sessionKey = "hudson-hustle-multiplayer-session-v2";
+type RealtimeStatus = "idle" | "connecting" | "subscribed" | "failed";
 
 interface SessionCredentials {
   roomCode: string;
@@ -158,6 +159,7 @@ export default function App(): JSX.Element {
   const [error, setError] = useState<string | null>(null);
   const [timer, setTimer] = useState<TimerUpdate | null>(null);
   const [timerNow, setTimerNow] = useState(() => Date.now());
+  const [realtimeStatus, setRealtimeStatus] = useState<RealtimeStatus>("idle");
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
   const [selectedTicketIds, setSelectedTicketIds] = useState<string[]>([]);
@@ -210,17 +212,37 @@ export default function App(): JSX.Element {
     if (!credentials) {
       socketRef.current?.disconnect();
       socketRef.current = null;
+      setRealtimeStatus("idle");
       return;
     }
 
+    setRealtimeStatus("connecting");
     const socket = io(wsUrl);
     socketRef.current = socket;
+    let handshakeResolved = false;
+    const handshakeTimeout = window.setTimeout(() => {
+      if (handshakeResolved) {
+        return;
+      }
+      awaitingSocketHandshakeRef.current = false;
+      setRealtimeStatus("failed");
+      setError("Realtime connection timed out before the room subscription was confirmed.");
+      setReconnectState("reconnect-failed");
+      socket.disconnect();
+    }, 8000);
+
+    const resolveHandshake = () => {
+      handshakeResolved = true;
+      window.clearTimeout(handshakeTimeout);
+    };
 
     socket.on("connect", () => {
       socket.emit("room:subscribe", credentials);
     });
 
     socket.on("room:update", (room) => {
+      resolveHandshake();
+      setRealtimeStatus("subscribed");
       setSnapshot((current) => (current ? { ...current, room } : { room, game: null, privateState: null }));
     });
 
@@ -233,7 +255,9 @@ export default function App(): JSX.Element {
     });
 
     socket.on("game:reconnected", (nextSnapshot) => {
+      resolveHandshake();
       awaitingSocketHandshakeRef.current = false;
+      setRealtimeStatus("subscribed");
       setSnapshot(nextSnapshot);
       setReconnectState("reconnected");
     });
@@ -243,6 +267,8 @@ export default function App(): JSX.Element {
     });
 
     socket.on("game:error", (payload) => {
+      resolveHandshake();
+      setRealtimeStatus("failed");
       if (awaitingSocketHandshakeRef.current) {
         awaitingSocketHandshakeRef.current = false;
         setReconnectState("reconnect-failed");
@@ -251,25 +277,37 @@ export default function App(): JSX.Element {
     });
 
     socket.on("connect_error", (connectError) => {
+      resolveHandshake();
       awaitingSocketHandshakeRef.current = false;
+      setRealtimeStatus("failed");
       setError(connectError.message || "Could not connect to the room.");
       setReconnectState("reconnect-failed");
     });
 
     socket.on("disconnect", (reason) => {
+      resolveHandshake();
       awaitingSocketHandshakeRef.current = false;
       if (reason === "io client disconnect") {
         return;
       }
+      setRealtimeStatus("failed");
       setError("Connection lost. Reconnect using your saved session details.");
       setReconnectState("reconnect-failed");
     });
 
     return () => {
+      resolveHandshake();
       socket.disconnect();
       socketRef.current = null;
     };
   }, [credentials]);
+
+  const realtimeMessage =
+    realtimeStatus === "connecting"
+      ? "Realtime connection is still being established. Ready and start stay disabled until the live room link is confirmed."
+      : realtimeStatus === "failed"
+        ? "Realtime connection failed. Seat presence and ready/start controls are disabled until the live room link recovers."
+        : null;
 
   useEffect(() => {
     if (!timer?.deadlineAt) {
@@ -551,6 +589,8 @@ export default function App(): JSX.Element {
         onReadyChange={sendReady}
         onStart={() => void startRoom()}
         timer={timer}
+        realtimeReady={realtimeStatus === "subscribed"}
+        realtimeMessage={realtimeMessage}
       />
     );
   }
