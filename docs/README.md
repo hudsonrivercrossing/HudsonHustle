@@ -6,6 +6,9 @@ This folder now separates long-lived product docs from versioned playtest artifa
 - [PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/prd.md)
 - [Tech Spec](/Users/djfan/Workspace/HudsonHustle/docs/product/tech-spec.md)
 - [Design System](/Users/djfan/Workspace/HudsonHustle/docs/product/design-system.md)
+- [V2 MVP Architecture](/Users/djfan/Workspace/HudsonHustle/docs/product/v2-mvp-architecture.md)
+- [V2 Multiplayer Flow](/Users/djfan/Workspace/HudsonHustle/docs/product/v2-multiplayer-flow.md)
+- [V2 Deployment](/Users/djfan/Workspace/HudsonHustle/docs/product/v2-deployment.md)
 
 ## Gameplay
 - [Player Guide](/Users/djfan/Workspace/HudsonHustle/docs/gameplay/player-guide.md)
@@ -22,6 +25,12 @@ This folder now separates long-lived product docs from versioned playtest artifa
 
 ## Planning
 - [V1 Status](/Users/djfan/Workspace/HudsonHustle/docs/planning/v1-status.md)
+
+## Branch Workflow
+- `main`: stable production branch
+- `develop`: shared staging and integration branch
+- working branches: short-lived branches off `develop`
+- deployment automation details live in [V2 Deployment](/Users/djfan/Workspace/HudsonHustle/docs/product/v2-deployment.md)
 
 ## Playtests
 

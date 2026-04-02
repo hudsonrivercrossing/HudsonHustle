@@ -52,11 +52,11 @@ async function main() {
     const importBase = toImportBase(entry.configPath);
     const varBase = `${entry.mode}${pascalCase(entry.id)}`;
 
-    importLines.push(`import ${varBase}Map from "${importBase}/map.json";`);
-    importLines.push(`import ${varBase}Meta from "${importBase}/meta.json";`);
-    importLines.push(`import ${varBase}Rules from "${importBase}/rules.json";`);
-    importLines.push(`import ${varBase}Tickets from "${importBase}/tickets.json";`);
-    importLines.push(`import ${varBase}Visuals from "${importBase}/visuals.json";`);
+    importLines.push(`import ${varBase}Map from "${importBase}/map.json" assert { type: "json" };`);
+    importLines.push(`import ${varBase}Meta from "${importBase}/meta.json" assert { type: "json" };`);
+    importLines.push(`import ${varBase}Rules from "${importBase}/rules.json" assert { type: "json" };`);
+    importLines.push(`import ${varBase}Tickets from "${importBase}/tickets.json" assert { type: "json" };`);
+    importLines.push(`import ${varBase}Visuals from "${importBase}/visuals.json" assert { type: "json" };`);
 
     objectEntries.push(`  "${entry.id}": {
     configId: "${entry.id}",
@@ -75,7 +75,7 @@ async function main() {
 // Edit the config snapshots, then regenerate this file instead of hand-editing it.
 
 ${importLines.join("\n")}
-import type { RegisteredConfigBundle, SnapshotMap, SnapshotMeta, SnapshotRules, SnapshotTickets, SnapshotVisuals } from "./config-types";
+import type { RegisteredConfigBundle, SnapshotMap, SnapshotMeta, SnapshotRules, SnapshotTickets, SnapshotVisuals } from "./config-types.js";
 
 export const generatedHudsonHustleConfigRegistry: Record<string, RegisteredConfigBundle> = {
 ${objectEntries.join(",\n")}

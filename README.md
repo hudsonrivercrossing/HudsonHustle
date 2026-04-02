@@ -91,7 +91,8 @@ Planned for `v2`:
 ## Repo Layout
 ```text
 apps/
-  web/           React client for local play
+  web/           React client for local and multiplayer play
+  server/        Fastify + Socket.IO authoritative backend
 packages/
   game-core/     deterministic rules engine
   game-data/     cities, routes, tickets, balance data
@@ -119,6 +120,8 @@ docs/
 scripts/
   config/        snapshot switching, preview, export, release tooling
   playtests/     seeded playtest and simulation harnesses
+.github/
+  workflows/     CI and branch-based deployment automation
 .codex/skills/
   roadmap-manager/
   game-balance/
@@ -131,6 +134,9 @@ scripts/
 - [Docs Index](docs/README.md)
 - [Product Requirements](docs/product/prd.md)
 - [Tech Spec](docs/product/tech-spec.md)
+- [V2 MVP Architecture](docs/product/v2-mvp-architecture.md)
+- [V2 Multiplayer Flow](docs/product/v2-multiplayer-flow.md)
+- [V2 Deployment](docs/product/v2-deployment.md)
 - [V1 Status](docs/planning/v1-status.md)
 - [Player Guide](docs/gameplay/player-guide.md)
 - [Onboarding Script](docs/gameplay/onboarding-script.md)
@@ -144,6 +150,18 @@ scripts/
 - Same-laptop `v1` is playable and documented.
 - The first playable small-map station set and the first full balance/playtest pass are complete.
 - Remaining iteration is mainly future playtesting, tuning, and presentation polish, not core `v1` foundation work.
+
+## Branch Strategy
+- `main`
+  - stable production branch
+  - deploys production frontend and backend
+- `develop`
+  - shared integration branch
+  - deploys preview frontend and staging backend
+- working branches
+  - branch off `develop`
+  - open PRs into `develop`
+  - promote from `develop` to `main` after staging validation
 
 ## Working In This Repo
 - Keep game rules in shared code, not in React components.

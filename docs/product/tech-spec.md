@@ -404,3 +404,83 @@
 - Add `apps/server` with `Node.js`, `Fastify`, `Socket.IO`, `PostgreSQL`, and `Drizzle`.
 - Server becomes the authority for deck order, ticket draws, route claims, and private state.
 - Clients receive public state plus their own private hand and ticket state.
+- Frontend hosting target: `Vercel`.
+- Backend hosting target: `Railway`.
+- Initial persistence target: room snapshot storage in `Postgres`, with optional action-log support.
+
+### V2 MVP Room And Identity Model
+- A room has one active game.
+- Players join with:
+  - room code
+  - seat assignment
+  - player secret
+- Reconnect should work after refresh without requiring a full account system.
+- The room creator chooses:
+  - player count
+  - config id from released snapshots
+  - per-turn timer in seconds
+- The default turn timer is `0`, meaning no timer.
+- Released config ids should be the only multiplayer map choices exposed in MVP2.
+- A player's own `roomCode`, `seatId`, and `playerSecret` should be visible through a low-prominence reveal control, not permanent full-screen chrome.
+
+### V2 Seat / Controller Model
+Seats and controllers should be modeled separately from the beginning.
+
+- `seat`
+  - one stable player position in a room
+- `controllerType`
+  - `human`
+  - `bot`
+  - `agent`
+  - `human+agent`
+
+Rules by phase:
+- `V2 MVP`
+  - ship only `human`
+- `V2.x`
+  - keep `bot` hooks available internally for testing
+- `MVP3`
+  - support `human+agent` before full autonomous `agent`
+
+### Why `human+agent` Comes Before `agent`
+- the human still confirms the move
+- the agent can provide guidance without owning game fairness
+- this is better for teaching, assisted play, and gradual trust
+
+### Suggested Server Responsibilities
+- room lifecycle
+- player seat mapping
+- legal action validation
+- private/public state projection
+- reconnect and resume
+- timer ownership and timeout resolution
+
+### Suggested Client Responsibilities
+- render public board state
+- render seat-specific private state
+- submit action intents only
+- recover the session from room code plus player secret
+- expose reconnect credentials in a subtle hover/click reveal affordance
+
+### Suggested HTTP Surface
+- `POST /rooms`
+- `POST /rooms/:roomCode/join`
+- `POST /rooms/:roomCode/rejoin`
+- `POST /rooms/:roomCode/start`
+- `GET /rooms/:roomCode`
+
+### Suggested WebSocket Events
+- client to server:
+  - `room:subscribe`
+  - `player:ready`
+  - `game:action`
+- server to client:
+  - `room:update`
+  - `game:update:public`
+  - `game:update:private`
+  - `game:error`
+  - `game:timer`
+  - `game:reconnected`
+
+- See `docs/product/v2-mvp-architecture.md` for the fuller phase plan.
+- See `docs/product/v2-multiplayer-flow.md` for the room UX, reconnect model, and initial API examples.

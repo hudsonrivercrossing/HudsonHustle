@@ -1,6 +1,6 @@
-import currentPointer from "../../../configs/hudson-hustle/current.json";
-import type { CurrentConfigPointer, RegisteredConfigBundle } from "./config-types";
-import { generatedHudsonHustleConfigRegistry } from "./generated-config-registry";
+import currentPointer from "../../../configs/hudson-hustle/current.json" assert { type: "json" };
+import type { CurrentConfigPointer, RegisteredConfigBundle } from "./config-types.js";
+import { generatedHudsonHustleConfigRegistry } from "./generated-config-registry.js";
 
 const pointer = currentPointer as CurrentConfigPointer;
 const registry = generatedHudsonHustleConfigRegistry as Record<string, RegisteredConfigBundle>;

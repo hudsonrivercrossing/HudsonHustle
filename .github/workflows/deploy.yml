@@ -1,0 +1,132 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+concurrency:
+  group: deploy-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run tests
+        run: pnpm test
+
+      - name: Run build
+        run: pnpm build
+
+  deploy-web:
+    runs-on: ubuntu-latest
+    needs: validate
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VITE_API_BASE_URL_PRODUCTION: ${{ vars.VITE_API_BASE_URL_PRODUCTION }}
+      VITE_WS_URL_PRODUCTION: ${{ vars.VITE_WS_URL_PRODUCTION }}
+      VITE_API_BASE_URL_DEVELOP: ${{ vars.VITE_API_BASE_URL_DEVELOP }}
+      VITE_WS_URL_DEVELOP: ${{ vars.VITE_WS_URL_DEVELOP }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.12.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Build Vercel deployment
+        run: |
+          if [ "${GITHUB_REF_NAME}" = "main" ]; then
+            export VITE_API_BASE_URL="${VITE_API_BASE_URL_PRODUCTION}"
+            export VITE_WS_URL="${VITE_WS_URL_PRODUCTION}"
+          else
+            export VITE_API_BASE_URL="${VITE_API_BASE_URL_DEVELOP}"
+            export VITE_WS_URL="${VITE_WS_URL_DEVELOP}"
+          fi
+
+          vercel pull --yes --environment=production --token="${{ secrets.VERCEL_TOKEN }}"
+          vercel build --token="${{ secrets.VERCEL_TOKEN }}"
+
+      - name: Deploy to Vercel
+        run: |
+          if [ "${GITHUB_REF_NAME}" = "main" ]; then
+            deployment_url="$(vercel deploy --prebuilt --prod --token="${{ secrets.VERCEL_TOKEN }}")"
+            echo "Deployed production frontend: ${deployment_url}" >> "$GITHUB_STEP_SUMMARY"
+          else
+            deployment_url="$(vercel deploy --prebuilt --token="${{ secrets.VERCEL_TOKEN }}")"
+            echo "Deployed preview frontend for develop: ${deployment_url}" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  deploy-server:
+    runs-on: ubuntu-latest
+    needs: validate
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+      RAILWAY_SERVICE_NAME_PRODUCTION: ${{ vars.RAILWAY_SERVICE_NAME_PRODUCTION || 'api' }}
+      RAILWAY_SERVICE_NAME_DEVELOP: ${{ vars.RAILWAY_SERVICE_NAME_DEVELOP || 'api-develop' }}
+      RAILWAY_ENVIRONMENT_PRODUCTION: ${{ vars.RAILWAY_ENVIRONMENT_PRODUCTION || 'production' }}
+      RAILWAY_ENVIRONMENT_DEVELOP: ${{ vars.RAILWAY_ENVIRONMENT_DEVELOP || 'develop' }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm install --global @railway/cli@latest
+
+      - name: Deploy backend to Railway
+        run: |
+          if [ "${GITHUB_REF_NAME}" = "main" ]; then
+            target_environment="${RAILWAY_ENVIRONMENT_PRODUCTION}"
+            target_service="${RAILWAY_SERVICE_NAME_PRODUCTION}"
+          else
+            target_environment="${RAILWAY_ENVIRONMENT_DEVELOP}"
+            target_service="${RAILWAY_SERVICE_NAME_DEVELOP}"
+          fi
+
+          railway up \
+            --ci \
+            --detach \
+            --project "${RAILWAY_PROJECT_ID}" \
+            --service "${target_service}" \
+            --environment "${target_environment}" \
+            --message "GitHub Actions deploy from ${GITHUB_REF_NAME} (${GITHUB_SHA})"
+
+          echo "Deployed backend to Railway service ${target_service} in environment ${target_environment}" >> "$GITHUB_STEP_SUMMARY"
