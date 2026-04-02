@@ -45,6 +45,7 @@ type VisibilityMode = "visible" | "postTurn" | "handoff";
 
 interface LocalPlayScreenProps {
   onOpenMultiplayer: () => void;
+  onReturnToGateway?: () => void;
 }
 
 const tutorialSteps: TutorialStep[] = [
@@ -187,7 +188,7 @@ function readSavedGame(): GameState | null {
   }
 }
 
-export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JSX.Element {
+export function LocalPlayScreen({ onOpenMultiplayer, onReturnToGateway }: LocalPlayScreenProps): JSX.Element {
   const [game, setGame] = useState<GameState | null>(null);
   const [visibility, setVisibility] = useState<VisibilityMode>("visible");
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
@@ -416,6 +417,7 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
           onResume={resumeGame}
           onOpenTutorial={openTutorial}
           onOpenMultiplayer={onOpenMultiplayer}
+          onBack={onReturnToGateway}
           configLabel={`${hudsonHustleCurrentConfigMeta.version} · ${hudsonHustleCurrentConfigId}`}
           configSummary={hudsonHustleCurrentConfigMeta.summary}
         />

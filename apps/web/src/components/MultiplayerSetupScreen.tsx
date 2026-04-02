@@ -20,6 +20,7 @@ interface MultiplayerSetupScreenProps {
   roomPreview: RoomSummary | null;
   error: string | null;
   onOpenLocal?: () => void;
+  onBack?: () => void;
   onPreviewRoom: (roomCode: string) => void;
   onCreateRoom: (form: CreateRoomForm) => void;
   onJoinRoom: (form: { roomCode: string; playerName: string; preferredSeatId?: string }) => void;
@@ -32,6 +33,7 @@ export function MultiplayerSetupScreen({
   roomPreview,
   error,
   onOpenLocal,
+  onBack,
   onPreviewRoom,
   onCreateRoom,
   onJoinRoom,
@@ -71,26 +73,28 @@ export function MultiplayerSetupScreen({
         : "Host a released map, share the room code, and move the game state to the server-owned multiplayer flow.";
 
   return (
-    <main className="setup-shell">
-      <section className="setup-card">
-        <p className="eyebrow">MVP2 Multiplayer</p>
-        <h1>Hudson Hustle</h1>
-        <p className="lead">
-          Create a room, share a code, and play the released NYC/NJ maps from separate devices with server-owned game state.
-        </p>
+    <main className="setup-shell setup-shell--mode">
+      <section className="setup-card setup-card--mode">
+        <div className="setup-mode-header">
+          <div className="setup-mode-header__copy">
+            <p className="eyebrow">Online mode</p>
+            <h1>Separate-device multiplayer</h1>
+            <p className="setup-mode-lead">Create a room, share a short code, and let the server own the game state while each player keeps a private device.</p>
+          </div>
+          <div className="setup-mode-switches">
+            {onBack ? <Button onClick={onBack}>All modes</Button> : null}
+            {onOpenLocal ? <Button onClick={onOpenLocal}>Local</Button> : null}
+          </div>
+        </div>
+
+        <div className="setup-mode-toolbar">
         <StateSurface
           tone={setupBannerTone}
           eyebrow={setupBannerEyebrow}
           headline={setupBannerHeadline}
           copy={setupBannerCopy}
         />
-        {onOpenLocal ? (
-          <div className="setup-actions">
-            <Button onClick={onOpenLocal}>
-              Local pass-and-play
-            </Button>
-          </div>
-        ) : null}
+        </div>
 
         <div className="multiplayer-setup-grid">
           <Panel variant="status" data-testid="create-room-panel">

@@ -34,6 +34,7 @@ import { IdentityChip } from "./components/IdentityChip";
 import { LocalPlayScreen } from "./components/LocalPlayScreen";
 import { LobbyScreen } from "./components/LobbyScreen";
 import { MultiplayerSetupScreen } from "./components/MultiplayerSetupScreen";
+import { SetupGateway } from "./components/SetupGateway";
 import { TicketPicker } from "./components/TicketPicker";
 import { TransitCard } from "./components/TransitCard";
 import { Button } from "./components/system/Button";
@@ -51,7 +52,7 @@ const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8787";
 const wsUrl = import.meta.env.VITE_WS_URL ?? apiBaseUrl;
 const sessionKey = "hudson-hustle-multiplayer-session-v2";
 type RealtimeStatus = "idle" | "connecting" | "subscribed" | "failed";
-type SetupMode = "local" | "multiplayer";
+type SetupMode = "gateway" | "local" | "multiplayer";
 
 class ApiError extends Error {
   constructor(
@@ -154,7 +155,7 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export default function App(): JSX.Element {
-  const [setupMode, setSetupMode] = useState<SetupMode>("multiplayer");
+  const [setupMode, setSetupMode] = useState<SetupMode>("gateway");
   const [releasedConfigs, setReleasedConfigs] = useState<HudsonHustleReleasedConfigSummary[]>(hudsonHustleReleasedConfigs);
   const [snapshot, setSnapshot] = useState<RoomSnapshot | null>(null);
   const [credentials, setCredentials] = useState<ReconnectCredentials | null>(null);
@@ -584,12 +585,29 @@ export default function App(): JSX.Element {
     setTimer(null);
     setMultiplayerError(null);
     setReconnectState("fresh");
-    setSetupMode("multiplayer");
+    setSetupMode("gateway");
   }
 
   if (!snapshot || !credentials) {
+    if (setupMode === "gateway") {
+      return (
+        <SetupGateway
+          onChooseLocal={() => setSetupMode("local")}
+          onChooseOnline={() => {
+            setSetupMode("multiplayer");
+            setMultiplayerError(null);
+          }}
+        />
+      );
+    }
+
     if (setupMode === "local") {
-      return <LocalPlayScreen onOpenMultiplayer={() => setSetupMode("multiplayer")} />;
+      return (
+        <LocalPlayScreen
+          onOpenMultiplayer={() => setSetupMode("multiplayer")}
+          onReturnToGateway={() => setSetupMode("gateway")}
+        />
+      );
     }
 
     return (
@@ -600,6 +618,10 @@ export default function App(): JSX.Element {
         error={multiplayerError}
         onOpenLocal={() => {
           setSetupMode("local");
+          setMultiplayerError(null);
+        }}
+        onBack={() => {
+          setSetupMode("gateway");
           setMultiplayerError(null);
         }}
         onPreviewRoom={(roomCode) => void previewRoom(roomCode)}

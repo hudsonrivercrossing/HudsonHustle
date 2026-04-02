@@ -32,6 +32,7 @@ async function openMultiplayerSetup(page: Page): Promise<void> {
   await page.goto("/");
   await waitForApi(page);
   await expect(page.getByRole("heading", { name: "Hudson Hustle" })).toBeVisible();
+  await page.getByTestId("gateway-online").click();
   await expect(page.getByRole("button", { name: "Create room" })).toBeVisible();
   await expect(page.getByTestId("create-room-panel")).toBeVisible();
   await expect(page.getByTestId("join-room-panel")).toBeVisible();
@@ -43,8 +44,8 @@ async function openLocalSetup(page: Page, options?: { resetTutorial?: boolean })
   if (options?.resetTutorial) {
     await page.evaluate((key) => window.localStorage.removeItem(key), TUTORIAL_SEEN_KEY);
   }
-  await page.getByRole("button", { name: "Local pass-and-play" }).click();
-  await expect(page.getByRole("heading", { name: "Hudson Hustle" })).toBeVisible();
+  await page.getByTestId("gateway-local").click();
+  await expect(page.getByRole("heading", { name: "Local pass-and-play" })).toBeVisible();
 }
 
 async function createRoom(page: Page): Promise<{ roomCode: string; seatId: string; playerSecret: string }> {
@@ -179,14 +180,14 @@ test("local tutorial and shell hierarchy keep ceremony and work roles distinct",
 
   await page.evaluate((key) => window.localStorage.setItem(key, "seen"), TUTORIAL_SEEN_KEY);
   await openLocalSetup(page);
-  await expect(page.getByRole("heading", { name: "Hudson Hustle" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Local pass-and-play" })).toBeVisible();
 
   const setupHeadingFontFamily = await page.locator("main.setup-shell h1").evaluate((node) => {
     return window.getComputedStyle(node).fontFamily;
   });
   expect(setupHeadingFontFamily).toContain("Fraunces");
 
-  const playersSectionFontFamily = await page.locator(".setup-card .section-header__title").evaluate((node) => {
+  const playersSectionFontFamily = await page.getByRole("heading", { name: "Players" }).evaluate((node) => {
     return window.getComputedStyle(node).fontFamily;
   });
   expect(playersSectionFontFamily).not.toContain("Fraunces");
