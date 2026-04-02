@@ -103,6 +103,7 @@ docs/
     tech-spec.md
     design-system.md
     v2/
+      README.md
       v2-mvp-architecture.md
       v2-multiplayer-flow.md
       v2-deployment.md
@@ -120,6 +121,7 @@ docs/
     v1-status.md
   playtests/
     v0.4/
+    mvp2/
   assets/
 scripts/
   config/        snapshot switching, preview, export, release tooling
@@ -138,6 +140,7 @@ scripts/
 - [Docs Index](docs/README.md)
 - [Product Requirements](docs/product/prd.md)
 - [Tech Spec](docs/product/tech-spec.md)
+- [V2 Docs Index](docs/product/v2/README.md)
 - [V2 MVP Architecture](docs/product/v2/v2-mvp-architecture.md)
 - [V2 Multiplayer Flow](docs/product/v2/v2-multiplayer-flow.md)
 - [V2 Deployment](docs/product/v2/v2-deployment.md)
@@ -148,6 +151,7 @@ scripts/
 - [Config Snapshot Guide](docs/config/config-snapshot-guide.md)
 - [Design System](docs/product/design-system.md)
 - [Map And Balance Notes](docs/map/map-balance-notes.md)
+- [MVP2 Staging Smoke Checklist](docs/playtests/mvp2/staging-smoke-checklist.md)
 - [Agent Operating Guide](AGENTS.md)
 
 ## Current Product Status

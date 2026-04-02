@@ -29,6 +29,23 @@ Recommended promotion path:
 4. merge `develop` into `main`
 5. let production deploy from `main`
 
+## Post-Merge Verification
+These checks should run by default after merges, not only when someone remembers to ask.
+
+### After Merge To `develop`
+Use platform CLIs to verify the staging path:
+- check `Vercel` preview deployment status for `develop`
+- check `Railway` deployment status for `api-develop`
+- check staging backend health:
+  - `curl https://api-develop-develop.up.railway.app/health`
+
+### After Merge To `main`
+Use platform CLIs to verify the production path:
+- check `Vercel` production deployment status
+- check `Railway` deployment status for `api`
+- check production backend health:
+  - `curl https://api-production-226b.up.railway.app/health`
+
 ## GitHub Actions
 This repo keeps GitHub Actions for CI only:
 
