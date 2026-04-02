@@ -246,7 +246,10 @@ Recommended long-term docs:
 - `docs/product/map-language-boundary.md`
 - `docs/product/design-implementation-backlog.md`
 
-In the near term, `v2.1` can keep this lighter by adding these as `v2` docs first, then promoting stable ideas to top-level product docs later.
+That promotion has now started:
+- stable system docs live in `docs/product/`
+- `docs/product/v2/` keeps versioned rationale and experiment history
+- this memo remains a strategy and synthesis document rather than the canonical spec
 
 ## Resource leverage guidance
 

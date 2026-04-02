@@ -1,4 +1,5 @@
 import { getCityName, type MapConfig, type TicketDef } from "@hudson-hustle/game-core";
+import { SectionHeader } from "./system/SectionHeader";
 
 interface TicketPickerProps {
   title: string;
@@ -26,8 +27,7 @@ export function TicketPicker({
   return (
     <div className="modal-backdrop">
       <div className="modal-card">
-        <p className="eyebrow">Private Choice</p>
-        <h2>{title}</h2>
+        <SectionHeader eyebrow="Private choice" title={title} meta={`Keep at least ${minimumKeep}`} />
         <p className="modal-copy">{subtitle}</p>
         <div className="ticket-list">
           {tickets.map((ticket) => {

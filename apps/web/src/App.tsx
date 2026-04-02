@@ -36,8 +36,12 @@ import { LobbyScreen } from "./components/LobbyScreen";
 import { MultiplayerSetupScreen } from "./components/MultiplayerSetupScreen";
 import { TicketPicker } from "./components/TicketPicker";
 import { TransitCard } from "./components/TransitCard";
+import { Chip } from "./components/system/Chip";
+import { ChoiceChipButton } from "./components/system/ChoiceChipButton";
 import { Panel } from "./components/system/Panel";
+import { SectionHeader } from "./components/system/SectionHeader";
 import { StatusBanner } from "./components/system/StatusBanner";
+import { SurfaceCard } from "./components/system/SurfaceCard";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8787";
 const wsUrl = import.meta.env.VITE_WS_URL ?? apiBaseUrl;
@@ -676,10 +680,7 @@ export default function App(): JSX.Element {
       <div className="game-layout">
         <aside className="side-panel">
           <Panel variant="status">
-            <div className="panel-header">
-              <h2>Round table</h2>
-              <span>{activePlayer?.name ?? "Unknown"} active</span>
-            </div>
+            <SectionHeader eyebrow="Table status" title="Round table" meta={`${activePlayer?.name ?? "Unknown"} active`} />
             <div className="scoreboard">
               {snapshot.game.players.map((player, index) => (
                 <article key={player.id} className={`player-strip ${index === snapshot.game?.activePlayerIndex ? "player-strip--active" : ""}`}>
@@ -695,10 +696,7 @@ export default function App(): JSX.Element {
           </Panel>
 
           <Panel variant="private-info">
-            <div className="panel-header">
-              <h2>Your hand</h2>
-              <span>{localPlayer.hand.length} cards</span>
-            </div>
+            <SectionHeader eyebrow="Private info" title="Your hand" meta={`${localPlayer.hand.length} cards`} />
             <div className="card-grid">
               {localPlayer.hand.map((card) => (
                 <TransitCard key={card.id} color={card.color} context="hand" />
@@ -707,19 +705,18 @@ export default function App(): JSX.Element {
           </Panel>
 
           <Panel variant="private-info">
-            <div className="panel-header">
-              <h2>Your tickets</h2>
-              <span>
-                {ticketProgress.filter((entry) => entry.completed).length}/{ticketProgress.length} connected
-              </span>
-            </div>
+            <SectionHeader
+              eyebrow="Private info"
+              title="Your tickets"
+              meta={`${ticketProgress.filter((entry) => entry.completed).length}/${ticketProgress.length} connected`}
+            />
             <div className="ticket-stack">
               {ticketProgress.map(({ ticket, completed }) => (
                 <div key={ticket.id} className={`ticket-row ${completed ? "ticket-row--done" : ""}`}>
                   <div className="ticket-route">
-                    <strong className={`ticket-status ${completed ? "ticket-status--done" : ""}`}>
+                    <Chip className={`ticket-status ${completed ? "ticket-status--done" : ""}`} tone={completed ? "success" : "warning"}>
                       {completed ? "Connected" : "Pending"}
-                    </strong>
+                    </Chip>
                     <span className="ticket-route__cities">
                       {getCityName(mapConfig, ticket.from)} <span className="ticket-arrow">to</span> {getCityName(mapConfig, ticket.to)}
                     </span>
@@ -731,10 +728,7 @@ export default function App(): JSX.Element {
           </Panel>
 
           <Panel variant="neutral">
-            <div className="panel-header">
-              <h2>Market</h2>
-              <span>{publicGame.trainDeckCount} deck</span>
-            </div>
+            <SectionHeader eyebrow="Transit supply" title="Market" meta={`${publicGame.trainDeckCount} deck`} />
             <div className="market-grid">
               {publicGame.market.map((card, index) => (
                 <TransitCard
@@ -756,10 +750,7 @@ export default function App(): JSX.Element {
 
         <main className="board-column">
           <Panel variant="neutral" className="board-panel">
-            <div className="panel-header">
-              <h2>Board</h2>
-              <span>All players see the same public network state.</span>
-            </div>
+            <SectionHeader eyebrow="Public board" title="Board" meta="All players see the same network state." />
             <BoardMap
               config={mapConfig}
               backdrop={visuals.backdrop}
@@ -792,10 +783,11 @@ export default function App(): JSX.Element {
           </Panel>
 
           <Panel variant="status" className="action-panel">
-              <div className="panel-header">
-                <h2>Action rail</h2>
-                <span>{publicGame.turn.summary ?? "Choose a route, city, or ticket action."}</span>
-              </div>
+              <SectionHeader
+                eyebrow="Turn controls"
+                title="Action rail"
+                meta={publicGame.turn.summary ?? "Choose a route, city, or ticket action."}
+              />
               {multiplayerError ? (
                 <StatusBanner
                   tone="failure"
@@ -808,13 +800,12 @@ export default function App(): JSX.Element {
             {publicGame.phase === "gameOver" ? (
               <div className="endgame-grid">
                 {projectedGame.players.map((player) => (
-                  <article key={player.id} className="endgame-card">
-                    <h3>{player.name}</h3>
+                  <SurfaceCard key={player.id} as="article" variant="summary" eyebrow="Final score" title={player.name} className="endgame-card">
                     <p className="endgame-score">{player.score} pts</p>
                     {summarizeEndgame(player, mapConfig).map((line) => (
                       <p key={line}>{line}</p>
                     ))}
-                  </article>
+                  </SurfaceCard>
                 ))}
               </div>
             ) : null}
@@ -834,8 +825,12 @@ export default function App(): JSX.Element {
             ) : null}
 
             {currentRoute && publicGame.phase === "main" ? (
-              <div className="detail-card">
-                <h3>{getCityName(mapConfig, currentRoute.from)} → {getCityName(mapConfig, currentRoute.to)}</h3>
+              <SurfaceCard
+                variant="detail"
+                className="detail-card"
+                eyebrow="Route detail"
+                title={`${getCityName(mapConfig, currentRoute.from)} → ${getCityName(mapConfig, currentRoute.to)}`}
+              >
                 <p>
                   {currentRoute.length} train{currentRoute.length === 1 ? "" : "s"} · {currentRoute.type}
                   {currentRoute.color === "gray" ? " · gray route" : ` · ${currentRoute.color}`}
@@ -845,41 +840,38 @@ export default function App(): JSX.Element {
                 <div className="chip-row">
                   {routeOptions.length > 0 ? (
                     routeOptions.map((color) => (
-                      <button
+                      <ChoiceChipButton
                         key={color}
-                        className="chip-button"
                         style={{ background: visuals.palettes.cards[color] }}
                         disabled={!canTakeTurnAction}
                         onClick={() => sendGameAction({ type: "claim_route", routeId: currentRoute.id, color })}
                       >
                         Claim with {color}
-                      </button>
+                      </ChoiceChipButton>
                     ))
                   ) : (
                     <span className="muted-copy">{currentRouteUnavailableReason}</span>
                   )}
                 </div>
-              </div>
+              </SurfaceCard>
             ) : null}
 
             {currentCity && publicGame.phase === "main" ? (
-              <div className="detail-card">
-                <h3>{currentCity.name}</h3>
+              <SurfaceCard variant="detail" className="detail-card" eyebrow="City detail" title={currentCity.name}>
                 <p>Build a station here to borrow one rival connection during final scoring.</p>
                 <div className="chip-row">
                   {currentCityOccupied ? (
                     <span className="muted-copy">A station already exists in this city.</span>
                   ) : stationOptions.length > 0 ? (
                     stationOptions.map((color) => (
-                      <button
+                      <ChoiceChipButton
                         key={color}
-                        className="chip-button"
                         style={{ background: visuals.palettes.cards[color] }}
                         disabled={!canTakeTurnAction}
                         onClick={() => sendGameAction({ type: "build_station", cityId: currentCity.id, color })}
                       >
                         Build with {color}
-                      </button>
+                      </ChoiceChipButton>
                     ))
                   ) : (
                     <span className="muted-copy">
@@ -887,7 +879,7 @@ export default function App(): JSX.Element {
                     </span>
                   )}
                 </div>
-              </div>
+              </SurfaceCard>
             ) : null}
           </Panel>
         </main>

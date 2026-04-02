@@ -13,6 +13,34 @@ Minimum system layer:
 - `Panel`
 - optional `Chip/Badge`
 - optional `SectionHeader`
+- `SurfaceCard`
+- `ChoiceChipButton`
+
+These primitives now also govern:
+- active game side-panel headers
+- private-information headers
+- board/action shell section framing
+- ticket status medallions
+- action-detail nested surfaces
+- in-action payment choice chips
+
+## Surface Card
+
+Use `SurfaceCard` for nested authored surfaces inside a larger panel:
+- route detail
+- city detail
+- tunnel reveal
+- endgame summary cards
+
+It should not replace the outer `Panel` layer.
+
+## Choice Chip Button
+
+Use `ChoiceChipButton` for compact action choices inside a detail surface, such as:
+- claim route with a specific color
+- build station with a specific color
+
+It belongs to the action/detail family, not the global button family.
 
 Do not start by building:
 - full button library
@@ -61,6 +89,20 @@ Use panel differentiation through:
 
 Do not differentiate panels through radically different shapes or unrelated visual languages.
 
+## Section Header
+
+Use `SectionHeader` when a shell or panel section needs:
+- an eyebrow
+- a title
+- a small right-side metadata line
+
+It should be used to strengthen hierarchy in:
+- lobby sections
+- setup sections
+- modal/picker headers
+
+It should not replace every inline heading in the product.
+
 ## Cards And Tickets
 
 Cards and tickets remain a separate family from banners and general panels.
@@ -82,6 +124,8 @@ Likely use cases:
 - room metadata
 - ownership indicators
 - small timer or status medallions
+
+During `v2.1`, keep chips small and restrained. They should support the shell, not become the dominant style language.
 
 ## Extraction Rule
 

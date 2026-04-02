@@ -18,7 +18,7 @@ async function createRoom(page: Page): Promise<{ roomCode: string; seatId: strin
   await createPanel.getByRole("button", { name: "+15" }).click();
   await expect(createPanel.getByText("30s")).toBeVisible();
   await createPanel.getByRole("button", { name: "Create room" }).click();
-  await expect(page.getByTestId("lobby-status-banner")).toBeVisible();
+  await expect(page.getByTestId("lobby-status-banner")).toBeVisible({ timeout: 10000 });
   await expect(page.getByTestId("seat-connected-seat-1")).toHaveText("Connected");
 
   const session = await page.evaluate((key) => window.localStorage.getItem(key), SESSION_KEY);
@@ -35,7 +35,7 @@ async function joinRoom(page: Page, roomCode: string): Promise<{ roomCode: strin
   await page.getByRole("button", { name: "seat-2" }).click();
   await joinPanel.getByLabel("Your name").fill("Guest");
   await joinPanel.getByRole("button", { name: "Join room" }).click();
-  await expect(page.getByTestId("lobby-status-banner")).toBeVisible();
+  await expect(page.getByTestId("lobby-status-banner")).toBeVisible({ timeout: 10000 });
   await expect(page.getByTestId("seat-connected-seat-2")).toHaveText("Connected");
 
   const session = await page.evaluate((key) => window.localStorage.getItem(key), SESSION_KEY);

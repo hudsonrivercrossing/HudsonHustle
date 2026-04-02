@@ -1,6 +1,8 @@
 import type { RoomSummary, TimerUpdate } from "@hudson-hustle/game-core";
 import { IdentityChip } from "./IdentityChip";
+import { Chip } from "./system/Chip";
 import { Panel } from "./system/Panel";
+import { SectionHeader } from "./system/SectionHeader";
 import { StatusBanner } from "./system/StatusBanner";
 
 interface LobbyScreenProps {
@@ -68,10 +70,7 @@ export function LobbyScreen({
 
         <div className="lobby-grid">
           <Panel variant="status">
-            <div className="panel-header">
-              <h2>Room</h2>
-              <span>{room.roomCode}</span>
-            </div>
+            <SectionHeader eyebrow="Session details" title="Room" meta={room.roomCode} />
             <p className="muted-copy">Map: {room.mapName}</p>
             <p className="muted-copy">Config: {room.configVersion} · {room.configId}</p>
             <p className="muted-copy">Turn timer: {room.turnTimeLimitSeconds === 0 ? "Untimed" : `${room.turnTimeLimitSeconds}s`}</p>
@@ -79,10 +78,11 @@ export function LobbyScreen({
           </Panel>
 
           <Panel variant="neutral">
-            <div className="panel-header">
-              <h2>Seats</h2>
-              <span>{room.seats.filter((seat) => seat.playerName).length}/{room.playerCount} joined</span>
-            </div>
+            <SectionHeader
+              eyebrow="Table state"
+              title="Seats"
+              meta={`${room.seats.filter((seat) => seat.playerName).length}/${room.playerCount} joined`}
+            />
             <div className="seat-stack">
               {room.seats.map((seat) => (
                 <article
@@ -99,12 +99,12 @@ export function LobbyScreen({
                     </p>
                   </div>
                   <div className="seat-status-stack">
-                    <span className={`seat-ready ${seat.ready ? "seat-ready--yes" : "seat-ready--no"}`}>
+                    <Chip tone={seat.ready ? "success" : "warning"} className="seat-ready">
                       {seat.ready ? "Ready" : "Waiting"}
-                    </span>
-                    <span className={`seat-ready ${seat.connected ? "seat-ready--yes" : "seat-ready--no"}`} data-testid={`seat-connected-${seat.seatId}`}>
+                    </Chip>
+                    <Chip tone={seat.connected ? "info" : "danger"} className="seat-ready" data-testid={`seat-connected-${seat.seatId}`}>
                       {seat.connected ? "Connected" : "Offline"}
-                    </span>
+                    </Chip>
                   </div>
                 </article>
               ))}

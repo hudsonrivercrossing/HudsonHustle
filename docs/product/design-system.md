@@ -30,7 +30,9 @@ Locked decisions:
 
 Stable design-system docs:
 - [Design Principles](/Users/djfan/Workspace/HudsonHustle/docs/product/design-principles.md)
+- [Color System](/Users/djfan/Workspace/HudsonHustle/docs/product/color-system.md)
 - [Typography And Layout](/Users/djfan/Workspace/HudsonHustle/docs/product/typography-and-layout.md)
+- [Layout Rhythm](/Users/djfan/Workspace/HudsonHustle/docs/product/layout-rhythm.md)
 - [Component System](/Users/djfan/Workspace/HudsonHustle/docs/product/component-system.md)
 - [Map Language Boundary](/Users/djfan/Workspace/HudsonHustle/docs/product/map-language-boundary.md)
 - [Design Implementation Backlog](/Users/djfan/Workspace/HudsonHustle/docs/product/design-implementation-backlog.md)
@@ -56,6 +58,7 @@ Working rules:
 Implementation rules:
 - shell-first before map restyling
 - tokens and system components should stay semantic, not page-specific
+- color and layout decisions should be expressed as reusable system roles before they spread through new pages
 - gameplay clarity outranks mood improvements
 - map readability outranks shell styling
 

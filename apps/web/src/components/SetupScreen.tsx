@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { SectionHeader } from "./system/SectionHeader";
 import { StatusBanner } from "./system/StatusBanner";
 
 interface SetupScreenProps {
@@ -47,6 +48,7 @@ export function SetupScreen({
           copy="Use one computer, hand off between turns, and keep private hands hidden during player changes."
         />
 
+        <SectionHeader eyebrow="Table setup" title="Players" meta={`${playerCount} seated`} />
         <label className="field">
           <span>Players</span>
           <select value={playerCount} onChange={(event) => setPlayerCount(Number(event.target.value))}>

@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import type { HudsonHustleReleasedConfigSummary } from "@hudson-hustle/game-data";
 import type { ReconnectState, RoomSummary } from "@hudson-hustle/game-core";
 import { Panel } from "./system/Panel";
+import { SectionHeader } from "./system/SectionHeader";
 import { StatusBanner } from "./system/StatusBanner";
 
 interface CreateRoomForm {
@@ -99,10 +100,7 @@ export function MultiplayerSetupScreen({
 
         <div className="multiplayer-setup-grid">
           <Panel variant="status" data-testid="create-room-panel">
-            <div className="panel-header">
-              <h2>Create room</h2>
-              <span>Host a new table</span>
-            </div>
+            <SectionHeader eyebrow="Host flow" title="Create room" meta="Host a new table" />
             <label className="field">
               <span>Your name</span>
               <input value={hostName} maxLength={24} onChange={(event) => setHostName(event.target.value)} />
@@ -153,10 +151,7 @@ export function MultiplayerSetupScreen({
           </Panel>
 
           <Panel variant="neutral" data-testid="join-room-panel">
-            <div className="panel-header">
-              <h2>Join room</h2>
-              <span>Pick an open seat</span>
-            </div>
+            <SectionHeader eyebrow="Guest flow" title="Join room" meta="Pick an open seat" />
             <label className="field">
               <span>Room code</span>
               <input value={joinRoomCode} onChange={(event) => setJoinRoomCode(event.target.value.toUpperCase())} maxLength={6} />
@@ -202,10 +197,7 @@ export function MultiplayerSetupScreen({
         </div>
 
         <Panel variant={reconnectState === "reconnect-failed" ? "alert" : "neutral"} className="reconnect-panel">
-          <div className="panel-header">
-            <h2>Manual reconnect</h2>
-            <span>Use your hidden session chip</span>
-          </div>
+          <SectionHeader eyebrow="Recovery" title="Manual reconnect" meta="Use your hidden session chip" />
           <div className="field-grid">
             <label className="field">
               <span>Room code</span>

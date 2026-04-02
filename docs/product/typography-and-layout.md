@@ -15,11 +15,12 @@ Fallbacks:
 ### Display
 Use `Fraunces` for:
 - page titles
-- section titles
 - major status headlines
-- hero moments in setup and lobby
+- rare hero moments in setup and lobby
 
 Do not use `Fraunces` for:
+- ordinary panel titles
+- section headers
 - timers
 - buttons
 - chips
@@ -48,6 +49,9 @@ Stable text roles:
 - `utility-xs`: dense chip, badge, and operational small print
 
 ## Layout Rules
+
+Stable layout rhythm now lives in:
+- [Layout Rhythm](/Users/djfan/Workspace/HudsonHustle/docs/product/layout-rhythm.md)
 
 ### Global
 - board remains the dominant visual region in active play

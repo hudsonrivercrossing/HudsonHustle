@@ -27,8 +27,12 @@ import { OnboardingTutorial, type TutorialStep } from "./OnboardingTutorial";
 import { SetupScreen } from "./SetupScreen";
 import { TicketPicker } from "./TicketPicker";
 import { TransitCard } from "./TransitCard";
+import { Chip } from "./system/Chip";
+import { ChoiceChipButton } from "./system/ChoiceChipButton";
 import { Panel } from "./system/Panel";
+import { SectionHeader } from "./system/SectionHeader";
 import { StatusBanner } from "./system/StatusBanner";
+import { SurfaceCard } from "./system/SurfaceCard";
 
 const saveKey = "hudson-hustle-save-v1";
 const tutorialSeenKey = "hudson-hustle-onboarding-v1-1";
@@ -485,10 +489,11 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
       <div className={`game-layout ${visibility !== "visible" ? "game-layout--obscured" : ""} ${tutorialTarget ? "game-layout--tutorial" : ""}`}>
         <aside className="side-panel">
           <Panel variant="status" className={tutorialTarget === "scoreboard" ? "panel--tutorial-focus" : ""}>
-            <div className="panel-header">
-              <h2>Round table</h2>
-              <span>{game.phase === "gameOver" ? "Final score" : `${activePlayer.name}'s turn`}</span>
-            </div>
+            <SectionHeader
+              eyebrow="Table status"
+              title="Round table"
+              meta={game.phase === "gameOver" ? "Final score" : `${activePlayer.name}'s turn`}
+            />
             <div className="scoreboard">
               {game.players.map((player, index) => (
                 <article key={player.id} className={`player-strip ${index === game.activePlayerIndex ? "player-strip--active" : ""}`}>
@@ -506,10 +511,7 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
           {visibility === "visible" ? (
             <>
               <Panel variant="private-info" className={tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}>
-                <div className="panel-header">
-                  <h2>Hand</h2>
-                  <span>{activePlayer.hand.length} cards</span>
-                </div>
+                <SectionHeader eyebrow="Private info" title="Hand" meta={`${activePlayer.hand.length} cards`} />
                 <div className="card-grid">
                   {activePlayer.hand.map((card) => (
                     <TransitCard key={card.id} color={card.color} context="hand" />
@@ -518,19 +520,18 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
               </Panel>
 
               <Panel variant="private-info" className={tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}>
-                <div className="panel-header">
-                  <h2>Tickets</h2>
-                  <span>
-                    {ticketProgress.filter((entry) => entry.completed).length}/{ticketProgress.length} connected
-                  </span>
-                </div>
+                <SectionHeader
+                  eyebrow="Private info"
+                  title="Tickets"
+                  meta={`${ticketProgress.filter((entry) => entry.completed).length}/${ticketProgress.length} connected`}
+                />
                 <div className="ticket-stack">
                   {ticketProgress.map(({ ticket, completed }) => (
                     <div key={ticket.id} className={`ticket-row ${completed ? "ticket-row--done" : ""}`}>
                       <div className="ticket-route">
-                        <strong className={`ticket-status ${completed ? "ticket-status--done" : ""}`}>
+                        <Chip className={`ticket-status ${completed ? "ticket-status--done" : ""}`} tone={completed ? "success" : "warning"}>
                           {completed ? "Connected" : "Pending"}
-                        </strong>
+                        </Chip>
                         <span className="ticket-route__cities">
                           {getCityName(hudsonHustleMap, ticket.from)} <span className="ticket-arrow">to</span> {getCityName(hudsonHustleMap, ticket.to)}
                         </span>
@@ -543,16 +544,13 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
             </>
           ) : (
             <Panel variant="alert" className="hidden-panel">
-              <h2>Private info hidden</h2>
+              <SectionHeader eyebrow="Privacy shield" title="Private info hidden" />
               <p>The next player should only see the public board until they click `I'm ready`.</p>
             </Panel>
           )}
 
           <Panel variant="neutral" className={tutorialTarget === "market" ? "panel--tutorial-focus" : ""}>
-            <div className="panel-header">
-              <h2>Market</h2>
-              <span>{game.trainDeck.length} deck</span>
-            </div>
+            <SectionHeader eyebrow="Transit supply" title="Market" meta={`${game.trainDeck.length} deck`} />
             <div className="market-grid">
               {game.market.map((card, index) => (
                 <TransitCard
@@ -574,10 +572,7 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
 
         <main className="board-column">
           <Panel variant="neutral" className={`board-panel ${tutorialTarget === "board" ? "panel--tutorial-focus" : ""}`}>
-            <div className="panel-header">
-              <h2>Board</h2>
-              <span>Click a route or city to inspect actions</span>
-            </div>
+            <SectionHeader eyebrow="Public board" title="Board" meta="Click a route or city to inspect actions" />
             <BoardMap
               config={hudsonHustleMap}
               backdrop={hudsonHustleBackdrop}
@@ -610,10 +605,11 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
           </Panel>
 
           <Panel variant="status" className={`action-panel ${tutorialTarget === "action" ? "panel--tutorial-focus" : ""}`}>
-            <div className="panel-header">
-              <h2>Action rail</h2>
-              <span>{game.turn.summary ?? "Choose one action for this turn."}</span>
-            </div>
+            <SectionHeader
+              eyebrow="Turn controls"
+              title="Action rail"
+              meta={game.turn.summary ?? "Choose one action for this turn."}
+            />
             {error ? (
               <StatusBanner
                 tone="failure"
@@ -626,13 +622,12 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
             {game.phase === "gameOver" ? (
               <div className="endgame-grid">
                 {game.players.map((player) => (
-                  <article key={player.id} className="endgame-card">
-                    <h3>{player.name}</h3>
+                  <SurfaceCard key={player.id} as="article" variant="summary" eyebrow="Final score" title={player.name} className="endgame-card">
                     <p className="endgame-score">{player.score} pts</p>
                     {summarizeEndgame(player, hudsonHustleMap).map((line) => (
                       <p key={line}>{line}</p>
                     ))}
-                  </article>
+                  </SurfaceCard>
                 ))}
               </div>
             ) : null}
@@ -649,8 +644,12 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
             ) : null}
 
             {currentRoute && game.phase === "main" && visibility === "visible" ? (
-              <div className="detail-card">
-                <h3>{getCityName(hudsonHustleMap, currentRoute.from)} → {getCityName(hudsonHustleMap, currentRoute.to)}</h3>
+              <SurfaceCard
+                variant="detail"
+                className="detail-card"
+                eyebrow="Route detail"
+                title={`${getCityName(hudsonHustleMap, currentRoute.from)} → ${getCityName(hudsonHustleMap, currentRoute.to)}`}
+              >
                 <p>
                   {currentRoute.length} train{currentRoute.length === 1 ? "" : "s"} · {currentRoute.type}
                   {currentRoute.color === "gray" ? " · gray route" : ` · ${currentRoute.color}`}
@@ -660,41 +659,38 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
                 <div className="chip-row">
                   {routeOptions.length > 0 ? (
                     routeOptions.map((color) => (
-                      <button
+                      <ChoiceChipButton
                         key={color}
-                        className="chip-button"
                         style={{ background: cardColorPalette[color] }}
                         disabled={!canTakeTurnAction}
                         onClick={() => applyAction({ type: "claim_route", routeId: currentRoute.id, color })}
                       >
                         Claim with {color}
-                      </button>
+                      </ChoiceChipButton>
                     ))
                   ) : (
                     <span className="muted-copy">{currentRouteUnavailableReason}</span>
                   )}
                 </div>
-              </div>
+              </SurfaceCard>
             ) : null}
 
             {currentCity && game.phase === "main" && visibility === "visible" ? (
-              <div className="detail-card">
-                <h3>{currentCity.name}</h3>
+              <SurfaceCard variant="detail" className="detail-card" eyebrow="City detail" title={currentCity.name}>
                 <p>Build a station here to borrow one rival connection at endgame.</p>
                 <div className="chip-row">
                   {currentCityOccupied ? (
                     <span className="muted-copy">A station is already built in this city.</span>
                   ) : stationOptions.length > 0 ? (
                     stationOptions.map((color) => (
-                      <button
+                      <ChoiceChipButton
                         key={color}
-                        className="chip-button"
                         style={{ background: cardColorPalette[color] }}
                         disabled={!canTakeTurnAction}
                         onClick={() => applyAction({ type: "build_station", cityId: currentCity.id, color })}
                       >
                         Build with {color}
-                      </button>
+                      </ChoiceChipButton>
                     ))
                   ) : (
                     <span className="muted-copy">
@@ -702,14 +698,13 @@ export function LocalPlayScreen({ onOpenMultiplayer }: LocalPlayScreenProps): JS
                     </span>
                   )}
                 </div>
-              </div>
+              </SurfaceCard>
             ) : null}
 
             {game.turn.latestTunnelReveal.length > 0 && visibility === "visible" ? (
-              <div className="detail-card detail-card--tunnel">
-                <h3>Tunnel reveal</h3>
+              <SurfaceCard variant="detail" className="detail-card detail-card--tunnel" eyebrow="Tunnel check" title="Tunnel reveal">
                 <p>{game.turn.latestTunnelReveal.join(", ")}</p>
-              </div>
+              </SurfaceCard>
             ) : null}
           </Panel>
         </main>
