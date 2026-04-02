@@ -6,6 +6,7 @@ This folder now separates long-lived product docs from versioned playtest artifa
 - [PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/prd.md)
 - [Tech Spec](/Users/djfan/Workspace/HudsonHustle/docs/product/tech-spec.md)
 - [Design System](/Users/djfan/Workspace/HudsonHustle/docs/product/design-system.md)
+- [V2 Docs Index](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/README.md)
 - V2
   - [V2 MVP Architecture](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2-mvp-architecture.md)
   - [V2 Multiplayer Flow](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2-multiplayer-flow.md)
@@ -45,6 +46,10 @@ This folder now separates long-lived product docs from versioned playtest artifa
 - Raw logs:
   - [Seed 42](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v0.4/raw/seed-42-raw.md)
   - [Seed 1337](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v0.4/raw/seed-1337-raw.md)
+
+### MVP2
+- [MVP2 Playtests Index](/Users/djfan/Workspace/HudsonHustle/docs/playtests/mvp2/README.md)
+- [Staging Smoke Checklist](/Users/djfan/Workspace/HudsonHustle/docs/playtests/mvp2/staging-smoke-checklist.md)
 
 ## Assets
 - `docs/assets/` stores README and docs illustration assets.
