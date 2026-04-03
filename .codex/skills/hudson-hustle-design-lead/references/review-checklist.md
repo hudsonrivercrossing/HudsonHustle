@@ -19,6 +19,8 @@ Use this when auditing a shell/system surface.
 - Does `UtilityPill` read as shell metadata?
 - Does `Chip` read as compact object state?
 - Do buttons feel like authored controls instead of generic app CTAs?
+- Do Storybook stories still match the component’s real public API and variants?
+- Does the HTML showcase still represent the same component boundaries and naming as Storybook?
 
 ## Layout
 - Is there one clear next action?

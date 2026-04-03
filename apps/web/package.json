@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -p tsconfig.json && vite build",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@hudson-hustle/game-core": "workspace:*",
@@ -17,10 +19,12 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.49.1",
+    "@storybook/react-vite": "^10.3.4",
     "@types/node": "^22.10.2",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "storybook": "^10.3.4",
     "typescript": "^5.6.3",
     "vite": "^5.4.11"
   }

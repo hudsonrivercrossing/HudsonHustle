@@ -180,6 +180,66 @@ Avoid:
 
 Apply the discipline, not the brand.
 
+## Storybook Maintenance Rules
+Treat Storybook as:
+- a component workbench
+- a documentation layer
+- a drift detector
+
+Do not treat it as a visual editor that writes back to source.
+
+Important truth:
+- changing a component `.tsx` should update the Storybook preview automatically
+- changing a `.stories.tsx` file should update the preview automatically
+- changing Storybook controls in the browser does **not** write back to code
+
+Use these rules:
+- co-locate stories with the system components they document
+- when a component API or supported variants change, review its story in the same turn
+- keep stories focused on public usage, not internal implementation duplication
+- use realistic system variants, not toy filler examples
+- if a component boundary matters, state it in the story docs text
+
+When a component changes, check:
+- did the props change?
+- did the supported variants change?
+- did the default hierarchy or typography contract change?
+- did the component drift into another family’s role?
+
+If yes, update the story immediately.
+
+Storybook validation tendency:
+- run app build first
+- run `build-storybook` second
+- use Storybook failures as evidence of story drift or invalid public contracts
+
+Do not commit generated Storybook output such as `storybook-static/`.
+Commit:
+- `.storybook/`
+- `*.stories.tsx`
+- package/lock changes
+
+Ignore:
+- build artifacts that can be regenerated on another machine
+
+## Showcase And Storybook Split
+Use both artifacts, but give them different jobs:
+
+- `docs/product/showcase/*.html`
+  - lightweight design review artifact
+  - good for broad shell-family comparison and typography/material gut checks
+- Storybook
+  - code-native component workbench
+  - good for variant coverage, public API review, and component drift detection
+
+Do not let them diverge silently.
+
+If a system component changes materially:
+- update its Storybook story in the same turn
+- decide whether the HTML showcase also needs to reflect the new contract
+
+At the current `v2.1` stage, Storybook should cover the full `apps/web/src/components/system/` set, not only the original first-wave primitives.
+
 ## Validation
 After each substantial slice:
 - `corepack pnpm build`
@@ -187,6 +247,8 @@ After each substantial slice:
 
 Also verify:
 - the showcase still reflects the latest system contracts
+- Storybook stories still reflect the latest public component contracts
+- showcase and Storybook are aligned on component boundaries and naming
 - new entry flows update browser tests
 - the change did not silently alter gameplay behavior
 
