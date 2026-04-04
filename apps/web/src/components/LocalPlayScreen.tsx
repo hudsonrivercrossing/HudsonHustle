@@ -24,6 +24,7 @@ import {
 } from "@hudson-hustle/game-data";
 import { BoardMap } from "./BoardMap";
 import { OnboardingTutorial, type TutorialStep } from "./OnboardingTutorial";
+import { ScoreGuide } from "./ScoreGuide";
 import { SetupScreen } from "./SetupScreen";
 import { TicketPicker } from "./TicketPicker";
 import { TransitCard } from "./TransitCard";
@@ -488,6 +489,7 @@ export function LocalPlayScreen({ onOpenMultiplayer, onReturnToGateway }: LocalP
           />
         </div>
         <div className="topbar-actions">
+          <ScoreGuide />
           <Button onClick={openTutorial}>
             Tutorial
           </Button>

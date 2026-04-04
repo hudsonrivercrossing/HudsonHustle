@@ -29,7 +29,7 @@ export function TicketPicker({
   const selectedCount = selectedIds.length;
 
   return (
-    <ModalShell width="md" align="center">
+    <ModalShell width="lg" align="center" cardClassName="ticket-picker-modal">
       <div className="ticket-picker">
         <div className="ticket-picker__header">
           <SectionHeader eyebrow="Private choice" title={title} density="ceremony" />

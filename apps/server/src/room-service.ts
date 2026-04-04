@@ -397,10 +397,23 @@ export class RoomService {
     invariant(room.game, "Missing game state.");
 
     const seat = this.getAuthorizedSeat(room, auth);
-    const activePlayer = getCurrentPlayer(room.game);
-    invariant(seat.playerId === activePlayer.id, "It is not your turn.");
+    let gameForAction = room.game;
+    if (payload.action.type === "select_initial_tickets" && room.game.phase === "initialTickets") {
+      const actingPlayerIndex = room.game.players.findIndex((player) => player.id === seat.playerId);
+      invariant(actingPlayerIndex >= 0, "This seat is not attached to an active player.", 403, "invalid_credentials");
+      invariant(room.game.players[actingPlayerIndex]?.pendingTickets.length === 4, "You do not have starting tickets to confirm right now.");
+      if (actingPlayerIndex !== room.game.activePlayerIndex) {
+        gameForAction = {
+          ...room.game,
+          activePlayerIndex: actingPlayerIndex
+        };
+      }
+    } else {
+      const activePlayer = getCurrentPlayer(room.game);
+      invariant(seat.playerId === activePlayer.id, "It is not your turn.");
+    }
 
-    let nextGame = reduceGame(room.game, payload.action, getHudsonHustleMapByConfigId(room.configId));
+    let nextGame = reduceGame(gameForAction, payload.action, getHudsonHustleMapByConfigId(room.configId));
     if (nextGame.turn.stage === "awaitingHandoff") {
       nextGame = reduceGame(nextGame, { type: "advance_turn" }, getHudsonHustleMapByConfigId(room.configId));
     }

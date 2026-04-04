@@ -34,6 +34,7 @@ import { IdentityChip } from "./components/IdentityChip";
 import { LocalPlayScreen } from "./components/LocalPlayScreen";
 import { LobbyScreen } from "./components/LobbyScreen";
 import { MultiplayerSetupScreen } from "./components/MultiplayerSetupScreen";
+import { ScoreGuide } from "./components/ScoreGuide";
 import { SetupGateway } from "./components/SetupGateway";
 import { TicketPicker } from "./components/TicketPicker";
 import { TransitCard } from "./components/TransitCard";
@@ -170,6 +171,7 @@ export default function App(): JSX.Element {
   const [selectedTicketIds, setSelectedTicketIds] = useState<string[]>([]);
   const socketRef = useRef<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null);
   const awaitingSocketHandshakeRef = useRef(false);
+  const lastPendingTicketKeyRef = useRef("");
 
   useEffect(() => {
     void requestJson<HudsonHustleReleasedConfigSummary[]>("/released-configs")
@@ -374,13 +376,19 @@ export default function App(): JSX.Element {
 
   useEffect(() => {
     const pending = snapshot?.privateState?.pendingTickets ?? [];
+    const pendingKey = pending.map((ticket) => ticket.id).join("|");
     if (pending.length === 0) {
+      lastPendingTicketKeyRef.current = "";
       setSelectedTicketIds([]);
       return;
     }
+    if (lastPendingTicketKeyRef.current === pendingKey) {
+      return;
+    }
+    lastPendingTicketKeyRef.current = pendingKey;
     const minimumKeep = snapshot?.game?.phase === "initialTickets" ? 2 : 1;
     setSelectedTicketIds(pending.slice(0, minimumKeep).map((ticket) => ticket.id));
-  }, [snapshot]);
+  }, [snapshot?.game?.phase, snapshot?.privateState?.pendingTickets]);
 
   const ticketProgress = useMemo(() => {
     if (!projectedGame || !mapConfig || !localPlayer) {
@@ -640,6 +648,7 @@ export default function App(): JSX.Element {
         reconnectToken={reconnectToken}
         onReadyChange={sendReady}
         onStart={() => void startRoom()}
+        onLeaveRoom={leaveRoom}
         timer={timer}
         realtimeReady={realtimeStatus === "subscribed"}
         realtimeMessage={realtimeMessage}
@@ -706,6 +715,7 @@ export default function App(): JSX.Element {
           />
         </div>
         <div className="topbar-actions">
+          <ScoreGuide />
           <IdentityChip reconnectToken={reconnectToken} />
           <Button onClick={leaveRoom}>
             Leave room

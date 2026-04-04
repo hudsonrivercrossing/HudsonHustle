@@ -25,7 +25,12 @@ async function clearInitialTicketChoice(page: Page): Promise<void> {
     return;
   }
 
-  await keepTicketsButton.click();
+  await keepTicketsButton.click().catch(async () => {
+    const stillVisible = await keepTicketsButton.isVisible().catch(() => false);
+    if (stillVisible) {
+      throw new Error("Initial ticket confirm button stayed visible after click.");
+    }
+  });
 }
 
 async function openMultiplayerSetup(page: Page): Promise<void> {
@@ -102,6 +107,7 @@ test("multiplayer room lifecycle covers connected badges, private state, reconne
 
   await expect(hostPage.getByTestId("turn-status-banner")).toContainText("Your turn");
   await expect(hostPage.getByTestId("config-utility-pill")).toBeVisible();
+  await expect(hostPage.getByRole("button", { name: "Scoring" })).toBeVisible();
 
   const roundTableFontFamily = await hostPage.locator(".round-table-panel .section-header__title").evaluate((node) => {
     return window.getComputedStyle(node).fontFamily;
@@ -132,7 +138,50 @@ test("multiplayer room lifecycle covers connected badges, private state, reconne
   expect(guestJson.privateState.hand).toHaveLength(4);
 
   await guestPage.reload();
-  await expect(guestPage.getByTestId("turn-status-banner")).toBeVisible();
+  await expect
+    .poll(async () => {
+      const pickerVisible = await guestPage.getByRole("button", { name: /Keep 2 tickets/ }).isVisible().catch(() => false);
+      const bannerVisible = await guestPage.getByTestId("turn-status-banner").isVisible().catch(() => false);
+      return pickerVisible || bannerVisible;
+    })
+    .toBe(true);
+
+  await hostContext.close();
+  await guestContext.close();
+});
+
+test("initial multiplayer ticket choices can be confirmed independently without resetting another player's selection", async ({ browser }) => {
+  const hostContext = await browser.newContext();
+  const guestContext = await browser.newContext();
+  const hostPage = await hostContext.newPage();
+  const guestPage = await guestContext.newPage();
+
+  await openMultiplayerSetup(hostPage);
+  const hostSession = await createRoom(hostPage);
+  await openMultiplayerSetup(guestPage);
+  await joinRoom(guestPage, hostSession.roomCode);
+
+  await hostPage.getByRole("button", { name: "Mark ready" }).click();
+  await guestPage.getByRole("button", { name: "Mark ready" }).click();
+  await hostPage.getByRole("button", { name: "Start game" }).click();
+
+  const guestTickets = guestPage.locator(".ticket-card");
+  await expect(guestTickets).toHaveCount(4);
+  await guestTickets.nth(2).click();
+  await guestTickets.nth(1).click();
+  await expect(guestTickets.nth(0)).toHaveClass(/ticket-card--selected/);
+  await expect(guestTickets.nth(1)).not.toHaveClass(/ticket-card--selected/);
+  await expect(guestTickets.nth(2)).toHaveClass(/ticket-card--selected/);
+
+  await hostPage.getByRole("button", { name: /Keep 2 tickets/ }).click();
+  await expect(hostPage.getByRole("button", { name: /Keep 2 tickets/ })).toHaveCount(0);
+  await expect(guestTickets.nth(0)).toHaveClass(/ticket-card--selected/);
+  await expect(guestTickets.nth(1)).not.toHaveClass(/ticket-card--selected/);
+  await expect(guestTickets.nth(2)).toHaveClass(/ticket-card--selected/);
+
+  await guestPage.getByRole("button", { name: /Keep 2 tickets/ }).click();
+  await expect(hostPage.getByTestId("turn-status-banner")).toContainText("Your turn");
+  await expect(guestPage.getByTestId("turn-status-banner")).toContainText("Waiting");
 
   await hostContext.close();
   await guestContext.close();
@@ -161,6 +210,23 @@ test("timer display counts down from the lobby-selected timeout", async ({ brows
   await expect(timerBadge).toHaveText(/^(Timer 30s|\d+s left)$/);
 
   await guestContext.close();
+  await context.close();
+});
+
+test("host can leave the lobby and return to the gateway", async ({ browser }) => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+
+  await openMultiplayerSetup(page);
+  await createRoom(page);
+  await expect(page.getByRole("heading", { name: "Hudson Hustle" })).toBeVisible();
+  await page.getByRole("button", { name: "Leave room" }).click();
+
+  await expect(page.getByRole("heading", { name: "Hudson Hustle" })).toBeVisible();
+  await expect(page.getByTestId("gateway-online")).toBeVisible();
+  const session = await page.evaluate((key) => window.localStorage.getItem(key), SESSION_KEY);
+  expect(session).toBeNull();
+
   await context.close();
 });
 

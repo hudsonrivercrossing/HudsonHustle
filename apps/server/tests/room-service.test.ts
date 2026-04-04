@@ -175,6 +175,62 @@ describe("RoomService", () => {
     expect(restoredDeadlineAt).toBeGreaterThan(Date.now());
   });
 
+  it("allows any player with pending starting tickets to confirm before the active seat rotates naturally", async () => {
+    const service = new RoomService(new MemoryRoomRepository(), hudsonHustleReleasedConfigs);
+    const created = await service.createRoom({
+      hostName: "Ava",
+      playerCount: 2,
+      configId: "v0.4-flushing-newark-airport",
+      turnTimeLimitSeconds: 0
+    });
+    const joined = await service.joinRoom(created.roomCode, {
+      playerName: "Beau"
+    });
+
+    await service.setReady(created.roomCode, { seatId: created.seatId, playerSecret: created.playerSecret }, true);
+    await service.setReady(created.roomCode, { seatId: joined.seatId, playerSecret: joined.playerSecret }, true);
+    const started = await service.startRoom(created.roomCode, { playerSecret: created.playerSecret });
+    const guestSnapshot = await service.getSnapshot(created.roomCode, {
+      seatId: joined.seatId,
+      playerSecret: joined.playerSecret
+    });
+
+    const guestConfirmed = await service.applyAction(
+      created.roomCode,
+      { seatId: joined.seatId, playerSecret: joined.playerSecret },
+      {
+        roomCode: created.roomCode,
+        seatId: joined.seatId,
+        playerSecret: joined.playerSecret,
+        action: {
+          type: "select_initial_tickets",
+          keptTicketIds: guestSnapshot.privateState?.pendingTickets.slice(0, 2).map((ticket) => ticket.id) ?? []
+        }
+      }
+    );
+
+    expect(guestConfirmed.room.status).toBe("active");
+    expect(guestConfirmed.game?.phase).toBe("initialTickets");
+    expect(guestConfirmed.privateState?.pendingTickets).toEqual([]);
+
+    const hostConfirmed = await service.applyAction(
+      created.roomCode,
+      { seatId: created.seatId, playerSecret: created.playerSecret },
+      {
+        roomCode: created.roomCode,
+        seatId: created.seatId,
+        playerSecret: created.playerSecret,
+        action: {
+          type: "select_initial_tickets",
+          keptTicketIds: started.snapshot.privateState?.pendingTickets.slice(0, 2).map((ticket) => ticket.id) ?? []
+        }
+      }
+    );
+
+    expect(hostConfirmed.game?.phase).toBe("main");
+    expect(hostConfirmed.room.activeSeatId).toBe(created.seatId);
+  });
+
   it("pauses the timer instead of scheduling an invalid auto-draw when fewer than two blind cards remain", async () => {
     let latestDeadlineAt: number | null = 1;
     const service = new RoomService(new MemoryRoomRepository(), hudsonHustleReleasedConfigs, undefined, (_roomCode, deadlineAt) => {

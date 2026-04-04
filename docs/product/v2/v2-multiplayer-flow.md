@@ -70,8 +70,23 @@ The host is only responsible for:
 - creating the room
 - choosing setup options
 - starting the game
+- confirming their own starting tickets like every other player
 
 The host is not required to stay connected for the room to remain valid.
+The host should also be able to leave the lobby or room UI without being trapped in the current screen.
+
+## Starting Ticket Selection
+After the host starts the room:
+- every player receives the same initial ticket choice flow
+- every player may review and confirm their own starting tickets independently
+- the game does not enter the main phase until every seated player has confirmed
+
+Important UX rules:
+- one player's confirmation must not reset another player's in-progress selection
+- if the host confirms first, the host waits while other players finish
+- reconnecting during this phase should restore either:
+  - the pending ticket picker for that seat, or
+  - the normal game view if that seat already confirmed
 
 ## Reconnect UX
 

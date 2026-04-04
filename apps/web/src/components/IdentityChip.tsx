@@ -12,8 +12,9 @@ async function copyText(value: string): Promise<void> {
 export function IdentityChip({ reconnectToken }: IdentityChipProps): JSX.Element {
   return (
     <div className="identity-chip">
-      <UtilityPill value="Reconnect token" interactive className="identity-chip__pill" />
+      <UtilityPill value="Reconnect" interactive className="identity-chip__pill" />
       <div className="identity-chip__panel">
+        <p className="identity-chip__eyebrow">Reconnect token</p>
         <p className="identity-chip__label">Copy this token if you need to reconnect manually from another browser or device.</p>
         <div className="identity-chip__token-row">
           <code className="identity-chip__token">{reconnectToken}</code>

@@ -248,6 +248,74 @@ button {
   width: fit-content;
 }
 
+.score-guide {
+  position: relative;
+  width: fit-content;
+}
+
+.score-guide__trigger.system-button {
+  min-width: auto;
+  padding-inline: 15px;
+}
+
+.score-guide__panel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  z-index: 12;
+  width: min(320px, 72vw);
+  display: grid;
+  gap: 10px;
+  padding: 14px 15px;
+  border: 1px solid rgba(68, 51, 34, 0.18);
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.22), transparent 28%),
+    rgba(255, 248, 235, 0.985);
+  box-shadow: 0 16px 34px rgba(62, 41, 20, 0.18);
+  color: var(--ink-soft);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.score-guide:hover .score-guide__panel,
+.score-guide:focus-within .score-guide__panel {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.score-guide__eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: var(--type-utility-xs);
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.score-guide__section {
+  display: grid;
+  gap: 6px;
+}
+
+.score-guide__heading {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.score-guide__list {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
 .utility-pill {
   display: inline-grid;
   width: fit-content;
@@ -1068,10 +1136,22 @@ h3 {
 .identity-chip {
   position: relative;
   display: inline-flex;
+  align-items: center;
 }
 
 .identity-chip__pill {
   cursor: default;
+  padding: 12px 20px;
+  border-radius: 22px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.56),
+    0 8px 18px rgba(62, 41, 20, 0.07);
+}
+
+.identity-chip__pill .utility-pill__value {
+  font-size: 1rem;
+  font-weight: 710;
+  letter-spacing: -0.018em;
 }
 
 .identity-chip__panel {
@@ -1089,6 +1169,15 @@ h3 {
   transform: translateY(-4px);
   transition: opacity 140ms ease, transform 140ms ease;
   z-index: 12;
+}
+
+.identity-chip__eyebrow {
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: var(--type-utility-xs);
+  font-weight: 800;
+  color: color-mix(in srgb, var(--accent-strong) 28%, var(--ink-soft) 72%);
 }
 
 .identity-chip:hover .identity-chip__panel,
@@ -2540,6 +2629,10 @@ h3 {
   width: min(980px, 100%);
 }
 
+.modal-shell__card--lg.ticket-picker-modal {
+  width: min(760px, 100%);
+}
+
 .modal-shell__card--left {
   text-align: left;
 }
@@ -2850,20 +2943,20 @@ h3 {
 }
 
 .ticket-picker__tray {
-  padding: 18px;
+  padding: 20px 22px;
   border: 1px solid rgba(92, 70, 46, 0.1);
   border-radius: calc(var(--radius-lg) + 2px);
   background:
     radial-gradient(circle at top left, rgba(182, 143, 74, 0.08), transparent 34%),
     linear-gradient(180deg, rgba(255, 252, 246, 0.82), rgba(246, 239, 226, 0.7));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.56);
-  max-height: min(46vh, 340px);
+  max-height: min(50vh, 400px);
   overflow: auto;
 }
 
 .ticket-picker__tray.panel {
   gap: 0;
-  padding: 20px;
+  padding: 22px;
 }
 
 .ticket-picker__tray .ticket-list {
@@ -2898,8 +2991,8 @@ h3 {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 16px;
-  padding: 15px 16px;
+  gap: 20px;
+  padding: 16px 18px;
   background:
     radial-gradient(circle at top right, color-mix(in srgb, var(--ticket-card-accent) 18%, transparent) 0%, transparent 30%),
     linear-gradient(180deg, rgba(255, 253, 248, 0.99), rgba(242, 233, 216, 0.93));
@@ -2935,7 +3028,7 @@ h3 {
   position: absolute;
   top: 14px;
   bottom: 14px;
-  right: 82px;
+  right: 92px;
   width: 1px;
   background:
     linear-gradient(180deg, rgba(130, 106, 79, 0.05), rgba(130, 106, 79, 0.14), rgba(130, 106, 79, 0.05));
@@ -2964,9 +3057,9 @@ h3 {
 .ticket-card__route {
   display: block;
   font-family: var(--font-display);
-  font-size: 1.04rem;
+  font-size: 1.08rem;
   font-weight: 650;
-  line-height: 0.99;
+  line-height: 1.02;
   letter-spacing: -0.03em;
   position: relative;
   z-index: 1;
@@ -2975,7 +3068,7 @@ h3 {
 .ticket-card__points {
   position: relative;
   z-index: 1;
-  min-width: 68px;
+  min-width: 74px;
   padding: 10px 12px;
   background:
     linear-gradient(180deg, rgba(255, 252, 247, 0.99), rgba(236, 224, 200, 0.95));

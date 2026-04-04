@@ -12,6 +12,7 @@ interface LobbyScreenProps {
   reconnectToken: string;
   onReadyChange: (ready: boolean) => void;
   onStart: () => void;
+  onLeaveRoom: () => void;
   timer: TimerUpdate | null;
   realtimeReady: boolean;
   realtimeMessage: string | null;
@@ -23,6 +24,7 @@ export function LobbyScreen({
   reconnectToken,
   onReadyChange,
   onStart,
+  onLeaveRoom,
   timer,
   realtimeReady,
   realtimeMessage
@@ -122,6 +124,7 @@ export function LobbyScreen({
               Start game
             </Button>
           ) : null}
+          <Button onClick={onLeaveRoom}>Leave room</Button>
         </div>
       </section>
     </main>
