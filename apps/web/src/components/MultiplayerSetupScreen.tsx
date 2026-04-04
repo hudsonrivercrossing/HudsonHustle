@@ -118,18 +118,19 @@ export function MultiplayerSetupScreen({
                 ))}
               </select>
             </FormField>
-            <div className="field">
-              <span>Turn timer</span>
+            <FormField as="div" label="Turn timer" className="form-field--timer">
               <div className="timer-picker">
                 <Button onClick={() => setTurnTimeLimitSeconds((current) => Math.max(0, current - 15))}>
                   −15
                 </Button>
-                <strong>{turnTimeLimitSeconds}s</strong>
+                <output className="timer-picker__value" aria-live="polite">
+                  {turnTimeLimitSeconds === 0 ? "Untimed" : `${turnTimeLimitSeconds}s`}
+                </output>
                 <Button onClick={() => setTurnTimeLimitSeconds((current) => current + 15)}>
                   +15
                 </Button>
               </div>
-            </div>
+            </FormField>
             <Button
               variant="primary"
               onClick={() =>

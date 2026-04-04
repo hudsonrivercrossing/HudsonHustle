@@ -408,11 +408,14 @@ button {
 
 .section-header__meta {
   color: var(--ink-soft);
-  font-size: var(--type-body-xs);
+  font-size: 0.76rem;
+  letter-spacing: 0.01em;
+  opacity: 0.82;
 }
 
 .section-header--compact .section-header__meta {
-  font-size: 0.78rem;
+  font-size: 0.74rem;
+  opacity: 0.78;
 }
 
 .config-summary-tooltip {
@@ -583,6 +586,10 @@ h3 {
   display: block;
 }
 
+.form-field--timer .form-field__control {
+  display: grid;
+}
+
 .form-field input,
 .form-field select,
 .field input,
@@ -660,7 +667,7 @@ h3 {
   gap: 8px;
   min-height: 42px;
   min-width: 132px;
-  padding: 11px 17px;
+  padding: 10px 17px;
   position: relative;
   overflow: hidden;
   isolation: isolate;
@@ -668,7 +675,10 @@ h3 {
   text-align: center;
   letter-spacing: -0.02em;
   line-height: 1.02;
-  font-size: 0.98rem;
+  font-size: 0.96rem;
+  font-family: var(--font-body);
+  font-weight: 740;
+  color: var(--ink);
 }
 
 .system-button::before,
@@ -684,16 +694,16 @@ h3 {
 
 .system-button::before {
   inset: 1px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  opacity: 0.9;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  opacity: 0.76;
 }
 
 .system-button::after,
 .status-banner__timer::before,
 .state-surface__aside::before {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 38%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent 42%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), transparent 34%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.06), transparent 44%);
   z-index: 0;
 }
 
@@ -704,8 +714,8 @@ h3 {
   align-items: center;
   justify-content: center;
   min-height: 1em;
-  font-weight: 750;
-  letter-spacing: -0.01em;
+  font-weight: 740;
+  letter-spacing: -0.012em;
 }
 
 .system-button:hover,
@@ -716,26 +726,28 @@ h3 {
 }
 
 .primary-button {
-  color: #fbf7ef;
+  color: #f8f3eb;
   background:
     radial-gradient(circle at top left, rgba(255, 255, 255, 0.08), transparent 24%),
-    linear-gradient(180deg, rgba(64, 98, 138, 0.98), rgba(31, 52, 82, 0.98));
-  border: 1px solid rgba(25, 45, 70, 0.4);
+    linear-gradient(180deg, rgba(76, 95, 111, 0.97), rgba(52, 67, 80, 0.97));
+  border: 1px solid rgba(50, 67, 83, 0.48);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    inset 0 -1px 0 rgba(17, 35, 58, 0.42),
-    0 12px 22px rgba(24, 52, 84, 0.18);
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(28, 41, 54, 0.28),
+    0 8px 16px rgba(46, 58, 69, 0.14);
+  text-shadow: 0 1px 0 rgba(22, 32, 42, 0.22);
 }
 
 .secondary-button {
   background:
-    linear-gradient(180deg, rgba(255, 253, 249, 0.98), rgba(245, 237, 222, 0.94));
-  border: 1px solid rgba(92, 70, 46, 0.18);
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.24), transparent 24%),
+    linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(243, 235, 220, 0.95));
+  border: 1px solid rgba(92, 70, 46, 0.22);
   color: var(--ink);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.62),
     inset 0 -1px 0 rgba(168, 145, 116, 0.12),
-    0 8px 16px rgba(62, 41, 20, 0.06);
+    0 7px 14px rgba(62, 41, 20, 0.06);
 }
 
 .system-button:hover {
@@ -745,17 +757,17 @@ h3 {
 .primary-button:hover {
   transform: translateY(-1px);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    inset 0 -1px 0 rgba(17, 35, 58, 0.44),
-    0 14px 24px rgba(24, 52, 84, 0.22);
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(28, 41, 54, 0.32),
+    0 10px 18px rgba(46, 58, 69, 0.18);
 }
 
 .secondary-button:hover {
   transform: translateY(-1px);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.64),
-    inset 0 -1px 0 rgba(168, 145, 116, 0.16),
-    0 12px 20px rgba(62, 41, 20, 0.08);
+    inset 0 1px 0 rgba(255, 255, 255, 0.66),
+    inset 0 -1px 0 rgba(168, 145, 116, 0.14),
+    0 9px 17px rgba(62, 41, 20, 0.08);
 }
 
 .system-button:focus-visible,
@@ -824,6 +836,25 @@ h3 {
   display: flex;
   align-items: center;
   gap: 12px;
+  justify-content: space-between;
+}
+
+.timer-picker .system-button {
+  min-width: 72px;
+  padding-inline: 14px;
+}
+
+.timer-picker__value {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88px;
+  padding: 0 6px;
+  color: color-mix(in srgb, var(--accent-strong) 30%, var(--ink) 70%);
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
 }
 
 .room-preview {
@@ -1499,22 +1530,22 @@ h3 {
 }
 
 .transit-card {
-  min-height: 98px;
+  min-height: 102px;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  gap: 2px;
-  padding: 12px;
+  gap: 3px;
+  padding: 12px 12px 11px;
   position: relative;
   overflow: hidden;
   isolation: isolate;
   border-radius: var(--card-radius);
-  border: 1.5px solid var(--card-border);
+  border: 1px solid color-mix(in srgb, var(--card-border) 86%, rgba(92, 70, 46, 0.18));
   background:
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.22), transparent 28%),
-    linear-gradient(180deg, #f7ecd9, #e6d2ae);
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.18), transparent 26%),
+    linear-gradient(180deg, rgba(251, 244, 232, 0.99), rgba(236, 220, 190, 0.96));
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.32),
-    0 11px 24px rgba(74, 53, 33, 0.17);
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    0 7px 16px rgba(74, 53, 33, 0.1);
   text-align: left;
   color: var(--transit-card-ink);
   transition:
@@ -1526,12 +1557,12 @@ h3 {
 .transit-card::before {
   content: "";
   position: absolute;
-  inset: 9px;
-  border-radius: 11px;
-  border: 1px solid rgba(176, 138, 67, 0.16);
+  inset: 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(176, 138, 67, 0.1);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 248, 232, 0.28),
-    inset 0 0 0 5px rgba(176, 138, 67, 0.04);
+    inset 0 0 0 1px rgba(255, 248, 232, 0.18),
+    inset 0 0 0 3px rgba(176, 138, 67, 0.025);
   pointer-events: none;
   z-index: 0;
 }
@@ -1541,8 +1572,8 @@ h3 {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 34%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.08), transparent 42%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 34%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.04), transparent 48%);
   pointer-events: none;
   z-index: 0;
 }
@@ -1558,10 +1589,10 @@ h3 {
 
 .transit-card--interactive:hover {
   transform: translateY(-1px);
-  border-color: rgba(176, 138, 67, 0.72);
+  border-color: rgba(176, 138, 67, 0.54);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.36),
-    0 15px 30px rgba(74, 53, 33, 0.24);
+    inset 0 1px 0 rgba(255, 255, 255, 0.38),
+    0 10px 22px rgba(74, 53, 33, 0.15);
 }
 
 .transit-card--interactive:focus-visible {
@@ -1589,17 +1620,17 @@ h3 {
   justify-content: space-between;
   align-items: baseline;
   gap: 6px;
-  color: color-mix(in srgb, var(--transit-card-ink) 76%, white 24%);
+  color: color-mix(in srgb, var(--transit-card-ink) 72%, white 28%);
 }
 
 .transit-card__top-band {
-  min-height: 9px;
+  min-height: 11px;
   padding-bottom: 0;
   border-bottom: 0;
 }
 
 .transit-card__bottom-band {
-  min-height: 8px;
+  min-height: 10px;
   padding-top: 0;
   border-top: 0;
 }
@@ -1609,15 +1640,16 @@ h3 {
 .transit-card__footer,
 .transit-card__stamp {
   font-family: var(--font-body);
-  font-size: 0.47rem;
+  font-size: 0.48rem;
   line-height: 1;
   text-transform: uppercase;
   letter-spacing: 0.12em;
+  font-weight: 700;
 }
 
 .transit-card__serial,
 .transit-card__stamp {
-  color: color-mix(in srgb, var(--transit-card-ink) 58%, white 42%);
+  color: color-mix(in srgb, var(--transit-card-ink) 46%, white 54%);
 }
 
 .transit-card__footer:empty,
@@ -1628,27 +1660,27 @@ h3 {
 }
 
 .transit-card__field {
-  min-height: 58px;
+  min-height: 60px;
   display: grid;
   align-items: stretch;
   padding: 0;
   border-radius: 14px;
   background:
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.18), transparent 28%),
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.11), transparent 28%),
     linear-gradient(180deg, var(--transit-card-route-light), var(--transit-card-route));
-  border: 1px solid rgba(62, 49, 40, 0.1);
+  border: 1px solid rgba(62, 49, 40, 0.12);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.05),
-    0 1px 0 rgba(0, 0, 0, 0.05);
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.03),
+    0 1px 0 rgba(0, 0, 0, 0.04);
 }
 
 .transit-card__watermark {
   position: absolute;
-  inset: 8px 10px auto auto;
-  width: 54%;
+  inset: 10px 12px auto auto;
+  width: 50%;
   height: auto;
-  opacity: var(--transit-card-watermark-opacity, 0.03);
+  opacity: calc(var(--transit-card-watermark-opacity, 0.02) * 0.72);
   overflow: visible;
 }
 
@@ -1714,19 +1746,19 @@ h3 {
   min-height: 100%;
   display: grid;
   place-items: center start;
-  padding: 0 15px;
+  padding: 0 14px;
 }
 
 .transit-card__title {
   display: block;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 0.98rem;
-  line-height: 1;
-  letter-spacing: 0.01em;
+  font-size: 0.96rem;
+  line-height: 0.98;
+  letter-spacing: -0.015em;
   white-space: nowrap;
   color: var(--transit-card-field-ink);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.14);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .transit-card__title--medium {
@@ -1743,18 +1775,18 @@ h3 {
   right: 12px;
   top: 12px;
   transform: none;
-  padding: 3px 7px;
+  padding: 2px 7px;
   border-radius: 999px;
   border: 1px solid rgba(90, 70, 54, 0.14);
-  background: rgba(255, 248, 236, 0.9);
+  background: rgba(255, 248, 236, 0.88);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    0 4px 10px rgba(74, 53, 33, 0.08);
+    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+    0 3px 8px rgba(74, 53, 33, 0.06);
   font-family: var(--font-body);
-  font-size: 0.43rem;
+  font-size: 0.44rem;
   font-weight: 700;
   line-height: 1;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
   color: color-mix(in srgb, var(--transit-card-ink) 72%, white 28%);
   z-index: 2;
@@ -1767,11 +1799,11 @@ h3 {
 
 .transit-card--locomotive .transit-card__field {
   background:
-    radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.22), transparent 34%),
+    radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.18), transparent 34%),
     linear-gradient(180deg, var(--transit-card-route-light), var(--transit-card-route));
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    0 1px 0 rgba(120, 92, 48, 0.08);
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 1px 0 rgba(120, 92, 48, 0.06);
   border: 1px solid rgba(176, 138, 67, 0.28);
 }
 
@@ -1810,11 +1842,11 @@ h3 {
 }
 
 .transit-card--hand {
-  min-height: 98px;
+  min-height: 102px;
 }
 
 .transit-card--market {
-  min-height: 102px;
+  min-height: 104px;
 }
 
 .transit-card--market .transit-card__field {
@@ -1846,17 +1878,17 @@ h3 {
 }
 
 .transit-card.artifact-card--hand {
-  transform: rotate(-0.35deg);
+  transform: none;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.24),
-    0 12px 24px rgba(74, 53, 33, 0.18);
+    0 8px 18px rgba(74, 53, 33, 0.12);
 }
 
 .transit-card.artifact-card--market {
-  transform: rotate(0.15deg);
+  transform: none;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.26),
-    0 13px 26px rgba(74, 53, 33, 0.2);
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    0 8px 18px rgba(74, 53, 33, 0.12);
 }
 
 .ticket-row {
@@ -1949,6 +1981,15 @@ h3 {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.56),
     0 16px 30px rgba(60, 42, 24, 0.1);
+}
+
+.surface-card.detail-card[aria-label="Route detail"] .surface-card__title,
+.surface-card.detail-card[data-detail-kind="route"] .surface-card__title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
 }
 
 .surface-card__meta {
@@ -2356,9 +2397,10 @@ h3 {
   border-radius: 999px;
   background:
     linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--choice-chip-accent) 24%, rgba(255, 251, 243, 0.98)) 0%,
-      rgba(255, 251, 243, 0.98) 58%
+      160deg,
+      color-mix(in srgb, var(--choice-chip-accent) 18%, rgba(255, 251, 243, 0.98)) 0%,
+      color-mix(in srgb, var(--choice-chip-accent) 10%, rgba(255, 251, 243, 0.98)) 38%,
+      rgba(255, 251, 243, 0.98) 100%
     );
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.58),
@@ -2378,8 +2420,7 @@ h3 {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 40%),
-    linear-gradient(90deg, color-mix(in srgb, var(--choice-chip-accent) 28%, transparent) 0%, transparent 34%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), transparent 42%);
   pointer-events: none;
 }
 
@@ -2388,9 +2429,10 @@ h3 {
   border-color: color-mix(in srgb, var(--choice-chip-accent) 48%, rgba(62, 49, 40, 0.14));
   background:
     linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--choice-chip-accent) 40%, rgba(255, 251, 243, 0.99)) 0%,
-      rgba(255, 251, 243, 0.99) 52%
+      160deg,
+      color-mix(in srgb, var(--choice-chip-accent) 34%, rgba(255, 251, 243, 0.99)) 0%,
+      color-mix(in srgb, var(--choice-chip-accent) 20%, rgba(255, 251, 243, 0.99)) 46%,
+      rgba(255, 251, 243, 0.99) 100%
     );
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.58),
@@ -2399,21 +2441,7 @@ h3 {
 
 .choice-chip-button::before {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 40%),
-    linear-gradient(90deg, color-mix(in srgb, var(--choice-chip-accent) 54%, transparent) 0%, transparent 42%);
-}
-
-.choice-chip-button::after {
-  content: "";
-  position: absolute;
-  left: 10px;
-  top: 9px;
-  bottom: 9px;
-  width: 4px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--choice-chip-accent) 86%, white 14%);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
-  pointer-events: none;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent 44%);
 }
 
 .choice-chip-button > *,
@@ -2428,7 +2456,7 @@ h3 {
   justify-content: center;
   min-height: 1em;
   font-family: var(--font-body);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   line-height: 1.15;
   font-weight: 760;
   letter-spacing: -0.01em;
@@ -2448,7 +2476,7 @@ h3 {
 .choice-chip-button:focus-visible {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.64),
-    0 14px 24px color-mix(in srgb, var(--choice-chip-accent) 18%, rgba(74, 53, 33, 0.12));
+    0 14px 24px color-mix(in srgb, var(--choice-chip-accent) 14%, rgba(74, 53, 33, 0.12));
 }
 
 .choice-chip-button:disabled,
@@ -2775,7 +2803,7 @@ h3 {
 
 .ticket-picker {
   display: grid;
-  gap: 18px;
+  gap: 20px;
 }
 
 .ticket-picker__header {
@@ -2789,6 +2817,7 @@ h3 {
   min-width: 170px;
   display: grid;
   gap: 6px;
+  margin-top: 0;
   padding: 14px 16px;
   border: 1px solid rgba(92, 70, 46, 0.14);
   border-radius: 20px;
@@ -2817,6 +2846,7 @@ h3 {
 .ticket-picker__intro {
   max-width: 44ch;
   margin: 0;
+  color: color-mix(in srgb, var(--ink-soft) 90%, var(--accent-strong) 10%);
 }
 
 .ticket-picker__tray {
@@ -2831,6 +2861,11 @@ h3 {
   overflow: auto;
 }
 
+.ticket-picker__tray.panel {
+  gap: 0;
+  padding: 20px;
+}
+
 .ticket-picker__tray .ticket-list {
   margin: 0;
 }
@@ -2838,12 +2873,15 @@ h3 {
 .ticket-picker__footer {
   display: grid;
   gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(92, 70, 46, 0.1);
 }
 
 .ticket-picker__hint {
   margin: 0;
   color: color-mix(in srgb, var(--accent-strong) 22%, var(--ink-soft) 78%);
   font-size: var(--type-body-sm);
+  max-width: 48ch;
 }
 
 .ticket-picker__footer .setup-actions {
@@ -2861,15 +2899,15 @@ h3 {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 16px;
-  padding: 16px;
+  padding: 15px 16px;
   background:
-    radial-gradient(circle at top right, color-mix(in srgb, var(--ticket-card-accent) 24%, transparent) 0%, transparent 28%),
-    linear-gradient(180deg, rgba(255, 253, 248, 0.99), rgba(244, 236, 220, 0.92));
+    radial-gradient(circle at top right, color-mix(in srgb, var(--ticket-card-accent) 18%, transparent) 0%, transparent 30%),
+    linear-gradient(180deg, rgba(255, 253, 248, 0.99), rgba(242, 233, 216, 0.93));
   border: 1px solid color-mix(in srgb, var(--ticket-card-accent) 28%, rgba(92, 70, 46, 0.14));
   border-radius: calc(var(--radius-md) + 2px);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.52),
-    0 14px 28px rgba(62, 41, 20, 0.08);
+    inset 0 1px 0 rgba(255, 255, 255, 0.46),
+    0 8px 18px rgba(62, 41, 20, 0.06);
   text-align: left;
   position: relative;
   overflow: hidden;
@@ -2886,8 +2924,8 @@ h3 {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent 36%),
-    linear-gradient(180deg, rgba(53, 111, 176, 0.03), transparent 52%);
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 38%),
+    linear-gradient(180deg, rgba(53, 111, 176, 0.02), transparent 56%);
   pointer-events: none;
   z-index: 0;
 }
@@ -2897,10 +2935,10 @@ h3 {
   position: absolute;
   top: 14px;
   bottom: 14px;
-  right: 84px;
+  right: 82px;
   width: 1px;
   background:
-    linear-gradient(180deg, rgba(130, 106, 79, 0.08), rgba(130, 106, 79, 0.22), rgba(130, 106, 79, 0.08));
+    linear-gradient(180deg, rgba(130, 106, 79, 0.05), rgba(130, 106, 79, 0.14), rgba(130, 106, 79, 0.05));
   pointer-events: none;
   z-index: 0;
 }
@@ -2910,12 +2948,12 @@ h3 {
   border-color: rgba(53, 111, 176, 0.42);
   box-shadow:
     inset 0 0 0 1px rgba(53, 111, 176, 0.16),
-    0 16px 30px rgba(31, 82, 133, 0.1);
+    0 12px 24px rgba(31, 82, 133, 0.08);
 }
 
 .ticket-card__kicker {
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 7px;
   text-transform: uppercase;
   letter-spacing: 0.18em;
   font-size: var(--type-utility-xs);
@@ -2926,9 +2964,9 @@ h3 {
 .ticket-card__route {
   display: block;
   font-family: var(--font-display);
-  font-size: 1.08rem;
+  font-size: 1.04rem;
   font-weight: 650;
-  line-height: 1.02;
+  line-height: 0.99;
   letter-spacing: -0.03em;
   position: relative;
   z-index: 1;
@@ -2943,8 +2981,8 @@ h3 {
     linear-gradient(180deg, rgba(255, 252, 247, 0.99), rgba(236, 224, 200, 0.95));
   border: 1px solid rgba(92, 70, 46, 0.14);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.54),
-    0 8px 16px rgba(62, 41, 20, 0.08);
+    inset 0 1px 0 rgba(255, 255, 255, 0.48),
+    0 5px 12px rgba(62, 41, 20, 0.06);
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -2953,14 +2991,8 @@ h3 {
 
 .ticket-card:hover {
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.58),
-    0 18px 32px rgba(74, 53, 33, 0.12);
-}
-
-.modal-card h2 {
-  font-family: var(--font-body);
-  font-weight: 700;
-  letter-spacing: -0.03em;
+    inset 0 1px 0 rgba(255, 255, 255, 0.52),
+    0 12px 24px rgba(74, 53, 33, 0.09);
 }
 
 .endgame-grid {

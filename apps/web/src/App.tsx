@@ -901,6 +901,7 @@ export default function App(): JSX.Element {
               <SurfaceCard
                 variant="detail"
                 className="detail-card"
+                data-detail-kind="route"
                 eyebrow="Route detail"
                 title={`${getCityName(mapConfig, currentRoute.from)} → ${getCityName(mapConfig, currentRoute.to)}`}
               >

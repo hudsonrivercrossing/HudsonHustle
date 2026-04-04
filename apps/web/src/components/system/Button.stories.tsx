@@ -11,7 +11,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Primary and secondary shell button family. Use this for setup actions, modal actions, and turn controls."
+          "Primary and secondary authored shell control family. Use this for setup actions, modal actions, and turn controls without drifting into generic app CTA styling."
       }
     }
   },

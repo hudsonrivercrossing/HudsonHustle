@@ -687,6 +687,7 @@ export function LocalPlayScreen({ onOpenMultiplayer, onReturnToGateway }: LocalP
               <SurfaceCard
                 variant="detail"
                 className="detail-card"
+                data-detail-kind="route"
                 eyebrow="Route detail"
                 title={`${getCityName(hudsonHustleMap, currentRoute.from)} → ${getCityName(hudsonHustleMap, currentRoute.to)}`}
               >

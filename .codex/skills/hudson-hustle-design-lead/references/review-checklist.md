@@ -10,6 +10,7 @@ Use this when auditing a shell/system surface.
 
 ## Typography
 - Does `Fraunces` appear only in approved ceremony zones?
+- If route detail uses `Fraunces`, is it limited to the route name rather than facts, prompts, or action text?
 - Are repeated labels and object rows using explicit contracts?
 - Is any component still relying on generic inherited `h2/h3` styling?
 

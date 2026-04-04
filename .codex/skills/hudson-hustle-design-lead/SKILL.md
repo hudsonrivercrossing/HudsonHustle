@@ -31,6 +31,7 @@ This skill is for `v2.1`-style shell work, not broad map redesign.
   - status moments
   - tutorial hero moments
   - summary/endgame emphasis
+  - approved route-detail route names
 
 Do not let `Fraunces` leak into every panel title or object label.
 

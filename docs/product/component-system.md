@@ -76,6 +76,8 @@ Use `SurfaceCard` for nested authored surfaces inside a larger panel:
 
 It should not replace the outer `Panel` layer.
 Summary variant titles may use the ceremony typography treatment when they represent endgame moments.
+Within route detail specifically, the named route title may use the display face as a controlled emphasis moment.
+That exception is for the route name only, not for facts, prompts, or ordinary nested object labels.
 
 ## Choice Chip Button
 

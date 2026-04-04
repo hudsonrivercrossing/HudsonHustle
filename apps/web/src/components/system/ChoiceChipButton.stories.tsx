@@ -35,17 +35,17 @@ export const NeutralAccent: Story = {
 export const RouteColors: Story = {
   render: () => (
     <div className="choice-chip-row">
-      <ChoiceChipButton style={accent("#3d7e52")}>Green</ChoiceChipButton>
-      <ChoiceChipButton style={accent("#3d72b3")}>Blue</ChoiceChipButton>
-      <ChoiceChipButton style={accent("#b08a43")}>Gold</ChoiceChipButton>
-      <ChoiceChipButton style={accent("#8b5a9e")}>Purple</ChoiceChipButton>
+      <ChoiceChipButton style={accent("#3d7e52")}>Claim with green</ChoiceChipButton>
+      <ChoiceChipButton style={accent("#3d72b3")}>Claim with blue</ChoiceChipButton>
+      <ChoiceChipButton style={accent("#b08a43")}>Claim with gold</ChoiceChipButton>
+      <ChoiceChipButton style={accent("#8b5a9e")}>Claim with purple</ChoiceChipButton>
     </div>
   )
 };
 
 export const Selected: Story = {
   args: {
-    children: "Selected color",
+    children: "Build with blue",
     style: accent("#2a6fb6")
   }
 };

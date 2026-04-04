@@ -16,12 +16,12 @@
         margin: 0 auto;
         padding: var(--space-page-y) 0 calc(var(--space-page-y) * 2);
         display: grid;
-        gap: var(--space-stack-xl);
+        gap: calc(var(--space-stack-xl) - 6px);
       }
 
       .showcase-grid {
         display: grid;
-        gap: var(--space-stack-lg);
+        gap: calc(var(--space-stack-lg) - 4px);
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       }
 
@@ -37,7 +37,7 @@
 
       .showcase-panel-stack {
         display: grid;
-        gap: var(--space-stack-md);
+        gap: calc(var(--space-stack-md) - 2px);
       }
 
       .showcase-chip-row {
@@ -55,10 +55,16 @@
       .showcase-note {
         color: var(--ink-soft);
         margin: 0;
+        max-width: 58ch;
+        font-size: 0.93rem;
       }
 
       .showcase-muted {
         color: var(--ink-soft);
+      }
+
+      .showcase-shell > header .lead {
+        max-width: 64ch;
       }
 
       /* In the showcase, modal shells should render as static examples,
@@ -82,8 +88,7 @@
         <p class="eyebrow">V2.1 Design System</p>
         <h1>System Components Showcase</h1>
         <p class="lead">
-          Temporary page for reviewing the current shell language: `Fraunces + Inter`, warm paper surfaces, restrained chips,
-          and authored action/detail cards.
+          Review page for the current shell language: `Fraunces + Inter`, warm paper surfaces, restrained chips, and authored action/detail cards.
         </p>
         <div class="utility-pill-group">
           <span class="utility-pill utility-pill--stacked utility-pill--accent"><span class="utility-pill__label">Active pair</span><span class="utility-pill__value">Fraunces + Inter</span></span>
@@ -362,7 +367,7 @@
               <button class="system-button secondary-button" disabled><span class="system-button__content">Timer 30s</span></button>
             </div>
 
-            <section class="surface-card surface-card--detail detail-card">
+            <section class="surface-card surface-card--detail detail-card" data-detail-kind="route">
               <div class="surface-card__header">
                 <span class="surface-card__eyebrow">Route detail</span>
                 <div class="surface-card__row">
@@ -381,7 +386,7 @@
                 <div class="detail-card__decision-shelf chip-row">
                   <button class="choice-chip-button" style="--choice-chip-accent:#3f7a4d"><span class="choice-chip-button__content">Claim with green</span></button>
                   <button class="choice-chip-button" style="--choice-chip-accent:#7c6a55"><span class="choice-chip-button__content">Claim with gray</span></button>
-                  <button class="choice-chip-button" style="--choice-chip-accent:#b65743"><span class="choice-chip-button__content">Use station</span></button>
+                  <button class="choice-chip-button" style="--choice-chip-accent:#b65743"><span class="choice-chip-button__content">Claim with red</span></button>
                 </div>
               </div>
             </section>
@@ -471,9 +476,9 @@
               </div>
             </div>
             <div class="market-grid">
-              <article class="transit-card transit-card--market artifact-card artifact-card--market" data-color="green">
+              <article class="transit-card transit-card--market artifact-card artifact-card--market" data-color="emerald">
                 <div class="transit-card__top-band"><span class="transit-card__kicker">Line</span><span class="transit-card__serial">MKT-01</span></div>
-                <div class="transit-card__field"><div class="transit-card__title-stack"><strong class="transit-card__title">Green</strong></div></div>
+                <div class="transit-card__field"><div class="transit-card__title-stack"><strong class="transit-card__title">Emerald</strong></div></div>
                 <div class="transit-card__bottom-band"><span class="transit-card__footer">Market</span><span class="transit-card__stamp">1</span></div>
               </article>
               <article class="transit-card transit-card--hand artifact-card artifact-card--hand" data-color="amber">
@@ -482,6 +487,7 @@
                 <div class="transit-card__bottom-band"><span class="transit-card__footer">Hand</span><span class="transit-card__stamp">7</span></div>
               </article>
             </div>
+            <p class="showcase-note">Transit cards and ticket cards should share one warm artifact family: restrained framing, quieter paper stock, and route-specific color without extra ornament.</p>
           </section>
 
           <section class="panel panel--neutral">
@@ -537,7 +543,7 @@
                     <span class="ticket-picker__rule-note">2 of 3 selected</span>
                   </div>
                 </div>
-                <p class="modal-copy ticket-picker__intro">Default modal shell for ticket choice, handoff, and reveal moments.</p>
+                <p class="modal-copy ticket-picker__intro">Use the shared modal shell for ticket choice, handoff, and reveal moments.</p>
                 <div class="ticket-picker__tray">
                   <div class="ticket-list">
                     <button class="ticket-card artifact-card artifact-card--ticket ticket-card--selected artifact-card--selected">
@@ -661,7 +667,7 @@
               <span class="section-header__eyebrow">Buttons</span>
               <div class="section-header__row">
                 <h2 class="section-header__title">Primary / secondary</h2>
-                <span class="section-header__meta">paper controls with stronger hierarchy</span>
+                <span class="section-header__meta">shared action language</span>
               </div>
             </div>
             <div class="showcase-actions">
