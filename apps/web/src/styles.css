@@ -2251,11 +2251,23 @@ h3 {
   letter-spacing: -0.04em;
 }
 
+.endgame-card .surface-card__header {
+  min-height: 84px;
+  align-content: start;
+}
+
+.endgame-card .surface-card__body {
+  grid-template-rows: minmax(124px, auto) 1fr;
+  align-content: start;
+}
+
 .endgame-card__hero {
   display: grid;
   justify-items: start;
+  align-content: start;
   gap: 4px;
   padding: 2px 0 10px;
+  min-height: 124px;
   border-bottom: 1px solid rgba(92, 70, 46, 0.12);
 }
 
