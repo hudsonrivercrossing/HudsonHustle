@@ -94,7 +94,11 @@ export function readReconnectCredentials(raw: string | null): ReconnectCredentia
   }
 
   if (trimmed.startsWith(reconnectTokenPrefix)) {
-    return decodeReconnectToken(trimmed);
+    try {
+      return decodeReconnectToken(trimmed);
+    } catch {
+      return null;
+    }
   }
 
   try {

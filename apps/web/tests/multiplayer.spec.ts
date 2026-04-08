@@ -74,16 +74,22 @@ async function createRoom(
   return decodeReconnectToken(session ?? "");
 }
 
-async function joinRoom(page: Page, roomCode: string): Promise<{ roomCode: string; seatId: string; playerSecret: string }> {
+async function joinRoom(
+  page: Page,
+  roomCode: string,
+  options?: { seatId?: string; playerName?: string }
+): Promise<{ roomCode: string; seatId: string; playerSecret: string }> {
   const joinPanel = page.getByTestId("join-room-panel");
+  const seatId = options?.seatId ?? "seat-2";
+  const playerName = options?.playerName ?? "Guest";
   await joinPanel.getByLabel("Room code").fill(roomCode);
   await joinPanel.getByRole("button", { name: "Preview room" }).click();
-  await expect(page.getByRole("button", { name: "seat-2" })).toBeVisible();
-  await page.getByRole("button", { name: "seat-2" }).click();
-  await joinPanel.getByLabel("Your name").fill("Guest");
+  await expect(page.getByRole("button", { name: seatId })).toBeVisible();
+  await page.getByRole("button", { name: seatId }).click();
+  await joinPanel.getByLabel("Your name").fill(playerName);
   await joinPanel.getByRole("button", { name: "Join room" }).click();
   await expect(page.getByTestId("lobby-status-banner")).toBeVisible({ timeout: 10000 });
-  await expect(page.getByTestId("seat-connected-seat-2")).toHaveText("Connected");
+  await expect(page.getByTestId(`seat-connected-${seatId}`)).toHaveText("Connected");
 
   const session = await page.evaluate((key) => window.localStorage.getItem(key), SESSION_KEY);
   expect(session).not.toBeNull();
@@ -156,6 +162,21 @@ test("multiplayer room lifecycle covers connected badges, private state, reconne
   await guestContext.close();
 });
 
+test("invalid saved reconnect tokens fall back to the gateway instead of crashing setup", async ({ browser }) => {
+  const context = await browser.newContext();
+  await context.addInitScript((sessionKey) => {
+    window.localStorage.setItem(sessionKey, "hh1.not-valid-base64");
+  }, SESSION_KEY);
+  const page = await context.newPage();
+
+  await page.goto("/");
+  await waitForApi(page);
+  await expect(page.getByRole("heading", { name: "Hudson Hustle" })).toBeVisible();
+  await expect(page.getByTestId("gateway-online")).toBeVisible();
+
+  await context.close();
+});
+
 test("initial multiplayer ticket choices can be confirmed independently without resetting another player's selection", async ({ browser }) => {
   const hostContext = await browser.newContext();
   const guestContext = await browser.newContext();
@@ -222,21 +243,38 @@ test("timer display counts down from the lobby-selected timeout", async ({ brows
   await context.close();
 });
 
-test("host can leave the lobby and return to the gateway", async ({ browser }) => {
-  const context = await browser.newContext();
-  const page = await context.newPage();
+test("host can leave the lobby without stranding the room", async ({ browser }) => {
+  const hostContext = await browser.newContext();
+  const guestContext = await browser.newContext();
+  const replacementContext = await browser.newContext();
+  const hostPage = await hostContext.newPage();
+  const guestPage = await guestContext.newPage();
+  const replacementPage = await replacementContext.newPage();
 
-  await openMultiplayerSetup(page);
-  await createRoom(page);
-  await expect(page.getByRole("heading", { name: "Hudson Hustle" })).toBeVisible();
-  await page.getByRole("button", { name: "Leave room" }).click();
+  await openMultiplayerSetup(hostPage);
+  const { roomCode } = await createRoom(hostPage);
+  await openMultiplayerSetup(guestPage);
+  await joinRoom(guestPage, roomCode);
 
-  await expect(page.getByRole("heading", { name: "Hudson Hustle" })).toBeVisible();
-  await expect(page.getByTestId("gateway-online")).toBeVisible();
-  const session = await page.evaluate((key) => window.localStorage.getItem(key), SESSION_KEY);
+  await hostPage.getByRole("button", { name: "Leave room" }).click();
+
+  await expect(hostPage.getByRole("heading", { name: "Hudson Hustle" })).toBeVisible();
+  await expect(hostPage.getByTestId("gateway-online")).toBeVisible();
+  const session = await hostPage.evaluate((key) => window.localStorage.getItem(key), SESSION_KEY);
   expect(session).toBeNull();
+  await expect(guestPage.getByTestId("seat-row-seat-1").getByText("Open seat")).toBeVisible();
+  await expect(guestPage.getByTestId("seat-row-seat-2")).toContainText("host");
 
-  await context.close();
+  await openMultiplayerSetup(replacementPage);
+  await joinRoom(replacementPage, roomCode, {
+    seatId: "seat-1",
+    playerName: "Returner"
+  });
+  await expect(guestPage.getByTestId("seat-row-seat-1")).toContainText("Returner");
+
+  await replacementContext.close();
+  await guestContext.close();
+  await hostContext.close();
 });
 
 test("local tutorial and shell hierarchy keep ceremony and work roles distinct", async ({ browser }) => {

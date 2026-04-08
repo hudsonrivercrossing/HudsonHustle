@@ -315,6 +315,13 @@ export class RoomService {
     const timestamp = nowIso();
     targetSeat.playerName = request.playerName.trim() || targetSeat.seatId;
     targetSeat.playerSecret = createPlayerSecret();
+    const currentHost = room.seats.find((seat) => seat.seatId === room.hostSeatId) ?? null;
+    if (!currentHost?.playerName) {
+      room.seats.forEach((seat) => {
+        seat.isHost = seat.seatId === targetSeat.seatId;
+      });
+      room.hostSeatId = targetSeat.seatId;
+    }
     targetSeat.updatedAt = timestamp;
 
     room.updatedAt = timestamp;
@@ -404,6 +411,45 @@ export class RoomService {
     seat.connected = false;
     seat.updatedAt = nowIso();
     room.updatedAt = seat.updatedAt;
+    await this.saveRoom(room);
+  }
+
+  async leaveRoom(roomCode: string, auth: RoomAuth): Promise<void> {
+    const room = await this.getRoomOrThrow(roomCode);
+    const seat = this.getAuthorizedSeat(room, auth);
+
+    if (room.status !== "lobby") {
+      seat.connected = false;
+      seat.updatedAt = nowIso();
+      room.updatedAt = seat.updatedAt;
+      await this.saveRoom(room);
+      return;
+    }
+
+    const timestamp = nowIso();
+    const nextHost =
+      seat.isHost
+        ? (room.seats.find((candidate) => candidate.seatId !== seat.seatId && candidate.playerName) ?? null)
+        : null;
+
+    if (seat.isHost) {
+      if (nextHost) {
+        seat.isHost = false;
+        room.hostSeatId = nextHost.seatId;
+        nextHost.isHost = true;
+        nextHost.updatedAt = timestamp;
+      } else {
+        seat.isHost = false;
+      }
+    }
+
+    seat.playerId = null;
+    seat.playerName = null;
+    seat.ready = false;
+    seat.connected = false;
+    seat.playerSecret = "";
+    seat.updatedAt = timestamp;
+    room.updatedAt = timestamp;
     await this.saveRoom(room);
   }
 

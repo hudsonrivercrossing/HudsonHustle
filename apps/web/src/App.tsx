@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import { io, type Socket } from "socket.io-client";
 import {
   getAffordableRouteColors,
@@ -82,6 +82,25 @@ function saveSession(credentials: ReconnectCredentials | null): void {
     return;
   }
   window.localStorage.setItem(sessionKey, encodeReconnectToken(credentials));
+}
+
+function clearSessionState(
+  setCredentials: Dispatch<SetStateAction<ReconnectCredentials | null>>,
+  setSnapshot: Dispatch<SetStateAction<RoomSnapshot | null>>,
+  setRoomPreview: Dispatch<SetStateAction<RoomSnapshot["room"] | null>>,
+  setTimer: Dispatch<SetStateAction<TimerUpdate | null>>,
+  setMultiplayerError: Dispatch<SetStateAction<string | null>>,
+  setReconnectState: Dispatch<SetStateAction<ReconnectState>>,
+  setSetupMode: Dispatch<SetStateAction<SetupMode>>
+): void {
+  saveSession(null);
+  setCredentials(null);
+  setSnapshot(null);
+  setRoomPreview(null);
+  setTimer(null);
+  setMultiplayerError(null);
+  setReconnectState("fresh");
+  setSetupMode("gateway");
 }
 
 function placeholderHand(playerId: string, count: number): GameState["players"][number]["hand"] {
@@ -584,16 +603,28 @@ export default function App(): JSX.Element {
     });
   }
 
-  function leaveRoom() {
+  async function leaveRoom() {
     awaitingSocketHandshakeRef.current = false;
-    saveSession(null);
-    setCredentials(null);
-    setSnapshot(null);
-    setRoomPreview(null);
-    setTimer(null);
-    setMultiplayerError(null);
-    setReconnectState("fresh");
-    setSetupMode("gateway");
+    if (snapshot?.room.status === "lobby" && credentials) {
+      try {
+        await requestJson<{ ok: true }>(`/rooms/${credentials.roomCode}/leave`, {
+          method: "POST",
+          body: JSON.stringify({
+            seatId: credentials.seatId,
+            playerSecret: credentials.playerSecret
+          })
+        });
+      } catch (caught) {
+        if (caught instanceof ApiError && (caught.status === 403 || caught.status === 404)) {
+          clearSessionState(setCredentials, setSnapshot, setRoomPreview, setTimer, setMultiplayerError, setReconnectState, setSetupMode);
+          return;
+        }
+        setMultiplayerError(caught instanceof Error ? caught.message : "Could not leave the room.");
+        return;
+      }
+    }
+
+    clearSessionState(setCredentials, setSnapshot, setRoomPreview, setTimer, setMultiplayerError, setReconnectState, setSetupMode);
   }
 
   if (!snapshot || !credentials) {

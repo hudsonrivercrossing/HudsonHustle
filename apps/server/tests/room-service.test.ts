@@ -113,6 +113,83 @@ describe("RoomService", () => {
     ).rejects.toMatchObject({ statusCode: 409, code: "seat_taken" });
   });
 
+  it("vacates a lobby seat and transfers host before another player joins", async () => {
+    const service = new RoomService(new MemoryRoomRepository(), hudsonHustleReleasedConfigs);
+    const created = await service.createRoom({
+      hostName: "Ava",
+      playerCount: 3,
+      configId: "v0.3-atlantic-hoboken",
+      turnTimeLimitSeconds: 0
+    });
+    const joined = await service.joinRoom(created.roomCode, {
+      playerName: "Beau",
+      preferredSeatId: "seat-2"
+    });
+
+    await service.leaveRoom(created.roomCode, {
+      seatId: created.seatId,
+      playerSecret: created.playerSecret
+    });
+
+    const snapshotAfterLeave = await service.getSnapshot(created.roomCode, {
+      seatId: joined.seatId,
+      playerSecret: joined.playerSecret
+    });
+    expect(snapshotAfterLeave.room.hostSeatId).toBe("seat-2");
+    expect(snapshotAfterLeave.room.seats[0]).toMatchObject({
+      seatId: "seat-1",
+      playerName: null,
+      isHost: false
+    });
+    expect(snapshotAfterLeave.room.seats[1]).toMatchObject({
+      seatId: "seat-2",
+      playerName: "Beau",
+      isHost: true
+    });
+
+    const replacement = await service.joinRoom(created.roomCode, {
+      playerName: "Casey",
+      preferredSeatId: "seat-1"
+    });
+    expect(replacement.snapshot.room.seats[0]).toMatchObject({
+      seatId: "seat-1",
+      playerName: "Casey",
+      isHost: false
+    });
+  });
+
+  it("reassigns host to the next player who joins an otherwise empty lobby", async () => {
+    const service = new RoomService(new MemoryRoomRepository(), hudsonHustleReleasedConfigs);
+    const created = await service.createRoom({
+      hostName: "Ava",
+      playerCount: 3,
+      configId: "v0.3-atlantic-hoboken",
+      turnTimeLimitSeconds: 0
+    });
+
+    await service.leaveRoom(created.roomCode, {
+      seatId: created.seatId,
+      playerSecret: created.playerSecret
+    });
+
+    const joined = await service.joinRoom(created.roomCode, {
+      playerName: "Beau",
+      preferredSeatId: "seat-2"
+    });
+
+    expect(joined.snapshot.room.hostSeatId).toBe("seat-2");
+    expect(joined.snapshot.room.seats[0]).toMatchObject({
+      seatId: "seat-1",
+      playerName: null,
+      isHost: false
+    });
+    expect(joined.snapshot.room.seats[1]).toMatchObject({
+      seatId: "seat-2",
+      playerName: "Beau",
+      isHost: true
+    });
+  });
+
   it("restores an active timer after reloading a timed room from persistence", async () => {
     const repository = new MemoryRoomRepository();
     const service = new RoomService(repository, hudsonHustleReleasedConfigs);
