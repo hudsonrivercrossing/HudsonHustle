@@ -13,6 +13,11 @@ Use this skill when the task is not only to write code, but to manage the engine
 - verifying deploy health
 - promoting work through `develop` and `main`
 
+This is a role-like orchestration skill.
+Use smaller workflow skills for adjacent jobs:
+- `hudson-hustle-qa-session` for a structured QA log
+- `hudson-hustle-prd-to-plan` when the work is still execution planning, not runtime triage
+
 ## Manager Role
 The main session is the manager.
 
@@ -91,6 +96,14 @@ Ask each subagent for:
 - staging/browser smoke
 - only then consider promotion
 
+6. If the likely fix is a non-trivial refactor, stop and write a short refactor note first:
+- objective
+- constraints
+- likely blast radius
+- validation path
+
+Do not jump into a large refactor because the first small fix was inconvenient.
+
 ## Testing Tendencies
 Prefer this order:
 
@@ -102,6 +115,11 @@ Prefer this order:
 - handshake endpoints when relevant
 4. deployed staging smoke
 5. production checks after merge
+
+Test observable behavior first.
+- prefer public outcomes over implementation detail assertions
+- one failing deterministic behavior test is worth more than many internal hunches
+- when reproducing regressions, lock the smallest test that proves the bug before broadening the fix
 
 Do not treat `CI green` as equivalent to `staging works`.
 
@@ -157,6 +175,12 @@ Before every merge, review in findings-first mode:
 - bugs and regressions first
 - residual risks second
 - summary last
+
+For issue triage, always state:
+- severity
+- repro shape
+- most likely owner area
+- fastest discriminating check
 
 If no findings exist, say so explicitly and still mention remaining test gaps.
 

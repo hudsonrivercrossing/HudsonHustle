@@ -7,7 +7,8 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: "DATABASE_URL= PGHOST= PGPORT= PGUSER= PGPASSWORD= PGDATABASE= pnpm --filter @hudson-hustle/server dev",
+      command:
+        "DATABASE_URL= PGHOST= PGPORT= PGUSER= PGPASSWORD= PGDATABASE= pnpm --filter @hudson-hustle/server build && DATABASE_URL= PGHOST= PGPORT= PGUSER= PGPASSWORD= PGDATABASE= pnpm --filter @hudson-hustle/server start",
       port: 8787,
       reuseExistingServer: true
     },

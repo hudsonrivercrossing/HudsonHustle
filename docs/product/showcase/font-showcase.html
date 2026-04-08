@@ -1,0 +1,721 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hudson Hustle Font Showcase</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Balsamiq+Sans:wght@400;700&family=Cormorant+Garamond:wght@500;600;700&family=DM+Sans:wght@400;500;700;800&family=Fraunces:opsz,wght,SOFT@9..144,500..700,0&family=IBM+Plex+Sans:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&family=Manrope:wght@500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&family=Sora:wght@500;600;700&family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #efe6d6;
+        --paper: #f8f1e4;
+        --paper-strong: #f3e7d2;
+        --ink: #2e241e;
+        --muted: #64584d;
+        --line: rgba(74, 56, 44, 0.18);
+        --shadow: 0 18px 40px rgba(63, 43, 29, 0.12);
+        --accent: #b07b3d;
+        --accent-deep: #7f5530;
+        --signal: #264b5d;
+        --radius: 24px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background:
+          radial-gradient(circle at top left, rgba(255, 255, 255, 0.5), transparent 38%),
+          linear-gradient(180deg, #f4ede1 0%, var(--bg) 100%);
+        color: var(--ink);
+      }
+
+      .page {
+        width: min(1180px, calc(100vw - 48px));
+        margin: 0 auto;
+        padding: 40px 0 64px;
+      }
+
+      .hero {
+        padding: 20px 0 32px;
+      }
+
+      .eyebrow {
+        font: 600 12px/1.2 Inter, sans-serif;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: var(--accent-deep);
+      }
+
+      .hero h1 {
+        margin: 10px 0 12px;
+        font: 700 56px/0.96 Inter, sans-serif;
+        letter-spacing: -0.04em;
+      }
+
+      .hero p {
+        max-width: 760px;
+        margin: 0;
+        font: 400 18px/1.6 Inter, sans-serif;
+        color: var(--muted);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 24px;
+      }
+
+      .specimen {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.56), rgba(255, 255, 255, 0.22));
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .specimen__head {
+        padding: 22px 24px 20px;
+        border-bottom: 1px solid var(--line);
+        background: rgba(255, 255, 255, 0.36);
+      }
+
+      .specimen__tag {
+        font: 600 11px/1.2 Inter, sans-serif;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--accent-deep);
+      }
+
+      .specimen__title {
+        margin: 10px 0 8px;
+        font-size: 40px;
+        line-height: 0.95;
+        letter-spacing: -0.03em;
+      }
+
+      .specimen__meta {
+        font: 500 14px/1.5 Inter, sans-serif;
+        color: var(--muted);
+      }
+
+      .specimen__body {
+        padding: 24px;
+      }
+
+      .banner {
+        padding: 18px 20px;
+        border: 1px solid rgba(38, 75, 93, 0.14);
+        border-radius: 20px;
+        background: linear-gradient(180deg, rgba(38, 75, 93, 0.06), rgba(255, 255, 255, 0.58));
+      }
+
+      .banner__label {
+        font: 600 11px/1.2 Inter, sans-serif;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--signal);
+      }
+
+      .banner__headline {
+        margin: 10px 0 6px;
+        font-size: 30px;
+        line-height: 1;
+      }
+
+      .banner__copy {
+        margin: 0;
+        font: 400 14px/1.5 Inter, sans-serif;
+        color: var(--muted);
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 16px;
+        margin-top: 16px;
+      }
+
+      .panel,
+      .ticket {
+        background: rgba(255, 255, 255, 0.48);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+      }
+
+      .panel {
+        padding: 18px;
+      }
+
+      .panel__eyebrow {
+        font: 600 11px/1.2 Inter, sans-serif;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .panel__title {
+        margin: 10px 0 8px;
+        font-size: 28px;
+        line-height: 1;
+      }
+
+      .panel__copy {
+        margin: 0;
+        font: 400 14px/1.55 Inter, sans-serif;
+        color: var(--muted);
+      }
+
+      .ticket {
+        padding: 18px;
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.46), rgba(243, 231, 210, 0.88)),
+          radial-gradient(circle at top left, rgba(176, 123, 61, 0.12), transparent 46%);
+      }
+
+      .ticket__kicker {
+        font: 600 10px/1.2 Inter, sans-serif;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--accent-deep);
+      }
+
+      .ticket__route {
+        margin: 12px 0 10px;
+        font-size: 24px;
+        line-height: 1.02;
+      }
+
+      .ticket__footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 12px;
+        font: 500 13px/1.4 Inter, sans-serif;
+        color: var(--muted);
+      }
+
+      .ticket__points {
+        font: 700 26px/1 Inter, sans-serif;
+        color: var(--ink);
+      }
+
+      .sample-copy {
+        margin-top: 18px;
+        font: 400 15px/1.65 Inter, sans-serif;
+        color: var(--ink);
+      }
+
+      .sample-copy__label {
+        display: block;
+        margin-bottom: 4px;
+        font: 600 11px/1.2 Inter, sans-serif;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent-deep);
+      }
+
+      .sample-copy strong {
+        font-weight: 600;
+      }
+
+      .sample-copy em {
+        color: var(--accent-deep);
+        font-style: normal;
+      }
+
+      .fraunces .specimen__title,
+      .fraunces .banner__headline,
+      .fraunces .panel__title,
+      .fraunces .ticket__route {
+        font-family: "Fraunces", serif;
+        font-variation-settings: "SOFT" 0;
+      }
+
+      .fraunces .banner__copy,
+      .fraunces .panel__copy,
+      .fraunces .ticket__footer,
+      .fraunces .sample-copy {
+        font-family: Inter, sans-serif;
+      }
+
+      .cormorant .specimen__title,
+      .cormorant .banner__headline,
+      .cormorant .panel__title,
+      .cormorant .ticket__route {
+        font-family: "Cormorant Garamond", serif;
+        font-weight: 600;
+      }
+
+      .cormorant .banner__copy,
+      .cormorant .panel__copy,
+      .cormorant .ticket__footer,
+      .cormorant .sample-copy {
+        font-family: Inter, sans-serif;
+      }
+
+      .sora .specimen__title,
+      .sora .banner__headline,
+      .sora .panel__title,
+      .sora .ticket__route {
+        font-family: "Sora", sans-serif;
+        font-weight: 600;
+      }
+
+      .sora .banner__copy,
+      .sora .panel__copy,
+      .sora .ticket__footer,
+      .sora .sample-copy {
+        font-family: Inter, sans-serif;
+      }
+
+      .manrope .specimen__title,
+      .manrope .banner__headline,
+      .manrope .panel__title,
+      .manrope .ticket__route {
+        font-family: "Manrope", sans-serif;
+        font-weight: 700;
+      }
+
+      .manrope .banner__copy,
+      .manrope .panel__copy,
+      .manrope .ticket__footer,
+      .manrope .sample-copy {
+        font-family: "IBM Plex Sans", sans-serif;
+      }
+
+      .jakarta .specimen__title,
+      .jakarta .banner__headline,
+      .jakarta .panel__title,
+      .jakarta .ticket__route {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-weight: 700;
+      }
+
+      .jakarta .banner__copy,
+      .jakarta .panel__copy,
+      .jakarta .ticket__footer,
+      .jakarta .sample-copy {
+        font-family: "Instrument Sans", sans-serif;
+      }
+
+      .space .specimen__title,
+      .space .banner__headline,
+      .space .panel__title,
+      .space .ticket__route {
+        font-family: "Space Grotesk", sans-serif;
+        font-weight: 700;
+      }
+
+      .space .banner__copy,
+      .space .panel__copy,
+      .space .ticket__footer,
+      .space .sample-copy {
+        font-family: "IBM Plex Sans", sans-serif;
+      }
+
+      .ideago .specimen__title,
+      .ideago .banner__headline,
+      .ideago .panel__title,
+      .ideago .ticket__route {
+        font-family: "Archivo Black", sans-serif;
+        font-weight: 400;
+        letter-spacing: -0.05em;
+        text-transform: uppercase;
+      }
+
+      .ideago .banner__copy,
+      .ideago .panel__copy,
+      .ideago .ticket__footer,
+      .ideago .sample-copy {
+        font-family: "DM Sans", sans-serif;
+      }
+
+      .doodle .specimen__title,
+      .doodle .banner__headline,
+      .doodle .panel__title,
+      .doodle .ticket__route {
+        font-family: "Balsamiq Sans", sans-serif;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      .doodle .banner__copy,
+      .doodle .panel__copy,
+      .doodle .ticket__footer,
+      .doodle .sample-copy {
+        font-family: "IBM Plex Sans", sans-serif;
+      }
+
+      .transit .specimen__title,
+      .transit .banner__headline,
+      .transit .panel__title,
+      .transit .ticket__route {
+        font-family: "Helvetica Neue", "Neue Haas Grotesk Text", Helvetica, Arial, sans-serif;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+      }
+
+      .transit .banner__copy,
+      .transit .panel__copy,
+      .transit .ticket__footer,
+      .transit .sample-copy,
+      .transit .banner__label,
+      .transit .panel__eyebrow,
+      .transit .ticket__kicker {
+        font-family: "Helvetica Neue", "Neue Haas Grotesk Text", Helvetica, Arial, sans-serif;
+      }
+
+      .notes {
+        margin-top: 28px;
+        padding: 20px 22px;
+        background: rgba(255, 255, 255, 0.42);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        font: 400 14px/1.6 Inter, sans-serif;
+        color: var(--muted);
+      }
+
+      @media (max-width: 1040px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <div class="eyebrow">V2.1 Font Showcase</div>
+        <h1>Hudson Hustle editorial shell candidates</h1>
+        <p>
+          These pairings compare serif, clean sans, brutalist, and playful directions for Hudson Hustle's shell
+          typography. The goal is to compare <em>editorial mood</em>, readability, distinctiveness, and how well each
+          pair fits a board-game shell rather than a portfolio site.
+        </p>
+      </section>
+
+      <section class="grid">
+        <article class="specimen fraunces">
+          <header class="specimen__head">
+            <div class="specimen__tag">Recommended</div>
+            <div class="specimen__title">Fraunces + Inter</div>
+            <div class="specimen__meta">Balanced editorial voice, strong shell identity, still practical for game UI.</div>
+          </header>
+          <div class="specimen__body">
+            <div class="banner">
+              <div class="banner__label">Turn Status</div>
+              <div class="banner__headline">Your turn.</div>
+              <p class="banner__copy">Draw cards, claim a corridor, or press your luck through the tunnel.</p>
+            </div>
+            <div class="row">
+              <section class="panel">
+                <div class="panel__eyebrow">Room Lobby</div>
+                <div class="panel__title">Waiting for the full table.</div>
+                <p class="panel__copy">Seats joined: 2/4. Ready: 1/4. Host starts once the room is complete.</p>
+              </section>
+              <section class="ticket">
+                <div class="ticket__kicker">Destination Ticket</div>
+                <div class="ticket__route">Grove St. to Flushing</div>
+                <div class="ticket__footer">
+                  <span>Cross-river route commitment</span>
+                  <span class="ticket__points">11</span>
+                </div>
+              </section>
+            </div>
+            <p class="sample-copy">
+              Best if you want Hudson Hustle to feel <strong>authored and premium</strong> without becoming too delicate.
+            </p>
+          </div>
+        </article>
+
+        <article class="specimen cormorant">
+          <header class="specimen__head">
+            <div class="specimen__tag">More dramatic</div>
+            <div class="specimen__title">Cormorant + Inter</div>
+            <div class="specimen__meta">Higher-art editorial feel, more romantic, stronger studio-site energy.</div>
+          </header>
+          <div class="specimen__body">
+            <div class="banner">
+              <div class="banner__label">Turn Status</div>
+              <div class="banner__headline">Your turn.</div>
+              <p class="banner__copy">Draw cards, claim a corridor, or press your luck through the tunnel.</p>
+            </div>
+            <div class="row">
+              <section class="panel">
+                <div class="panel__eyebrow">Room Lobby</div>
+                <div class="panel__title">Waiting for the full table.</div>
+                <p class="panel__copy">Seats joined: 2/4. Ready: 1/4. Host starts once the room is complete.</p>
+              </section>
+              <section class="ticket">
+                <div class="ticket__kicker">Destination Ticket</div>
+                <div class="ticket__route">Grove St. to Flushing</div>
+                <div class="ticket__footer">
+                  <span>Cross-river route commitment</span>
+                  <span class="ticket__points">11</span>
+                </div>
+              </section>
+            </div>
+            <p class="sample-copy">
+              Best if you want the shell to feel <strong>more luxurious and expressive</strong>, but it carries more risk
+              of becoming too soft for operational UI.
+            </p>
+          </div>
+        </article>
+
+        <article class="specimen sora">
+          <header class="specimen__head">
+            <div class="specimen__tag">Safer</div>
+            <div class="specimen__title">Sora + Inter</div>
+            <div class="specimen__meta">Cleaner, more modern, lower-risk product choice with weaker editorial flavor.</div>
+          </header>
+          <div class="specimen__body">
+            <div class="banner">
+              <div class="banner__label">Turn Status</div>
+              <div class="banner__headline">Your turn.</div>
+              <p class="banner__copy">Draw cards, claim a corridor, or press your luck through the tunnel.</p>
+            </div>
+            <div class="row">
+              <section class="panel">
+                <div class="panel__eyebrow">Room Lobby</div>
+                <div class="panel__title">Waiting for the full table.</div>
+                <p class="panel__copy">Seats joined: 2/4. Ready: 1/4. Host starts once the room is complete.</p>
+              </section>
+              <section class="ticket">
+                <div class="ticket__kicker">Destination Ticket</div>
+                <div class="ticket__route">Grove St. to Flushing</div>
+                <div class="ticket__footer">
+                  <span>Cross-river route commitment</span>
+                  <span class="ticket__points">11</span>
+                </div>
+              </section>
+            </div>
+            <p class="sample-copy">
+              Best if you want a <strong>cleaner product UI</strong> and lower implementation risk, but it is less aligned
+              with the `ideago.cc` direction you like.
+            </p>
+          </div>
+        </article>
+
+        <article class="specimen manrope">
+          <header class="specimen__head">
+            <div class="specimen__tag">Sans / distinct</div>
+            <div class="specimen__title">Manrope + IBM Plex Sans</div>
+            <div class="specimen__meta">More authored than typical app UI, but still sharp and controlled.</div>
+          </header>
+          <div class="specimen__body">
+            <div class="banner">
+              <div class="banner__label">Turn Status</div>
+              <div class="banner__headline">Your turn.</div>
+              <p class="banner__copy">Draw cards, claim a corridor, or press your luck through the tunnel.</p>
+            </div>
+            <div class="row">
+              <section class="panel">
+                <div class="panel__eyebrow">Room Lobby</div>
+                <div class="panel__title">Waiting for the full table.</div>
+                <p class="panel__copy">Seats joined: 2/4. Ready: 1/4. Host starts once the room is complete.</p>
+              </section>
+              <section class="ticket">
+                <div class="ticket__kicker">Destination Ticket</div>
+                <div class="ticket__route">Grove St. to Flushing</div>
+                <div class="ticket__footer">
+                  <span>Cross-river route commitment</span>
+                  <span class="ticket__points">11</span>
+                </div>
+              </section>
+            </div>
+            <p class="sample-copy">
+              <span class="sample-copy__label">Why it stands out</span>
+              Feels less like default AI-product typography because the body isn't `Inter`, and the display is cleaner but still more authored than a generic startup sans.
+            </p>
+          </div>
+        </article>
+
+        <article class="specimen jakarta">
+          <header class="specimen__head">
+            <div class="specimen__tag">Sans / softer</div>
+            <div class="specimen__title">Plus Jakarta Sans + Instrument Sans</div>
+            <div class="specimen__meta">Friendly and elegant, but risks drifting toward polished generic app UI.</div>
+          </header>
+          <div class="specimen__body">
+            <div class="banner">
+              <div class="banner__label">Turn Status</div>
+              <div class="banner__headline">Your turn.</div>
+              <p class="banner__copy">Draw cards, claim a corridor, or press your luck through the tunnel.</p>
+            </div>
+            <div class="row">
+              <section class="panel">
+                <div class="panel__eyebrow">Room Lobby</div>
+                <div class="panel__title">Waiting for the full table.</div>
+                <p class="panel__copy">Seats joined: 2/4. Ready: 1/4. Host starts once the room is complete.</p>
+              </section>
+              <section class="ticket">
+                <div class="ticket__kicker">Destination Ticket</div>
+                <div class="ticket__route">Grove St. to Flushing</div>
+                <div class="ticket__footer">
+                  <span>Cross-river route commitment</span>
+                  <span class="ticket__points">11</span>
+                </div>
+              </section>
+            </div>
+            <p class="sample-copy">
+              <span class="sample-copy__label">Why it stands out</span>
+              Nicer than a default SaaS stack, but it is the closest to current “well-made vibe coded product” territory.
+            </p>
+          </div>
+        </article>
+
+        <article class="specimen space">
+          <header class="specimen__head">
+            <div class="specimen__tag">Sans / boldest</div>
+            <div class="specimen__title">Space Grotesk + IBM Plex Sans</div>
+            <div class="specimen__meta">Most distinctive sans option; stronger personality, higher risk of overstatement.</div>
+          </header>
+          <div class="specimen__body">
+            <div class="banner">
+              <div class="banner__label">Turn Status</div>
+              <div class="banner__headline">Your turn.</div>
+              <p class="banner__copy">Draw cards, claim a corridor, or press your luck through the tunnel.</p>
+            </div>
+            <div class="row">
+              <section class="panel">
+                <div class="panel__eyebrow">Room Lobby</div>
+                <div class="panel__title">Waiting for the full table.</div>
+                <p class="panel__copy">Seats joined: 2/4. Ready: 1/4. Host starts once the room is complete.</p>
+              </section>
+              <section class="ticket">
+                <div class="ticket__kicker">Destination Ticket</div>
+                <div class="ticket__route">Grove St. to Flushing</div>
+                <div class="ticket__footer">
+                  <span>Cross-river route commitment</span>
+                  <span class="ticket__points">11</span>
+                </div>
+              </section>
+            </div>
+            <p class="sample-copy">
+              <span class="sample-copy__label">Why it stands out</span>
+              The least generic of the sans options. If you want clear distance from default AI app vibes, this is the most aggressive non-serif candidate.
+            </p>
+          </div>
+        </article>
+
+        <article class="specimen ideago">
+          <header class="specimen__head">
+            <div class="specimen__tag">Ideago reference</div>
+            <div class="specimen__title">Archivo Black + DM Sans</div>
+            <div class="specimen__meta">The actual ideago stack: bold, brutalist, poster-like, and product-forward.</div>
+          </header>
+          <div class="specimen__body">
+            <div class="banner">
+              <div class="banner__label">Turn Status</div>
+              <div class="banner__headline">Your turn.</div>
+              <p class="banner__copy">Draw cards, claim a corridor, or press your luck through the tunnel.</p>
+            </div>
+            <div class="row">
+              <section class="panel">
+                <div class="panel__eyebrow">Room Lobby</div>
+                <div class="panel__title">Waiting for the full table.</div>
+                <p class="panel__copy">Seats joined: 2/4. Ready: 1/4. Host starts once the room is complete.</p>
+              </section>
+              <section class="ticket">
+                <div class="ticket__kicker">Destination Ticket</div>
+                <div class="ticket__route">Grove St. to Flushing</div>
+                <div class="ticket__footer">
+                  <span>Cross-river route commitment</span>
+                  <span class="ticket__points">11</span>
+                </div>
+              </section>
+            </div>
+            <p class="sample-copy">
+              <span class="sample-copy__label">Why it stands out</span>
+              This is much harder and more brutalist than our current direction. It has real distinction, but it pushes Hudson Hustle away from warm transit nostalgia.
+            </p>
+          </div>
+        </article>
+
+        <article class="specimen doodle">
+          <header class="specimen__head">
+            <div class="specimen__tag">Comic / doodle</div>
+            <div class="specimen__title">Balsamiq Sans + IBM Plex Sans</div>
+            <div class="specimen__meta">Playful hand-drawn energy without going fully childish or illegible.</div>
+          </header>
+          <div class="specimen__body">
+            <div class="banner">
+              <div class="banner__label">Turn Status</div>
+              <div class="banner__headline">Your turn.</div>
+              <p class="banner__copy">Draw cards, claim a corridor, or press your luck through the tunnel.</p>
+            </div>
+            <div class="row">
+              <section class="panel">
+                <div class="panel__eyebrow">Room Lobby</div>
+                <div class="panel__title">Waiting for the full table.</div>
+                <p class="panel__copy">Seats joined: 2/4. Ready: 1/4. Host starts once the room is complete.</p>
+              </section>
+              <section class="ticket">
+                <div class="ticket__kicker">Destination Ticket</div>
+                <div class="ticket__route">Grove St. to Flushing</div>
+                <div class="ticket__footer">
+                  <span>Cross-river route commitment</span>
+                  <span class="ticket__points">11</span>
+                </div>
+              </section>
+            </div>
+            <p class="sample-copy">
+              <span class="sample-copy__label">Why it stands out</span>
+              This gives you a sketchbook / marker-board energy. It is the most playful option so far, but it is probably too casual for the main Hudson Hustle shell unless heavily constrained.
+            </p>
+          </div>
+        </article>
+
+        <article class="specimen transit">
+          <header class="specimen__head">
+            <div class="specimen__tag">Transit-authentic</div>
+            <div class="specimen__title">Helvetica / Neue Haas / Arial</div>
+            <div class="specimen__meta">Closest to real NY/NJ operational signage: neutral, disciplined, and unmistakably transit-coded.</div>
+          </header>
+          <div class="specimen__body">
+            <div class="banner">
+              <div class="banner__label">Turn Status</div>
+              <div class="banner__headline">Your turn.</div>
+              <p class="banner__copy">Draw cards, claim a corridor, or press your luck through the tunnel.</p>
+            </div>
+            <div class="row">
+              <section class="panel">
+                <div class="panel__eyebrow">Room Lobby</div>
+                <div class="panel__title">Waiting for the full table.</div>
+                <p class="panel__copy">Seats joined: 2/4. Ready: 1/4. Host starts once the room is complete.</p>
+              </section>
+              <section class="ticket">
+                <div class="ticket__kicker">Destination Ticket</div>
+                <div class="ticket__route">Grove St. to Flushing</div>
+                <div class="ticket__footer">
+                  <span>Cross-river route commitment</span>
+                  <span class="ticket__points">11</span>
+                </div>
+              </section>
+            </div>
+            <p class="sample-copy">
+              <span class="sample-copy__label">Why it stands out</span>
+              This is the most operationally authentic option. It nails the transit system feel, but it may not give Hudson Hustle enough authored shell identity on its own.
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <section class="notes">
+        <strong>Suggested reading:</strong> Fraunces + Inter is the strongest `v2.1` candidate if the goal is
+        editorial shell energy with practical in-game readability. Cormorant + Inter is more romantic and more
+        obviously “designerly,” but also easier to overuse. Sora + Inter is the safest fallback if the editorial route
+        ends up feeling too soft for the product. If you want clear separation from default vibe-coded product typography,
+        compare `Manrope + IBM Plex Sans`, `Space Grotesk + IBM Plex Sans`, and `Archivo Black + DM Sans` most closely.
+      </section>
+    </main>
+  </body>
+</html>

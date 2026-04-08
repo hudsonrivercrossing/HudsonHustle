@@ -113,6 +113,83 @@ describe("RoomService", () => {
     ).rejects.toMatchObject({ statusCode: 409, code: "seat_taken" });
   });
 
+  it("vacates a lobby seat and transfers host before another player joins", async () => {
+    const service = new RoomService(new MemoryRoomRepository(), hudsonHustleReleasedConfigs);
+    const created = await service.createRoom({
+      hostName: "Ava",
+      playerCount: 3,
+      configId: "v0.3-atlantic-hoboken",
+      turnTimeLimitSeconds: 0
+    });
+    const joined = await service.joinRoom(created.roomCode, {
+      playerName: "Beau",
+      preferredSeatId: "seat-2"
+    });
+
+    await service.leaveRoom(created.roomCode, {
+      seatId: created.seatId,
+      playerSecret: created.playerSecret
+    });
+
+    const snapshotAfterLeave = await service.getSnapshot(created.roomCode, {
+      seatId: joined.seatId,
+      playerSecret: joined.playerSecret
+    });
+    expect(snapshotAfterLeave.room.hostSeatId).toBe("seat-2");
+    expect(snapshotAfterLeave.room.seats[0]).toMatchObject({
+      seatId: "seat-1",
+      playerName: null,
+      isHost: false
+    });
+    expect(snapshotAfterLeave.room.seats[1]).toMatchObject({
+      seatId: "seat-2",
+      playerName: "Beau",
+      isHost: true
+    });
+
+    const replacement = await service.joinRoom(created.roomCode, {
+      playerName: "Casey",
+      preferredSeatId: "seat-1"
+    });
+    expect(replacement.snapshot.room.seats[0]).toMatchObject({
+      seatId: "seat-1",
+      playerName: "Casey",
+      isHost: false
+    });
+  });
+
+  it("reassigns host to the next player who joins an otherwise empty lobby", async () => {
+    const service = new RoomService(new MemoryRoomRepository(), hudsonHustleReleasedConfigs);
+    const created = await service.createRoom({
+      hostName: "Ava",
+      playerCount: 3,
+      configId: "v0.3-atlantic-hoboken",
+      turnTimeLimitSeconds: 0
+    });
+
+    await service.leaveRoom(created.roomCode, {
+      seatId: created.seatId,
+      playerSecret: created.playerSecret
+    });
+
+    const joined = await service.joinRoom(created.roomCode, {
+      playerName: "Beau",
+      preferredSeatId: "seat-2"
+    });
+
+    expect(joined.snapshot.room.hostSeatId).toBe("seat-2");
+    expect(joined.snapshot.room.seats[0]).toMatchObject({
+      seatId: "seat-1",
+      playerName: null,
+      isHost: false
+    });
+    expect(joined.snapshot.room.seats[1]).toMatchObject({
+      seatId: "seat-2",
+      playerName: "Beau",
+      isHost: true
+    });
+  });
+
   it("restores an active timer after reloading a timed room from persistence", async () => {
     const repository = new MemoryRoomRepository();
     const service = new RoomService(repository, hudsonHustleReleasedConfigs);
@@ -173,6 +250,62 @@ describe("RoomService", () => {
 
     expect(restoredDeadlineAt).not.toBeNull();
     expect(restoredDeadlineAt).toBeGreaterThan(Date.now());
+  });
+
+  it("allows any player with pending starting tickets to confirm before the active seat rotates naturally", async () => {
+    const service = new RoomService(new MemoryRoomRepository(), hudsonHustleReleasedConfigs);
+    const created = await service.createRoom({
+      hostName: "Ava",
+      playerCount: 2,
+      configId: "v0.4-flushing-newark-airport",
+      turnTimeLimitSeconds: 0
+    });
+    const joined = await service.joinRoom(created.roomCode, {
+      playerName: "Beau"
+    });
+
+    await service.setReady(created.roomCode, { seatId: created.seatId, playerSecret: created.playerSecret }, true);
+    await service.setReady(created.roomCode, { seatId: joined.seatId, playerSecret: joined.playerSecret }, true);
+    const started = await service.startRoom(created.roomCode, { playerSecret: created.playerSecret });
+    const guestSnapshot = await service.getSnapshot(created.roomCode, {
+      seatId: joined.seatId,
+      playerSecret: joined.playerSecret
+    });
+
+    const guestConfirmed = await service.applyAction(
+      created.roomCode,
+      { seatId: joined.seatId, playerSecret: joined.playerSecret },
+      {
+        roomCode: created.roomCode,
+        seatId: joined.seatId,
+        playerSecret: joined.playerSecret,
+        action: {
+          type: "select_initial_tickets",
+          keptTicketIds: guestSnapshot.privateState?.pendingTickets.slice(0, 2).map((ticket) => ticket.id) ?? []
+        }
+      }
+    );
+
+    expect(guestConfirmed.room.status).toBe("active");
+    expect(guestConfirmed.game?.phase).toBe("initialTickets");
+    expect(guestConfirmed.privateState?.pendingTickets).toEqual([]);
+
+    const hostConfirmed = await service.applyAction(
+      created.roomCode,
+      { seatId: created.seatId, playerSecret: created.playerSecret },
+      {
+        roomCode: created.roomCode,
+        seatId: created.seatId,
+        playerSecret: created.playerSecret,
+        action: {
+          type: "select_initial_tickets",
+          keptTicketIds: started.snapshot.privateState?.pendingTickets.slice(0, 2).map((ticket) => ticket.id) ?? []
+        }
+      }
+    );
+
+    expect(hostConfirmed.game?.phase).toBe("main");
+    expect(hostConfirmed.room.activeSeatId).toBe(created.seatId);
   });
 
   it("pauses the timer instead of scheduling an invalid auto-draw when fewer than two blind cards remain", async () => {
@@ -281,6 +414,105 @@ describe("RoomService", () => {
       expect(deadlineChanges.at(-1)).not.toBeNull();
       expect((deadlineChanges.at(-1) ?? 0)).toBeGreaterThan(deadlineChanges[0] ?? 0);
       expect(snapshotAfter.room.activeSeatId).toBe(joined.seatId);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("keeps the same deadline after the first draw and auto-completes the turn on timeout", async () => {
+    vi.useFakeTimers();
+    try {
+      let latestDeadlineAt: number | null = null;
+      const service = new RoomService(new MemoryRoomRepository(), hudsonHustleReleasedConfigs, undefined, (_roomCode, deadlineAt) => {
+        latestDeadlineAt = deadlineAt;
+      });
+
+      const created = await service.createRoom({
+        hostName: "Ava",
+        playerCount: 2,
+        configId: "v0.4-flushing-newark-airport",
+        turnTimeLimitSeconds: 15
+      });
+      const joined = await service.joinRoom(created.roomCode, {
+        playerName: "Beau"
+      });
+
+      await service.setReady(created.roomCode, { seatId: created.seatId, playerSecret: created.playerSecret }, true);
+      await service.setReady(created.roomCode, { seatId: joined.seatId, playerSecret: joined.playerSecret }, true);
+      const started = await service.startRoom(created.roomCode, { playerSecret: created.playerSecret });
+
+      await service.applyAction(
+        created.roomCode,
+        { seatId: created.seatId, playerSecret: created.playerSecret },
+        {
+          roomCode: created.roomCode,
+          seatId: created.seatId,
+          playerSecret: created.playerSecret,
+          action: {
+            type: "select_initial_tickets",
+            keptTicketIds: started.snapshot.privateState?.pendingTickets.slice(0, 2).map((ticket) => ticket.id) ?? []
+          }
+        }
+      );
+
+      const guestSnapshot = await service.getSnapshot(created.roomCode, {
+        seatId: joined.seatId,
+        playerSecret: joined.playerSecret
+      });
+      await service.applyAction(
+        created.roomCode,
+        { seatId: joined.seatId, playerSecret: joined.playerSecret },
+        {
+          roomCode: created.roomCode,
+          seatId: joined.seatId,
+          playerSecret: joined.playerSecret,
+          action: {
+            type: "select_initial_tickets",
+            keptTicketIds: guestSnapshot.privateState?.pendingTickets.slice(0, 2).map((ticket) => ticket.id) ?? []
+          }
+        }
+      );
+
+      const roomBeforeDraw = (service as any).rooms.get(created.roomCode);
+      const initialDeadlineAt = roomBeforeDraw.deadlineAt;
+      expect(initialDeadlineAt).not.toBeNull();
+
+      const hostBeforeDraw = await service.getSnapshot(created.roomCode, {
+        seatId: created.seatId,
+        playerSecret: created.playerSecret
+      });
+      expect(hostBeforeDraw.privateState?.hand).toHaveLength(4);
+
+      await service.applyAction(
+        created.roomCode,
+        { seatId: created.seatId, playerSecret: created.playerSecret },
+        {
+          roomCode: created.roomCode,
+          seatId: created.seatId,
+          playerSecret: created.playerSecret,
+          action: {
+            type: "draw_card",
+            source: "deck"
+          }
+        }
+      );
+
+      const roomAfterFirstDraw = (service as any).rooms.get(created.roomCode);
+      expect(roomAfterFirstDraw.game.turn.stage).toBe("drawing");
+      expect(roomAfterFirstDraw.deadlineAt).toBe(initialDeadlineAt);
+      expect(latestDeadlineAt).toBe(initialDeadlineAt);
+
+      await vi.advanceTimersByTimeAsync(15_000);
+      await vi.runAllTicks();
+
+      const hostAfterTimeout = await service.getSnapshot(created.roomCode, {
+        seatId: created.seatId,
+        playerSecret: created.playerSecret
+      });
+
+      expect(hostAfterTimeout.room.activeSeatId).toBe(joined.seatId);
+      expect(hostAfterTimeout.privateState?.hand).toHaveLength(6);
+      expect((service as any).rooms.get(created.roomCode).deadlineAt).not.toBe(initialDeadlineAt);
     } finally {
       vi.useRealTimers();
     }

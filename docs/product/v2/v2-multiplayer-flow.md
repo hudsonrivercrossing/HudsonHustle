@@ -45,20 +45,22 @@ The server returns:
 - `seatId`
 - `playerSecret`
 
+The client should combine those values into one reconnect token for copy/paste and later recovery.
+
 ## Hidden Session Info UX
 Each player should be able to inspect:
-- `roomCode`
-- `seatId`
-- `playerSecret`
+- one reconnect token that decodes to room code, seat, and player secret
+
+Recommended format:
+- versioned prefix such as `hh1.`
+- opaque payload such as base64url(JSON)
 
 But this should not live in the main gameplay surface all the time.
 
 Recommended presentation:
 - small identity chip in a corner
 - click or hover reveals:
-  - room code
-  - seat
-  - reconnect secret
+  - reconnect token
 - add a copy button
 
 This keeps reconnect information accessible without making the game screen feel operational or cluttered.
@@ -68,16 +70,29 @@ The host is only responsible for:
 - creating the room
 - choosing setup options
 - starting the game
+- confirming their own starting tickets like every other player
 
 The host is not required to stay connected for the room to remain valid.
+The host should also be able to leave the lobby or room UI without being trapped in the current screen.
+
+## Starting Ticket Selection
+After the host starts the room:
+- every player receives the same initial ticket choice flow
+- every player may review and confirm their own starting tickets independently
+- the game does not enter the main phase until every seated player has confirmed
+
+Important UX rules:
+- one player's confirmation must not reset another player's in-progress selection
+- if the host confirms first, the host waits while other players finish
+- reconnecting during this phase should restore either:
+  - the pending ticket picker for that seat, or
+  - the normal game view if that seat already confirmed
 
 ## Reconnect UX
 
 ### Automatic Reconnect
 On load, the client checks local storage for:
-- `roomCode`
-- `seatId`
-- `playerSecret`
+- one reconnect token
 
 If found:
 1. try silent reconnect
@@ -85,10 +100,7 @@ If found:
 3. if it fails, fall back to manual rejoin UI
 
 ### Manual Reconnect
-The manual form accepts:
-- room code
-- seat id
-- player secret
+The manual form accepts one reconnect token and decodes it client-side before calling the existing backend rejoin endpoint.
 
 ### Reconnect State Machine
 Recommended states:
@@ -153,7 +165,7 @@ Response:
 Joins a free seat.
 
 #### `POST /rooms/:roomCode/rejoin`
-Rejoins with `seatId + playerSecret`.
+Rejoins with the seat id and player secret decoded from the reconnect token.
 
 #### `POST /rooms/:roomCode/start`
 Starts the game once lobby conditions are satisfied.

@@ -59,7 +59,7 @@ Hudson Hustle is an original transit strategy game for laptop play, set on a cus
 - Reconnect support through room code plus player secret.
 - Resume an in-progress room after refresh or brief disconnect.
 - Hosted frontend on `Vercel` and backend on `Railway`.
-- Each player can reveal their own `roomCode`, `seatId`, and `playerSecret` through a low-prominence hover/click affordance instead of always exposing them in the main UI.
+- Each player can reveal their own reconnect token through a low-prominence hover/click affordance instead of always exposing session details in the main UI.
 
 ## V2.x Scope
 - Keep the server-side seat/controller model open to non-human controllers.

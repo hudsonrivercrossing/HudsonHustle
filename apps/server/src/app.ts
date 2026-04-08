@@ -150,6 +150,11 @@ export async function createServerApp() {
     return roomService.rejoinRoom(request.params.roomCode, request.body);
   });
 
+  app.post<{ Params: { roomCode: string }; Body: { seatId: string; playerSecret: string } }>("/rooms/:roomCode/leave", async (request) => {
+    await roomService.leaveRoom(request.params.roomCode, request.body);
+    return { ok: true };
+  });
+
   app.post<{ Params: { roomCode: string }; Body: StartRoomRequest }>("/rooms/:roomCode/start", async (request) => {
     return roomService.startRoom(request.params.roomCode, request.body);
   });

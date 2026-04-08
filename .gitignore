@@ -13,3 +13,5 @@ packages/*/src/*.d.ts.map
 .vercel
 .railway
 tmp/
+storybook-static
+apps/web/storybook-static

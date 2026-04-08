@@ -16,6 +16,8 @@ You score points by:
 
 You lose points for unfinished destination tickets.
 
+If you need a quick reminder during play, use the in-app `Scoring` button in the top bar. It summarizes route points and endgame bonuses without leaving the table.
+
 ## First Game Setup
 1. Choose `2-4` players.
 2. Enter player names.

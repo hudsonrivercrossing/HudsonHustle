@@ -61,7 +61,7 @@ The client is responsible for:
 Recommended MVP identity flow:
 - room code
 - seat assignment
-- player secret stored locally on the device
+- one reconnect token stored locally on the device, using a versioned opaque format such as `hh1.<base64url(json)>`
 
 This is enough for:
 - refresh recovery
@@ -117,7 +117,7 @@ A seat is a stable player position in a room.
 - `GET /rooms/:roomCode`
 
 ### WebSocket
-- connect with room code + player secret
+- connect with room code + player secret recovered from the reconnect token in the UI
 - submit action intent
 - receive authoritative state updates
 - receive private state payload for that seat only

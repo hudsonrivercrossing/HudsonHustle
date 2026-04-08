@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import { io, type Socket } from "socket.io-client";
 import {
   getAffordableRouteColors,
@@ -34,20 +34,26 @@ import { IdentityChip } from "./components/IdentityChip";
 import { LocalPlayScreen } from "./components/LocalPlayScreen";
 import { LobbyScreen } from "./components/LobbyScreen";
 import { MultiplayerSetupScreen } from "./components/MultiplayerSetupScreen";
+import { ScoreGuide } from "./components/ScoreGuide";
+import { SetupGateway } from "./components/SetupGateway";
 import { TicketPicker } from "./components/TicketPicker";
 import { TransitCard } from "./components/TransitCard";
+import { Button } from "./components/system/Button";
+import { Chip } from "./components/system/Chip";
+import { ChoiceChipButton } from "./components/system/ChoiceChipButton";
+import { Panel } from "./components/system/Panel";
+import { SectionHeader } from "./components/system/SectionHeader";
+import { SurfaceCard } from "./components/system/SurfaceCard";
+import { StateSurface } from "./components/system/StateSurface";
+import { StatusBanner } from "./components/system/StatusBanner";
+import { UtilityPill } from "./components/system/UtilityPill";
+import { decodeReconnectToken, encodeReconnectToken, readReconnectCredentials, type ReconnectCredentials } from "./reconnect-token";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8787";
 const wsUrl = import.meta.env.VITE_WS_URL ?? apiBaseUrl;
 const sessionKey = "hudson-hustle-multiplayer-session-v2";
 type RealtimeStatus = "idle" | "connecting" | "subscribed" | "failed";
-type SetupMode = "local" | "multiplayer";
-
-interface SessionCredentials {
-  roomCode: string;
-  seatId: string;
-  playerSecret: string;
-}
+type SetupMode = "gateway" | "local" | "multiplayer";
 
 class ApiError extends Error {
   constructor(
@@ -59,25 +65,42 @@ class ApiError extends Error {
   }
 }
 
-function readSession(): SessionCredentials | null {
+function readSession(): ReconnectCredentials | null {
   const raw = window.localStorage.getItem(sessionKey);
-  if (!raw) {
-    return null;
+  const credentials = readReconnectCredentials(raw);
+  if (!raw || !credentials || raw.trim().startsWith("hh1.")) {
+    return credentials;
   }
 
-  try {
-    return JSON.parse(raw) as SessionCredentials;
-  } catch {
-    return null;
-  }
+  window.localStorage.setItem(sessionKey, encodeReconnectToken(credentials));
+  return credentials;
 }
 
-function saveSession(credentials: SessionCredentials | null): void {
+function saveSession(credentials: ReconnectCredentials | null): void {
   if (!credentials) {
     window.localStorage.removeItem(sessionKey);
     return;
   }
-  window.localStorage.setItem(sessionKey, JSON.stringify(credentials));
+  window.localStorage.setItem(sessionKey, encodeReconnectToken(credentials));
+}
+
+function clearSessionState(
+  setCredentials: Dispatch<SetStateAction<ReconnectCredentials | null>>,
+  setSnapshot: Dispatch<SetStateAction<RoomSnapshot | null>>,
+  setRoomPreview: Dispatch<SetStateAction<RoomSnapshot["room"] | null>>,
+  setTimer: Dispatch<SetStateAction<TimerUpdate | null>>,
+  setMultiplayerError: Dispatch<SetStateAction<string | null>>,
+  setReconnectState: Dispatch<SetStateAction<ReconnectState>>,
+  setSetupMode: Dispatch<SetStateAction<SetupMode>>
+): void {
+  saveSession(null);
+  setCredentials(null);
+  setSnapshot(null);
+  setRoomPreview(null);
+  setTimer(null);
+  setMultiplayerError(null);
+  setReconnectState("fresh");
+  setSetupMode("gateway");
 }
 
 function placeholderHand(playerId: string, count: number): GameState["players"][number]["hand"] {
@@ -152,10 +175,10 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export default function App(): JSX.Element {
-  const [setupMode, setSetupMode] = useState<SetupMode>("multiplayer");
+  const [setupMode, setSetupMode] = useState<SetupMode>("gateway");
   const [releasedConfigs, setReleasedConfigs] = useState<HudsonHustleReleasedConfigSummary[]>(hudsonHustleReleasedConfigs);
   const [snapshot, setSnapshot] = useState<RoomSnapshot | null>(null);
-  const [credentials, setCredentials] = useState<SessionCredentials | null>(null);
+  const [credentials, setCredentials] = useState<ReconnectCredentials | null>(null);
   const [roomPreview, setRoomPreview] = useState<RoomSnapshot["room"] | null>(null);
   const [reconnectState, setReconnectState] = useState<ReconnectState>("fresh");
   const [multiplayerError, setMultiplayerError] = useState<string | null>(null);
@@ -167,6 +190,7 @@ export default function App(): JSX.Element {
   const [selectedTicketIds, setSelectedTicketIds] = useState<string[]>([]);
   const socketRef = useRef<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null);
   const awaitingSocketHandshakeRef = useRef(false);
+  const lastPendingTicketKeyRef = useRef("");
 
   useEffect(() => {
     void requestJson<HudsonHustleReleasedConfigSummary[]>("/released-configs")
@@ -362,15 +386,28 @@ export default function App(): JSX.Element {
     return snapshot.game.players[snapshot.game.activePlayerIndex]?.id === snapshot.privateState.playerId;
   }, [snapshot]);
 
+  const reconnectToken = useMemo(() => {
+    if (!credentials) {
+      return "";
+    }
+    return encodeReconnectToken(credentials);
+  }, [credentials]);
+
   useEffect(() => {
     const pending = snapshot?.privateState?.pendingTickets ?? [];
+    const pendingKey = pending.map((ticket) => ticket.id).join("|");
     if (pending.length === 0) {
+      lastPendingTicketKeyRef.current = "";
       setSelectedTicketIds([]);
       return;
     }
+    if (lastPendingTicketKeyRef.current === pendingKey) {
+      return;
+    }
+    lastPendingTicketKeyRef.current = pendingKey;
     const minimumKeep = snapshot?.game?.phase === "initialTickets" ? 2 : 1;
     setSelectedTicketIds(pending.slice(0, minimumKeep).map((ticket) => ticket.id));
-  }, [snapshot]);
+  }, [snapshot?.game?.phase, snapshot?.privateState?.pendingTickets]);
 
   const ticketProgress = useMemo(() => {
     if (!projectedGame || !mapConfig || !localPlayer) {
@@ -492,8 +529,9 @@ export default function App(): JSX.Element {
     }
   }
 
-  async function manualReconnect(form: SessionCredentials) {
+  async function manualReconnect(reconnectToken: string) {
     try {
+      const form = decodeReconnectToken(reconnectToken);
       const response = await requestJson<RejoinRoomResponse>(`/rooms/${form.roomCode}/rejoin`, {
         method: "POST",
         body: JSON.stringify({
@@ -513,6 +551,11 @@ export default function App(): JSX.Element {
       setSnapshot(response.snapshot);
       setMultiplayerError(null);
     } catch (caught) {
+      if (caught instanceof Error && caught.message.startsWith("Reconnect token")) {
+        setReconnectState("reconnect-failed");
+        setMultiplayerError(caught.message);
+        return;
+      }
       if (caught instanceof ApiError && (caught.status === 403 || caught.status === 404)) {
         saveSession(null);
       }
@@ -560,21 +603,50 @@ export default function App(): JSX.Element {
     });
   }
 
-  function leaveRoom() {
+  async function leaveRoom() {
     awaitingSocketHandshakeRef.current = false;
-    saveSession(null);
-    setCredentials(null);
-    setSnapshot(null);
-    setRoomPreview(null);
-    setTimer(null);
-    setMultiplayerError(null);
-    setReconnectState("fresh");
-    setSetupMode("multiplayer");
+    if (snapshot?.room.status === "lobby" && credentials) {
+      try {
+        await requestJson<{ ok: true }>(`/rooms/${credentials.roomCode}/leave`, {
+          method: "POST",
+          body: JSON.stringify({
+            seatId: credentials.seatId,
+            playerSecret: credentials.playerSecret
+          })
+        });
+      } catch (caught) {
+        if (caught instanceof ApiError && (caught.status === 403 || caught.status === 404)) {
+          clearSessionState(setCredentials, setSnapshot, setRoomPreview, setTimer, setMultiplayerError, setReconnectState, setSetupMode);
+          return;
+        }
+        setMultiplayerError(caught instanceof Error ? caught.message : "Could not leave the room.");
+        return;
+      }
+    }
+
+    clearSessionState(setCredentials, setSnapshot, setRoomPreview, setTimer, setMultiplayerError, setReconnectState, setSetupMode);
   }
 
   if (!snapshot || !credentials) {
+    if (setupMode === "gateway") {
+      return (
+        <SetupGateway
+          onChooseLocal={() => setSetupMode("local")}
+          onChooseOnline={() => {
+            setSetupMode("multiplayer");
+            setMultiplayerError(null);
+          }}
+        />
+      );
+    }
+
     if (setupMode === "local") {
-      return <LocalPlayScreen onOpenMultiplayer={() => setSetupMode("multiplayer")} />;
+      return (
+        <LocalPlayScreen
+          onOpenMultiplayer={() => setSetupMode("multiplayer")}
+          onReturnToGateway={() => setSetupMode("gateway")}
+        />
+      );
     }
 
     return (
@@ -587,10 +659,14 @@ export default function App(): JSX.Element {
           setSetupMode("local");
           setMultiplayerError(null);
         }}
+        onBack={() => {
+          setSetupMode("gateway");
+          setMultiplayerError(null);
+        }}
         onPreviewRoom={(roomCode) => void previewRoom(roomCode)}
         onCreateRoom={(form) => void createRoom(form)}
         onJoinRoom={(form) => void joinRoom(form)}
-        onManualReconnect={(form) => void manualReconnect(form)}
+        onManualReconnect={(reconnectToken) => void manualReconnect(reconnectToken)}
       />
     );
   }
@@ -600,9 +676,10 @@ export default function App(): JSX.Element {
       <LobbyScreen
         room={snapshot.room}
         localSeatId={credentials.seatId}
-        playerSecret={credentials.playerSecret}
+        reconnectToken={reconnectToken}
         onReadyChange={sendReady}
         onStart={() => void startRoom()}
+        onLeaveRoom={leaveRoom}
         timer={timer}
         realtimeReady={realtimeStatus === "subscribed"}
         realtimeMessage={realtimeMessage}
@@ -648,100 +725,107 @@ export default function App(): JSX.Element {
         <div>
           <p className="eyebrow">Hudson Hustle Multiplayer</p>
           <h1>{mapConfig.name}</h1>
-          <div className="config-chip-group">
+          <div className="utility-pill-group">
             <div className="config-hover-card">
-              <span className="config-chip">Config: {snapshot.room.configVersion} · {snapshot.room.configId}</span>
+              <UtilityPill
+                label="Config"
+                value={`${snapshot.room.configVersion} · ${snapshot.room.configId}`}
+                tone="accent"
+                testId="config-utility-pill"
+              />
               <span className="config-summary-tooltip">{snapshot.room.configSummary}</span>
             </div>
           </div>
-          <div className={`status-banner status-banner--${turnBannerTone}`} data-testid="turn-status-banner">
-            <div>
-              <span className="status-banner__eyebrow">{turnBannerLabel}</span>
-              <strong className="status-banner__headline">
-                {localIsActive ? "Make your move." : `${activePlayer?.name ?? "Another player"} is acting.`}
-              </strong>
-              <span className="status-banner__copy">{turnBannerCopy}</span>
-            </div>
-            <span className="status-banner__timer" data-testid="turn-timer-badge">
-              {timerCopy}
-            </span>
-          </div>
+          <StatusBanner
+            tone={turnBannerTone}
+            eyebrow={turnBannerLabel}
+            headline={localIsActive ? "Make your move." : `${activePlayer?.name ?? "Another player"} is acting.`}
+            copy={turnBannerCopy}
+            timerLabel={timerCopy}
+            testId="turn-status-banner"
+          />
         </div>
         <div className="topbar-actions">
-          <IdentityChip roomCode={credentials.roomCode} seatId={credentials.seatId} playerSecret={credentials.playerSecret} />
-          <button className="secondary-button" onClick={leaveRoom}>
+          <ScoreGuide />
+          <IdentityChip reconnectToken={reconnectToken} />
+          <Button onClick={leaveRoom}>
             Leave room
-          </button>
+          </Button>
         </div>
       </header>
 
       <div className="game-layout">
         <aside className="side-panel">
-          <section className="panel">
-            <div className="panel-header">
-              <h2>Round table</h2>
-              <span>{activePlayer?.name ?? "Unknown"} active</span>
-            </div>
+          <Panel variant="status" className="round-table-panel">
+            <SectionHeader
+              eyebrow="Table status"
+              title="Round table"
+              meta={`${activePlayer?.name ?? "Unknown"} active`}
+              density="ceremony"
+            />
             <div className="scoreboard">
               {snapshot.game.players.map((player, index) => (
                 <article key={player.id} className={`player-strip ${index === snapshot.game?.activePlayerIndex ? "player-strip--active" : ""}`}>
-                  <span className="player-swatch" style={{ background: visuals.palettes.players[player.color] }} />
-                  <strong>{player.name}</strong>
-                  <span>{player.score} pts</span>
-                  <span>{player.trainsLeft} trains</span>
-                  <span>{player.stationsLeft} stations</span>
-                  <span>{player.ticketCount} tickets</span>
+                  <span className="player-swatch row-object__lead" style={{ background: visuals.palettes.players[player.color] }} />
+                  <div className="row-object__main">
+                    <strong className="row-object__title">{player.name}</strong>
+                    <span className="row-object__meta">{player.ticketCount} tickets</span>
+                  </div>
+                  <div className="row-object__stats">
+                    <span className="row-object__stat row-object__stat--strong">{player.score} pts</span>
+                    <span className="row-object__stat">{player.trainsLeft} trains</span>
+                    <span className="row-object__stat">{player.stationsLeft} stations</span>
+                  </div>
                 </article>
               ))}
             </div>
-          </section>
+          </Panel>
 
-          <section className="panel">
-            <div className="panel-header">
-              <h2>Your hand</h2>
-              <span>{localPlayer.hand.length} cards</span>
-            </div>
-            <div className="card-grid">
-              {localPlayer.hand.map((card) => (
-                <TransitCard key={card.id} color={card.color} context="hand" />
-              ))}
-            </div>
-          </section>
+          <div className="side-panel__private-stack">
+            <Panel variant="private-info">
+              <SectionHeader title="Your hand" meta={`${localPlayer.hand.length} cards`} density="compact" />
+              <div className="card-grid">
+                    {localPlayer.hand.map((card) => (
+                  <TransitCard key={card.id} className="artifact-card artifact-card--hand" color={card.color} context="hand" />
+                    ))}
+              </div>
+            </Panel>
 
-          <section className="panel">
-            <div className="panel-header">
-              <h2>Your tickets</h2>
-              <span>
-                {ticketProgress.filter((entry) => entry.completed).length}/{ticketProgress.length} connected
-              </span>
-            </div>
-            <div className="ticket-stack">
-              {ticketProgress.map(({ ticket, completed }) => (
-                <div key={ticket.id} className={`ticket-row ${completed ? "ticket-row--done" : ""}`}>
-                  <div className="ticket-route">
-                    <strong className={`ticket-status ${completed ? "ticket-status--done" : ""}`}>
-                      {completed ? "Connected" : "Pending"}
-                    </strong>
-                    <span className="ticket-route__cities">
-                      {getCityName(mapConfig, ticket.from)} <span className="ticket-arrow">to</span> {getCityName(mapConfig, ticket.to)}
-                    </span>
+            <Panel variant="private-info">
+              <SectionHeader
+                title="Your tickets"
+                meta={`${ticketProgress.filter((entry) => entry.completed).length}/${ticketProgress.length} connected`}
+                density="compact"
+              />
+              <div className="ticket-stack">
+                {ticketProgress.map(({ ticket, completed }) => (
+                  <div key={ticket.id} className={`ticket-row ${completed ? "ticket-row--done" : ""}`}>
+                    <div className="row-object__lead">
+                      <Chip className={`ticket-status ${completed ? "ticket-status--done" : ""}`} tone={completed ? "success" : "warning"}>
+                        {completed ? "Connected" : "Pending"}
+                      </Chip>
+                    </div>
+                    <div className="row-object__main">
+                      <span className="row-object__title ticket-route__cities">
+                        {getCityName(mapConfig, ticket.from)} <span className="ticket-arrow">to</span> {getCityName(mapConfig, ticket.to)}
+                      </span>
+                    </div>
+                    <div className="row-object__stats">
+                      <strong className="ticket-points row-object__stat row-object__stat--strong">{ticket.points}</strong>
+                    </div>
                   </div>
-                  <strong className="ticket-points">{ticket.points}</strong>
-                </div>
-              ))}
-            </div>
-          </section>
+                ))}
+              </div>
+            </Panel>
+          </div>
 
-          <section className="panel">
-            <div className="panel-header">
-              <h2>Market</h2>
-              <span>{publicGame.trainDeckCount} deck</span>
-            </div>
+          <Panel variant="neutral" className="side-panel__supply-panel">
+            <SectionHeader title="Market" meta={`${publicGame.trainDeckCount} deck`} density="compact" />
             <div className="market-grid">
               {publicGame.market.map((card, index) => (
                 <TransitCard
                   key={card.id}
-                  className="market-card"
+                  className="market-card artifact-card artifact-card--market"
                   color={card.color}
                   context="market"
                   disabled={!canContinueDrawing || (publicGame.turn.drawsTaken === 1 && card.color === "locomotive")}
@@ -750,18 +834,15 @@ export default function App(): JSX.Element {
                 />
               ))}
             </div>
-            <button className="secondary-button" disabled={!canContinueDrawing} onClick={() => sendGameAction({ type: "draw_card", source: "deck" })}>
+            <Button disabled={!canContinueDrawing} onClick={() => sendGameAction({ type: "draw_card", source: "deck" })}>
               Draw from deck
-            </button>
-          </section>
+            </Button>
+          </Panel>
         </aside>
 
         <main className="board-column">
-          <section className="panel board-panel">
-            <div className="panel-header">
-              <h2>Board</h2>
-              <span>All players see the same public network state.</span>
-            </div>
+          <Panel variant="neutral" className="board-panel">
+            <SectionHeader eyebrow="Public board" title="Board" meta="All players see the same network state." />
             <BoardMap
               config={mapConfig}
               backdrop={visuals.backdrop}
@@ -769,6 +850,7 @@ export default function App(): JSX.Element {
               boardLabelMode={visuals.boardLabelMode}
               cardPalette={visuals.palettes.cards}
               playerPalette={visuals.palettes.players}
+              viewerPlayerId={snapshot.privateState?.playerId ?? null}
               game={{
                 players: projectedGame.players.map((player) => ({
                   id: player.id,
@@ -790,90 +872,135 @@ export default function App(): JSX.Element {
                 setSelectedRouteId(null);
               }}
             />
-          </section>
+          </Panel>
 
-          <section className="panel action-panel">
-              <div className="panel-header">
-                <h2>Action rail</h2>
-                <span>{publicGame.turn.summary ?? "Choose a route, city, or ticket action."}</span>
-              </div>
-              {multiplayerError ? <p className="error-banner">{multiplayerError}</p> : null}
+          <Panel variant="status" className="action-panel">
+            <SectionHeader
+              eyebrow="Turn controls"
+              title="Action rail"
+              meta={publicGame.turn.summary ?? "Choose a route, city, or ticket action."}
+            />
+            {multiplayerError ? (
+              <StateSurface
+                tone="failure"
+                eyebrow="Action issue"
+                headline="This move could not complete."
+                copy={multiplayerError}
+              />
+            ) : null}
+
+            {publicGame.phase === "main" && !currentRoute && !currentCity ? (
+              <StateSurface
+                tone="neutral"
+                eyebrow="Inspect the board"
+                headline="Select a route or city."
+                copy="The action rail will show payment choices, tunnel reveals, and build options once you inspect a board element."
+                testId="action-empty-state"
+              />
+            ) : null}
 
             {publicGame.phase === "gameOver" ? (
               <div className="endgame-grid">
                 {projectedGame.players.map((player) => (
-                  <article key={player.id} className="endgame-card">
-                    <h3>{player.name}</h3>
-                    <p className="endgame-score">{player.score} pts</p>
-                    {summarizeEndgame(player, mapConfig).map((line) => (
-                      <p key={line}>{line}</p>
-                    ))}
-                  </article>
+                  <SurfaceCard key={player.id} as="article" variant="summary" eyebrow="Final score" title={player.name} className="endgame-card">
+                    <div className="endgame-card__hero">
+                      <p className="endgame-score">{player.score}</p>
+                      <span className="endgame-score__label">points</span>
+                    </div>
+                    <div className="endgame-breakdown">
+                      {summarizeEndgame(player, mapConfig).map((line) => {
+                        const [label, ...valueParts] = line.split(":");
+                        const value = valueParts.join(":").trim();
+                        return (
+                          <div key={line} className="endgame-breakdown__row">
+                            <span className="endgame-breakdown__label">{label}</span>
+                            <span className="endgame-breakdown__value">{value || line}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </SurfaceCard>
                 ))}
               </div>
             ) : null}
 
             {publicGame.phase === "main" ? (
               <div className="action-rail">
-                <button className="secondary-button" disabled={!canTakeTurnAction} onClick={() => sendGameAction({ type: "draw_tickets" })}>
+                <Button disabled={!canTakeTurnAction} onClick={() => sendGameAction({ type: "draw_tickets" })}>
                   Draw tickets
-                </button>
-                <button className="primary-button" disabled={!canAdvanceTurn} onClick={() => sendGameAction({ type: "advance_turn" })}>
+                </Button>
+                <Button variant="primary" disabled={!canAdvanceTurn} onClick={() => sendGameAction({ type: "advance_turn" })}>
                   End turn
-                </button>
-                <button className="secondary-button" disabled>
+                </Button>
+                <Button disabled>
                   {snapshot.room.turnTimeLimitSeconds === 0 ? "Untimed room" : `Timer ${snapshot.room.turnTimeLimitSeconds}s`}
-                </button>
+                </Button>
               </div>
             ) : null}
 
             {currentRoute && publicGame.phase === "main" ? (
-              <div className="detail-card">
-                <h3>{getCityName(mapConfig, currentRoute.from)} → {getCityName(mapConfig, currentRoute.to)}</h3>
-                <p>
-                  {currentRoute.length} train{currentRoute.length === 1 ? "" : "s"} · {currentRoute.type}
-                  {currentRoute.color === "gray" ? " · gray route" : ` · ${currentRoute.color}`}
-                  {currentRoute.locomotiveCost ? ` · ${currentRoute.locomotiveCost} locomotives` : ""}
-                </p>
-                {currentRouteOwner ? <p className="muted-copy">Claimed by {currentRouteOwner.name}.</p> : null}
-                <div className="chip-row">
+              <SurfaceCard
+                variant="detail"
+                className="detail-card"
+                data-detail-kind="route"
+                eyebrow="Route detail"
+                title={`${getCityName(mapConfig, currentRoute.from)} → ${getCityName(mapConfig, currentRoute.to)}`}
+              >
+                <div className="detail-card__summary">
+                  <div className="detail-card__facts">
+                    <span className="detail-card__fact">{currentRoute.length} train{currentRoute.length === 1 ? "" : "s"}</span>
+                    <span className="detail-card__fact">{currentRoute.type}</span>
+                    <span className="detail-card__fact">{currentRoute.color === "gray" ? "gray route" : currentRoute.color}</span>
+                    {currentRoute.locomotiveCost ? (
+                      <span className="detail-card__fact">{currentRoute.locomotiveCost} locomotive{currentRoute.locomotiveCost === 1 ? "" : "s"}</span>
+                    ) : null}
+                  </div>
+                  <p className="detail-card__prompt">
+                    {currentRouteOwner ? `Claimed by ${currentRouteOwner.name}.` : "Choose a payment color to claim this segment."}
+                  </p>
+                </div>
+                <div className="detail-card__decision-shelf chip-row">
                   {routeOptions.length > 0 ? (
                     routeOptions.map((color) => (
-                      <button
+                      <ChoiceChipButton
                         key={color}
-                        className="chip-button"
-                        style={{ background: visuals.palettes.cards[color] }}
+                        style={{ ["--choice-chip-accent" as string]: visuals.palettes.cards[color] }}
                         disabled={!canTakeTurnAction}
                         onClick={() => sendGameAction({ type: "claim_route", routeId: currentRoute.id, color })}
                       >
                         Claim with {color}
-                      </button>
+                      </ChoiceChipButton>
                     ))
                   ) : (
                     <span className="muted-copy">{currentRouteUnavailableReason}</span>
                   )}
                 </div>
-              </div>
+              </SurfaceCard>
             ) : null}
 
             {currentCity && publicGame.phase === "main" ? (
-              <div className="detail-card">
-                <h3>{currentCity.name}</h3>
-                <p>Build a station here to borrow one rival connection during final scoring.</p>
-                <div className="chip-row">
+              <SurfaceCard variant="detail" className="detail-card" eyebrow="City detail" title={currentCity.name}>
+                <div className="detail-card__summary">
+                  <div className="detail-card__facts">
+                    <span className="detail-card__fact">station city</span>
+                    <span className="detail-card__fact">borrow 1 rival link</span>
+                    <span className="detail-card__fact">endgame only</span>
+                  </div>
+                  <p className="detail-card__prompt">Choose a payment color to build a station here.</p>
+                </div>
+                <div className="detail-card__decision-shelf chip-row">
                   {currentCityOccupied ? (
                     <span className="muted-copy">A station already exists in this city.</span>
                   ) : stationOptions.length > 0 ? (
                     stationOptions.map((color) => (
-                      <button
+                      <ChoiceChipButton
                         key={color}
-                        className="chip-button"
-                        style={{ background: visuals.palettes.cards[color] }}
+                        style={{ ["--choice-chip-accent" as string]: visuals.palettes.cards[color] }}
                         disabled={!canTakeTurnAction}
                         onClick={() => sendGameAction({ type: "build_station", cityId: currentCity.id, color })}
                       >
                         Build with {color}
-                      </button>
+                      </ChoiceChipButton>
                     ))
                   ) : (
                     <span className="muted-copy">
@@ -881,9 +1008,9 @@ export default function App(): JSX.Element {
                     </span>
                   )}
                 </div>
-              </div>
+              </SurfaceCard>
             ) : null}
-          </section>
+          </Panel>
         </main>
       </div>
 
