@@ -493,7 +493,11 @@ function getAvailableRoutes(config: MapConfig, game: PublicGameState): RouteDef[
   });
 }
 
-function getTicketChoiceRoutes(config: MapConfig, game: PublicGameState, playerId: string): RouteDef[] {
+function getTicketChoiceRoutes(config: MapConfig, game: PublicGameState, playerId: string | null): RouteDef[] {
+  if (!playerId) {
+    return getAvailableRoutes(config, game);
+  }
+
   const claimedByPlayer = new Set(
     game.routeClaims.filter((claim) => claim.playerId === playerId).map((claim) => claim.routeId)
   );
