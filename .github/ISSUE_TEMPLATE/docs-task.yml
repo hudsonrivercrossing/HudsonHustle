@@ -3,15 +3,48 @@ description: Create a docs-only issue that should land in the Hudson Hustle Road
 title: "[Docs] "
 labels:
   - documentation
+  - area:docs
 projects:
   - hudsonrivercrossing/1
 body:
+  - type: markdown
+    attributes:
+      value: |
+        This form automatically:
+        - attaches the issue to `Hudson Hustle Roadmap`
+        - applies the base `documentation` and `area:docs` labels
+        - syncs `Milestone`, `Track`, `Horizon`, and `Priority` through repo automation
+
+        `Status` still starts at the project default `Todo` and should move through `In Progress` and `Done` during execution.
   - type: input
     id: milestone
     attributes:
       label: Milestone
       description: Version milestone such as V2.2.
       placeholder: V2.2
+    validations:
+      required: true
+  - type: dropdown
+    id: horizon
+    attributes:
+      label: Horizon
+      description: Choose the planning horizon for this issue.
+      options:
+        - Now
+        - Next
+        - Later
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: Choose the rough execution priority.
+      options:
+        - P0
+        - P1
+        - P2
+        - P3
     validations:
       required: true
   - type: textarea

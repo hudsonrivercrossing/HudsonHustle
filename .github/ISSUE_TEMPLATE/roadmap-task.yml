@@ -6,6 +6,15 @@ labels:
 projects:
   - hudsonrivercrossing/1
 body:
+  - type: markdown
+    attributes:
+      value: |
+        This form automatically:
+        - attaches the issue to `Hudson Hustle Roadmap`
+        - applies the base `enhancement` label
+        - syncs `Milestone`, area label, and project fields `Track`, `Horizon`, and `Priority` through repo automation
+
+        `Status` still starts at the project default `Todo` and should move through `In Progress` and `Done` during execution.
   - type: dropdown
     id: area
     attributes:
@@ -26,6 +35,29 @@ body:
       label: Milestone
       description: Version milestone such as V2.2.
       placeholder: V2.2
+    validations:
+      required: true
+  - type: dropdown
+    id: horizon
+    attributes:
+      label: Horizon
+      description: Choose the planning horizon for this issue.
+      options:
+        - Now
+        - Next
+        - Later
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: Choose the rough execution priority.
+      options:
+        - P0
+        - P1
+        - P2
+        - P3
     validations:
       required: true
   - type: textarea

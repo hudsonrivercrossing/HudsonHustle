@@ -3,6 +3,11 @@
 ## Title
 
 ## Metadata
+- Note:
+  - GitHub issue forms in this repo auto-attach the roadmap project and base labels.
+  - Repo automation syncs milestone, area label, and project-field values `Track`, `Horizon`, and `Priority`.
+  - `Status` still starts at project default `Todo`.
+  - Manual issues created outside the forms still need explicit follow-up.
 - Project: `Hudson Hustle Roadmap`
 - Milestone: `...`
 - Primary Label: `enhancement | documentation | bug`

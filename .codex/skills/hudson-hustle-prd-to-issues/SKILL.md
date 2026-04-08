@@ -59,11 +59,23 @@ Use `hudson-hustle-prd-to-plan` first when the work has not yet been sliced and 
   - `area:product`
   - `area:ops`
 - leave issues unassigned unless the current owner is explicit; do not auto-assign to a personal account by default
-- after issue creation, set project fields:
+- GitHub issue forms in this repo auto-attach:
+  - the `Hudson Hustle Roadmap` project
+  - base labels such as `enhancement` or `documentation`
+- repo automation syncs:
+  - milestone sidebar metadata
+  - area labels
+  - project fields:
+    - `Track`
+    - `Horizon`
+    - `Priority`
+- after issue creation, keep project fields sane:
   - `Track`
   - `Horizon`
   - `Priority`
+- `Status` still starts at the project default `Todo`
 - when executing issues from the board, keep `Status` current instead of leaving everything in `Todo`
+- issues created manually outside the forms may still need metadata cleanup
 - GitHub sidebar `Type` is not a required automation target in this repo yet; use labels plus project fields instead
 
 ## Output Shape
@@ -75,4 +87,4 @@ A good turn should leave behind:
 - stable acceptance criteria
 - clear validation notes
 - explicit excluded work per item
-- metadata defaults that are ready to apply in GitHub without extra guesswork
+- metadata defaults that are ready for GitHub form + automation sync without extra guesswork

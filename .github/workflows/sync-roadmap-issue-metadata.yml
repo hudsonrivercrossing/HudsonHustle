@@ -1,0 +1,201 @@
+name: Sync Roadmap Issue Metadata
+
+on:
+  issues:
+    types:
+      - opened
+      - edited
+      - reopened
+
+permissions:
+  issues: write
+  repository-projects: write
+
+jobs:
+  sync-roadmap-metadata:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync milestone, labels, and roadmap fields
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const body = issue.body || "";
+            const existingLabels = (issue.labels || []).map((label) => typeof label === "string" ? label : label.name);
+
+            function parseSections(markdown) {
+              const sections = {};
+              const regex = /^###\s+(.+)\n([\s\S]*?)(?=^###\s+|\Z)/gm;
+              for (const match of markdown.matchAll(regex)) {
+                sections[match[1].trim()] = match[2].trim();
+              }
+              return sections;
+            }
+
+            function firstLine(value) {
+              return (value || "").split("\n")[0].trim();
+            }
+
+            const sections = parseSections(body);
+
+            const areaMap = {
+              Engineering: { label: "area:engineering", track: "Engineering" },
+              Docs: { label: "area:docs", track: "Docs" },
+              Design: { label: "area:design", track: "Design" },
+              Gameplay: { label: "area:gameplay", track: "Gameplay" },
+              Product: { label: "area:product", track: "Product" },
+              Ops: { label: "area:ops", track: "Ops" },
+            };
+
+            let area = firstLine(sections["Area"]);
+            if (!area && (existingLabels.includes("area:docs") || existingLabels.includes("documentation"))) {
+              area = "Docs";
+            }
+
+            const milestoneTitle = firstLine(sections["Milestone"]);
+            const horizon = firstLine(sections["Horizon"]);
+            const priority = firstLine(sections["Priority"]);
+            const metadataLooksFormDriven = Boolean(milestoneTitle || horizon || priority || area);
+
+            if (!metadataLooksFormDriven) {
+              core.info("Issue does not look like a repo issue-form issue. Skipping metadata sync.");
+              return;
+            }
+
+            const labelsToAdd = [];
+            if (area && areaMap[area] && !existingLabels.includes(areaMap[area].label)) {
+              labelsToAdd.push(areaMap[area].label);
+            }
+
+            if (labelsToAdd.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: labelsToAdd,
+              });
+            }
+
+            if (milestoneTitle) {
+              const milestones = await github.paginate(github.rest.issues.listMilestones, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: "all",
+                per_page: 100,
+              });
+
+              const matchedMilestone = milestones.find((milestone) => milestone.title === milestoneTitle);
+              if (matchedMilestone && issue.milestone?.number !== matchedMilestone.number) {
+                await github.rest.issues.update({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  milestone: matchedMilestone.number,
+                });
+              }
+            }
+
+            const projectData = await github.graphql(
+              `
+                query($login: String!, $number: Int!) {
+                  organization(login: $login) {
+                    projectV2(number: $number) {
+                      id
+                      fields(first: 50) {
+                        nodes {
+                          ... on ProjectV2FieldCommon {
+                            id
+                            name
+                          }
+                          ... on ProjectV2SingleSelectField {
+                            id
+                            name
+                            options {
+                              id
+                              name
+                            }
+                          }
+                        }
+                      }
+                      items(first: 100) {
+                        nodes {
+                          id
+                          content {
+                            ... on Issue {
+                              number
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              `,
+              {
+                login: "hudsonrivercrossing",
+                number: 1,
+              },
+            );
+
+            const project = projectData.organization.projectV2;
+            let projectItem = project.items.nodes.find((node) => node.content?.number === issue.number);
+            if (!projectItem) {
+              const addResult = await github.graphql(
+                `
+                  mutation($projectId: ID!, $contentId: ID!) {
+                    addProjectV2ItemById(input: { projectId: $projectId, contentId: $contentId }) {
+                      item {
+                        id
+                      }
+                    }
+                  }
+                `,
+                {
+                  projectId: project.id,
+                  contentId: issue.node_id,
+                },
+              );
+
+              projectItem = { id: addResult.addProjectV2ItemById.item.id };
+            }
+
+            const fieldsByName = new Map(project.fields.nodes.map((field) => [field.name, field]));
+
+            async function updateSingleSelect(fieldName, optionName) {
+              if (!optionName) return;
+              const field = fieldsByName.get(fieldName);
+              const option = field?.options?.find((entry) => entry.name === optionName);
+              if (!field || !option) {
+                core.info(`No matching field option for ${fieldName}: ${optionName}`);
+                return;
+              }
+
+              await github.graphql(
+                `
+                  mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+                    updateProjectV2ItemFieldValue(
+                      input: {
+                        projectId: $projectId
+                        itemId: $itemId
+                        fieldId: $fieldId
+                        value: { singleSelectOptionId: $optionId }
+                      }
+                    ) {
+                      projectV2Item {
+                        id
+                      }
+                    }
+                  }
+                `,
+                {
+                  projectId: project.id,
+                  itemId: projectItem.id,
+                  fieldId: field.id,
+                  optionId: option.id,
+                },
+              );
+            }
+
+            await updateSingleSelect("Track", area && areaMap[area] ? areaMap[area].track : undefined);
+            await updateSingleSelect("Horizon", horizon);
+            await updateSingleSelect("Priority", priority);
