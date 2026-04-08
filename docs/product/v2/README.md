@@ -10,6 +10,10 @@ This folder groups the multiplayer-specific product and engineering docs for `v2
 - [V2.1 Design Critique And Reference](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.1-design-critique-and-reference.md)
 - [V2.1 Shell Design Direction](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.1-shell-design-direction.md)
 - [V2.1 Shell Review Memo](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.1-shell-review-memo.md)
+- [V2.2 System Player PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-system-player-prd.md)
+- [V2.2 System Player Plan](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-system-player-plan.md)
+- [V2.2 Slice 1 Bot Seat Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-1-bot-seat-implementation-prd.md)
+- [V2.2 Slice 1 Bot Seat Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-1-bot-seat-issues.md)
 - [V2.2 System Agent Architecture](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-system-agent-architecture.md)
 
 ## How To Use These
@@ -21,4 +25,8 @@ This folder groups the multiplayer-specific product and engineering docs for `v2
 - Use [V2.1 Design Lock](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.1-design-lock.md) for the minimum system decisions that should stay fixed while the first `v2.1` design slice is implemented.
 - Use [V2.1 Design Critique And Reference](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.1-design-critique-and-reference.md) and [V2.1 Shell Design Direction](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.1-shell-design-direction.md) for the current shell-first design-system work.
 - Use [V2.1 Shell Review Memo](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.1-shell-review-memo.md) for the latest multi-agent review findings and the concrete `v2.1` shell corrections they led to.
+- Use [V2.2 System Player PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-system-player-prd.md) for the first bounded `v2.2` product requirement around a built-in system-owned player seat.
+- Use [V2.2 System Player Plan](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-system-player-plan.md) for the phased implementation order and validation path for that first `v2.2` milestone.
+- Use [V2.2 Slice 1 Bot Seat Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-1-bot-seat-implementation-prd.md) when starting the first architecture-proof implementation slice.
+- Use [V2.2 Slice 1 Bot Seat Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-1-bot-seat-issues.md) for task-sized breakdown of that first slice.
 - Use [V2.2 System Agent Architecture](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-system-agent-architecture.md) for the first system-player recommendation path.
