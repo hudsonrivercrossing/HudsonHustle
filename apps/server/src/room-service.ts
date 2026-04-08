@@ -1,6 +1,8 @@
 import { randomBytes, randomUUID } from "node:crypto";
 import {
   getCurrentPlayer,
+  type ControllerType,
+  type GameAction,
   type GameActionPayload,
   reduceGame,
   startGame,
@@ -27,6 +29,7 @@ import {
   type HudsonHustleReleasedConfigSummary
 } from "@hudson-hustle/game-data";
 import type { RoomRepository, StoredRoomRecord, StoredSeatRecord } from "./persistence/types.js";
+import { chooseBotAction } from "./bot-policy.js";
 
 type RoomTimerCallback = (roomCode: string, deadlineAt: number | null) => void;
 
@@ -81,6 +84,38 @@ function randomToken(length: number): string {
 
 function createPlayerSecret(): string {
   return randomUUID();
+}
+
+function createClientControllerState() {
+  return {
+    ownership: "client",
+    authStrategy: "player_secret"
+  } as const;
+}
+
+function createBotControllerState() {
+  return {
+    ownership: "server",
+    controllerKey: "internal:bot"
+  } as const;
+}
+
+function buildBotSeatIds(playerCount: number, requestedBotSeatIds: string[] | undefined): Set<string> {
+  const allowedSeatIds = new Set(Array.from({ length: playerCount - 1 }, (_, index) => `seat-${index + 2}`));
+  const botSeatIds = new Set<string>();
+  for (const seatId of requestedBotSeatIds ?? []) {
+    invariant(allowedSeatIds.has(seatId), `Invalid bot seat: ${seatId}.`, 400, "invalid_bot_seat");
+    botSeatIds.add(seatId);
+  }
+  return botSeatIds;
+}
+
+function seatRequiresPlayerSecret(controllerType: ControllerType): boolean {
+  return controllerType === "human" || controllerType === "human+agent";
+}
+
+function seatCanOwnHostPrivileges(seat: StoredSeatRecord | null): boolean {
+  return Boolean(seat?.playerName && seat.controllerState.ownership === "client" && seat.playerSecret);
 }
 
 function buildPublicGameState(game: GameState): PublicGameState {
@@ -191,8 +226,24 @@ function fromStoredRecord(record: StoredRoomRecord): ServerRoom {
   };
 }
 
+function timedAutoDrawsRemaining(game: GameState): number {
+  if (game.phase !== "main") {
+    return 0;
+  }
+
+  if (game.turn.stage === "idle") {
+    return 2;
+  }
+
+  if (game.turn.stage === "drawing" && game.turn.drawsTaken === 1 && !game.turn.tookFaceUpLocomotive) {
+    return 1;
+  }
+
+  return 0;
+}
+
 function hasEnoughBlindCardsForTimedAutoDraw(game: GameState): boolean {
-  return game.trainDeck.length + game.discardPile.length >= 2;
+  return game.trainDeck.length + game.discardPile.length >= timedAutoDrawsRemaining(game);
 }
 
 export class RoomService {
@@ -224,6 +275,7 @@ export class RoomService {
     }
 
     const timestamp = nowIso();
+    const botSeatIds = buildBotSeatIds(request.playerCount, request.botSeatIds);
     const hostSeat: StoredSeatRecord = {
       seatId: "seat-1",
       playerId: null,
@@ -233,21 +285,25 @@ export class RoomService {
       connected: false,
       isHost: true,
       playerSecret: createPlayerSecret(),
+      controllerState: createClientControllerState(),
       joinedAt: timestamp,
       updatedAt: timestamp
     };
 
     const seats: StoredSeatRecord[] = [hostSeat];
     for (let index = 2; index <= request.playerCount; index += 1) {
+      const seatId = `seat-${index}`;
+      const isBotSeat = botSeatIds.has(seatId);
       seats.push({
-        seatId: `seat-${index}`,
+        seatId,
         playerId: null,
-        playerName: null,
-        controllerType: "human",
-        ready: false,
-        connected: false,
+        playerName: isBotSeat ? `Bot ${index - 1}` : null,
+        controllerType: isBotSeat ? "bot" : "human",
+        ready: isBotSeat,
+        connected: isBotSeat,
         isHost: false,
-        playerSecret: "",
+        playerSecret: null,
+        controllerState: isBotSeat ? createBotControllerState() : createClientControllerState(),
         joinedAt: timestamp,
         updatedAt: timestamp
       });
@@ -272,6 +328,7 @@ export class RoomService {
     };
 
     await this.saveRoom(room);
+    invariant(hostSeat.playerSecret, "Host seat is missing player credentials.", 500, "invalid_room_state");
     return {
       roomCode,
       seatId: hostSeat.seatId,
@@ -299,10 +356,20 @@ export class RoomService {
     const timestamp = nowIso();
     targetSeat.playerName = request.playerName.trim() || targetSeat.seatId;
     targetSeat.playerSecret = createPlayerSecret();
+    targetSeat.controllerType = "human";
+    targetSeat.controllerState = createClientControllerState();
+    const currentHost = room.seats.find((seat) => seat.seatId === room.hostSeatId) ?? null;
+    if (!seatCanOwnHostPrivileges(currentHost)) {
+      room.seats.forEach((seat) => {
+        seat.isHost = seat.seatId === targetSeat.seatId;
+      });
+      room.hostSeatId = targetSeat.seatId;
+    }
     targetSeat.updatedAt = timestamp;
 
     room.updatedAt = timestamp;
     await this.saveRoom(room);
+    invariant(targetSeat.playerSecret, "Joined seat is missing player credentials.", 500, "invalid_room_state");
     return {
       roomCode: room.roomCode,
       seatId: targetSeat.seatId,
@@ -311,9 +378,32 @@ export class RoomService {
     };
   }
 
+  async assignBotSeat(roomCode: string, seatId: string, botName = "System Bot"): Promise<RoomSnapshot> {
+    const room = await this.getRoomOrThrow(roomCode);
+    invariant(room.status === "lobby", "Bot seats can only be assigned before the game starts.");
+    const seat = room.seats.find((entry) => entry.seatId === seatId) ?? null;
+    invariant(seat, "That seat does not exist.", 404, "seat_not_found");
+    invariant(!seat.playerName, "That seat is already taken.", 409, "seat_taken");
+
+    const timestamp = nowIso();
+    seat.playerId = null;
+    seat.playerName = botName.trim() || seat.seatId;
+    seat.controllerType = "bot";
+    seat.controllerState = createBotControllerState();
+    seat.playerSecret = null;
+    seat.ready = true;
+    seat.connected = true;
+    seat.updatedAt = timestamp;
+    room.updatedAt = timestamp;
+
+    await this.saveRoom(room);
+    return this.buildSnapshot(room, null);
+  }
+
   async rejoinRoom(roomCode: string, request: RejoinRoomRequest): Promise<RejoinRoomResponse> {
     const room = await this.getRoomOrThrow(roomCode);
     const seat = this.getAuthorizedSeat(room, request);
+    invariant(seat.playerSecret, "Joined seat is missing player credentials.", 500, "invalid_room_state");
     return {
       roomCode: room.roomCode,
       seatId: seat.seatId,
@@ -336,7 +426,10 @@ export class RoomService {
     const hostSeat = this.getAuthorizedSeat(room, { seatId: room.hostSeatId, playerSecret: request.playerSecret });
     invariant(hostSeat.isHost, "Only the host can start the room.");
     invariant(room.status === "lobby", "The room is already running.");
-    invariant(room.seats.every((seat) => seat.playerName && seat.playerSecret), "All seats must be filled before starting.");
+    invariant(
+      room.seats.every((seat) => seat.playerName && (!seatRequiresPlayerSecret(seat.controllerType) || seat.playerSecret)),
+      "All seats must be filled before starting."
+    );
     invariant(room.seats.every((seat) => seat.ready), "All players must be ready before starting.");
 
     const nextGame = startGame(getHudsonHustleMapByConfigId(room.configId), {
@@ -353,6 +446,7 @@ export class RoomService {
 
     this.scheduleTimer(room);
     await this.saveRoom(room);
+    await this.runServerControlledTurns(room);
     return {
       snapshot: this.buildSnapshot(room, hostSeat.seatId)
     };
@@ -391,26 +485,56 @@ export class RoomService {
     await this.saveRoom(room);
   }
 
+  async leaveRoom(roomCode: string, auth: RoomAuth): Promise<void> {
+    const room = await this.getRoomOrThrow(roomCode);
+    const seat = this.getAuthorizedSeat(room, auth);
+
+    if (room.status !== "lobby") {
+      seat.connected = false;
+      seat.updatedAt = nowIso();
+      room.updatedAt = seat.updatedAt;
+      await this.saveRoom(room);
+      return;
+    }
+
+    const timestamp = nowIso();
+    const nextHost =
+      seat.isHost
+        ? (room.seats.find((candidate) => candidate.seatId !== seat.seatId && seatCanOwnHostPrivileges(candidate)) ?? null)
+        : null;
+
+    if (seat.isHost) {
+      if (nextHost) {
+        seat.isHost = false;
+        room.hostSeatId = nextHost.seatId;
+        nextHost.isHost = true;
+        nextHost.updatedAt = timestamp;
+      } else {
+        seat.isHost = false;
+      }
+    }
+
+    seat.playerId = null;
+    seat.playerName = null;
+    seat.ready = false;
+    seat.connected = false;
+    seat.playerSecret = null;
+    seat.controllerType = "human";
+    seat.controllerState = createClientControllerState();
+    seat.updatedAt = timestamp;
+    room.updatedAt = timestamp;
+    await this.saveRoom(room);
+  }
+
   async applyAction(roomCode: string, auth: RoomAuth, payload: GameActionPayload): Promise<RoomSnapshot> {
     const room = await this.getRoomOrThrow(roomCode);
     invariant(room.status === "active", "The game has not started yet.");
     invariant(room.game, "Missing game state.");
 
     const seat = this.getAuthorizedSeat(room, auth);
-    const activePlayer = getCurrentPlayer(room.game);
-    invariant(seat.playerId === activePlayer.id, "It is not your turn.");
-
-    let nextGame = reduceGame(room.game, payload.action, getHudsonHustleMapByConfigId(room.configId));
-    if (nextGame.turn.stage === "awaitingHandoff") {
-      nextGame = reduceGame(nextGame, { type: "advance_turn" }, getHudsonHustleMapByConfigId(room.configId));
-    }
-
-    room.game = nextGame;
-    room.status = nextGame.phase === "gameOver" ? "finished" : room.status;
-    room.updatedAt = nowIso();
-    room.snapshotVersion += 1;
-    this.scheduleTimer(room);
+    this.applySeatAction(room, seat, payload.action);
     await this.saveRoom(room);
+    await this.runServerControlledTurns(room);
     return this.buildSnapshot(room, seat.seatId);
   }
 
@@ -420,7 +544,8 @@ export class RoomService {
       if (!room.game || room.status !== "active") {
         return;
       }
-      if (room.turnTimeLimitSeconds <= 0 || room.game.phase !== "main" || room.game.turn.stage !== "idle") {
+      const autoDrawsRemaining = timedAutoDrawsRemaining(room.game);
+      if (room.turnTimeLimitSeconds <= 0 || room.game.phase !== "main" || autoDrawsRemaining === 0) {
         return;
       }
       if (!hasEnoughBlindCardsForTimedAutoDraw(room.game)) {
@@ -429,8 +554,10 @@ export class RoomService {
         return;
       }
 
-      let nextGame = reduceGame(room.game, { type: "draw_card", source: "deck" }, getHudsonHustleMapByConfigId(room.configId));
-      nextGame = reduceGame(nextGame, { type: "draw_card", source: "deck" }, getHudsonHustleMapByConfigId(room.configId));
+      let nextGame = room.game;
+      for (let index = 0; index < autoDrawsRemaining; index += 1) {
+        nextGame = reduceGame(nextGame, { type: "draw_card", source: "deck" }, getHudsonHustleMapByConfigId(room.configId));
+      }
       if (nextGame.turn.stage === "awaitingHandoff") {
         nextGame = reduceGame(nextGame, { type: "advance_turn" }, getHudsonHustleMapByConfigId(room.configId));
       }
@@ -440,6 +567,7 @@ export class RoomService {
       room.snapshotVersion += 1;
       this.scheduleTimer(room);
       await this.saveRoom(room);
+      await this.resumeServerControlledTurnsIfNeeded(room);
     } catch {
       this.timeouts.delete(roomCode);
       this.onTimerChanged?.(roomCode, null);
@@ -453,7 +581,12 @@ export class RoomService {
       if (stored) {
         room = fromStoredRecord(stored);
         this.rooms.set(roomCode, room);
-        this.scheduleTimer(room, room.deadlineAt);
+        const activeSeat = this.getActiveSeat(room);
+        if (activeSeat?.controllerState.ownership === "server") {
+          await this.resumeServerControlledTurnsIfNeeded(room);
+        } else {
+          this.scheduleTimer(room, room.deadlineAt);
+        }
       }
     }
     invariant(room, "Unknown room code.", 404, "room_not_found");
@@ -462,7 +595,15 @@ export class RoomService {
 
   private getAuthorizedSeat(room: ServerRoom, auth: RoomAuth): StoredSeatRecord {
     const seat = room.seats.find((entry) => entry.seatId === auth.seatId);
-    invariant(seat && seat.playerSecret && seat.playerSecret === auth.playerSecret, "Room credentials do not match.", 403, "invalid_credentials");
+    invariant(
+      seat &&
+        seat.controllerState.ownership === "client" &&
+        seat.playerSecret &&
+        seat.playerSecret === auth.playerSecret,
+      "Room credentials do not match.",
+      403,
+      "invalid_credentials"
+    );
     return seat;
   }
 
@@ -495,7 +636,7 @@ export class RoomService {
       return;
     }
 
-    if (room.game.phase !== "main" || room.game.turn.stage !== "idle" || !hasEnoughBlindCardsForTimedAutoDraw(room.game)) {
+    if (room.game.phase !== "main" || timedAutoDrawsRemaining(room.game) === 0 || !hasEnoughBlindCardsForTimedAutoDraw(room.game)) {
       room.deadlineAt = null;
       this.onTimerChanged?.(room.roomCode, null);
       return;
@@ -518,5 +659,101 @@ export class RoomService {
       void this.handleTimeout(room.roomCode);
     }, Math.max(0, room.deadlineAt - now));
     this.timeouts.set(room.roomCode, timeout);
+  }
+
+  private applySeatAction(room: ServerRoom, seat: StoredSeatRecord, action: GameAction): void {
+    invariant(room.status === "active", "The game has not started yet.");
+    invariant(room.game, "Missing game state.");
+    const previousGame = room.game;
+    const previousDeadlineAt = room.deadlineAt;
+
+    let gameForAction = room.game;
+    if (action.type === "select_initial_tickets" && room.game.phase === "initialTickets") {
+      const actingPlayerIndex = room.game.players.findIndex((player) => player.id === seat.playerId);
+      invariant(actingPlayerIndex >= 0, "This seat is not attached to an active player.", 403, "invalid_credentials");
+      invariant(room.game.players[actingPlayerIndex]?.pendingTickets.length === 4, "You do not have starting tickets to confirm right now.");
+      if (actingPlayerIndex !== room.game.activePlayerIndex) {
+        gameForAction = {
+          ...room.game,
+          activePlayerIndex: actingPlayerIndex
+        };
+      }
+    } else {
+      const activePlayer = getCurrentPlayer(room.game);
+      invariant(seat.playerId === activePlayer.id, "It is not your turn.");
+    }
+
+    let nextGame = reduceGame(gameForAction, action, getHudsonHustleMapByConfigId(room.configId));
+    if (nextGame.turn.stage === "awaitingHandoff") {
+      nextGame = reduceGame(nextGame, { type: "advance_turn" }, getHudsonHustleMapByConfigId(room.configId));
+    }
+
+    room.game = nextGame;
+    room.status = nextGame.phase === "gameOver" ? "finished" : room.status;
+    room.updatedAt = nowIso();
+    room.snapshotVersion += 1;
+    const shouldPreserveDeadline =
+      previousDeadlineAt !== null &&
+      previousGame.phase === "main" &&
+      nextGame.phase === "main" &&
+      previousGame.activePlayerIndex === nextGame.activePlayerIndex;
+    this.scheduleTimer(room, shouldPreserveDeadline ? previousDeadlineAt : null);
+  }
+
+  private getActiveSeat(room: ServerRoom): StoredSeatRecord | null {
+    if (!room.game) {
+      return null;
+    }
+    const activePlayer = room.game.players[room.game.activePlayerIndex] ?? null;
+    if (!activePlayer) {
+      return null;
+    }
+    return room.seats.find((seat) => seat.playerId === activePlayer.id) ?? null;
+  }
+
+  private getNextServerControlledAction(room: ServerRoom, seat: StoredSeatRecord): GameAction {
+    invariant(room.game, "Missing game state.");
+    const privateState = buildPrivateState(room, seat);
+    invariant(privateState, "Server-controlled seat is missing private state.", 500, "invalid_room_state");
+
+    return chooseBotAction({
+      config: getHudsonHustleMapByConfigId(room.configId),
+      game: buildPublicGameState(room.game),
+      privateState
+    });
+  }
+
+  private async runServerControlledTurns(room: ServerRoom): Promise<void> {
+    for (let steps = 0; steps < 8; steps += 1) {
+      if (room.status !== "active" || !room.game) {
+        return;
+      }
+
+      const activeSeat = this.getActiveSeat(room);
+      if (!activeSeat || activeSeat.controllerState.ownership !== "server") {
+        return;
+      }
+
+      const action = this.getNextServerControlledAction(room, activeSeat);
+      this.applySeatAction(room, activeSeat, action);
+      await this.saveRoom(room);
+    }
+
+    throw new RoomServiceError("Server-controlled turn loop exceeded safety limit.", 500, "bot_loop_limit");
+  }
+
+  private async resumeServerControlledTurnsIfNeeded(room: ServerRoom): Promise<void> {
+    if (room.status !== "active" || !room.game) {
+      return;
+    }
+
+    const activeSeat = this.getActiveSeat(room);
+    if (!activeSeat || activeSeat.controllerState.ownership !== "server") {
+      return;
+    }
+
+    room.deadlineAt = null;
+    this.onTimerChanged?.(room.roomCode, null);
+    await this.runServerControlledTurns(room);
   }
 }

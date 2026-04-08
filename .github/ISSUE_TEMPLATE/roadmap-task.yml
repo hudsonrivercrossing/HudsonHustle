@@ -1,0 +1,99 @@
+name: Roadmap task
+description: Create a product, engineering, gameplay, or design task that should land in the Hudson Hustle Roadmap project.
+title: "[Roadmap] "
+labels:
+  - enhancement
+projects:
+  - hudsonrivercrossing/1
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This form automatically:
+        - attaches the issue to `Hudson Hustle Roadmap`
+        - applies the base `enhancement` label
+        - syncs `Milestone`, area label, and project fields `Track`, `Horizon`, and `Priority` through repo automation
+
+        `Status` still starts at the project default `Todo` and should move through `In Progress` and `Done` during execution.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Choose the primary area for this task.
+      options:
+        - Engineering
+        - Docs
+        - Design
+        - Gameplay
+        - Product
+        - Ops
+    validations:
+      required: true
+  - type: input
+    id: milestone
+    attributes:
+      label: Milestone
+      description: Version milestone such as V2.2.
+      placeholder: V2.2
+    validations:
+      required: true
+  - type: dropdown
+    id: horizon
+    attributes:
+      label: Horizon
+      description: Choose the planning horizon for this issue.
+      options:
+        - Now
+        - Next
+        - Later
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: Choose the rough execution priority.
+      options:
+        - P0
+        - P1
+        - P2
+        - P3
+    validations:
+      required: true
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+      description: What should this issue accomplish?
+      placeholder: Describe the smallest independently valuable outcome.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List the observable outcomes that make this issue done.
+      placeholder: |
+        - ...
+        - ...
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation
+      description: Which tests, smoke checks, or manual verification should be run?
+      placeholder: |
+        - ...
+        - ...
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: What should explicitly not be included in this issue?
+      placeholder: |
+        - ...
+    validations:
+      required: true

@@ -5,11 +5,20 @@ This document turns the `V2 MVP` product direction into concrete multiplayer UX,
 
 ## Room UX
 
+### Shipped Mixed-Room Rule
+The shipped `v2.2` controller milestone includes public mixed human/`bot` rooms.
+
+That means:
+- hosts may prefill one or more non-host seats as `bot`
+- `bot` seats are visible as server-owned seats, not hidden pseudo-humans
+- reconnect stays a human-only concept
+
 ### Create Room
 The host sees:
 - player count selector
 - map selector
 - per-turn timer selector
+- seat-oriented bot toggles for non-host seats
 
 Recommended defaults:
 - player count: `2`
@@ -19,6 +28,11 @@ Recommended defaults:
 Timer meaning:
 - `0` = untimed
 - positive values = turn deadline in seconds
+
+Seat-plan meaning:
+- `seat-1` is always the host's human seat
+- any later seat may stay open for a human join or be prefilled as a `bot` seat
+- a room may mix humans and bots up to room size
 
 ### Map Selector
 MVP2 should only expose released snapshots, not drafts.
@@ -40,25 +54,35 @@ Join flow should be minimal:
 - choose or confirm a seat
 - enter nickname
 
+Join flow should never offer:
+- seats already occupied by a `bot`
+- seats already occupied by another human
+
+Join flow should also make it obvious that:
+- a `bot` seat is not joinable
+- a reconnecting human still returns to the same original human seat
+
 The server returns:
 - `roomCode`
 - `seatId`
 - `playerSecret`
 
+The client should combine those values into one reconnect token for copy/paste and later recovery.
+
 ## Hidden Session Info UX
 Each player should be able to inspect:
-- `roomCode`
-- `seatId`
-- `playerSecret`
+- one reconnect token that decodes to room code, seat, and player secret
+
+Recommended format:
+- versioned prefix such as `hh1.`
+- opaque payload such as base64url(JSON)
 
 But this should not live in the main gameplay surface all the time.
 
 Recommended presentation:
 - small identity chip in a corner
 - click or hover reveals:
-  - room code
-  - seat
-  - reconnect secret
+  - reconnect token
 - add a copy button
 
 This keeps reconnect information accessible without making the game screen feel operational or cluttered.
@@ -68,16 +92,36 @@ The host is only responsible for:
 - creating the room
 - choosing setup options
 - starting the game
+- confirming their own starting tickets like every other player
 
 The host is not required to stay connected for the room to remain valid.
+The host should also be able to leave the lobby or room UI without being trapped in the current screen.
+
+## Starting Ticket Selection
+After the host starts the room:
+- every player receives the same initial ticket choice flow
+- every player may review and confirm their own starting tickets independently
+- the game does not enter the main phase until every seated player has confirmed
+
+Important UX rules:
+- one player's confirmation must not reset another player's in-progress selection
+- if the host confirms first, the host waits while other players finish
+- reconnecting during this phase should restore either:
+  - the pending ticket picker for that seat, or
+  - the normal game view if that seat already confirmed
+
+## Drawn Ticket Choice
+When a player chooses `Draw tickets` during the main phase:
+- the draw is committed immediately
+- the player must finish the ticket picker before taking any other action
+- the player must keep at least one of the drawn tickets
+- the UI should not offer a cancel or `Back` path that returns the draw to the deck
 
 ## Reconnect UX
 
 ### Automatic Reconnect
 On load, the client checks local storage for:
-- `roomCode`
-- `seatId`
-- `playerSecret`
+- one reconnect token
 
 If found:
 1. try silent reconnect
@@ -85,10 +129,7 @@ If found:
 3. if it fails, fall back to manual rejoin UI
 
 ### Manual Reconnect
-The manual form accepts:
-- room code
-- seat id
-- player secret
+The manual form accepts one reconnect token and decodes it client-side before calling the existing backend rejoin endpoint.
 
 ### Reconnect State Machine
 Recommended states:
@@ -97,6 +138,13 @@ Recommended states:
 - `reconnected`
 - `reconnect-failed`
 - `manual-rejoin`
+
+### Mixed-Room Reconnect Rules
+- `bot` seats are server-owned and never receive reconnect credentials.
+- Human seats keep the same reconnect token flow as `v2.1` / Slice 2.
+- In timed mixed rooms, a human timeout may hand off through one or more immediate `bot` turns before the next human seat becomes active.
+- Reloading or restoring an active mixed room should immediately resume server-owned turns instead of waiting on a missing client action from a `bot` seat.
+- Public room state should continue to show which seats are human and which are `bot`, even while reconnect is happening.
 
 ## Human+Agent UX Direction
 This is not in MVP2, but the room and seat model should leave room for it.
@@ -133,7 +181,8 @@ Request:
   "hostName": "Blue",
   "playerCount": 3,
   "configId": "v0.4-flushing-newark-airport",
-  "turnTimeLimitSeconds": 0
+  "turnTimeLimitSeconds": 0,
+  "botSeatIds": ["seat-3"]
 }
 ```
 
@@ -153,7 +202,7 @@ Response:
 Joins a free seat.
 
 #### `POST /rooms/:roomCode/rejoin`
-Rejoins with `seatId + playerSecret`.
+Rejoins with the seat id and player secret decoded from the reconnect token.
 
 #### `POST /rooms/:roomCode/start`
 Starts the game once lobby conditions are satisfied.
@@ -182,11 +231,12 @@ Server sends:
 - timer expiration is resolved on the server
 - reconnect restores the exact seat-specific view
 
-## MVP2.x Bot Hook
-Keep controller plumbing ready for:
-- `bot`
+## V2.2 Frozen Bot Milestone
+`v2.2` now exposes the first public `bot` seat path:
+- normal multiplayer setup may prefill one or more non-host seats as `bot`
+- lobby and room state must distinguish `bot` seats from reconnectable human seats
+- reconnect remains human-only
+- `agent` and `human+agent` work remain separate future controller modes
 
-But do not expose bot seats in the public MVP UI yet.
-
-The important design rule is:
+The important design rule remains:
 - seat identity and room lifecycle must not assume every seat is browser-controlled forever

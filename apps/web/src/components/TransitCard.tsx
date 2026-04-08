@@ -242,8 +242,8 @@ export function TransitCard({
   onClick
 }: TransitCardProps): JSX.Element {
   const resolvedFaceLabel = faceLabel ?? (color === "locomotive" ? "Locomotive" : formatFaceLabel(color));
-  const resolvedKicker = kicker ?? (color === "locomotive" ? "Wildcard" : "");
-  const resolvedFooter = footer ?? "";
+  const resolvedKicker = kicker ?? (color === "locomotive" ? "Wildcard" : "Line");
+  const resolvedFooter = footer ?? (context === "hand" ? "Hand" : "Market");
   const resolvedSerial = serial ?? buildSerial(color, context);
   const resolvedStamp = "";
   const interactive = typeof onClick === "function";

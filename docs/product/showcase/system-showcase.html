@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hudson Hustle System Showcase</title>
+    <link rel="stylesheet" href="../../../apps/web/src/design/theme.css" />
+    <link rel="stylesheet" href="../../../apps/web/src/styles.css" />
+    <style>
+      body {
+        min-height: 100vh;
+      }
+
+      .showcase-shell {
+        width: min(var(--layout-content-max-width), calc(100vw - (var(--space-page-x) * 2)));
+        margin: 0 auto;
+        padding: var(--space-page-y) 0 calc(var(--space-page-y) * 2);
+        display: grid;
+        gap: calc(var(--space-stack-xl) - 6px);
+      }
+
+      .showcase-grid {
+        display: grid;
+        gap: calc(var(--space-stack-lg) - 4px);
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      }
+
+      .showcase-grid--2x2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      @media (max-width: 900px) {
+        .showcase-grid--2x2 {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .showcase-panel-stack {
+        display: grid;
+        gap: calc(var(--space-stack-md) - 2px);
+      }
+
+      .showcase-chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .showcase-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .showcase-note {
+        color: var(--ink-soft);
+        margin: 0;
+        max-width: 58ch;
+        font-size: 0.93rem;
+      }
+
+      .showcase-muted {
+        color: var(--ink-soft);
+      }
+
+      .showcase-shell > header .lead {
+        max-width: 64ch;
+      }
+
+      /* In the showcase, modal shells should render as static examples,
+         not fixed full-screen overlays that cover the rest of the page. */
+      .showcase-grid .modal-shell {
+        position: relative;
+        inset: auto;
+        padding: 0;
+        background: transparent;
+        place-items: stretch;
+      }
+
+      .showcase-grid .modal-shell__card {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="showcase-shell">
+      <header>
+        <p class="eyebrow">V2.1 Design System</p>
+        <h1>System Components Showcase</h1>
+        <p class="lead">
+          Review page for the current shell language: `Fraunces + Inter`, warm paper surfaces, restrained chips, and authored action/detail cards.
+        </p>
+        <div class="utility-pill-group">
+          <span class="utility-pill utility-pill--stacked utility-pill--accent"><span class="utility-pill__label">Active pair</span><span class="utility-pill__value">Fraunces + Inter</span></span>
+          <span class="utility-pill utility-pill--stacked utility-pill--neutral"><span class="utility-pill__label">Slice status</span><span class="utility-pill__value">freeze pass · shell nearly complete</span></span>
+        </div>
+      </header>
+
+      <section class="showcase-panel-stack">
+        <div class="section-header">
+          <span class="section-header__eyebrow">Utility chrome</span>
+          <div class="section-header__row">
+            <h2 class="section-header__title">UtilityPill</h2>
+            <span class="section-header__meta">topbar metadata and session chrome</span>
+          </div>
+        </div>
+
+        <div class="showcase-grid">
+          <section class="panel panel--neutral">
+            <div class="section-header">
+              <span class="section-header__eyebrow">Utility family</span>
+              <div class="section-header__row">
+                <h2 class="section-header__title">Utility pills</h2>
+                <span class="section-header__meta">neutral / accent / interactive</span>
+              </div>
+            </div>
+            <div class="showcase-chip-row">
+              <span class="utility-pill utility-pill--stacked utility-pill--accent">
+                <span class="utility-pill__label">Config</span>
+                <span class="utility-pill__value">v2.1 · shell-system</span>
+              </span>
+              <span class="utility-pill utility-pill--stacked utility-pill--neutral">
+                <span class="utility-pill__label">Room</span>
+                <span class="utility-pill__value">M7QK</span>
+              </span>
+              <span class="utility-pill utility-pill--stacked utility-pill--neutral utility-pill--interactive">
+                <span class="utility-pill__label">Session</span>
+                <span class="utility-pill__value">Reconnect token</span>
+              </span>
+              <span class="utility-pill utility-pill--single utility-pill--neutral">
+                <span class="utility-pill__value">Preview · develop</span>
+              </span>
+            </div>
+            <p class="showcase-note">Use these for shell chrome metadata and session entry points. They should feel like quiet session plates, not inline gameplay state.</p>
+          </section>
+        </div>
+      </section>
+
+      <section class="showcase-panel-stack">
+        <div class="section-header">
+          <span class="section-header__eyebrow">State family</span>
+          <div class="section-header__row">
+            <h2 class="section-header__title">StateSurface</h2>
+            <span class="section-header__meta">setup / lobby / reconnect / empty-detail / failure</span>
+          </div>
+        </div>
+
+        <div class="showcase-grid">
+          <section class="state-surface state-surface--neutral">
+            <div class="state-surface__body">
+              <span class="state-surface__eyebrow">Setup</span>
+              <span class="state-surface__headline">Pass the board between rivals.</span>
+              <span class="state-surface__copy">Use this for larger setup and lobby states that need more narrative room than a banner.</span>
+            </div>
+            <div class="state-surface__aside">Untimed</div>
+          </section>
+
+          <section class="state-surface state-surface--failure">
+            <div class="state-surface__body">
+              <span class="state-surface__eyebrow">Reconnect</span>
+              <span class="state-surface__headline">This room needs attention.</span>
+              <span class="state-surface__copy">Use this for reconnect failures and larger error blocks that need copy plus recovery guidance.</span>
+            </div>
+            <div class="state-surface__actions">
+              <button class="system-button secondary-button"><span class="system-button__content">Try again</span></button>
+              <button class="system-button primary-button"><span class="system-button__content">Paste token</span></button>
+            </div>
+          </section>
+
+          <section class="state-surface state-surface--waiting">
+            <div class="state-surface__body">
+              <span class="state-surface__eyebrow">Empty detail</span>
+              <span class="state-surface__headline">Select a route or city.</span>
+              <span class="state-surface__copy">Use this when the action rail needs to explain what to do next instead of showing a blank panel.</span>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="showcase-panel-stack">
+        <div class="section-header">
+          <span class="section-header__eyebrow">Status family</span>
+          <div class="section-header__row">
+            <h2 class="section-header__title">StatusBanner</h2>
+            <span class="section-header__meta">neutral / active / waiting / warning / failure</span>
+          </div>
+        </div>
+
+        <div class="showcase-panel-stack">
+          <section class="status-banner status-banner--neutral">
+            <div class="status-banner__body">
+              <span class="status-banner__eyebrow">Neutral</span>
+              <span class="status-banner__headline">Table is ready to start.</span>
+              <span class="status-banner__copy">Use this for calm, orienting states that should feel owned by the product.</span>
+            </div>
+            <span class="status-banner__timer">Untimed</span>
+          </section>
+
+          <section class="status-banner status-banner--active">
+            <div class="status-banner__body">
+              <span class="status-banner__eyebrow">Your turn</span>
+              <span class="status-banner__headline">Make your move.</span>
+              <span class="status-banner__copy">Use this for active turn states and high-confidence forward motion.</span>
+            </div>
+            <span class="status-banner__timer">27s left</span>
+          </section>
+
+          <section class="status-banner status-banner--waiting">
+            <div class="status-banner__body">
+              <span class="status-banner__eyebrow">Waiting</span>
+              <span class="status-banner__headline">Another player is acting.</span>
+              <span class="status-banner__copy">Use this for passive but still important shared-state moments.</span>
+            </div>
+            <span class="status-banner__timer">45s left</span>
+          </section>
+
+          <section class="status-banner status-banner--warning">
+            <div class="status-banner__body">
+              <span class="status-banner__eyebrow">Warning</span>
+              <span class="status-banner__headline">Timer is almost out.</span>
+              <span class="status-banner__copy">Use this when urgency should increase without collapsing into error styling.</span>
+            </div>
+            <span class="status-banner__timer">6s left</span>
+          </section>
+
+          <section class="status-banner status-banner--failure">
+            <div class="status-banner__body">
+              <span class="status-banner__eyebrow">Failure</span>
+              <span class="status-banner__headline">This move could not complete.</span>
+              <span class="status-banner__copy">Use this when a room or action fails and the user needs a clear recovery cue.</span>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="showcase-panel-stack">
+        <div class="section-header">
+          <span class="section-header__eyebrow">Shell family</span>
+          <div class="section-header__row">
+            <h2 class="section-header__title">Panel + SectionHeader + Chip</h2>
+            <span class="section-header__meta">outer shell primitives</span>
+          </div>
+        </div>
+
+        <div class="showcase-grid showcase-grid--2x2">
+          <section class="panel panel--status">
+            <div class="section-header section-header--ceremony">
+              <span class="section-header__eyebrow">Table status</span>
+              <div class="section-header__row">
+                <h2 class="section-header__title">Round table</h2>
+                <span class="section-header__meta">Mina active</span>
+              </div>
+            </div>
+            <div class="scoreboard">
+              <article class="player-strip player-strip--active">
+                <span class="player-swatch row-object__lead" style="background:#d15b4e"></span>
+                <div class="row-object__main">
+                  <strong class="row-object__title">Mina</strong>
+                  <span class="row-object__meta">4 tickets</span>
+                </div>
+                <div class="row-object__stats">
+                  <span class="row-object__stat row-object__stat--strong">22 pts</span>
+                  <span class="row-object__stat">26 trains</span>
+                  <span class="row-object__stat">3 stations</span>
+                </div>
+              </article>
+              <article class="player-strip">
+                <span class="player-swatch row-object__lead" style="background:#356fb0"></span>
+                <div class="row-object__main">
+                  <strong class="row-object__title">Andre</strong>
+                  <span class="row-object__meta">3 tickets</span>
+                </div>
+                <div class="row-object__stats">
+                  <span class="row-object__stat row-object__stat--strong">18 pts</span>
+                  <span class="row-object__stat">29 trains</span>
+                  <span class="row-object__stat">3 stations</span>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="panel panel--private-info">
+            <div class="section-header section-header--compact">
+              <div class="section-header__row">
+                <h2 class="section-header__title">Your tickets</h2>
+                <span class="section-header__meta">1/3 connected</span>
+              </div>
+            </div>
+            <div class="ticket-stack">
+              <div class="ticket-row">
+                <div class="row-object__lead">
+                  <span class="system-chip system-chip--warning ticket-status">Pending</span>
+                </div>
+                <div class="row-object__main">
+                  <span class="row-object__title ticket-route__cities">Hoboken <span class="ticket-arrow">to</span> Jamaica</span>
+                </div>
+                <div class="row-object__stats">
+                  <strong class="ticket-points row-object__stat row-object__stat--strong">10</strong>
+                </div>
+              </div>
+              <div class="ticket-row ticket-row--done">
+                <div class="row-object__lead">
+                  <span class="system-chip system-chip--success ticket-status ticket-status--done">Connected</span>
+                </div>
+                <div class="row-object__main">
+                  <span class="row-object__title ticket-route__cities">Newark <span class="ticket-arrow">to</span> Flushing</span>
+                </div>
+                <div class="row-object__stats">
+                  <strong class="ticket-points row-object__stat row-object__stat--strong">8</strong>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel panel--neutral">
+            <div class="section-header section-header--compact">
+              <div class="section-header__row">
+                <h2 class="section-header__title">Chip family</h2>
+                <span class="section-header__meta">small metadata</span>
+              </div>
+            </div>
+            <div class="showcase-chip-row">
+              <span class="system-chip system-chip--neutral">Offline</span>
+              <span class="system-chip system-chip--info">Seat 2</span>
+              <span class="system-chip system-chip--success">Connected</span>
+              <span class="system-chip system-chip--warning">Pending</span>
+              <span class="system-chip system-chip--danger">Error</span>
+            </div>
+            <p class="showcase-note">Chips should read like compact state marks attached to rows, seats, tickets, or objects. They are tighter and more status-like than UtilityPill.</p>
+          </section>
+
+          <section class="panel panel--alert">
+            <div class="section-header section-header--compact">
+              <span class="section-header__eyebrow">Recovery surface</span>
+              <div class="section-header__row">
+                <h2 class="section-header__title">Alert panel</h2>
+                <span class="section-header__meta">attention without alarm collapse</span>
+              </div>
+            </div>
+            <p class="showcase-note">Use this for reconnect failures, blocked state, or any shell moment that needs a clear recovery path.</p>
+          </section>
+        </div>
+      </section>
+
+      <section class="showcase-panel-stack">
+        <div class="section-header">
+          <span class="section-header__eyebrow">Action/detail family</span>
+          <div class="section-header__row">
+            <h2 class="section-header__title">SurfaceCard + ChoiceChipButton</h2>
+            <span class="section-header__meta">nested surfaces inside the action rail</span>
+          </div>
+        </div>
+
+        <div class="showcase-grid">
+          <section class="panel panel--status">
+            <div class="section-header">
+              <span class="section-header__eyebrow">Turn controls</span>
+              <div class="section-header__row">
+                <h2 class="section-header__title">Action rail</h2>
+                <span class="section-header__meta">Choose a route, city, or ticket action.</span>
+              </div>
+            </div>
+
+            <div class="action-rail">
+              <button class="system-button secondary-button"><span class="system-button__content">Draw tickets</span></button>
+              <button class="system-button primary-button"><span class="system-button__content">End turn</span></button>
+              <button class="system-button secondary-button" disabled><span class="system-button__content">Timer 30s</span></button>
+            </div>
+
+            <section class="surface-card surface-card--detail detail-card" data-detail-kind="route">
+              <div class="surface-card__header">
+                <span class="surface-card__eyebrow">Route detail</span>
+                <div class="surface-card__row">
+                  <h3 class="surface-card__title">Hoboken → Journal Square</h3>
+                </div>
+              </div>
+              <div class="surface-card__body">
+                <div class="detail-card__summary">
+                  <div class="detail-card__facts">
+                    <span class="detail-card__fact">2 trains</span>
+                    <span class="detail-card__fact">surface</span>
+                    <span class="detail-card__fact">gray route</span>
+                  </div>
+                  <p class="detail-card__prompt">Choose a payment color to claim this segment.</p>
+                </div>
+                <div class="detail-card__decision-shelf chip-row">
+                  <button class="choice-chip-button" style="--choice-chip-accent:#3f7a4d"><span class="choice-chip-button__content">Claim with green</span></button>
+                  <button class="choice-chip-button" style="--choice-chip-accent:#7c6a55"><span class="choice-chip-button__content">Claim with gray</span></button>
+                  <button class="choice-chip-button" style="--choice-chip-accent:#b65743"><span class="choice-chip-button__content">Claim with red</span></button>
+                </div>
+              </div>
+            </section>
+
+            <section class="surface-card surface-card--detail detail-card detail-card--tunnel">
+              <div class="surface-card__header">
+                <span class="surface-card__eyebrow">Tunnel check</span>
+                <div class="surface-card__row">
+                  <h3 class="surface-card__title">Tunnel reveal</h3>
+                </div>
+              </div>
+              <div class="surface-card__body">
+                <p>amber, black</p>
+              </div>
+            </section>
+          </section>
+
+          <section class="panel panel--status">
+            <div class="section-header">
+              <span class="section-header__eyebrow">Summary family</span>
+              <div class="section-header__row">
+                <h2 class="section-header__title">Endgame cards</h2>
+                <span class="section-header__meta">same family, different variant</span>
+              </div>
+            </div>
+
+            <div class="endgame-grid">
+              <article class="surface-card surface-card--summary endgame-card">
+                <div class="surface-card__header">
+                  <span class="surface-card__eyebrow">Final score</span>
+                  <div class="surface-card__row">
+                    <h3 class="surface-card__title">Mina</h3>
+                  </div>
+                </div>
+                <div class="surface-card__body">
+                  <div class="endgame-card__hero">
+                    <p class="endgame-score">78</p>
+                    <span class="endgame-score__label">points</span>
+                  </div>
+                  <div class="endgame-breakdown">
+                    <div class="endgame-breakdown__row"><span class="endgame-breakdown__label">Routes</span><span class="endgame-breakdown__value">+41</span></div>
+                    <div class="endgame-breakdown__row"><span class="endgame-breakdown__label">Tickets</span><span class="endgame-breakdown__value">+25</span></div>
+                    <div class="endgame-breakdown__row"><span class="endgame-breakdown__label">Stations left</span><span class="endgame-breakdown__value">+12</span></div>
+                  </div>
+                </div>
+              </article>
+
+              <article class="surface-card surface-card--summary endgame-card">
+                <div class="surface-card__header">
+                  <span class="surface-card__eyebrow">Final score</span>
+                  <div class="surface-card__row">
+                    <h3 class="surface-card__title">Andre</h3>
+                  </div>
+                </div>
+                <div class="surface-card__body">
+                  <div class="endgame-card__hero">
+                    <p class="endgame-score">71</p>
+                    <span class="endgame-score__label">points</span>
+                  </div>
+                  <div class="endgame-breakdown">
+                    <div class="endgame-breakdown__row"><span class="endgame-breakdown__label">Routes</span><span class="endgame-breakdown__value">+38</span></div>
+                    <div class="endgame-breakdown__row"><span class="endgame-breakdown__label">Tickets</span><span class="endgame-breakdown__value">+18</span></div>
+                    <div class="endgame-breakdown__row"><span class="endgame-breakdown__label">Stations left</span><span class="endgame-breakdown__value">+15</span></div>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="showcase-panel-stack">
+        <div class="section-header">
+          <span class="section-header__eyebrow">Artifact family</span>
+          <div class="section-header__row">
+            <h2 class="section-header__title">Row object + inventory surfaces</h2>
+            <span class="section-header__meta">tactile game objects, not generic app cards</span>
+          </div>
+        </div>
+
+        <div class="showcase-grid">
+          <section class="panel panel--private-info">
+            <div class="section-header">
+              <span class="section-header__eyebrow">Hand / market</span>
+              <div class="section-header__row">
+                <h2 class="section-header__title">Transit artifacts</h2>
+              </div>
+            </div>
+            <div class="market-grid">
+              <article class="transit-card transit-card--market artifact-card artifact-card--market" data-color="emerald">
+                <div class="transit-card__top-band"><span class="transit-card__kicker">Line</span><span class="transit-card__serial">MKT-01</span></div>
+                <div class="transit-card__field"><div class="transit-card__title-stack"><strong class="transit-card__title">Emerald</strong></div></div>
+                <div class="transit-card__bottom-band"><span class="transit-card__footer">Market</span><span class="transit-card__stamp">1</span></div>
+              </article>
+              <article class="transit-card transit-card--hand artifact-card artifact-card--hand" data-color="amber">
+                <div class="transit-card__top-band"><span class="transit-card__kicker">Line</span><span class="transit-card__serial">HND-07</span></div>
+                <div class="transit-card__field"><div class="transit-card__title-stack"><strong class="transit-card__title">Amber</strong></div></div>
+                <div class="transit-card__bottom-band"><span class="transit-card__footer">Hand</span><span class="transit-card__stamp">7</span></div>
+              </article>
+            </div>
+            <p class="showcase-note">Transit cards and ticket cards should share one warm artifact family: restrained framing, quieter paper stock, and route-specific color without extra ornament.</p>
+          </section>
+
+          <section class="panel panel--neutral">
+            <div class="section-header">
+              <span class="section-header__eyebrow">Ticket picker</span>
+              <div class="section-header__row">
+                <h2 class="section-header__title">Selection artifact</h2>
+              </div>
+            </div>
+            <div class="ticket-list">
+              <button class="ticket-card artifact-card artifact-card--ticket">
+                <span>
+                  <span class="ticket-card__kicker">Destination ticket</span>
+                  <span class="ticket-card__route">Hoboken <span class="ticket-arrow">to</span> Jamaica</span>
+                </span>
+                <strong class="ticket-card__points">10 pts</strong>
+              </button>
+              <button class="ticket-card artifact-card artifact-card--ticket ticket-card--selected artifact-card--selected">
+                <span>
+                  <span class="ticket-card__kicker">Destination ticket</span>
+                  <span class="ticket-card__route">Newark <span class="ticket-arrow">to</span> Flushing</span>
+                </span>
+                <strong class="ticket-card__points">8 pts</strong>
+              </button>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="showcase-panel-stack">
+        <div class="section-header">
+          <span class="section-header__eyebrow">Overlay family</span>
+          <div class="section-header__row">
+            <h2 class="section-header__title">ModalShell</h2>
+            <span class="section-header__meta">shared overlay / modal / tutorial container</span>
+          </div>
+        </div>
+
+        <div class="showcase-grid">
+          <div class="modal-shell">
+            <div class="modal-shell__card modal-shell__card--md modal-shell__card--center">
+              <div class="ticket-picker">
+                <div class="ticket-picker__header">
+                  <div class="section-header section-header--ceremony">
+                    <span class="section-header__eyebrow">Private choice</span>
+                    <div class="section-header__row">
+                      <h2 class="section-header__title">Choose starting tickets</h2>
+                    </div>
+                  </div>
+                  <div class="ticket-picker__rule">
+                    <span class="ticket-picker__rule-label">Selection rule</span>
+                    <strong class="ticket-picker__rule-value">Keep at least 2</strong>
+                    <span class="ticket-picker__rule-note">2 of 3 selected</span>
+                  </div>
+                </div>
+                <p class="modal-copy ticket-picker__intro">Use the shared modal shell for ticket choice, handoff, and reveal moments.</p>
+                <div class="ticket-picker__tray">
+                  <div class="ticket-list">
+                    <button class="ticket-card artifact-card artifact-card--ticket ticket-card--selected artifact-card--selected">
+                      <span>
+                        <span class="ticket-card__kicker">Destination ticket</span>
+                        <span class="ticket-card__route">Hoboken <span class="ticket-arrow">to</span> Jamaica</span>
+                      </span>
+                      <strong class="ticket-card__points">10 pts</strong>
+                    </button>
+                    <button class="ticket-card artifact-card artifact-card--ticket">
+                      <span>
+                        <span class="ticket-card__kicker">Destination ticket</span>
+                        <span class="ticket-card__route">Newark <span class="ticket-arrow">to</span> Flushing</span>
+                      </span>
+                      <strong class="ticket-card__points">8 pts</strong>
+                    </button>
+                  </div>
+                </div>
+                <div class="ticket-picker__footer">
+                  <p class="ticket-picker__hint">Ticket picks lock once you confirm. Review the map pairings before you keep.</p>
+                  <div class="setup-actions">
+                    <button class="system-button primary-button"><span class="system-button__content">Keep 2 tickets</span></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-shell modal-shell--tutorial">
+            <div class="modal-shell__card modal-shell__card--lg modal-shell__card--left tutorial-card">
+              <div class="tutorial-layout">
+                <aside class="tutorial-nav">
+                  <div class="tutorial-nav__intro">
+                    <p class="eyebrow">First game guide</p>
+                    <h2>Learn the board in a few minutes</h2>
+                    <p class="tutorial-copy">Use this walkthrough to learn where the public board ends and where your private choices begin.</p>
+                  </div>
+                  <p class="tutorial-progress-note">Step 2 of 6</p>
+                  <div class="tutorial-step-list">
+                    <button class="tutorial-step-link"><span class="tutorial-step-link__index">1</span><span class="tutorial-step-link__label">Read the setup table</span></button>
+                    <button class="tutorial-step-link tutorial-step-link--active"><span class="tutorial-step-link__index">2</span><span class="tutorial-step-link__label">Read the public board first</span></button>
+                    <button class="tutorial-step-link"><span class="tutorial-step-link__index">3</span><span class="tutorial-step-link__label">Inspect the action rail</span></button>
+                  </div>
+                </aside>
+
+                <div class="tutorial-main">
+                  <div class="tutorial-header">
+                    <div class="tutorial-header__meta">
+                      <span class="tutorial-header__kicker">Guided tutorial</span>
+                      <span class="tutorial-header__target">Main board</span>
+                    </div>
+                    <button class="system-button secondary-button"><span class="system-button__content">Skip tutorial</span></button>
+                  </div>
+
+                  <div class="tutorial-hero">
+                    <div class="section-header section-header--ceremony">
+                      <div class="section-header__row">
+                        <h2 class="section-header__title">Read the public board first</h2>
+                      </div>
+                    </div>
+                    <p class="tutorial-copy tutorial-copy--hero">Start with the public board so you can separate shared information from private hand management.</p>
+                  </div>
+
+                  <div class="tutorial-progress" aria-hidden="true">
+                    <span class="tutorial-progress__dot"></span>
+                    <span class="tutorial-progress__dot tutorial-progress__dot--active"></span>
+                    <span class="tutorial-progress__dot"></span>
+                  </div>
+
+                  <div class="tutorial-body">
+                    <section class="surface-card surface-card--detail tutorial-lesson">
+                      <div class="surface-card__header">
+                        <span class="surface-card__eyebrow">Lesson sheet</span>
+                        <div class="surface-card__row">
+                          <h3 class="surface-card__title">What to notice</h3>
+                        </div>
+                      </div>
+                      <div class="surface-card__body tutorial-lesson__section">
+                        <span class="tutorial-lesson__label">Focus area</span>
+                        <strong class="tutorial-lesson__focus">Main board</strong>
+                        <ul class="tutorial-point-list">
+                          <li>Routes and stations are the only objects that drive decisions.</li>
+                          <li>Claimed lines and station markers are always public.</li>
+                          <li>The action rail responds once you inspect a route or city.</li>
+                        </ul>
+                      </div>
+                    </section>
+
+                    <section class="surface-card surface-card--detail tutorial-tip">
+                      <div class="surface-card__header">
+                        <span class="surface-card__eyebrow">Try this</span>
+                        <div class="surface-card__row">
+                          <h3 class="surface-card__title">Suggested move</h3>
+                        </div>
+                      </div>
+                      <div class="surface-card__body">
+                        <p>Click a short route first so you can see how the action rail responds.</p>
+                      </div>
+                    </section>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="showcase-panel-stack">
+        <div class="section-header">
+          <span class="section-header__eyebrow">Control family</span>
+          <div class="section-header__row">
+            <h2 class="section-header__title">Button + FormField</h2>
+            <span class="section-header__meta">shared action and input language</span>
+          </div>
+        </div>
+
+        <div class="showcase-grid">
+          <section class="panel panel--neutral">
+            <div class="section-header">
+              <span class="section-header__eyebrow">Buttons</span>
+              <div class="section-header__row">
+                <h2 class="section-header__title">Primary / secondary</h2>
+                <span class="section-header__meta">shared action language</span>
+              </div>
+            </div>
+            <div class="showcase-actions">
+              <button class="system-button primary-button"><span class="system-button__content">Primary action</span></button>
+              <button class="system-button secondary-button"><span class="system-button__content">Secondary action</span></button>
+              <button class="system-button secondary-button" disabled><span class="system-button__content">Disabled state</span></button>
+            </div>
+          </section>
+
+          <section class="panel panel--neutral">
+            <div class="section-header">
+              <span class="section-header__eyebrow">Fields</span>
+              <div class="section-header__row">
+                <h2 class="section-header__title">FormField wrapper</h2>
+                <span class="section-header__meta">label rhythm and focus states</span>
+              </div>
+            </div>
+            <label class="field form-field">
+              <span class="field__label form-field__label">Your name</span>
+              <span class="field__control form-field__control">
+                <input value="Host" />
+              </span>
+            </label>
+            <label class="field form-field">
+              <span class="field__label form-field__label">Players</span>
+              <span class="field__control form-field__control">
+                <select>
+                  <option>2 players</option>
+                  <option>3 players</option>
+                </select>
+              </span>
+            </label>
+          </section>
+        </div>
+      </section>
+    </main>
+  </body>
+  </html>

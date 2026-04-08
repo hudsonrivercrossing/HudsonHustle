@@ -28,8 +28,9 @@ async function ensureSchema(sql: postgres.Sql): Promise<void> {
       seat_id text not null,
       player_id text,
       player_name text,
-      player_secret text not null,
+      player_secret text,
       controller_type text not null,
+      controller_state jsonb not null,
       ready boolean not null,
       connected boolean not null,
       joined_at timestamptz not null,
@@ -37,6 +38,14 @@ async function ensureSchema(sql: postgres.Sql): Promise<void> {
       primary key (room_code, seat_id)
     )
   `;
+  await sql`alter table room_seats alter column player_secret drop not null`;
+  await sql`alter table room_seats add column if not exists controller_state jsonb`;
+  await sql`
+    update room_seats
+    set controller_state = '{"ownership":"client","authStrategy":"player_secret"}'::jsonb
+    where controller_state is null
+  `;
+  await sql`alter table room_seats alter column controller_state set not null`;
   await sql`
     create table if not exists game_snapshots (
       room_code text primary key,
@@ -118,6 +127,7 @@ export class PostgresRoomRepository implements RoomRepository {
           playerName: seat.playerName,
           playerSecret: seat.playerSecret,
           controllerType: seat.controllerType,
+          controllerState: seat.controllerState,
           ready: seat.ready,
           connected: seat.connected,
           joinedAt: new Date(seat.joinedAt),
@@ -190,6 +200,11 @@ export class PostgresRoomRepository implements RoomRepository {
         playerId: seat.playerId,
         playerName: seat.playerName,
         controllerType: seat.controllerType as StoredRoomRecord["seats"][number]["controllerType"],
+        controllerState:
+          (seat.controllerState as StoredRoomRecord["seats"][number]["controllerState"]) ?? {
+            ownership: "client",
+            authStrategy: "player_secret"
+          },
         ready: seat.ready,
         connected: seat.connected,
         isHost: seat.seatId === room.hostSeatId,

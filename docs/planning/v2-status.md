@@ -7,7 +7,7 @@ The core architecture is in place:
 - separate-device multiplayer shell exists
 - authoritative backend exists
 - released-map room setup exists
-- reconnect credentials exist
+- reconnect token flow exists
 - staging/production deployment paths exist
 
 The remaining work is mostly validation and hardening, not first-principles architecture.
@@ -25,7 +25,7 @@ The remaining work is mostly validation and hardening, not first-principles arch
   - server-owned timeout handling
   - restart-safe deadline persistence
   - client-side live countdown display
-- reconnect model is defined and implemented around:
+- reconnect model is defined and implemented around a single reconnect token that decodes to:
   - `roomCode`
   - `seatId`
   - `playerSecret`

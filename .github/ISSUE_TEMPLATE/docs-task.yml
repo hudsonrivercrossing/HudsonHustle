@@ -1,0 +1,87 @@
+name: Docs task
+description: Create a docs-only issue that should land in the Hudson Hustle Roadmap project.
+title: "[Docs] "
+labels:
+  - documentation
+  - area:docs
+projects:
+  - hudsonrivercrossing/1
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This form automatically:
+        - attaches the issue to `Hudson Hustle Roadmap`
+        - applies the base `documentation` and `area:docs` labels
+        - syncs `Milestone`, `Track`, `Horizon`, and `Priority` through repo automation
+
+        `Status` still starts at the project default `Todo` and should move through `In Progress` and `Done` during execution.
+  - type: input
+    id: milestone
+    attributes:
+      label: Milestone
+      description: Version milestone such as V2.2.
+      placeholder: V2.2
+    validations:
+      required: true
+  - type: dropdown
+    id: horizon
+    attributes:
+      label: Horizon
+      description: Choose the planning horizon for this issue.
+      options:
+        - Now
+        - Next
+        - Later
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: Choose the rough execution priority.
+      options:
+        - P0
+        - P1
+        - P2
+        - P3
+    validations:
+      required: true
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+      description: What doc gap or doc update is needed?
+      placeholder: Describe the specific doc outcome.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: List the doc outcomes that make this issue done.
+      placeholder: |
+        - ...
+        - ...
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Validation
+      description: What should be checked after the doc update?
+      placeholder: |
+        - linked docs updated
+        - terminology aligned
+        - examples still match the product
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: What is not part of this docs issue?
+      placeholder: |
+        - ...
+    validations:
+      required: true

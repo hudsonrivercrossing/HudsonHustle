@@ -148,6 +148,7 @@ interface BoardMapProps {
   boardLabelMode: SnapshotVisuals["boardLabelMode"];
   cardPalette: Record<string, string>;
   playerPalette: Record<string, string>;
+  viewerPlayerId?: string | null;
   game: {
     players: Array<{ id: string; name: string; color: string }>;
     activePlayerIndex: number;
@@ -167,6 +168,7 @@ export function BoardMap({
   boardLabelMode,
   cardPalette,
   playerPalette,
+  viewerPlayerId,
   game,
   selectedRouteId,
   selectedCityId,
@@ -174,6 +176,7 @@ export function BoardMap({
   onSelectCity
 }: BoardMapProps): JSX.Element {
   const activePlayerId = game.players[game.activePlayerIndex]?.id;
+  const claimViewerPlayerId = viewerPlayerId ?? activePlayerId;
   const boardWidth = 1200;
   const boardHeight = 900;
   const backdropOpacityScale = {
@@ -256,7 +259,7 @@ export function BoardMap({
           const totalLength = getPathLength(pathPoints);
           const segments = getSegments(route, pathPoints);
           const claim = game.routeClaims.find((item) => item.routeId === route.id);
-          const claimedByActive = claim?.playerId === activePlayerId;
+          const claimedByViewer = claim?.playerId === claimViewerPlayerId;
           const claimingPlayer = claim ? game.players.find((player) => player.id === claim.playerId) : null;
           const stroke = claim
             ? playerPalette[game.players.find((player) => player.id === claim.playerId)?.color ?? "harbor-blue"]
@@ -270,11 +273,11 @@ export function BoardMap({
           const markerY = middlePoint.y + direction.ny * 18;
           const fillOpacity = claim ? 0.96 : 0.82;
           const ownerBadge = claimingPlayer?.name.trim().charAt(0).toUpperCase() ?? "";
-          const backplateFill = claim ? (claimedByActive ? "#f3df9f" : "#4a3a2b") : "#f7f0e3";
-          const claimStitchStroke = claimedByActive ? "rgba(255, 251, 236, 0.98)" : "rgba(255, 247, 236, 0.22)";
-          const claimStitchWidth = claimedByActive ? 4.6 : 3;
-          const claimStitchDasharray = claimedByActive ? "3.4 5.6" : "2 8.2";
-          const claimStitchDashoffset = claimedByActive ? 0 : 1.4;
+          const backplateFill = claim ? (claimedByViewer ? "#f3df9f" : "#4a3a2b") : "#f7f0e3";
+          const claimStitchStroke = claimedByViewer ? "rgba(255, 251, 236, 0.98)" : "rgba(255, 247, 236, 0.22)";
+          const claimStitchWidth = claimedByViewer ? 4.6 : 3;
+          const claimStitchDasharray = claimedByViewer ? "3.4 5.6" : "2 8.2";
+          const claimStitchDashoffset = claimedByViewer ? 0 : 1.4;
 
           return (
             <g key={route.id}>
@@ -316,8 +319,8 @@ export function BoardMap({
                 </g>
               ))}
               {claim ? (
-                <g transform={`translate(${markerX} ${markerY - 18})`}>
-                  <circle r="11" className={claimedByActive ? "claim-badge claim-badge--self" : "claim-badge claim-badge--opponent"} />
+                <g transform={`translate(${markerX} ${markerY - 18})`} data-testid={`route-claim-${route.id}`}>
+                  <circle r="11" className={claimedByViewer ? "claim-badge claim-badge--self" : "claim-badge claim-badge--opponent"} />
                   <text textAnchor="middle" dy="4" className="claim-badge__label">
                     {ownerBadge}
                   </text>
@@ -330,6 +333,7 @@ export function BoardMap({
                 strokeLinecap="round"
                 onClick={() => onSelectRoute(route.id)}
                 className="route-hitbox"
+                data-testid={`route-hitbox-${route.id}`}
                 fill="none"
               />
             </g>

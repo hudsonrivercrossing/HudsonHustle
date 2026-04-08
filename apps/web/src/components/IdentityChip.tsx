@@ -1,44 +1,27 @@
+import { Button } from "./system/Button";
+import { UtilityPill } from "./system/UtilityPill";
+
 interface IdentityChipProps {
-  roomCode: string;
-  seatId: string;
-  playerSecret: string;
+  reconnectToken: string;
 }
 
 async function copyText(value: string): Promise<void> {
   await navigator.clipboard.writeText(value);
 }
 
-export function IdentityChip({ roomCode, seatId, playerSecret }: IdentityChipProps): JSX.Element {
-  const copyAll = `${roomCode}\n${seatId}\n${playerSecret}`;
-
+export function IdentityChip({ reconnectToken }: IdentityChipProps): JSX.Element {
   return (
     <div className="identity-chip">
-      <span className="identity-chip__pill">Session</span>
+      <UtilityPill value="Reconnect" interactive className="identity-chip__pill" />
       <div className="identity-chip__panel">
-        <div className="identity-chip__row">
-          <span>Room</span>
-          <code>{roomCode}</code>
-          <button className="secondary-button identity-chip__copy" onClick={() => void copyText(roomCode)}>
-            Copy
-          </button>
+        <p className="identity-chip__eyebrow">Reconnect token</p>
+        <p className="identity-chip__label">Copy this token if you need to reconnect manually from another browser or device.</p>
+        <div className="identity-chip__token-row">
+          <code className="identity-chip__token">{reconnectToken}</code>
+          <Button className="identity-chip__copy" onClick={() => void copyText(reconnectToken)}>
+            Copy token
+          </Button>
         </div>
-        <div className="identity-chip__row">
-          <span>Seat</span>
-          <code>{seatId}</code>
-          <button className="secondary-button identity-chip__copy" onClick={() => void copyText(seatId)}>
-            Copy
-          </button>
-        </div>
-        <div className="identity-chip__row">
-          <span>Secret</span>
-          <code>{playerSecret}</code>
-          <button className="secondary-button identity-chip__copy" onClick={() => void copyText(playerSecret)}>
-            Copy
-          </button>
-        </div>
-        <button className="secondary-button identity-chip__copy-all" onClick={() => void copyText(copyAll)}>
-          Copy all
-        </button>
       </div>
     </div>
   );

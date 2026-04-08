@@ -82,6 +82,7 @@ export interface CreateRoomRequest {
   playerCount: 2 | 3 | 4;
   configId: string;
   turnTimeLimitSeconds: number;
+  botSeatIds?: string[];
 }
 
 export interface CreateRoomResponse {

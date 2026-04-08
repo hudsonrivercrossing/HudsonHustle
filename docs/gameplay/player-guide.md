@@ -5,6 +5,14 @@ Hudson Hustle is a route-building game about connecting the NYC/NJ metro area be
 
 If you are brand new, the in-app tutorial gives you a short guided teach and points at the exact part of the screen being explained. If you already know the flow, you can skip it immediately.
 
+## Online Room Note
+In online multiplayer, a room may include one or more built-in `bot` seats.
+
+What stays true:
+- `bot` seats still play by the same route, ticket, and scoring rules
+- `bot` seats are server-owned and do not use reconnect tokens
+- human seats keep the normal reconnect flow if they refresh or briefly disconnect
+
 ## Goal
 Finish the game with the highest score.
 
@@ -15,6 +23,8 @@ You score points by:
 - earning the longest continuous network bonus
 
 You lose points for unfinished destination tickets.
+
+If you need a quick reminder during play, use the in-app `Scoring` button in the top bar. It summarizes route points and endgame bonuses without leaving the table.
 
 ## First Game Setup
 1. Choose `2-4` players.
@@ -32,7 +42,12 @@ Choose exactly one action:
 
 When your turn is finished, click `I'm done`. The app hides your private information and shows a neutral handoff screen for the next player.
 
-If you open a new ticket draw and change your mind before keeping any, you can use the `Back` button to return those tickets and keep planning.
+If you draw new destination tickets, that action is committed.
+
+What that means:
+- you must finish the ticket choice before taking any other action
+- you must keep at least one of the drawn tickets
+- there is no `Back` button to return the draw and change plans
 
 Your private ticket panel also acts as a live checklist:
 - `Pending` means your current owned network does not connect the ticket yet.
