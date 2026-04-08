@@ -46,6 +46,7 @@ jobs:
               Product: { label: "area:product", track: "Product" },
               Ops: { label: "area:ops", track: "Ops" },
             };
+            const areaLabels = Object.values(areaMap).map((entry) => entry.label);
 
             let area = firstLine(sections["Area"]);
             if (!area && (existingLabels.includes("area:docs") || existingLabels.includes("documentation"))) {
@@ -62,9 +63,21 @@ jobs:
               return;
             }
 
+            const nextAreaLabel = area && areaMap[area] ? areaMap[area].label : null;
+            const labelsToRemove = areaLabels.filter((label) => label !== nextAreaLabel && existingLabels.includes(label));
+
+            if (labelsToRemove.length > 0) {
+              await github.rest.issues.removeLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: labelsToRemove,
+              });
+            }
+
             const labelsToAdd = [];
-            if (area && areaMap[area] && !existingLabels.includes(areaMap[area].label)) {
-              labelsToAdd.push(areaMap[area].label);
+            if (nextAreaLabel && !existingLabels.includes(nextAreaLabel)) {
+              labelsToAdd.push(nextAreaLabel);
             }
 
             if (labelsToAdd.length > 0) {
@@ -97,7 +110,7 @@ jobs:
 
             const projectData = await github.graphql(
               `
-                query($login: String!, $number: Int!) {
+                query($login: String!, $number: Int!, $cursor: String) {
                   organization(login: $login) {
                     projectV2(number: $number) {
                       id
@@ -117,7 +130,11 @@ jobs:
                           }
                         }
                       }
-                      items(first: 100) {
+                      items(first: 100, after: $cursor) {
+                        pageInfo {
+                          hasNextPage
+                          endCursor
+                        }
                         nodes {
                           id
                           content {
@@ -134,11 +151,50 @@ jobs:
               {
                 login: "hudsonrivercrossing",
                 number: 1,
+                cursor: null,
               },
             );
 
             const project = projectData.organization.projectV2;
             let projectItem = project.items.nodes.find((node) => node.content?.number === issue.number);
+            let nextCursor = project.items.pageInfo.hasNextPage ? project.items.pageInfo.endCursor : null;
+
+            while (!projectItem && nextCursor) {
+              const nextPage = await github.graphql(
+                `
+                  query($login: String!, $number: Int!, $cursor: String) {
+                    organization(login: $login) {
+                      projectV2(number: $number) {
+                        items(first: 100, after: $cursor) {
+                          pageInfo {
+                            hasNextPage
+                            endCursor
+                          }
+                          nodes {
+                            id
+                            content {
+                              ... on Issue {
+                                number
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                `,
+                {
+                  login: "hudsonrivercrossing",
+                  number: 1,
+                  cursor: nextCursor,
+                },
+              );
+
+              const page = nextPage.organization.projectV2.items;
+              projectItem = page.nodes.find((node) => node.content?.number === issue.number);
+              nextCursor = page.pageInfo.hasNextPage ? page.pageInfo.endCursor : null;
+            }
+
             if (!projectItem) {
               const addResult = await github.graphql(
                 `
