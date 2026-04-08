@@ -12,7 +12,6 @@ interface TicketPickerProps {
   selectedIds: string[];
   onToggle: (ticketId: string) => void;
   onConfirm: () => void;
-  onCancel?: () => void;
 }
 
 export function TicketPicker({
@@ -23,8 +22,7 @@ export function TicketPicker({
   minimumKeep,
   selectedIds,
   onToggle,
-  onConfirm,
-  onCancel
+  onConfirm
 }: TicketPickerProps): JSX.Element {
   const selectedCount = selectedIds.length;
 
@@ -68,11 +66,6 @@ export function TicketPicker({
         <div className="ticket-picker__footer">
           <p className="ticket-picker__hint">Ticket picks lock once you confirm. Review the map pairings before you keep.</p>
           <div className="setup-actions">
-            {onCancel ? (
-              <Button onClick={onCancel}>
-                Back
-              </Button>
-            ) : null}
             <Button variant="primary" disabled={selectedCount < minimumKeep} onClick={onConfirm}>
               Keep {selectedCount} ticket{selectedCount === 1 ? "" : "s"}
             </Button>

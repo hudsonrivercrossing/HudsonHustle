@@ -141,6 +141,90 @@ describe("chooseBotAction", () => {
     });
   });
 
+  it("uses only currently available routes when choosing which drawn ticket to keep", () => {
+    const ticketChoiceConfig: MapConfig = {
+      id: "ticket-choice-map",
+      name: "Ticket Choice Map",
+      cities: [
+        { id: "A", name: "Alpha", x: 0, y: 0 },
+        { id: "B", name: "Bravo", x: 0, y: 0 },
+        { id: "C", name: "Charlie", x: 0, y: 0 }
+      ],
+      routes: [
+        { id: "A-C-direct", from: "A", to: "C", length: 2, color: "crimson", type: "normal" },
+        { id: "B-C-open", from: "B", to: "C", length: 2, color: "cobalt", type: "normal" }
+      ],
+      tickets: [],
+      settings: {
+        trainsPerPlayer: 45,
+        stationsPerPlayer: 3,
+        longestRouteBonus: 10,
+        stationValue: 4
+      }
+    };
+
+    const action = chooseBotAction({
+      config: ticketChoiceConfig,
+      game: buildGame({
+        phase: "ticketChoice",
+        routeClaims: [{ routeId: "A-C-direct", playerId: "p2", colorUsed: "crimson", cardsSpent: ["crimson", "crimson"], tunnelExtraCost: 0 }]
+      }),
+      privateState: buildPrivateState({
+        pendingTickets: [
+          { id: "blocked-high", from: "A", to: "C", points: 10, bucket: "regular" },
+          { id: "open-low", from: "B", to: "C", points: 5, bucket: "regular" }
+        ]
+      })
+    });
+
+    expect(action).toEqual({
+      type: "keep_drawn_tickets",
+      keptTicketIds: ["open-low"]
+    });
+  });
+
+  it("keeps a drawn ticket that is already completed by the bot's claimed routes", () => {
+    const ticketChoiceConfig: MapConfig = {
+      id: "ticket-choice-owned-route-map",
+      name: "Ticket Choice Owned Route Map",
+      cities: [
+        { id: "A", name: "Alpha", x: 0, y: 0 },
+        { id: "B", name: "Bravo", x: 0, y: 0 },
+        { id: "C", name: "Charlie", x: 0, y: 0 }
+      ],
+      routes: [
+        { id: "A-B-owned", from: "A", to: "B", length: 2, color: "crimson", type: "normal" },
+        { id: "B-C-open", from: "B", to: "C", length: 2, color: "cobalt", type: "normal" }
+      ],
+      tickets: [],
+      settings: {
+        trainsPerPlayer: 45,
+        stationsPerPlayer: 3,
+        longestRouteBonus: 10,
+        stationValue: 4
+      }
+    };
+
+    const action = chooseBotAction({
+      config: ticketChoiceConfig,
+      game: buildGame({
+        phase: "ticketChoice",
+        routeClaims: [{ routeId: "A-B-owned", playerId: "p1", colorUsed: "crimson", cardsSpent: ["crimson", "crimson"], tunnelExtraCost: 0 }]
+      }),
+      privateState: buildPrivateState({
+        pendingTickets: [
+          { id: "completed-high", from: "A", to: "B", points: 10, bucket: "regular" },
+          { id: "open-low", from: "B", to: "C", points: 5, bucket: "regular" }
+        ]
+      })
+    });
+
+    expect(action).toEqual({
+      type: "keep_drawn_tickets",
+      keptTicketIds: ["completed-high"]
+    });
+  });
+
   it("claims an affordable route aligned with its incomplete ticket before drawing", () => {
     const hand: TrainCard[] = [
       { id: "c1", color: "crimson" },
@@ -186,6 +270,28 @@ describe("chooseBotAction", () => {
       type: "claim_route",
       routeId: "B-C-blue",
       color: "cobalt"
+    });
+  });
+
+  it("claims an affordable tunnel when it is the useful legal route for the current ticket", () => {
+    const action = chooseBotAction({
+      config: baseConfig,
+      game: buildGame(),
+      privateState: buildPrivateState({
+        hand: [
+          { id: "c1", color: "amber" },
+          { id: "c2", color: "amber" },
+          { id: "c3", color: "amber" },
+          { id: "c4", color: "rose" }
+        ],
+        tickets: [{ id: "ticket-ac", from: "A", to: "C", points: 8, bucket: "regular" }]
+      })
+    });
+
+    expect(action).toEqual({
+      type: "claim_route",
+      routeId: "A-C-tunnel",
+      color: "amber"
     });
   });
 

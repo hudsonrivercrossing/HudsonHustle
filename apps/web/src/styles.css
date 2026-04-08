@@ -2283,10 +2283,10 @@ h3 {
 }
 
 .endgame-breakdown__row {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(118px, 132px) minmax(0, 1fr);
   gap: 16px;
-  align-items: baseline;
+  align-items: start;
   padding: 8px 0;
   border-bottom: 1px dashed rgba(92, 70, 46, 0.12);
 }
@@ -2299,12 +2299,35 @@ h3 {
 .endgame-breakdown__label {
   color: var(--ink-soft);
   font-size: 0.84rem;
+  line-height: 1.2;
 }
 
 .endgame-breakdown__value {
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--ink);
+  text-align: right;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.endgame-breakdown__value--empty {
+  text-transform: none;
+}
+
+.endgame-breakdown__list {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.endgame-breakdown__list-item {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  overflow-wrap: anywhere;
 }
 
 .ticket-row {

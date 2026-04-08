@@ -39,14 +39,19 @@ export function chooseBotAction(context: BotDecisionContext): GameAction {
   if (context.game.phase === "initialTickets") {
     return {
       type: "select_initial_tickets",
-      keptTicketIds: chooseTicketSet(context.config, context.privateState.pendingTickets, 2)
+      keptTicketIds: chooseTicketSet(context.config, context.config.routes, context.privateState.pendingTickets, 2)
     };
   }
 
   if (context.game.phase === "ticketChoice") {
     return {
       type: "keep_drawn_tickets",
-      keptTicketIds: chooseTicketSet(context.config, context.privateState.pendingTickets, 1)
+      keptTicketIds: chooseTicketSet(
+        context.config,
+        getTicketChoiceRoutes(context.config, context.game, context.privateState.playerId),
+        context.privateState.pendingTickets,
+        1
+      )
     };
   }
 
@@ -65,8 +70,8 @@ export function chooseBotAction(context: BotDecisionContext): GameAction {
   return chooseDrawAction(context, demand);
 }
 
-function chooseTicketSet(config: MapConfig, tickets: SeatTicket[], keepCount: number): string[] {
-  const plans = buildTicketPlans(config, config.routes, tickets);
+function chooseTicketSet(config: MapConfig, routes: RouteDef[], tickets: SeatTicket[], keepCount: number): string[] {
+  const plans = buildTicketPlans(config, routes, tickets);
   const selections = combinations(plans, keepCount);
 
   const bestSelection = selections
@@ -127,7 +132,6 @@ function buildRouteDemand(context: BotDecisionContext): RouteDemand[] {
 
 function chooseTicketAlignedClaim(context: BotDecisionContext, demand: RouteDemand[]): GameAction | null {
   const candidates = demand
-    .filter((entry) => entry.route.type !== "tunnel")
     .map((entry) => ({
       route: entry.route,
       score: entry.score + entry.ticketIds.size * 18,
@@ -157,11 +161,10 @@ function chooseTicketAlignedClaim(context: BotDecisionContext, demand: RouteDema
 function chooseFallbackClaim(context: BotDecisionContext, demand: RouteDemand[]): GameAction | null {
   const fallbackBonus = new Map(demand.map((entry) => [entry.route.id, entry.score]));
   const candidates = getAvailableRoutes(context.config, context.game)
-    .filter((route) => route.type !== "tunnel")
     .map((route) => ({
       route,
       color: chooseAffordableColor(route, context.privateState.hand),
-      score: fallbackBonus.get(route.id) ?? route.length * 2
+      score: (fallbackBonus.get(route.id) ?? route.length * 2) - (route.type === "tunnel" ? 10 : 0)
     }))
     .filter((candidate): candidate is { route: RouteDef; color: TrainCardColor; score: number } => candidate.color !== null)
     .sort((left, right) => {
@@ -488,6 +491,14 @@ function getAvailableRoutes(config: MapConfig, game: PublicGameState): RouteDef[
     }
     return true;
   });
+}
+
+function getTicketChoiceRoutes(config: MapConfig, game: PublicGameState, playerId: string): RouteDef[] {
+  const claimedByPlayer = new Set(
+    game.routeClaims.filter((claim) => claim.playerId === playerId).map((claim) => claim.routeId)
+  );
+
+  return getAvailableRoutes(config, game).concat(config.routes.filter((route) => claimedByPlayer.has(route.id)));
 }
 
 function findShortestPath(config: MapConfig, routes: RouteDef[], from: string, to: string): RouteDef[] {

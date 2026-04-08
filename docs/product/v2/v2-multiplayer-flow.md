@@ -110,6 +110,13 @@ Important UX rules:
   - the pending ticket picker for that seat, or
   - the normal game view if that seat already confirmed
 
+## Drawn Ticket Choice
+When a player chooses `Draw tickets` during the main phase:
+- the draw is committed immediately
+- the player must finish the ticket picker before taking any other action
+- the player must keep at least one of the drawn tickets
+- the UI should not offer a cancel or `Back` path that returns the draw to the deck
+
 ## Reconnect UX
 
 ### Automatic Reconnect

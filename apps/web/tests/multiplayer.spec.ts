@@ -249,6 +249,41 @@ test("timer display counts down from the lobby-selected timeout", async ({ brows
   await context.close();
 });
 
+test("drawing tickets in multiplayer offers no cancel path and still requires a keep decision", async ({ browser }) => {
+  const hostContext = await browser.newContext();
+  const guestContext = await browser.newContext();
+  const hostPage = await hostContext.newPage();
+  const guestPage = await guestContext.newPage();
+
+  await openMultiplayerSetup(hostPage);
+  const { roomCode } = await createRoom(hostPage);
+
+  await openMultiplayerSetup(guestPage);
+  await joinRoom(guestPage, roomCode);
+
+  await hostPage.getByRole("button", { name: "Mark ready" }).click();
+  await guestPage.getByRole("button", { name: "Mark ready" }).click();
+  await hostPage.getByRole("button", { name: "Start game" }).click();
+  await clearInitialTicketChoice(hostPage);
+  await clearInitialTicketChoice(guestPage);
+
+  await hostPage.getByRole("button", { name: "Draw tickets" }).click();
+  await expect(hostPage.getByRole("button", { name: "Back" })).toHaveCount(0);
+  await expect(hostPage.getByRole("button", { name: /Keep 1 ticket/ })).toBeVisible();
+
+  const pickerCards = hostPage.locator(".ticket-card");
+  await expect(pickerCards).toHaveCount(3);
+  await pickerCards.nth(0).click();
+  await expect(hostPage.getByRole("button", { name: /Keep 0 tickets/ })).toBeDisabled();
+  await pickerCards.nth(1).click();
+  await expect(hostPage.getByRole("button", { name: /Keep 1 ticket/ })).toBeEnabled();
+  await hostPage.getByRole("button", { name: /Keep 1 ticket/ }).click();
+  await expect(hostPage.getByRole("button", { name: /Keep 1 ticket/ })).toHaveCount(0);
+
+  await guestContext.close();
+  await hostContext.close();
+});
+
 test("host can leave the lobby without stranding the room", async ({ browser }) => {
   const hostContext = await browser.newContext();
   const guestContext = await browser.newContext();

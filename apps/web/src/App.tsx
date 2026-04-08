@@ -5,7 +5,6 @@ import {
   getAffordableStationColors,
   getCityName,
   getTicketProgress,
-  summarizeEndgame,
   type ClientToServerEvents,
   type CreateRoomRequest,
   type CreateRoomResponse,
@@ -30,6 +29,7 @@ import {
   type HudsonHustleReleasedConfigSummary
 } from "@hudson-hustle/game-data";
 import { BoardMap } from "./components/BoardMap";
+import { EndgameBreakdown } from "./components/EndgameBreakdown";
 import { IdentityChip } from "./components/IdentityChip";
 import { LocalPlayScreen } from "./components/LocalPlayScreen";
 import { LobbyScreen } from "./components/LobbyScreen";
@@ -907,18 +907,7 @@ export default function App(): JSX.Element {
                       <p className="endgame-score">{player.score}</p>
                       <span className="endgame-score__label">points</span>
                     </div>
-                    <div className="endgame-breakdown">
-                      {summarizeEndgame(player, mapConfig).map((line) => {
-                        const [label, ...valueParts] = line.split(":");
-                        const value = valueParts.join(":").trim();
-                        return (
-                          <div key={line} className="endgame-breakdown__row">
-                            <span className="endgame-breakdown__label">{label}</span>
-                            <span className="endgame-breakdown__value">{value || line}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
+                    <EndgameBreakdown player={player} config={mapConfig} />
                   </SurfaceCard>
                 ))}
               </div>
@@ -1026,7 +1015,6 @@ export default function App(): JSX.Element {
           config={mapConfig}
           minimumKeep={publicGame.phase === "initialTickets" ? 2 : 1}
           selectedIds={selectedTicketIds}
-          onCancel={publicGame.phase === "ticketChoice" ? () => sendGameAction({ type: "cancel_ticket_draw" }) : undefined}
           onToggle={(ticketId) =>
             setSelectedTicketIds((current) =>
               current.includes(ticketId) ? current.filter((id) => id !== ticketId) : [...current, ticketId]

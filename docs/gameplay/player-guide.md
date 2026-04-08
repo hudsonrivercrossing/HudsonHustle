@@ -42,7 +42,12 @@ Choose exactly one action:
 
 When your turn is finished, click `I'm done`. The app hides your private information and shows a neutral handoff screen for the next player.
 
-If you open a new ticket draw and change your mind before keeping any, you can use the `Back` button to return those tickets and keep planning.
+If you draw new destination tickets, that action is committed.
+
+What that means:
+- you must finish the ticket choice before taking any other action
+- you must keep at least one of the drawn tickets
+- there is no `Back` button to return the draw and change plans
 
 Your private ticket panel also acts as a live checklist:
 - `Pending` means your current owned network does not connect the ticket yet.
