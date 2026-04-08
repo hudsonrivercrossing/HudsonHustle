@@ -7,6 +7,13 @@ description: Use when working on Hudson Hustle planning artifacts, milestone seq
 
 Use this skill when the task touches project planning, milestone reshaping, or doc alignment.
 
+This is a planning/orchestration skill, not the best place for every workflow.
+
+Pair it with:
+- `hudson-hustle-write-a-prd` for drafting requirements
+- `hudson-hustle-prd-to-plan` for converting an accepted PRD into slices
+- `hudson-hustle-prd-to-issues` for issue-sized execution breakdowns
+
 ## Workflow
 1. Read only the relevant planning docs from `docs/`.
 2. State which milestone or scope boundary the request affects.
@@ -25,6 +32,10 @@ Use `hudson-hustle-engineering-manager` instead when the task is about:
 - testing strategy
 - merge gates
 - deploy verification
+
+Use `hudson-hustle-prd-to-plan` instead when the source PRD is accepted and the main job is turning it into phased execution slices.
+
+Use `hudson-hustle-prd-to-issues` instead when the source plan is accepted and the main job is turning it into task-sized items.
 
 ## Hudson Hustle Defaults
 - `V1`: local pass-and-play web app.

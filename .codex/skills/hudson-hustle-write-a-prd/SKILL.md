@@ -18,6 +18,7 @@ Do not use this skill for:
 - simple roadmap status updates without a new requirement document
 
 Use `roadmap-manager` instead when the task is mainly milestone planning, sequencing, or risk control.
+Use `hudson-hustle-prd-to-plan` after this skill when the PRD is accepted and needs to be sliced into execution phases.
 
 ## Output Location
 - Prefer updating an existing doc before creating a new one.
@@ -66,6 +67,9 @@ Use `roadmap-manager` instead when the task is mainly milestone planning, sequen
   - `docs/product/tech-spec.md`
   - `docs/gameplay/player-guide.md`
   - design docs under `docs/product/`
+7. If the user also wants execution planning, explicitly hand off to:
+- `hudson-hustle-prd-to-plan`
+- and later `hudson-hustle-prd-to-issues` if issue/task breakdown is needed
 
 ## Hudson Hustle Defaults
 - Preserve:

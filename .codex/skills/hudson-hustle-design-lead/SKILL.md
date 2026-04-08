@@ -12,6 +12,11 @@ Use this skill when the task is not only to style a screen, but to lead a Hudson
 - orchestrating critique subagents
 - translating design critique into concrete repo changes
 
+This is a role-like orchestration skill.
+Use smaller workflow skills for adjacent jobs:
+- `hudson-hustle-ubiquitous-language` when the real problem is naming drift
+- `hudson-hustle-qa-session` when the task is a structured UI/browser findings pass
+
 This skill is for `v2.1`-style shell work, not broad map redesign.
 
 ## Product Stance
@@ -103,6 +108,13 @@ Hudson Hustle works better when:
 ## Review Workflow
 Run review in findings-first mode.
 
+Before locking a new component family or layout direction, prefer a brief “design it twice” step:
+- compare at least two plausible hierarchy/layout directions
+- choose one explicitly
+- state why the rejected option is wrong for Hudson Hustle
+
+Do not skip straight from first instinct to system law when the boundary is still unclear.
+
 Look for these failure modes:
 - too many components acting like generic cards
 - too many titles at the same weight
@@ -165,6 +177,12 @@ Typical fixes:
 - separate info zone from decision zone
 - group private info explicitly
 - use one clear hero moment instead of many medium-emphasis blocks
+
+When layout is uncertain, sketch two alternatives in prose before coding:
+- one conservative option
+- one bolder option
+
+Then choose one and say why.
 
 ## Duolingo Lessons Worth Adapting
 Allowed:
