@@ -49,11 +49,17 @@ This folder groups the multiplayer-specific product and engineering docs for `v2
 - the remaining `v2.2` work should build from this internal proof instead of reopening controller foundations
 
 ## Current V2.2 Slice 2 Focus
-- expose `bot` seat selection in normal multiplayer room setup
-- support mixed human/bot rooms up to room size
-- prove normal setup, lobby, and start flow for the first public bot-seat milestone
+- completed:
+  - `bot` seat selection in normal multiplayer room setup
+  - mixed human/bot rooms up to room size
+  - normal setup, lobby, and start flow for the first public bot-seat milestone
 
 ## Current V2.2 Slice 3 Focus
-- improve the baseline bot from “legal” to “competent deterministic”
-- strengthen ticket-keep, claim, and draw heuristics
-- keep the policy testable and free of difficulty-tier creep
+- completed:
+  - improved the baseline bot from “legal” to “competent deterministic”
+  - strengthened ticket-keep, claim, and draw heuristics
+  - kept the policy testable and free of difficulty-tier creep
+
+## Current V2.2 Slice 4 Focus
+- harden timer, reconnect, and mixed-room lifecycle behavior around the stronger baseline bot
+- keep public mixed rooms stable before any future difficulty tiers or `human+agent` work

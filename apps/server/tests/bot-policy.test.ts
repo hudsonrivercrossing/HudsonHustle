@@ -8,12 +8,16 @@ const baseConfig: MapConfig = {
   cities: [
     { id: "A", name: "Alpha", x: 0, y: 0 },
     { id: "B", name: "Bravo", x: 0, y: 0 },
-    { id: "C", name: "Charlie", x: 0, y: 0 }
+    { id: "C", name: "Charlie", x: 0, y: 0 },
+    { id: "D", name: "Delta", x: 0, y: 0 },
+    { id: "E", name: "Echo", x: 0, y: 0 }
   ],
   routes: [
     { id: "A-B-red", from: "A", to: "B", length: 2, color: "crimson", type: "normal" },
     { id: "B-C-blue", from: "B", to: "C", length: 2, color: "cobalt", type: "normal" },
-    { id: "A-C-tunnel", from: "A", to: "C", length: 3, color: "amber", type: "tunnel" }
+    { id: "A-C-tunnel", from: "A", to: "C", length: 3, color: "amber", type: "tunnel" },
+    { id: "C-D-green", from: "C", to: "D", length: 2, color: "emerald", type: "normal" },
+    { id: "D-E-black", from: "D", to: "E", length: 2, color: "obsidian", type: "normal" }
   ],
   tickets: [],
   settings: {
@@ -113,7 +117,27 @@ describe("chooseBotAction", () => {
 
     expect(action).toEqual({
       type: "select_initial_tickets",
-      keptTicketIds: ["t-high", "t-mid"]
+      keptTicketIds: ["t-high", "t-mid-2"]
+    });
+  });
+
+  it("prefers a more coherent starting ticket pair over a disconnected higher-point mix", () => {
+    const action = chooseBotAction({
+      config: baseConfig,
+      game: buildGame({ phase: "initialTickets" }),
+      privateState: buildPrivateState({
+        pendingTickets: [
+          { id: "t-ac", from: "A", to: "C", points: 7, bucket: "regular" },
+          { id: "t-ab", from: "A", to: "B", points: 6, bucket: "regular" },
+          { id: "t-de", from: "D", to: "E", points: 8, bucket: "regular" },
+          { id: "t-cd", from: "C", to: "D", points: 4, bucket: "regular" }
+        ]
+      })
+    });
+
+    expect(action).toEqual({
+      type: "select_initial_tickets",
+      keptTicketIds: ["t-ab", "t-ac"]
     });
   });
 
@@ -138,6 +162,33 @@ describe("chooseBotAction", () => {
     });
   });
 
+  it("prefers a claim that advances multiple incomplete tickets over the first path edge of the highest-point ticket", () => {
+    const hand: TrainCard[] = [
+      { id: "c1", color: "crimson" },
+      { id: "c2", color: "crimson" },
+      { id: "c3", color: "cobalt" },
+      { id: "c4", color: "cobalt" }
+    ];
+
+    const action = chooseBotAction({
+      config: baseConfig,
+      game: buildGame(),
+      privateState: buildPrivateState({
+        hand,
+        tickets: [
+          { id: "ticket-ac", from: "A", to: "C", points: 8, bucket: "regular" },
+          { id: "ticket-bc", from: "B", to: "C", points: 7, bucket: "regular" }
+        ]
+      })
+    });
+
+    expect(action).toEqual({
+      type: "claim_route",
+      routeId: "B-C-blue",
+      color: "cobalt"
+    });
+  });
+
   it("draws a matching market color for its target path when no aligned claim is affordable", () => {
     const action = chooseBotAction({
       config: baseConfig,
@@ -155,7 +206,40 @@ describe("chooseBotAction", () => {
     expect(action).toEqual({
       type: "draw_card",
       source: "market",
-      marketIndex: 0
+      marketIndex: 1
+    });
+  });
+
+  it("prefers a market color that supports the stronger shared claim over an earlier but weaker match", () => {
+    const action = chooseBotAction({
+      config: baseConfig,
+      game: buildGame({
+        market: [
+          { id: "m1", color: "crimson" },
+          { id: "m2", color: "cobalt" },
+          { id: "m3", color: "locomotive" },
+          { id: "m4", color: "amber" },
+          { id: "m5", color: "rose" }
+        ]
+      }),
+      privateState: buildPrivateState({
+        hand: [
+          { id: "c1", color: "rose" },
+          { id: "c2", color: "amber" },
+          { id: "c3", color: "rose" },
+          { id: "c4", color: "amber" }
+        ],
+        tickets: [
+          { id: "ticket-ac", from: "A", to: "C", points: 8, bucket: "regular" },
+          { id: "ticket-bc", from: "B", to: "C", points: 7, bucket: "regular" }
+        ]
+      })
+    });
+
+    expect(action).toEqual({
+      type: "draw_card",
+      source: "market",
+      marketIndex: 1
     });
   });
 });
