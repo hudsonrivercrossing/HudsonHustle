@@ -97,7 +97,7 @@ export function MultiplayerSetupScreen({
         </div>
 
         <div className="multiplayer-setup-grid">
-          <Panel variant="status" data-testid="create-room-panel">
+          <Panel variant="status" className="multiplayer-setup-panel multiplayer-setup-panel--primary" data-testid="create-room-panel">
             <SectionHeader eyebrow="Host flow" title="Create room" meta="Host a new table" />
             <FormField label="Your name">
               <input value={hostName} maxLength={24} onChange={(event) => setHostName(event.target.value)} />
@@ -146,7 +146,7 @@ export function MultiplayerSetupScreen({
             </Button>
           </Panel>
 
-          <Panel variant="neutral" data-testid="join-room-panel">
+          <Panel variant="neutral" className="multiplayer-setup-panel multiplayer-setup-panel--secondary" data-testid="join-room-panel">
             <SectionHeader eyebrow="Guest flow" title="Join room" meta="Pick an open seat" />
             <FormField label="Room code">
               <input value={joinRoomCode} onChange={(event) => setJoinRoomCode(event.target.value.toUpperCase())} maxLength={6} />
@@ -190,7 +190,10 @@ export function MultiplayerSetupScreen({
           </Panel>
         </div>
 
-        <Panel variant={reconnectState === "reconnect-failed" ? "alert" : "neutral"} className="reconnect-panel">
+        <Panel
+          variant={reconnectState === "reconnect-failed" ? "alert" : "neutral"}
+          className="reconnect-panel multiplayer-setup-panel multiplayer-setup-panel--tertiary"
+        >
           <SectionHeader eyebrow="Recovery" title="Manual reconnect" meta="Paste one reconnect token" />
           <FormField label="Reconnect token">
             <input
