@@ -10,6 +10,7 @@
 - `V1` runs entirely through `apps/web`, using the shared rules engine locally.
 - `V2` keeps gameplay rules in `packages/game-core`, but moves room lifecycle and authoritative state ownership into `apps/server`.
 - Clients submit intent; the server validates and broadcasts resulting public/private projections.
+- `V2.2` extends the room model so a seat can be owned either by a client controller or by a server-owned internal bot controller.
 - `packages/game-data` remains the shared source for released maps and balance data across both `web` and `server`.
 
 ## State Model
@@ -440,12 +441,16 @@ Seats and controllers should be modeled separately from the beginning.
   - `bot`
   - `agent`
   - `human+agent`
+- `controllerState`
+  - client-owned seats authenticate with `playerSecret`
+  - server-owned bot seats do not expose reconnect credentials and act through server-owned controller state
 
 Rules by phase:
 - `V2 MVP`
   - ship only `human`
 - `V2.x`
   - keep `bot` hooks available internally for testing
+  - the first bot proof should operate only on the bot seat's public/private projection
 - `MVP3`
   - support `human+agent` before full autonomous `agent`
 

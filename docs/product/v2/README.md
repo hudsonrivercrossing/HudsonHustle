@@ -30,3 +30,12 @@ This folder groups the multiplayer-specific product and engineering docs for `v2
 - Use [V2.2 Slice 1 Bot Seat Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-1-bot-seat-implementation-prd.md) when starting the first architecture-proof implementation slice.
 - Use [V2.2 Slice 1 Bot Seat Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-1-bot-seat-issues.md) for task-sized breakdown of that first slice.
 - Use [V2.2 System Agent Architecture](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-system-agent-architecture.md) for the first system-player recommendation path.
+
+## Current V2.2 Slice 1 Status
+- authoritative room model now supports server-owned `bot` seats
+- the first server-owned legal action loop is proven
+- the current deterministic baseline bot can:
+  - confirm starting tickets
+  - make simple ticket-aligned route claims
+  - make deterministic draw choices when no obvious claim is available
+- the remaining `v2.2` work should build from this internal proof instead of reopening controller foundations

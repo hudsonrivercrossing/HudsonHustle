@@ -1,7 +1,18 @@
 import type { GameState, RoomSeatSummary, RoomStatus } from "@hudson-hustle/game-core";
 
+export type StoredSeatControllerState =
+  | {
+      ownership: "client";
+      authStrategy: "player_secret";
+    }
+  | {
+      ownership: "server";
+      controllerKey: "internal:bot";
+    };
+
 export interface StoredSeatRecord extends RoomSeatSummary {
-  playerSecret: string;
+  playerSecret: string | null;
+  controllerState: StoredSeatControllerState;
   joinedAt: string;
   updatedAt: string;
 }

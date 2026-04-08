@@ -54,7 +54,8 @@ The client is responsible for:
 ## Room Model
 - one room hosts one game
 - each room has a short room code
-- each seat has a stable player secret
+- each client-controlled seat has a stable player secret
+- a server-owned seat may have no client auth secret at all
 - the room may have a host for setup flow, but game continuity must not depend on the host staying connected
 
 ## Reconnect Model
@@ -85,6 +86,8 @@ A seat is a stable player position in a room.
 
 ### MVP2.x Rule
 - keep a private `bot` controller interface available for internal testing
+- the first internal proof should keep `bot` server-owned and route it through the same authoritative action path as human seats
+- the bot should only see the same public/private projection that its seat would see
 
 ### MVP3 Direction
 - add `human+agent` first
@@ -153,6 +156,16 @@ Do not start with a fully elaborate event-sourced system unless reconnect and de
 1. internal bot controller hook
 2. test-only bot seats
 3. simulation harness integration
+
+### Current Slice 1 Proof
+- internal room state now distinguishes:
+  - client-owned seats authenticated by `playerSecret`
+  - server-owned `bot` seats with no reconnect secret
+- the first `bot` path submits normal legal actions through the authoritative room service
+- the first deterministic baseline handles:
+  - initial ticket confirmation
+  - simple ticket-aligned route claims
+  - deterministic draw decisions when no obvious claim is available
 
 ### MVP3
 1. `human+agent` assisted seats

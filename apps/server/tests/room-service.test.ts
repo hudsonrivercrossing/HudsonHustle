@@ -190,6 +190,198 @@ describe("RoomService", () => {
     });
   });
 
+  it("can represent a server-owned bot seat without a player secret in the authoritative room model", async () => {
+    const service = new RoomService(new MemoryRoomRepository(), hudsonHustleReleasedConfigs);
+    const created = await service.createRoom({
+      hostName: "Ava",
+      playerCount: 2,
+      configId: "v0.4-flushing-newark-airport",
+      turnTimeLimitSeconds: 0
+    });
+
+    const botAssigned = await service.assignBotSeat(created.roomCode, "seat-2", "Bot West");
+
+    expect(botAssigned.room.seats[1]).toMatchObject({
+      seatId: "seat-2",
+      playerName: "Bot West",
+      controllerType: "bot",
+      ready: true,
+      connected: true
+    });
+
+    const room = (service as any).rooms.get(created.roomCode);
+    expect(room.seats[1]?.playerSecret).toBeNull();
+    expect(room.seats[1]?.controllerState).toEqual({
+      ownership: "server",
+      controllerKey: "internal:bot"
+    });
+
+    await expect(
+      service.rejoinRoom(created.roomCode, {
+        seatId: "seat-2",
+        playerSecret: "fake-secret"
+      })
+    ).rejects.toMatchObject({ statusCode: 403, code: "invalid_credentials" });
+  });
+
+  it("allows a human host to start a room that includes a server-owned bot seat", async () => {
+    const service = new RoomService(new MemoryRoomRepository(), hudsonHustleReleasedConfigs);
+    const created = await service.createRoom({
+      hostName: "Ava",
+      playerCount: 2,
+      configId: "v0.4-flushing-newark-airport",
+      turnTimeLimitSeconds: 0
+    });
+
+    await service.assignBotSeat(created.roomCode, "seat-2", "Bot West");
+    await service.setReady(created.roomCode, { seatId: created.seatId, playerSecret: created.playerSecret }, true);
+
+    const started = await service.startRoom(created.roomCode, { playerSecret: created.playerSecret });
+
+    expect(started.snapshot.room.status).toBe("active");
+    expect(started.snapshot.game?.players).toHaveLength(2);
+    expect(started.snapshot.room.seats[1]).toMatchObject({
+      seatId: "seat-2",
+      controllerType: "bot",
+      playerName: "Bot West"
+    });
+  });
+
+  it("keeps private snapshot isolation intact when a server-owned bot seat is present", async () => {
+    const service = new RoomService(new MemoryRoomRepository(), hudsonHustleReleasedConfigs);
+    const created = await service.createRoom({
+      hostName: "Ava",
+      playerCount: 2,
+      configId: "v0.4-flushing-newark-airport",
+      turnTimeLimitSeconds: 0
+    });
+
+    await service.assignBotSeat(created.roomCode, "seat-2", "Bot West");
+    await service.setReady(created.roomCode, { seatId: created.seatId, playerSecret: created.playerSecret }, true);
+    await service.startRoom(created.roomCode, { playerSecret: created.playerSecret });
+
+    const publicSnapshot = await service.getSnapshot(created.roomCode);
+    const hostSnapshot = await service.getSnapshot(created.roomCode, {
+      seatId: created.seatId,
+      playerSecret: created.playerSecret
+    });
+
+    expect(publicSnapshot.privateState).toBeNull();
+    expect(hostSnapshot.privateState?.seatId).toBe(created.seatId);
+    expect(hostSnapshot.privateState?.playerId).toBe(hostSnapshot.game?.players[0]?.id);
+
+    const botPlayer = hostSnapshot.game?.players.find((player) => player.name === "Bot West");
+    expect(botPlayer?.handCount).toBe(4);
+    expect(botPlayer?.ticketCount).toBe(0);
+    expect(botPlayer?.pendingTicketCount).toBe(4);
+  });
+
+  it("auto-confirms initial tickets for a server-owned bot seat through the normal action path", async () => {
+    const service = new RoomService(new MemoryRoomRepository(), hudsonHustleReleasedConfigs);
+    const created = await service.createRoom({
+      hostName: "Ava",
+      playerCount: 2,
+      configId: "v0.4-flushing-newark-airport",
+      turnTimeLimitSeconds: 0
+    });
+
+    await service.assignBotSeat(created.roomCode, "seat-2", "Bot West");
+    await service.setReady(created.roomCode, { seatId: created.seatId, playerSecret: created.playerSecret }, true);
+    const started = await service.startRoom(created.roomCode, { playerSecret: created.playerSecret });
+
+    expect(started.snapshot.game?.phase).toBe("initialTickets");
+
+    const afterHostSelection = await service.applyAction(
+      created.roomCode,
+      { seatId: created.seatId, playerSecret: created.playerSecret },
+      {
+        roomCode: created.roomCode,
+        seatId: created.seatId,
+        playerSecret: created.playerSecret,
+        action: {
+          type: "select_initial_tickets",
+          keptTicketIds: started.snapshot.privateState?.pendingTickets.slice(0, 2).map((ticket) => ticket.id) ?? []
+        }
+      }
+    );
+
+    expect(afterHostSelection.game?.phase).toBe("main");
+    expect(afterHostSelection.room.activeSeatId).toBe(created.seatId);
+
+    const botPlayer = afterHostSelection.game?.players.find((player) => player.name === "Bot West");
+    expect(botPlayer?.ticketCount).toBe(2);
+    expect(botPlayer?.pendingTicketCount).toBe(0);
+  });
+
+  it("automatically completes a legal bot turn when the bot becomes the active seat", async () => {
+    const service = new RoomService(new MemoryRoomRepository(), hudsonHustleReleasedConfigs);
+    const created = await service.createRoom({
+      hostName: "Ava",
+      playerCount: 2,
+      configId: "v0.4-flushing-newark-airport",
+      turnTimeLimitSeconds: 0
+    });
+
+    await service.assignBotSeat(created.roomCode, "seat-2", "Bot West");
+    await service.setReady(created.roomCode, { seatId: created.seatId, playerSecret: created.playerSecret }, true);
+    const started = await service.startRoom(created.roomCode, { playerSecret: created.playerSecret });
+
+    await service.applyAction(
+      created.roomCode,
+      { seatId: created.seatId, playerSecret: created.playerSecret },
+      {
+        roomCode: created.roomCode,
+        seatId: created.seatId,
+        playerSecret: created.playerSecret,
+        action: {
+          type: "select_initial_tickets",
+          keptTicketIds: started.snapshot.privateState?.pendingTickets.slice(0, 2).map((ticket) => ticket.id) ?? []
+        }
+      }
+    );
+
+    await service.applyAction(
+      created.roomCode,
+      { seatId: created.seatId, playerSecret: created.playerSecret },
+      {
+        roomCode: created.roomCode,
+        seatId: created.seatId,
+        playerSecret: created.playerSecret,
+        action: {
+          type: "draw_card",
+          source: "deck"
+        }
+      }
+    );
+
+    const beforeBotTurn = await service.getSnapshot(created.roomCode, {
+      seatId: created.seatId,
+      playerSecret: created.playerSecret
+    });
+
+    const afterBotTurn = await service.applyAction(
+      created.roomCode,
+      { seatId: created.seatId, playerSecret: created.playerSecret },
+      {
+        roomCode: created.roomCode,
+        seatId: created.seatId,
+        playerSecret: created.playerSecret,
+        action: {
+          type: "draw_card",
+          source: "deck"
+        }
+      }
+    );
+
+    expect(afterBotTurn.room.activeSeatId).toBe(created.seatId);
+    const botPlayer = afterBotTurn.game?.players.find((player) => player.name === "Bot West");
+    expect(botPlayer).toBeTruthy();
+    expect(
+      (afterBotTurn.game?.routeClaims.length ?? 0) > (beforeBotTurn.game?.routeClaims.length ?? 0) ||
+        (botPlayer?.handCount ?? 0) !== (beforeBotTurn.game?.players.find((player) => player.name === "Bot West")?.handCount ?? 0)
+    ).toBe(true);
+  });
+
   it("restores an active timer after reloading a timed room from persistence", async () => {
     const repository = new MemoryRoomRepository();
     const service = new RoomService(repository, hudsonHustleReleasedConfigs);
