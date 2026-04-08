@@ -31,7 +31,7 @@ export function LobbyScreen({
 }: LobbyScreenProps): JSX.Element {
   const localSeat = room.seats.find((seat) => seat.seatId === localSeatId);
   const canStart = realtimeReady && localSeat?.isHost && room.seats.every((seat) => seat.playerName) && room.seats.every((seat) => seat.ready);
-  const joinedCount = room.seats.filter((seat) => seat.playerName).length;
+  const occupiedCount = room.seats.filter((seat) => seat.playerName).length;
   const readyCount = room.seats.filter((seat) => seat.ready).length;
   const lobbyTone = realtimeMessage ? "failure" : canStart ? "active" : "waiting";
   const lobbyHeadline = realtimeMessage
@@ -46,7 +46,7 @@ export function LobbyScreen({
     : canStart
     ? "Everyone is seated and ready. Start the game when you want."
     : localSeat?.isHost
-      ? `Seats joined: ${joinedCount}/${room.playerCount}. Ready: ${readyCount}/${room.playerCount}.`
+      ? `Seats occupied: ${occupiedCount}/${room.playerCount}. Ready: ${readyCount}/${room.playerCount}.`
       : "Share the room code, mark yourself ready, and wait for the host to start.";
 
   return (
@@ -84,7 +84,7 @@ export function LobbyScreen({
             <SectionHeader
               eyebrow="Table state"
               title="Seats"
-              meta={`${room.seats.filter((seat) => seat.playerName).length}/${room.playerCount} joined`}
+              meta={`${occupiedCount}/${room.playerCount} occupied`}
             />
             <div className="seat-stack">
               {room.seats.map((seat) => (
@@ -98,16 +98,33 @@ export function LobbyScreen({
                     <p className="row-object__meta">
                       {seat.seatId}
                       {seat.isHost ? " · host" : ""}
-                      {seat.connected ? " · connected" : ""}
+                      {seat.controllerType === "bot" ? " · server-owned bot" : seat.playerName ? seat.connected ? " · connected" : " · offline" : ""}
                     </p>
                   </div>
                   <div className="row-object__stats seat-status-stack">
-                    <Chip tone={seat.ready ? "success" : "warning"} className="seat-ready">
-                      {seat.ready ? "Ready" : "Waiting"}
-                    </Chip>
-                    <Chip tone={seat.connected ? "info" : "danger"} className="seat-ready" data-testid={`seat-connected-${seat.seatId}`}>
-                      {seat.connected ? "Connected" : "Offline"}
-                    </Chip>
+                    {seat.playerName === null ? (
+                      <Chip tone="neutral" className="seat-ready">
+                        Open
+                      </Chip>
+                    ) : seat.controllerType === "bot" ? (
+                      <>
+                        <Chip tone="info" className="seat-ready">
+                          Bot
+                        </Chip>
+                        <Chip tone="success" className="seat-ready" data-testid={`seat-connected-${seat.seatId}`}>
+                          Server
+                        </Chip>
+                      </>
+                    ) : (
+                      <>
+                        <Chip tone={seat.ready ? "success" : "warning"} className="seat-ready">
+                          {seat.ready ? "Ready" : "Waiting"}
+                        </Chip>
+                        <Chip tone={seat.connected ? "info" : "danger"} className="seat-ready" data-testid={`seat-connected-${seat.seatId}`}>
+                          {seat.connected ? "Connected" : "Offline"}
+                        </Chip>
+                      </>
+                    )}
                   </div>
                 </article>
               ))}

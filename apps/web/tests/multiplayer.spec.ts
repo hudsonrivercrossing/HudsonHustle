@@ -55,16 +55,22 @@ async function openLocalSetup(page: Page, options?: { resetTutorial?: boolean })
 
 async function createRoom(
   page: Page,
-  options?: { timerAdjustments?: number; expectedTimerText?: string }
+  options?: { timerAdjustments?: number; expectedTimerText?: string; botSeats?: string[]; playerCount?: 2 | 3 | 4 }
 ): Promise<{ roomCode: string; seatId: string; playerSecret: string }> {
   const createPanel = page.getByTestId("create-room-panel");
   const timerAdjustments = options?.timerAdjustments ?? 2;
   const expectedTimerText = options?.expectedTimerText ?? "30s";
+  const botSeats = new Set(options?.botSeats ?? []);
+  const playerCount = options?.playerCount ?? 2;
   await createPanel.getByLabel("Your name").fill("Host");
+  await createPanel.getByLabel("Players").selectOption(String(playerCount));
   for (let index = 0; index < timerAdjustments; index += 1) {
     await createPanel.getByRole("button", { name: "+15" }).click();
   }
   await expect(createPanel.getByText(expectedTimerText)).toBeVisible();
+  for (const seatId of botSeats) {
+    await createPanel.getByTestId(`seat-plan-toggle-${seatId}`).click();
+  }
   await createPanel.getByRole("button", { name: "Create room" }).click();
   await expect(page.getByTestId("lobby-status-banner")).toBeVisible({ timeout: 10000 });
   await expect(page.getByTestId("seat-connected-seat-1")).toHaveText("Connected");
@@ -273,6 +279,103 @@ test("host can leave the lobby without stranding the room", async ({ browser }) 
   await expect(guestPage.getByTestId("seat-row-seat-1")).toContainText("Returner");
 
   await replacementContext.close();
+  await guestContext.close();
+  await hostContext.close();
+});
+
+test("normal setup can create a room with one bot seat and start with the host alone", async ({ browser }) => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+
+  await openMultiplayerSetup(page);
+  await createRoom(page, { botSeats: ["seat-2"] });
+
+  await expect(page.getByTestId("seat-row-seat-2")).toContainText("Bot 1");
+  await expect(page.getByTestId("seat-connected-seat-2")).toHaveText("Server");
+
+  await page.getByRole("button", { name: "Mark ready" }).click();
+  await expect(page.getByRole("button", { name: "Start game" })).toBeEnabled();
+  await page.getByRole("button", { name: "Start game" }).click();
+  await clearInitialTicketChoice(page);
+
+  await expect(page.getByTestId("turn-status-banner")).toBeVisible();
+  await context.close();
+});
+
+test("normal setup can create a mixed room with multiple bot seats and only leave human seats joinable", async ({ browser }) => {
+  const hostContext = await browser.newContext();
+  const guestContext = await browser.newContext();
+  const hostPage = await hostContext.newPage();
+  const guestPage = await guestContext.newPage();
+
+  await openMultiplayerSetup(hostPage);
+  const { roomCode } = await createRoom(hostPage, {
+    playerCount: 4,
+    botSeats: ["seat-2", "seat-3"]
+  });
+
+  await expect(hostPage.getByTestId("seat-row-seat-2")).toContainText("Bot 1");
+  await expect(hostPage.getByTestId("seat-row-seat-3")).toContainText("Bot 2");
+  await expect(hostPage.getByTestId("seat-row-seat-4")).toContainText("Open seat");
+
+  await openMultiplayerSetup(guestPage);
+  const joinPanel = guestPage.getByTestId("join-room-panel");
+  await joinPanel.getByLabel("Room code").fill(roomCode);
+  await joinPanel.getByRole("button", { name: "Preview room" }).click();
+  await expect(guestPage.getByRole("button", { name: "seat-4" })).toBeVisible();
+  await expect(guestPage.getByRole("button", { name: "seat-2" })).toHaveCount(0);
+  await expect(guestPage.getByRole("button", { name: "seat-3" })).toHaveCount(0);
+  await guestPage.getByRole("button", { name: "seat-4" }).click();
+  await joinPanel.getByLabel("Your name").fill("Guest");
+  await joinPanel.getByRole("button", { name: "Join room" }).click();
+
+  await expect(guestPage.getByTestId("seat-row-seat-2")).toContainText("Bot 1");
+  await expect(guestPage.getByTestId("seat-row-seat-3")).toContainText("Bot 2");
+  await expect(guestPage.getByTestId("seat-row-seat-4")).toContainText("Guest");
+
+  await guestContext.close();
+  await hostContext.close();
+});
+
+test("timed mixed rooms hand off through bot turns and still allow human reconnect", async ({ browser }) => {
+  const hostContext = await browser.newContext();
+  const guestContext = await browser.newContext();
+  const hostPage = await hostContext.newPage();
+  const guestPage = await guestContext.newPage();
+
+  await openMultiplayerSetup(hostPage);
+  const { roomCode } = await createRoom(hostPage, {
+    playerCount: 3,
+    botSeats: ["seat-2"],
+    timerAdjustments: 1,
+    expectedTimerText: "15s"
+  });
+
+  await openMultiplayerSetup(guestPage);
+  await joinRoom(guestPage, roomCode, {
+    seatId: "seat-3",
+    playerName: "Guest"
+  });
+
+  await hostPage.getByRole("button", { name: "Mark ready" }).click();
+  await guestPage.getByRole("button", { name: "Mark ready" }).click();
+  await hostPage.getByRole("button", { name: "Start game" }).click();
+  await clearInitialTicketChoice(hostPage);
+  await clearInitialTicketChoice(guestPage);
+
+  await expect(hostPage.getByTestId("turn-status-banner")).toContainText("Your turn");
+  await expect(guestPage.getByTestId("turn-status-banner")).toContainText("Waiting");
+
+  await expect
+    .poll(async () => {
+      return guestPage.getByTestId("turn-status-banner").textContent();
+    }, { timeout: 25000 })
+    .toContain("Your turn");
+
+  await guestPage.reload();
+  await expect(guestPage.getByTestId("turn-status-banner")).toBeVisible();
+  await expect(guestPage.getByTestId("turn-status-banner")).toContainText("Your turn");
+
   await guestContext.close();
   await hostContext.close();
 });

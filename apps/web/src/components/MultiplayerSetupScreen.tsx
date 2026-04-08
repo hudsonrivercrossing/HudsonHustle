@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import type { HudsonHustleReleasedConfigSummary } from "@hudson-hustle/game-data";
 import type { ReconnectState, RoomSummary } from "@hudson-hustle/game-core";
 import { Button } from "./system/Button";
+import { Chip } from "./system/Chip";
 import { FormField } from "./system/FormField";
 import { Panel } from "./system/Panel";
 import { SectionHeader } from "./system/SectionHeader";
@@ -12,6 +13,7 @@ interface CreateRoomForm {
   playerCount: 2 | 3 | 4;
   configId: string;
   turnTimeLimitSeconds: number;
+  botSeatIds: string[];
 }
 
 interface MultiplayerSetupScreenProps {
@@ -44,6 +46,7 @@ export function MultiplayerSetupScreen({
   const [playerCount, setPlayerCount] = useState<2 | 3 | 4>(2);
   const [configId, setConfigId] = useState(latestConfigId);
   const [turnTimeLimitSeconds, setTurnTimeLimitSeconds] = useState(0);
+  const [botSeatIds, setBotSeatIds] = useState<string[]>([]);
 
   const [joinRoomCode, setJoinRoomCode] = useState("");
   const [joinPlayerName, setJoinPlayerName] = useState("Player");
@@ -55,6 +58,12 @@ export function MultiplayerSetupScreen({
     () => roomPreview?.seats.filter((seat) => seat.playerName === null) ?? [],
     [roomPreview]
   );
+  const setupSeatIds = useMemo(
+    () => Array.from({ length: playerCount }, (_, index) => `seat-${index + 1}`),
+    [playerCount]
+  );
+  const plannedBotCount = botSeatIds.filter((seatId) => seatId !== "seat-1" && setupSeatIds.includes(seatId)).length;
+  const plannedHumanOpenSeats = Math.max(0, playerCount - 1 - plannedBotCount);
   const setupBannerTone = error || reconnectState === "reconnect-failed" ? "failure" : reconnectState === "attempting-reconnect" ? "waiting" : "neutral";
   const setupBannerEyebrow =
     error || reconnectState === "reconnect-failed" ? "Connection issue" : reconnectState === "attempting-reconnect" ? "Reconnect" : "Separate-device multiplayer";
@@ -109,6 +118,40 @@ export function MultiplayerSetupScreen({
                 <option value={4}>4 players</option>
               </select>
             </FormField>
+            <FormField as="div" label="Seat plan" helper={`${plannedBotCount} bot seat${plannedBotCount === 1 ? "" : "s"} · ${plannedHumanOpenSeats} open human seat${plannedHumanOpenSeats === 1 ? "" : "s"}`}>
+              <div className="seat-plan">
+                {setupSeatIds.map((seatId, index) => {
+                  const isHostSeat = seatId === "seat-1";
+                  const isBotSeat = botSeatIds.includes(seatId);
+                  return (
+                    <div key={seatId} className={`seat-plan__row ${isBotSeat ? "seat-plan__row--bot" : ""}`} data-testid={`seat-plan-${seatId}`}>
+                      <div className="seat-plan__copy">
+                        <strong className="seat-plan__title">{seatId}</strong>
+                        <span className="seat-plan__meta">
+                          {isHostSeat ? "Host seat" : isBotSeat ? `Bot ${index}` : "Open human seat"}
+                        </span>
+                      </div>
+                      {isHostSeat ? (
+                        <Chip tone="info">Host</Chip>
+                      ) : (
+                        <button
+                          type="button"
+                          className={`chip-button seat-plan__toggle ${isBotSeat ? "chip-button--selected" : ""}`}
+                          data-testid={`seat-plan-toggle-${seatId}`}
+                          onClick={() =>
+                            setBotSeatIds((current) =>
+                              current.includes(seatId) ? current.filter((entry) => entry !== seatId) : [...current, seatId]
+                            )
+                          }
+                        >
+                          {isBotSeat ? "Bot" : "Open"}
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </FormField>
             <FormField label="Released map">
               <select value={configId} onChange={(event) => setConfigId(event.target.value)}>
                 {releasedConfigs.map((config) => (
@@ -138,7 +181,8 @@ export function MultiplayerSetupScreen({
                   hostName: hostName.trim() || "Host",
                   playerCount,
                   configId,
-                  turnTimeLimitSeconds
+                  turnTimeLimitSeconds,
+                  botSeatIds: botSeatIds.filter((seatId) => setupSeatIds.includes(seatId))
                 })
               }
             >
@@ -170,6 +214,7 @@ export function MultiplayerSetupScreen({
                     </Button>
                   ))}
                 </div>
+                {openSeats.length === 0 ? <p className="muted-copy room-preview__empty">No open human seats left in this room.</p> : null}
               </div>
             ) : null}
             <FormField label="Your name">

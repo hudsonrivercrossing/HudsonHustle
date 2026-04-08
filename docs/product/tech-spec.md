@@ -10,6 +10,11 @@
 - `V1` runs entirely through `apps/web`, using the shared rules engine locally.
 - `V2` keeps gameplay rules in `packages/game-core`, but moves room lifecycle and authoritative state ownership into `apps/server`.
 - Clients submit intent; the server validates and broadcasts resulting public/private projections.
+- `V2.2` extends the room model so a seat can be owned either by a client controller or by a server-owned `bot` controller.
+- `V2.2` Slice 2 exposes that controller distinction in normal multiplayer room setup through seat-oriented `bot` assignment for non-host seats.
+- `V2.2` Slice 3 strengthens the built-in deterministic bot with coherent ticket-keep, route-demand claim selection, and color-demand draw heuristics while keeping the same authoritative action path.
+- `V2.2` Slice 4 hardens mixed-room lifecycle behavior so timed human turns, persisted-room restore, and reconnect flows can hand off cleanly through server-owned bot seats.
+- `V2.2` Slice 5 freezes the first public system-player milestone and keeps `bot`, `agent`, `human+agent`, `seat`, and `controller` terminology explicit.
 - `packages/game-data` remains the shared source for released maps and balance data across both `web` and `server`.
 
 ## State Model
@@ -440,12 +445,17 @@ Seats and controllers should be modeled separately from the beginning.
   - `bot`
   - `agent`
   - `human+agent`
+- `controllerState`
+  - client-owned seats authenticate with `playerSecret`
+  - server-owned bot seats do not expose reconnect credentials and act through server-owned controller state
 
 Rules by phase:
 - `V2 MVP`
   - ship only `human`
-- `V2.x`
-  - keep `bot` hooks available internally for testing
+- `V2.2`
+  - ship public mixed human/`bot` rooms through normal setup
+  - keep `bot` seats server-owned and non-reconnectable
+  - keep the first bot path limited to the bot seat's public/private projection
 - `MVP3`
   - support `human+agent` before full autonomous `agent`
 

@@ -5,6 +5,14 @@ Hudson Hustle is a route-building game about connecting the NYC/NJ metro area be
 
 If you are brand new, the in-app tutorial gives you a short guided teach and points at the exact part of the screen being explained. If you already know the flow, you can skip it immediately.
 
+## Online Room Note
+In online multiplayer, a room may include one or more built-in `bot` seats.
+
+What stays true:
+- `bot` seats still play by the same route, ticket, and scoring rules
+- `bot` seats are server-owned and do not use reconnect tokens
+- human seats keep the normal reconnect flow if they refresh or briefly disconnect
+
 ## Goal
 Finish the game with the highest score.
 

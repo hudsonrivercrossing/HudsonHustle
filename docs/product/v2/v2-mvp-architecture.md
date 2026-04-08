@@ -22,7 +22,7 @@ This split keeps the static client cheap and easy to deploy while the backend ha
 - matchmaking
 - spectator mode
 - social login
-- public bot feature
+- difficulty tiers for `bot` seats
 - user-supplied agents
 - chat, voice, or emotes
 
@@ -54,7 +54,8 @@ The client is responsible for:
 ## Room Model
 - one room hosts one game
 - each room has a short room code
-- each seat has a stable player secret
+- each client-controlled seat has a stable player secret
+- a server-owned seat may have no client auth secret at all
 - the room may have a host for setup flow, but game continuity must not depend on the host staying connected
 
 ## Reconnect Model
@@ -83,8 +84,11 @@ A seat is a stable player position in a room.
 ### MVP2 Rule
 - only `human` is active in shipped MVP2 rooms
 
-### MVP2.x Rule
-- keep a private `bot` controller interface available for internal testing
+### V2.2 Shipped Rule
+- public mixed human/`bot` rooms are now part of shipped `v2.2`
+- `bot` seats stay server-owned and route through the same authoritative action path as human seats
+- `bot` seats see only the same public/private projection their seat should see
+- `bot` seats do not expose reconnect credentials
 
 ### MVP3 Direction
 - add `human+agent` first
@@ -149,10 +153,26 @@ Do not start with a fully elaborate event-sourced system unless reconnect and de
 4. reconnect and resume
 5. hosted end-to-end deployment
 
-### MVP2.x
-1. internal bot controller hook
-2. test-only bot seats
-3. simulation harness integration
+### V2.2 System Player Milestone
+1. public mixed human/`bot` room setup
+2. one deterministic competent baseline `bot` policy
+3. hardened timer, reconnect, and persistence behavior for mixed rooms
+
+### Current V2.2 Freeze
+- room state now distinguishes:
+  - client-owned seats authenticated by `playerSecret`
+  - server-owned `bot` seats with no reconnect secret
+- public mixed rooms can assign any number of non-host seats as `bot` up to room size
+- the shipped `bot` path submits normal legal actions through the authoritative room service
+- the current deterministic baseline handles:
+  - initial ticket confirmation
+  - coherent ticket keeps
+  - route-demand claim prioritization
+  - deterministic draw decisions aimed at near-term claims
+- mixed-room lifecycle is hardened for:
+  - timed human-to-bot handoff
+  - persisted-room resume with a `bot` active seat
+  - explicitly human-only reconnect semantics
 
 ### MVP3
 1. `human+agent` assisted seats
