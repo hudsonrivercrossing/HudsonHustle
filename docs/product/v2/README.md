@@ -20,6 +20,9 @@ This folder groups the multiplayer-specific product and engineering docs for `v2
 - [V2.2 Slice 3 Bot Quality Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-3-bot-quality-issues.md)
 - [V2.2 Slice 4 Lifecycle Hardening Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-4-lifecycle-hardening-implementation-prd.md)
 - [V2.2 Slice 4 Lifecycle Hardening Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-4-lifecycle-hardening-issues.md)
+- [V2.2 Slice 5 Freeze And Doc Alignment Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-5-freeze-and-doc-alignment-implementation-prd.md)
+- [V2.2 Slice 5 Freeze And Doc Alignment Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-5-freeze-and-doc-alignment-issues.md)
+- [V2.2 Slice 5 Freeze Review](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-5-freeze-review.md)
 - [V2.2 System Agent Architecture](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-system-agent-architecture.md)
 
 ## How To Use These
@@ -41,6 +44,9 @@ This folder groups the multiplayer-specific product and engineering docs for `v2
 - Use [V2.2 Slice 3 Bot Quality Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-3-bot-quality-issues.md) for task-sized breakdown of the first bot-quality slice.
 - Use [V2.2 Slice 4 Lifecycle Hardening Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-4-lifecycle-hardening-implementation-prd.md) when hardening timer, reconnect, and mixed-room lifecycle behavior.
 - Use [V2.2 Slice 4 Lifecycle Hardening Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-4-lifecycle-hardening-issues.md) for task-sized breakdown of the lifecycle hardening slice.
+- Use [V2.2 Slice 5 Freeze And Doc Alignment Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-5-freeze-and-doc-alignment-implementation-prd.md) when closing the first public system-player milestone without reopening scope.
+- Use [V2.2 Slice 5 Freeze And Doc Alignment Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-5-freeze-and-doc-alignment-issues.md) for the final freeze-review and docs-alignment tasks.
+- Use [V2.2 Slice 5 Freeze Review](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-5-freeze-review.md) for the final findings-first closeout note.
 - Use [V2.2 System Agent Architecture](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-system-agent-architecture.md) for the first system-player recommendation path.
 
 ## Current V2.2 Slice 1 Status
@@ -70,5 +76,14 @@ This folder groups the multiplayer-specific product and engineering docs for `v2
   - kept public mixed rooms stable before any future difficulty tiers or `human+agent` work
 
 ## Current V2.2 Slice 5 Focus
-- freeze the first `v2.2` system-player milestone
-- align docs and terminology without reopening design or controller scope
+- completed:
+  - ran the final findings-first freeze review
+  - aligned core `v2` docs, multiplayer flow wording, and player-facing bot/reconnect wording
+  - froze the first public `v2.2` system-player milestone without reopening controller scope
+
+## Post-V2.2 Boundary
+- `v2.2` is now frozen around public mixed human/`bot` rooms with one deterministic competent baseline policy.
+- follow-on work should stay outside this freeze unless it is an explicit new slice or version:
+  - difficulty tiers
+  - `human+agent`
+  - broader `agent` controller work

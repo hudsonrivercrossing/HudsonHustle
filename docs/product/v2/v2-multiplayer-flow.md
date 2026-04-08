@@ -5,6 +5,14 @@ This document turns the `V2 MVP` product direction into concrete multiplayer UX,
 
 ## Room UX
 
+### Shipped Mixed-Room Rule
+The shipped `v2.2` controller milestone includes public mixed human/`bot` rooms.
+
+That means:
+- hosts may prefill one or more non-host seats as `bot`
+- `bot` seats are visible as server-owned seats, not hidden pseudo-humans
+- reconnect stays a human-only concept
+
 ### Create Room
 The host sees:
 - player count selector
@@ -49,6 +57,10 @@ Join flow should be minimal:
 Join flow should never offer:
 - seats already occupied by a `bot`
 - seats already occupied by another human
+
+Join flow should also make it obvious that:
+- a `bot` seat is not joinable
+- a reconnecting human still returns to the same original human seat
 
 The server returns:
 - `roomCode`
@@ -125,6 +137,7 @@ Recommended states:
 - Human seats keep the same reconnect token flow as `v2.1` / Slice 2.
 - In timed mixed rooms, a human timeout may hand off through one or more immediate `bot` turns before the next human seat becomes active.
 - Reloading or restoring an active mixed room should immediately resume server-owned turns instead of waiting on a missing client action from a `bot` seat.
+- Public room state should continue to show which seats are human and which are `bot`, even while reconnect is happening.
 
 ## Human+Agent UX Direction
 This is not in MVP2, but the room and seat model should leave room for it.
@@ -211,10 +224,12 @@ Server sends:
 - timer expiration is resolved on the server
 - reconnect restores the exact seat-specific view
 
-## MVP2.x Bot Hook
+## V2.2 Frozen Bot Milestone
 `v2.2` now exposes the first public `bot` seat path:
 - normal multiplayer setup may prefill one or more non-host seats as `bot`
 - lobby and room state must distinguish `bot` seats from reconnectable human seats
+- reconnect remains human-only
+- `agent` and `human+agent` work remain separate future controller modes
 
 The important design rule remains:
 - seat identity and room lifecycle must not assume every seat is browser-controlled forever
