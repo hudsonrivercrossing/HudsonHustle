@@ -120,6 +120,12 @@ Recommended states:
 - `reconnect-failed`
 - `manual-rejoin`
 
+### Mixed-Room Reconnect Rules
+- `bot` seats are server-owned and never receive reconnect credentials.
+- Human seats keep the same reconnect token flow as `v2.1` / Slice 2.
+- In timed mixed rooms, a human timeout may hand off through one or more immediate `bot` turns before the next human seat becomes active.
+- Reloading or restoring an active mixed room should immediately resume server-owned turns instead of waiting on a missing client action from a `bot` seat.
+
 ## Human+Agent UX Direction
 This is not in MVP2, but the room and seat model should leave room for it.
 

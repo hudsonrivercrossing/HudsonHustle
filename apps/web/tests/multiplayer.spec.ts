@@ -337,6 +337,49 @@ test("normal setup can create a mixed room with multiple bot seats and only leav
   await hostContext.close();
 });
 
+test("timed mixed rooms hand off through bot turns and still allow human reconnect", async ({ browser }) => {
+  const hostContext = await browser.newContext();
+  const guestContext = await browser.newContext();
+  const hostPage = await hostContext.newPage();
+  const guestPage = await guestContext.newPage();
+
+  await openMultiplayerSetup(hostPage);
+  const { roomCode } = await createRoom(hostPage, {
+    playerCount: 3,
+    botSeats: ["seat-2"],
+    timerAdjustments: 1,
+    expectedTimerText: "15s"
+  });
+
+  await openMultiplayerSetup(guestPage);
+  await joinRoom(guestPage, roomCode, {
+    seatId: "seat-3",
+    playerName: "Guest"
+  });
+
+  await hostPage.getByRole("button", { name: "Mark ready" }).click();
+  await guestPage.getByRole("button", { name: "Mark ready" }).click();
+  await hostPage.getByRole("button", { name: "Start game" }).click();
+  await clearInitialTicketChoice(hostPage);
+  await clearInitialTicketChoice(guestPage);
+
+  await expect(hostPage.getByTestId("turn-status-banner")).toContainText("Your turn");
+  await expect(guestPage.getByTestId("turn-status-banner")).toContainText("Waiting");
+
+  await expect
+    .poll(async () => {
+      return guestPage.getByTestId("turn-status-banner").textContent();
+    }, { timeout: 25000 })
+    .toContain("Your turn");
+
+  await guestPage.reload();
+  await expect(guestPage.getByTestId("turn-status-banner")).toBeVisible();
+  await expect(guestPage.getByTestId("turn-status-banner")).toContainText("Your turn");
+
+  await guestContext.close();
+  await hostContext.close();
+});
+
 test("local tutorial and shell hierarchy keep ceremony and work roles distinct", async ({ browser }) => {
   const context = await browser.newContext();
   const page = await context.newPage();

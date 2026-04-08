@@ -801,4 +801,242 @@ describe("RoomService", () => {
       vi.useRealTimers();
     }
   });
+
+  it("continues through a bot turn when a timed human timeout hands off to a server-owned seat", async () => {
+    vi.useFakeTimers();
+    try {
+      let latestDeadlineAt: number | null = null;
+      const service = new RoomService(new MemoryRoomRepository(), hudsonHustleReleasedConfigs, undefined, (_roomCode, deadlineAt) => {
+        latestDeadlineAt = deadlineAt;
+      });
+
+      const created = await service.createRoom({
+        hostName: "Ava",
+        playerCount: 3,
+        configId: "v0.4-flushing-newark-airport",
+        turnTimeLimitSeconds: 15,
+        botSeatIds: ["seat-2"]
+      });
+      const joined = await service.joinRoom(created.roomCode, {
+        playerName: "Beau",
+        preferredSeatId: "seat-3"
+      });
+
+      await service.setReady(created.roomCode, { seatId: created.seatId, playerSecret: created.playerSecret }, true);
+      await service.setReady(created.roomCode, { seatId: joined.seatId, playerSecret: joined.playerSecret }, true);
+      const started = await service.startRoom(created.roomCode, { playerSecret: created.playerSecret });
+
+      await service.applyAction(
+        created.roomCode,
+        { seatId: created.seatId, playerSecret: created.playerSecret },
+        {
+          roomCode: created.roomCode,
+          seatId: created.seatId,
+          playerSecret: created.playerSecret,
+          action: {
+            type: "select_initial_tickets",
+            keptTicketIds: started.snapshot.privateState?.pendingTickets.slice(0, 2).map((ticket) => ticket.id) ?? []
+          }
+        }
+      );
+
+      const guestSnapshot = await service.getSnapshot(created.roomCode, {
+        seatId: joined.seatId,
+        playerSecret: joined.playerSecret
+      });
+      await service.applyAction(
+        created.roomCode,
+        { seatId: joined.seatId, playerSecret: joined.playerSecret },
+        {
+          roomCode: created.roomCode,
+          seatId: joined.seatId,
+          playerSecret: joined.playerSecret,
+          action: {
+            type: "select_initial_tickets",
+            keptTicketIds: guestSnapshot.privateState?.pendingTickets.slice(0, 2).map((ticket) => ticket.id) ?? []
+          }
+        }
+      );
+
+      const beforeTimeout = await service.getSnapshot(created.roomCode, {
+        seatId: created.seatId,
+        playerSecret: created.playerSecret
+      });
+      expect(beforeTimeout.room.activeSeatId).toBe(created.seatId);
+
+      await vi.advanceTimersByTimeAsync(15_000);
+      await vi.runAllTicks();
+
+      const afterTimeout = await service.getSnapshot(created.roomCode, {
+        seatId: joined.seatId,
+        playerSecret: joined.playerSecret
+      });
+
+      expect(afterTimeout.room.activeSeatId).toBe(joined.seatId);
+      expect(afterTimeout.game?.players.find((player) => player.name === "Bot 1")).toBeTruthy();
+      expect(latestDeadlineAt).not.toBeNull();
+      expect((latestDeadlineAt ?? 0)).toBeGreaterThan(Date.now());
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("resumes a persisted mixed room immediately when the restored active seat is server-owned", async () => {
+    const repository = new MemoryRoomRepository();
+    const service = new RoomService(repository, hudsonHustleReleasedConfigs);
+    const created = await service.createRoom({
+      hostName: "Ava",
+      playerCount: 3,
+      configId: "v0.4-flushing-newark-airport",
+      turnTimeLimitSeconds: 30,
+      botSeatIds: ["seat-2"]
+    });
+    const joined = await service.joinRoom(created.roomCode, {
+      playerName: "Beau",
+      preferredSeatId: "seat-3"
+    });
+
+    await service.setReady(created.roomCode, { seatId: created.seatId, playerSecret: created.playerSecret }, true);
+    await service.setReady(created.roomCode, { seatId: joined.seatId, playerSecret: joined.playerSecret }, true);
+    const started = await service.startRoom(created.roomCode, { playerSecret: created.playerSecret });
+
+    await service.applyAction(
+      created.roomCode,
+      { seatId: created.seatId, playerSecret: created.playerSecret },
+      {
+        roomCode: created.roomCode,
+        seatId: created.seatId,
+        playerSecret: created.playerSecret,
+        action: {
+          type: "select_initial_tickets",
+          keptTicketIds: started.snapshot.privateState?.pendingTickets.slice(0, 2).map((ticket) => ticket.id) ?? []
+        }
+      }
+    );
+
+    const guestSnapshot = await service.getSnapshot(created.roomCode, {
+      seatId: joined.seatId,
+      playerSecret: joined.playerSecret
+    });
+    await service.applyAction(
+      created.roomCode,
+      { seatId: joined.seatId, playerSecret: joined.playerSecret },
+      {
+        roomCode: created.roomCode,
+        seatId: joined.seatId,
+        playerSecret: joined.playerSecret,
+        action: {
+          type: "select_initial_tickets",
+          keptTicketIds: guestSnapshot.privateState?.pendingTickets.slice(0, 2).map((ticket) => ticket.id) ?? []
+        }
+      }
+    );
+
+    await service.applyAction(
+      created.roomCode,
+      { seatId: created.seatId, playerSecret: created.playerSecret },
+      {
+        roomCode: created.roomCode,
+        seatId: created.seatId,
+        playerSecret: created.playerSecret,
+        action: {
+          type: "draw_card",
+          source: "deck"
+        }
+      }
+    );
+
+    await service.applyAction(
+      created.roomCode,
+      { seatId: created.seatId, playerSecret: created.playerSecret },
+      {
+        roomCode: created.roomCode,
+        seatId: created.seatId,
+        playerSecret: created.playerSecret,
+        action: {
+          type: "draw_card",
+          source: "deck"
+        }
+      }
+    );
+
+    const storedRoom = (repository as any).rooms.get(created.roomCode);
+    storedRoom.deadlineAt = new Date(Date.now() + 15_000).toISOString();
+
+    const reloadedService = new RoomService(repository, hudsonHustleReleasedConfigs);
+    const resumed = await reloadedService.getSnapshot(created.roomCode, {
+      seatId: joined.seatId,
+      playerSecret: joined.playerSecret
+    });
+
+    expect(resumed.room.activeSeatId).toBe(joined.seatId);
+  });
+
+  it("keeps reconnect and disconnect semantics stable for human seats in a mixed active room", async () => {
+    const service = new RoomService(new MemoryRoomRepository(), hudsonHustleReleasedConfigs);
+    const created = await service.createRoom({
+      hostName: "Ava",
+      playerCount: 3,
+      configId: "v0.4-flushing-newark-airport",
+      turnTimeLimitSeconds: 30,
+      botSeatIds: ["seat-2"]
+    });
+    const joined = await service.joinRoom(created.roomCode, {
+      playerName: "Beau",
+      preferredSeatId: "seat-3"
+    });
+
+    await service.setReady(created.roomCode, { seatId: created.seatId, playerSecret: created.playerSecret }, true);
+    await service.setReady(created.roomCode, { seatId: joined.seatId, playerSecret: joined.playerSecret }, true);
+    const started = await service.startRoom(created.roomCode, { playerSecret: created.playerSecret });
+
+    await service.applyAction(
+      created.roomCode,
+      { seatId: created.seatId, playerSecret: created.playerSecret },
+      {
+        roomCode: created.roomCode,
+        seatId: created.seatId,
+        playerSecret: created.playerSecret,
+        action: {
+          type: "select_initial_tickets",
+          keptTicketIds: started.snapshot.privateState?.pendingTickets.slice(0, 2).map((ticket) => ticket.id) ?? []
+        }
+      }
+    );
+
+    const guestSnapshot = await service.getSnapshot(created.roomCode, {
+      seatId: joined.seatId,
+      playerSecret: joined.playerSecret
+    });
+    await service.applyAction(
+      created.roomCode,
+      { seatId: joined.seatId, playerSecret: joined.playerSecret },
+      {
+        roomCode: created.roomCode,
+        seatId: joined.seatId,
+        playerSecret: joined.playerSecret,
+        action: {
+          type: "select_initial_tickets",
+          keptTicketIds: guestSnapshot.privateState?.pendingTickets.slice(0, 2).map((ticket) => ticket.id) ?? []
+        }
+      }
+    );
+
+    await service.disconnectSeat(created.roomCode, joined.seatId);
+    const afterDisconnect = await service.getSnapshot(created.roomCode, {
+      seatId: created.seatId,
+      playerSecret: created.playerSecret
+    });
+
+    expect(afterDisconnect.room.seats.find((seat) => seat.seatId === joined.seatId)?.connected).toBe(false);
+    expect(afterDisconnect.room.seats.find((seat) => seat.seatId === "seat-2")?.connected).toBe(true);
+
+    const afterReconnect = await service.connectSeat(created.roomCode, {
+      seatId: joined.seatId,
+      playerSecret: joined.playerSecret
+    });
+
+    expect(afterReconnect.room.seats.find((seat) => seat.seatId === joined.seatId)?.connected).toBe(true);
+    expect(afterReconnect.room.seats.find((seat) => seat.seatId === "seat-2")?.controllerType).toBe("bot");
+  });
 });

@@ -567,6 +567,7 @@ export class RoomService {
       room.snapshotVersion += 1;
       this.scheduleTimer(room);
       await this.saveRoom(room);
+      await this.resumeServerControlledTurnsIfNeeded(room);
     } catch {
       this.timeouts.delete(roomCode);
       this.onTimerChanged?.(roomCode, null);
@@ -580,7 +581,12 @@ export class RoomService {
       if (stored) {
         room = fromStoredRecord(stored);
         this.rooms.set(roomCode, room);
-        this.scheduleTimer(room, room.deadlineAt);
+        const activeSeat = this.getActiveSeat(room);
+        if (activeSeat?.controllerState.ownership === "server") {
+          await this.resumeServerControlledTurnsIfNeeded(room);
+        } else {
+          this.scheduleTimer(room, room.deadlineAt);
+        }
       }
     }
     invariant(room, "Unknown room code.", 404, "room_not_found");
@@ -734,5 +740,20 @@ export class RoomService {
     }
 
     throw new RoomServiceError("Server-controlled turn loop exceeded safety limit.", 500, "bot_loop_limit");
+  }
+
+  private async resumeServerControlledTurnsIfNeeded(room: ServerRoom): Promise<void> {
+    if (room.status !== "active" || !room.game) {
+      return;
+    }
+
+    const activeSeat = this.getActiveSeat(room);
+    if (!activeSeat || activeSeat.controllerState.ownership !== "server") {
+      return;
+    }
+
+    room.deadlineAt = null;
+    this.onTimerChanged?.(room.roomCode, null);
+    await this.runServerControlledTurns(room);
   }
 }

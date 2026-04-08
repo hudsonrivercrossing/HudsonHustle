@@ -18,6 +18,8 @@ This folder groups the multiplayer-specific product and engineering docs for `v2
 - [V2.2 Slice 2 Public Bot Setup Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-2-public-bot-setup-issues.md)
 - [V2.2 Slice 3 Bot Quality Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-3-bot-quality-implementation-prd.md)
 - [V2.2 Slice 3 Bot Quality Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-3-bot-quality-issues.md)
+- [V2.2 Slice 4 Lifecycle Hardening Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-4-lifecycle-hardening-implementation-prd.md)
+- [V2.2 Slice 4 Lifecycle Hardening Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-4-lifecycle-hardening-issues.md)
 - [V2.2 System Agent Architecture](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-system-agent-architecture.md)
 
 ## How To Use These
@@ -37,6 +39,8 @@ This folder groups the multiplayer-specific product and engineering docs for `v2
 - Use [V2.2 Slice 2 Public Bot Setup Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-2-public-bot-setup-issues.md) for task-sized breakdown of the first public bot-setup slice.
 - Use [V2.2 Slice 3 Bot Quality Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-3-bot-quality-implementation-prd.md) when improving the bot from legal baseline to competent baseline quality.
 - Use [V2.2 Slice 3 Bot Quality Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-3-bot-quality-issues.md) for task-sized breakdown of the first bot-quality slice.
+- Use [V2.2 Slice 4 Lifecycle Hardening Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-4-lifecycle-hardening-implementation-prd.md) when hardening timer, reconnect, and mixed-room lifecycle behavior.
+- Use [V2.2 Slice 4 Lifecycle Hardening Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-4-lifecycle-hardening-issues.md) for task-sized breakdown of the lifecycle hardening slice.
 - Use [V2.2 System Agent Architecture](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-system-agent-architecture.md) for the first system-player recommendation path.
 
 ## Current V2.2 Slice 1 Status
@@ -61,5 +65,10 @@ This folder groups the multiplayer-specific product and engineering docs for `v2
   - kept the policy testable and free of difficulty-tier creep
 
 ## Current V2.2 Slice 4 Focus
-- harden timer, reconnect, and mixed-room lifecycle behavior around the stronger baseline bot
-- keep public mixed rooms stable before any future difficulty tiers or `human+agent` work
+- completed:
+  - hardened timer, reconnect, and mixed-room lifecycle behavior around the stronger baseline bot
+  - kept public mixed rooms stable before any future difficulty tiers or `human+agent` work
+
+## Current V2.2 Slice 5 Focus
+- freeze the first `v2.2` system-player milestone
+- align docs and terminology without reopening design or controller scope
