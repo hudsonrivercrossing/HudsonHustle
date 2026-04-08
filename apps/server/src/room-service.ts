@@ -100,8 +100,22 @@ function createBotControllerState() {
   } as const;
 }
 
+function buildBotSeatIds(playerCount: number, requestedBotSeatIds: string[] | undefined): Set<string> {
+  const allowedSeatIds = new Set(Array.from({ length: playerCount - 1 }, (_, index) => `seat-${index + 2}`));
+  const botSeatIds = new Set<string>();
+  for (const seatId of requestedBotSeatIds ?? []) {
+    invariant(allowedSeatIds.has(seatId), `Invalid bot seat: ${seatId}.`, 400, "invalid_bot_seat");
+    botSeatIds.add(seatId);
+  }
+  return botSeatIds;
+}
+
 function seatRequiresPlayerSecret(controllerType: ControllerType): boolean {
   return controllerType === "human" || controllerType === "human+agent";
+}
+
+function seatCanOwnHostPrivileges(seat: StoredSeatRecord | null): boolean {
+  return Boolean(seat?.playerName && seat.controllerState.ownership === "client" && seat.playerSecret);
 }
 
 function buildPublicGameState(game: GameState): PublicGameState {
@@ -261,6 +275,7 @@ export class RoomService {
     }
 
     const timestamp = nowIso();
+    const botSeatIds = buildBotSeatIds(request.playerCount, request.botSeatIds);
     const hostSeat: StoredSeatRecord = {
       seatId: "seat-1",
       playerId: null,
@@ -277,16 +292,18 @@ export class RoomService {
 
     const seats: StoredSeatRecord[] = [hostSeat];
     for (let index = 2; index <= request.playerCount; index += 1) {
+      const seatId = `seat-${index}`;
+      const isBotSeat = botSeatIds.has(seatId);
       seats.push({
-        seatId: `seat-${index}`,
+        seatId,
         playerId: null,
-        playerName: null,
-        controllerType: "human",
-        ready: false,
-        connected: false,
+        playerName: isBotSeat ? `Bot ${index - 1}` : null,
+        controllerType: isBotSeat ? "bot" : "human",
+        ready: isBotSeat,
+        connected: isBotSeat,
         isHost: false,
         playerSecret: null,
-        controllerState: createClientControllerState(),
+        controllerState: isBotSeat ? createBotControllerState() : createClientControllerState(),
         joinedAt: timestamp,
         updatedAt: timestamp
       });
@@ -342,7 +359,7 @@ export class RoomService {
     targetSeat.controllerType = "human";
     targetSeat.controllerState = createClientControllerState();
     const currentHost = room.seats.find((seat) => seat.seatId === room.hostSeatId) ?? null;
-    if (!currentHost?.playerName) {
+    if (!seatCanOwnHostPrivileges(currentHost)) {
       room.seats.forEach((seat) => {
         seat.isHost = seat.seatId === targetSeat.seatId;
       });
@@ -483,7 +500,7 @@ export class RoomService {
     const timestamp = nowIso();
     const nextHost =
       seat.isHost
-        ? (room.seats.find((candidate) => candidate.seatId !== seat.seatId && candidate.playerName) ?? null)
+        ? (room.seats.find((candidate) => candidate.seatId !== seat.seatId && seatCanOwnHostPrivileges(candidate)) ?? null)
         : null;
 
     if (seat.isHost) {

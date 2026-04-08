@@ -10,6 +10,7 @@ The host sees:
 - player count selector
 - map selector
 - per-turn timer selector
+- seat-oriented bot toggles for non-host seats
 
 Recommended defaults:
 - player count: `2`
@@ -19,6 +20,11 @@ Recommended defaults:
 Timer meaning:
 - `0` = untimed
 - positive values = turn deadline in seconds
+
+Seat-plan meaning:
+- `seat-1` is always the host's human seat
+- any later seat may stay open for a human join or be prefilled as a `bot` seat
+- a room may mix humans and bots up to room size
 
 ### Map Selector
 MVP2 should only expose released snapshots, not drafts.
@@ -39,6 +45,10 @@ Join flow should be minimal:
 - enter room code
 - choose or confirm a seat
 - enter nickname
+
+Join flow should never offer:
+- seats already occupied by a `bot`
+- seats already occupied by another human
 
 The server returns:
 - `roomCode`
@@ -145,7 +155,8 @@ Request:
   "hostName": "Blue",
   "playerCount": 3,
   "configId": "v0.4-flushing-newark-airport",
-  "turnTimeLimitSeconds": 0
+  "turnTimeLimitSeconds": 0,
+  "botSeatIds": ["seat-3"]
 }
 ```
 
@@ -195,10 +206,9 @@ Server sends:
 - reconnect restores the exact seat-specific view
 
 ## MVP2.x Bot Hook
-Keep controller plumbing ready for:
-- `bot`
+`v2.2` now exposes the first public `bot` seat path:
+- normal multiplayer setup may prefill one or more non-host seats as `bot`
+- lobby and room state must distinguish `bot` seats from reconnectable human seats
 
-But do not expose bot seats in the public MVP UI yet.
-
-The important design rule is:
+The important design rule remains:
 - seat identity and room lifecycle must not assume every seat is browser-controlled forever

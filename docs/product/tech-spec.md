@@ -11,6 +11,7 @@
 - `V2` keeps gameplay rules in `packages/game-core`, but moves room lifecycle and authoritative state ownership into `apps/server`.
 - Clients submit intent; the server validates and broadcasts resulting public/private projections.
 - `V2.2` extends the room model so a seat can be owned either by a client controller or by a server-owned internal bot controller.
+- `V2.2` Slice 2 exposes that controller distinction in normal multiplayer room setup through seat-oriented `bot` assignment for non-host seats.
 - `packages/game-data` remains the shared source for released maps and balance data across both `web` and `server`.
 
 ## State Model

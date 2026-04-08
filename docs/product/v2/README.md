@@ -14,6 +14,8 @@ This folder groups the multiplayer-specific product and engineering docs for `v2
 - [V2.2 System Player Plan](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-system-player-plan.md)
 - [V2.2 Slice 1 Bot Seat Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-1-bot-seat-implementation-prd.md)
 - [V2.2 Slice 1 Bot Seat Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-1-bot-seat-issues.md)
+- [V2.2 Slice 2 Public Bot Setup Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-2-public-bot-setup-implementation-prd.md)
+- [V2.2 Slice 2 Public Bot Setup Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-2-public-bot-setup-issues.md)
 - [V2.2 System Agent Architecture](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-system-agent-architecture.md)
 
 ## How To Use These
@@ -29,6 +31,8 @@ This folder groups the multiplayer-specific product and engineering docs for `v2
 - Use [V2.2 System Player Plan](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-system-player-plan.md) for the phased implementation order and validation path for that first `v2.2` milestone.
 - Use [V2.2 Slice 1 Bot Seat Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-1-bot-seat-implementation-prd.md) when starting the first architecture-proof implementation slice.
 - Use [V2.2 Slice 1 Bot Seat Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-1-bot-seat-issues.md) for task-sized breakdown of that first slice.
+- Use [V2.2 Slice 2 Public Bot Setup Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-2-public-bot-setup-implementation-prd.md) when turning the internal bot-seat proof into normal multiplayer setup work.
+- Use [V2.2 Slice 2 Public Bot Setup Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-2-public-bot-setup-issues.md) for task-sized breakdown of the first public bot-setup slice.
 - Use [V2.2 System Agent Architecture](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-system-agent-architecture.md) for the first system-player recommendation path.
 
 ## Current V2.2 Slice 1 Status
@@ -39,3 +43,8 @@ This folder groups the multiplayer-specific product and engineering docs for `v2
   - make simple ticket-aligned route claims
   - make deterministic draw choices when no obvious claim is available
 - the remaining `v2.2` work should build from this internal proof instead of reopening controller foundations
+
+## Current V2.2 Slice 2 Focus
+- expose `bot` seat selection in normal multiplayer room setup
+- support mixed human/bot rooms up to room size
+- prove normal setup, lobby, and start flow for the first public bot-seat milestone

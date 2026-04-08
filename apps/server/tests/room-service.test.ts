@@ -28,6 +28,65 @@ describe("RoomService", () => {
     expect(started.snapshot.privateState?.hand).toHaveLength(4);
   });
 
+  it("creates a mixed room with bot seats through normal room creation", async () => {
+    const service = new RoomService(new MemoryRoomRepository(), hudsonHustleReleasedConfigs);
+
+    const created = await service.createRoom({
+      hostName: "Ava",
+      playerCount: 4,
+      configId: "v0.4-flushing-newark-airport",
+      turnTimeLimitSeconds: 0,
+      botSeatIds: ["seat-2", "seat-4"]
+    });
+
+    expect(created.snapshot.room.seats[0]).toMatchObject({
+      seatId: "seat-1",
+      playerName: "Ava",
+      controllerType: "human"
+    });
+    expect(created.snapshot.room.seats[1]).toMatchObject({
+      seatId: "seat-2",
+      playerName: "Bot 1",
+      controllerType: "bot",
+      ready: true,
+      connected: true
+    });
+    expect(created.snapshot.room.seats[2]).toMatchObject({
+      seatId: "seat-3",
+      playerName: null,
+      controllerType: "human"
+    });
+    expect(created.snapshot.room.seats[3]).toMatchObject({
+      seatId: "seat-4",
+      playerName: "Bot 3",
+      controllerType: "bot",
+      ready: true,
+      connected: true
+    });
+  });
+
+  it("starts a full mixed room using bot seats without bypassing the normal lifecycle", async () => {
+    const service = new RoomService(new MemoryRoomRepository(), hudsonHustleReleasedConfigs);
+
+    const created = await service.createRoom({
+      hostName: "Ava",
+      playerCount: 2,
+      configId: "v0.4-flushing-newark-airport",
+      turnTimeLimitSeconds: 0,
+      botSeatIds: ["seat-2"]
+    });
+
+    await service.setReady(created.roomCode, { seatId: created.seatId, playerSecret: created.playerSecret }, true);
+    const started = await service.startRoom(created.roomCode, { playerSecret: created.playerSecret });
+
+    expect(started.snapshot.room.status).toBe("active");
+    expect(started.snapshot.room.seats[1]).toMatchObject({
+      seatId: "seat-2",
+      controllerType: "bot"
+    });
+    expect(started.snapshot.game?.players).toHaveLength(2);
+  });
+
   it("supports reconnect with roomCode + seatId + playerSecret", async () => {
     const service = new RoomService(new MemoryRoomRepository(), hudsonHustleReleasedConfigs);
     const created = await service.createRoom({
@@ -185,6 +244,39 @@ describe("RoomService", () => {
     });
     expect(joined.snapshot.room.seats[1]).toMatchObject({
       seatId: "seat-2",
+      playerName: "Beau",
+      isHost: true
+    });
+  });
+
+  it("does not transfer host privileges to a bot seat when the host leaves the lobby", async () => {
+    const service = new RoomService(new MemoryRoomRepository(), hudsonHustleReleasedConfigs);
+    const created = await service.createRoom({
+      hostName: "Ava",
+      playerCount: 3,
+      configId: "v0.3-atlantic-hoboken",
+      turnTimeLimitSeconds: 0,
+      botSeatIds: ["seat-2"]
+    });
+
+    await service.leaveRoom(created.roomCode, {
+      seatId: created.seatId,
+      playerSecret: created.playerSecret
+    });
+
+    const replacement = await service.joinRoom(created.roomCode, {
+      playerName: "Beau",
+      preferredSeatId: "seat-3"
+    });
+
+    expect(replacement.snapshot.room.hostSeatId).toBe("seat-3");
+    expect(replacement.snapshot.room.seats[1]).toMatchObject({
+      seatId: "seat-2",
+      controllerType: "bot",
+      isHost: false
+    });
+    expect(replacement.snapshot.room.seats[2]).toMatchObject({
+      seatId: "seat-3",
       playerName: "Beau",
       isHost: true
     });
