@@ -33,8 +33,13 @@ Use `hudson-hustle-prd-to-plan` first when the work has not yet been sliced and 
 - area label
 - assignee or explicit `unassigned`
 - project field values
-5. Prefer vertical issues over layer-only issues.
-6. If the repo is not using GitHub issues for this work, output markdown that can live in a planning doc or checklist.
+5. If the work will be executed through the roadmap board, define the intended execution order.
+6. As implementation starts and finishes, update project status deliberately:
+- `Todo` before work starts
+- `In Progress` when that issue becomes the active task
+- `Done` only after implementation and validation are actually complete
+7. Prefer vertical issues over layer-only issues.
+8. If the repo is not using GitHub issues for this work, output markdown that can live in a planning doc or checklist.
 
 ## Hudson Hustle Defaults
 - keep gameplay, UI, backend, and docs aligned when behavior changes
@@ -58,6 +63,7 @@ Use `hudson-hustle-prd-to-plan` first when the work has not yet been sliced and 
   - `Track`
   - `Horizon`
   - `Priority`
+- when executing issues from the board, keep `Status` current instead of leaving everything in `Todo`
 - GitHub sidebar `Type` is not a required automation target in this repo yet; use labels plus project fields instead
 
 ## Output Shape

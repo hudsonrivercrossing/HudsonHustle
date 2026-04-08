@@ -12,6 +12,10 @@
   - Track: `...`
   - Horizon: `Now | Next | Later`
   - Priority: `P0 | P1 | P2 | P3`
+  - Status: `Todo -> In Progress -> Done`
+
+## Execution Order
+- `...`
 
 ## Objective
 - ...

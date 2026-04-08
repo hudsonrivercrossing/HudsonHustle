@@ -20,6 +20,7 @@ Pair it with:
 3. Prefer updating existing docs instead of creating new planning files.
 4. Keep v1 focused on same-laptop play unless the user explicitly changes scope.
 5. When implementation changes behavior, reflect that in `docs/product/prd.md`, `docs/product/tech-spec.md`, and `docs/gameplay/player-guide.md` if needed.
+6. When a milestone is effectively complete, prefer an explicit freeze or closeout doc update over leaving the status implicit.
 
 ## Use This Instead Of `hudson-hustle-engineering-manager` When
 - the task is primarily milestone planning or scope control
