@@ -53,12 +53,18 @@ async function openLocalSetup(page: Page, options?: { resetTutorial?: boolean })
   await expect(page.getByRole("heading", { name: "Local pass-and-play" })).toBeVisible();
 }
 
-async function createRoom(page: Page): Promise<{ roomCode: string; seatId: string; playerSecret: string }> {
+async function createRoom(
+  page: Page,
+  options?: { timerAdjustments?: number; expectedTimerText?: string }
+): Promise<{ roomCode: string; seatId: string; playerSecret: string }> {
   const createPanel = page.getByTestId("create-room-panel");
+  const timerAdjustments = options?.timerAdjustments ?? 2;
+  const expectedTimerText = options?.expectedTimerText ?? "30s";
   await createPanel.getByLabel("Your name").fill("Host");
-  await createPanel.getByRole("button", { name: "+15" }).click();
-  await createPanel.getByRole("button", { name: "+15" }).click();
-  await expect(createPanel.getByText("30s")).toBeVisible();
+  for (let index = 0; index < timerAdjustments; index += 1) {
+    await createPanel.getByRole("button", { name: "+15" }).click();
+  }
+  await expect(createPanel.getByText(expectedTimerText)).toBeVisible();
   await createPanel.getByRole("button", { name: "Create room" }).click();
   await expect(page.getByTestId("lobby-status-banner")).toBeVisible({ timeout: 10000 });
   await expect(page.getByTestId("seat-connected-seat-1")).toHaveText("Connected");
@@ -192,7 +198,7 @@ test("timer display counts down from the lobby-selected timeout", async ({ brows
   const page = await context.newPage();
 
   await openMultiplayerSetup(page);
-  const { roomCode } = await createRoom(page);
+  const { roomCode } = await createRoom(page, { timerAdjustments: 1, expectedTimerText: "15s" });
 
   const guestContext = await browser.newContext();
   const guestPage = await guestContext.newPage();
@@ -203,11 +209,14 @@ test("timer display counts down from the lobby-selected timeout", async ({ brows
   await guestPage.getByRole("button", { name: "Mark ready" }).click();
   await page.getByRole("button", { name: "Start game" }).click();
   await clearInitialTicketChoice(page);
+  await clearInitialTicketChoice(guestPage);
 
   const timerBadge = page.getByTestId("turn-timer-badge");
-  await expect(timerBadge).toHaveText(/^(Timer 30s|\d+s left)$/);
+  await expect(timerBadge).toHaveText(/^(Timer 15s|\d+s left)$/);
+  await page.getByRole("button", { name: "Draw from deck" }).click();
+  await expect(timerBadge).toHaveText(/\d+s left/);
   await page.waitForTimeout(1500);
-  await expect(timerBadge).toHaveText(/^(Timer 30s|\d+s left)$/);
+  await expect(timerBadge).toHaveText(/\d+s left/);
 
   await guestContext.close();
   await context.close();

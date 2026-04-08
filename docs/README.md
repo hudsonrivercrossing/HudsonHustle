@@ -3,6 +3,7 @@
 This folder now separates long-lived product docs from versioned playtest artifacts.
 
 ## Product
+- [Design Entry](/Users/djfan/Workspace/HudsonHustle/DESIGN.md)
 - [PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/prd.md)
 - [Tech Spec](/Users/djfan/Workspace/HudsonHustle/docs/product/tech-spec.md)
 - [Design System](/Users/djfan/Workspace/HudsonHustle/docs/product/design-system.md)

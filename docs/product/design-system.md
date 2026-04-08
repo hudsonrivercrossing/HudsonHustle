@@ -4,6 +4,8 @@
 
 This is the stable design-system home for Hudson Hustle.
 
+If you need the shortest entrypoint first, start with [DESIGN.md](/Users/djfan/Workspace/HudsonHustle/DESIGN.md).
+
 Use it for:
 - design principles that should stay true across `v2.x`
 - active typography, layout, and component guidance

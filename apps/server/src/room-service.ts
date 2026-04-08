@@ -191,8 +191,24 @@ function fromStoredRecord(record: StoredRoomRecord): ServerRoom {
   };
 }
 
+function timedAutoDrawsRemaining(game: GameState): number {
+  if (game.phase !== "main") {
+    return 0;
+  }
+
+  if (game.turn.stage === "idle") {
+    return 2;
+  }
+
+  if (game.turn.stage === "drawing" && game.turn.drawsTaken === 1 && !game.turn.tookFaceUpLocomotive) {
+    return 1;
+  }
+
+  return 0;
+}
+
 function hasEnoughBlindCardsForTimedAutoDraw(game: GameState): boolean {
-  return game.trainDeck.length + game.discardPile.length >= 2;
+  return game.trainDeck.length + game.discardPile.length >= timedAutoDrawsRemaining(game);
 }
 
 export class RoomService {
@@ -395,6 +411,8 @@ export class RoomService {
     const room = await this.getRoomOrThrow(roomCode);
     invariant(room.status === "active", "The game has not started yet.");
     invariant(room.game, "Missing game state.");
+    const previousGame = room.game;
+    const previousDeadlineAt = room.deadlineAt;
 
     const seat = this.getAuthorizedSeat(room, auth);
     let gameForAction = room.game;
@@ -422,7 +440,12 @@ export class RoomService {
     room.status = nextGame.phase === "gameOver" ? "finished" : room.status;
     room.updatedAt = nowIso();
     room.snapshotVersion += 1;
-    this.scheduleTimer(room);
+    const shouldPreserveDeadline =
+      previousDeadlineAt !== null &&
+      previousGame.phase === "main" &&
+      nextGame.phase === "main" &&
+      previousGame.activePlayerIndex === nextGame.activePlayerIndex;
+    this.scheduleTimer(room, shouldPreserveDeadline ? previousDeadlineAt : null);
     await this.saveRoom(room);
     return this.buildSnapshot(room, seat.seatId);
   }
@@ -433,7 +456,8 @@ export class RoomService {
       if (!room.game || room.status !== "active") {
         return;
       }
-      if (room.turnTimeLimitSeconds <= 0 || room.game.phase !== "main" || room.game.turn.stage !== "idle") {
+      const autoDrawsRemaining = timedAutoDrawsRemaining(room.game);
+      if (room.turnTimeLimitSeconds <= 0 || room.game.phase !== "main" || autoDrawsRemaining === 0) {
         return;
       }
       if (!hasEnoughBlindCardsForTimedAutoDraw(room.game)) {
@@ -442,8 +466,10 @@ export class RoomService {
         return;
       }
 
-      let nextGame = reduceGame(room.game, { type: "draw_card", source: "deck" }, getHudsonHustleMapByConfigId(room.configId));
-      nextGame = reduceGame(nextGame, { type: "draw_card", source: "deck" }, getHudsonHustleMapByConfigId(room.configId));
+      let nextGame = room.game;
+      for (let index = 0; index < autoDrawsRemaining; index += 1) {
+        nextGame = reduceGame(nextGame, { type: "draw_card", source: "deck" }, getHudsonHustleMapByConfigId(room.configId));
+      }
       if (nextGame.turn.stage === "awaitingHandoff") {
         nextGame = reduceGame(nextGame, { type: "advance_turn" }, getHudsonHustleMapByConfigId(room.configId));
       }
@@ -508,7 +534,7 @@ export class RoomService {
       return;
     }
 
-    if (room.game.phase !== "main" || room.game.turn.stage !== "idle" || !hasEnoughBlindCardsForTimedAutoDraw(room.game)) {
+    if (room.game.phase !== "main" || timedAutoDrawsRemaining(room.game) === 0 || !hasEnoughBlindCardsForTimedAutoDraw(room.game)) {
       room.deadlineAt = null;
       this.onTimerChanged?.(room.roomCode, null);
       return;
