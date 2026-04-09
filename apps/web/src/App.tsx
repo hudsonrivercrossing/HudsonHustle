@@ -910,7 +910,7 @@ export default function App(): JSX.Element {
             {publicGame.phase === "gameOver" ? (
               <div className="endgame-grid">
                 {projectedGame.players.map((player) => (
-                  <SurfaceCard key={player.id} as="article" variant="summary" eyebrow="Final score" title={player.name} className="endgame-card">
+                  <SurfaceCard key={player.id} as="article" variant="summary" title={player.name} className="endgame-card">
                     <div className="endgame-card__hero">
                       <p className="endgame-score">{player.score}</p>
                       <span className="endgame-score__label">points</span>

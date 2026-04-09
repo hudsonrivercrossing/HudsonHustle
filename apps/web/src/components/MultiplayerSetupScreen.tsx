@@ -76,10 +76,10 @@ export function MultiplayerSetupScreen({
   const setupBannerCopy = error
     ? error
     : reconnectState === "reconnect-failed"
-      ? "Saved reconnect token could not reconnect. Use the manual reconnect token below."
+      ? "Saved reconnect token failed. Use the manual reconnect field below."
       : reconnectState === "attempting-reconnect"
-        ? "Checking the saved reconnect token before showing the normal join flow."
-        : "Host a released map, share the room code, and move the game state to the server-owned multiplayer flow.";
+        ? "Checking the saved reconnect token first."
+        : "Host a table or join one by room code.";
 
   return (
     <main className="setup-shell setup-shell--mode">
@@ -88,11 +88,11 @@ export function MultiplayerSetupScreen({
           <div className="setup-mode-header__copy">
             <p className="eyebrow">Online mode</p>
             <h1>Separate-device multiplayer</h1>
-            <p className="setup-mode-lead">Create a room, share a short code, and let the server own the game state while each player keeps a private device.</p>
+            <p className="setup-mode-lead">Create a room, share a short code, and keep each hand private.</p>
           </div>
           <div className="setup-mode-switches">
-            {onBack ? <Button onClick={onBack}>All modes</Button> : null}
-            {onOpenLocal ? <Button onClick={onOpenLocal}>Local</Button> : null}
+            {onBack ? <Button onClick={onBack}>Back</Button> : null}
+            {onOpenLocal ? <Button onClick={onOpenLocal}>Shared laptop</Button> : null}
           </div>
         </div>
 
@@ -107,7 +107,7 @@ export function MultiplayerSetupScreen({
 
         <div className="multiplayer-setup-grid">
           <Panel variant="status" className="multiplayer-setup-panel multiplayer-setup-panel--primary" data-testid="create-room-panel">
-            <SectionHeader eyebrow="Host flow" title="Create room" meta="Host a new table" />
+            <SectionHeader eyebrow="Host flow" title="Create room" meta="Start a new table" />
             <FormField label="Your name">
               <input value={hostName} maxLength={24} onChange={(event) => setHostName(event.target.value)} />
             </FormField>
@@ -118,7 +118,7 @@ export function MultiplayerSetupScreen({
                 <option value={4}>4 players</option>
               </select>
             </FormField>
-            <FormField as="div" label="Seat plan" helper={`${plannedBotCount} bot seat${plannedBotCount === 1 ? "" : "s"} · ${plannedHumanOpenSeats} open human seat${plannedHumanOpenSeats === 1 ? "" : "s"}`}>
+            <FormField as="div" label="Seat plan" helper={`${plannedBotCount} bot · ${plannedHumanOpenSeats} human open`}>
               <div className="seat-plan">
                 {setupSeatIds.map((seatId, index) => {
                   const isHostSeat = seatId === "seat-1";
@@ -152,7 +152,7 @@ export function MultiplayerSetupScreen({
                 })}
               </div>
             </FormField>
-            <FormField label="Released map">
+            <FormField label="Map">
               <select value={configId} onChange={(event) => setConfigId(event.target.value)}>
                 {releasedConfigs.map((config) => (
                   <option key={config.configId} value={config.configId}>
@@ -161,7 +161,7 @@ export function MultiplayerSetupScreen({
                 ))}
               </select>
             </FormField>
-            <FormField as="div" label="Turn timer" className="form-field--timer">
+            <FormField as="div" label="Timer" className="form-field--timer">
               <div className="timer-picker">
                 <Button onClick={() => setTurnTimeLimitSeconds((current) => Math.max(0, current - 15))}>
                   −15
@@ -191,11 +191,11 @@ export function MultiplayerSetupScreen({
           </Panel>
 
           <Panel variant="neutral" className="multiplayer-setup-panel multiplayer-setup-panel--secondary" data-testid="join-room-panel">
-            <SectionHeader eyebrow="Guest flow" title="Join room" meta="Pick an open seat" />
+            <SectionHeader eyebrow="Guest flow" title="Join room" meta="Room code + seat" />
             <FormField label="Room code">
               <input value={joinRoomCode} onChange={(event) => setJoinRoomCode(event.target.value.toUpperCase())} maxLength={6} />
             </FormField>
-            <Button onClick={() => onPreviewRoom(joinRoomCode)}>
+            <Button className="join-preview-button" onClick={() => onPreviewRoom(joinRoomCode)}>
               Preview room
             </Button>
             {roomPreview ? (
@@ -239,7 +239,7 @@ export function MultiplayerSetupScreen({
           variant={reconnectState === "reconnect-failed" ? "alert" : "neutral"}
           className="reconnect-panel multiplayer-setup-panel multiplayer-setup-panel--tertiary"
         >
-          <SectionHeader eyebrow="Recovery" title="Manual reconnect" meta="Paste one reconnect token" />
+          <SectionHeader eyebrow="Recovery" title="Reconnect" meta="Paste one token" />
           <FormField label="Reconnect token">
             <input
               value={manualReconnectToken}
