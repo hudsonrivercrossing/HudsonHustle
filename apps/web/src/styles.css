@@ -1169,6 +1169,10 @@ h3 {
   font-weight: 760;
 }
 
+.row-object__stat--muted {
+  opacity: 0.78;
+}
+
 .seat-status-stack {
   justify-content: flex-end;
 }
@@ -1584,10 +1588,6 @@ h3 {
   gap: 10px;
 }
 
-.side-panel__supply-panel {
-  margin-top: 2px;
-}
-
 .panel {
   padding: var(--space-panel-md);
   position: relative;
@@ -1759,6 +1759,51 @@ h3 {
   grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
 }
 
+.card-economy-panel {
+  gap: 14px;
+}
+
+.card-economy-panel__section {
+  display: grid;
+  gap: 10px;
+}
+
+.card-economy-panel__section + .card-economy-panel__section {
+  padding-top: 12px;
+  border-top: 1px solid rgba(92, 70, 46, 0.1);
+}
+
+.card-economy-panel__section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.card-economy-panel__label {
+  font-family: var(--font-body);
+  font-size: 0.84rem;
+  font-weight: 760;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--accent-strong) 24%, var(--ink-soft) 76%);
+}
+
+.card-economy-panel__meta {
+  color: var(--ink-soft);
+  font-size: 0.75rem;
+}
+
+.card-economy-panel__actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.card-economy-panel__actions .system-button {
+  min-width: auto;
+  padding-inline: 14px;
+}
+
 .transit-card {
   min-height: 102px;
   display: grid;
@@ -1811,6 +1856,10 @@ h3 {
 .market-grid {
   grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
   margin-bottom: 10px;
+}
+
+.market-grid--compact {
+  margin-bottom: 0;
 }
 
 .transit-card--interactive {
@@ -2266,8 +2315,8 @@ h3 {
 .detail-card__prompt {
   margin: 0;
   color: var(--ink);
-  font-size: 1rem;
-  line-height: 1.45;
+  font-size: 0.94rem;
+  line-height: 1.35;
   font-weight: 620;
 }
 
@@ -2298,6 +2347,43 @@ h3 {
 .detail-card__decision-shelf > * {
   position: relative;
   z-index: 1;
+}
+
+.action-empty-prompt {
+  display: grid;
+  gap: 4px;
+  padding: 12px 0 4px;
+  border-top: 1px solid rgba(92, 70, 46, 0.08);
+}
+
+.action-empty-prompt__title {
+  font-family: var(--font-body);
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.action-empty-prompt__copy {
+  color: var(--ink-soft);
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.action-rail__timer {
+  display: inline-flex;
+  align-items: center;
+  min-height: 42px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(92, 70, 46, 0.14);
+  background:
+    linear-gradient(180deg, rgba(255, 252, 247, 0.94), rgba(243, 235, 220, 0.84));
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  font-weight: 760;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .surface-card--summary .surface-card__title {

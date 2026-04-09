@@ -757,7 +757,7 @@ export default function App(): JSX.Element {
           <Panel variant="status" className="round-table-panel">
             <SectionHeader
               eyebrow="Table status"
-              title="Round table"
+              title="Table"
               meta={`${activePlayer?.name ?? "Unknown"} active`}
               density="ceremony"
             />
@@ -767,12 +767,14 @@ export default function App(): JSX.Element {
                   <span className="player-swatch row-object__lead" style={{ background: visuals.palettes.players[player.color] }} />
                   <div className="row-object__main">
                     <strong className="row-object__title">{player.name}</strong>
-                    <span className="row-object__meta">{player.ticketCount} tickets</span>
+                    <span className="row-object__meta">
+                      {index === snapshot.game?.activePlayerIndex ? "Active now" : `${player.ticketCount} tickets`}
+                    </span>
                   </div>
                   <div className="row-object__stats">
                     <span className="row-object__stat row-object__stat--strong">{player.score} pts</span>
                     <span className="row-object__stat">{player.trainsLeft} trains</span>
-                    <span className="row-object__stat">{player.stationsLeft} stations</span>
+                    <span className="row-object__stat row-object__stat--muted">{player.stationsLeft} stations</span>
                   </div>
                 </article>
               ))}
@@ -780,18 +782,49 @@ export default function App(): JSX.Element {
           </Panel>
 
           <div className="side-panel__private-stack">
-            <Panel variant="private-info">
-              <SectionHeader title="Your hand" meta={`${localPlayer.hand.length} cards`} density="compact" />
-              <div className="card-grid">
-                    {localPlayer.hand.map((card) => (
-                  <TransitCard key={card.id} className="artifact-card artifact-card--hand" color={card.color} context="hand" />
-                    ))}
+            <Panel variant="private-info" className="card-economy-panel">
+              <SectionHeader title="Cards" meta={`${localPlayer.hand.length} hand · ${publicGame.trainDeckCount} deck`} density="compact" />
+              <div className="card-economy-panel__section">
+                <div className="card-economy-panel__section-header">
+                  <span className="card-economy-panel__label">Hand</span>
+                  <span className="card-economy-panel__meta">{localPlayer.hand.length} cards</span>
+                </div>
+                <div className="card-grid">
+                  {localPlayer.hand.map((card) => (
+                    <TransitCard key={card.id} className="artifact-card artifact-card--hand" color={card.color} context="hand" />
+                  ))}
+                </div>
+              </div>
+
+              <div className="card-economy-panel__section">
+                <div className="card-economy-panel__section-header">
+                  <span className="card-economy-panel__label">Market</span>
+                  <span className="card-economy-panel__meta">{publicGame.trainDeckCount} deck</span>
+                </div>
+                <div className="market-grid market-grid--compact">
+                  {publicGame.market.map((card, index) => (
+                    <TransitCard
+                      key={card.id}
+                      className="market-card artifact-card artifact-card--market"
+                      color={card.color}
+                      context="market"
+                      disabled={!canContinueDrawing || (publicGame.turn.drawsTaken === 1 && card.color === "locomotive")}
+                      onClick={() => sendGameAction({ type: "draw_card", source: "market", marketIndex: index })}
+                      tag={card.color === "locomotive" ? "Ends draw" : undefined}
+                    />
+                  ))}
+                </div>
+                <div className="card-economy-panel__actions">
+                  <Button disabled={!canContinueDrawing} onClick={() => sendGameAction({ type: "draw_card", source: "deck" })}>
+                    Draw from deck
+                  </Button>
+                </div>
               </div>
             </Panel>
 
             <Panel variant="private-info">
               <SectionHeader
-                title="Your tickets"
+                title="Tickets"
                 meta={`${ticketProgress.filter((entry) => entry.completed).length}/${ticketProgress.length} connected`}
                 density="compact"
               />
@@ -816,26 +849,6 @@ export default function App(): JSX.Element {
               </div>
             </Panel>
           </div>
-
-          <Panel variant="neutral" className="side-panel__supply-panel">
-            <SectionHeader title="Market" meta={`${publicGame.trainDeckCount} deck`} density="compact" />
-            <div className="market-grid">
-              {publicGame.market.map((card, index) => (
-                <TransitCard
-                  key={card.id}
-                  className="market-card artifact-card artifact-card--market"
-                  color={card.color}
-                  context="market"
-                  disabled={!canContinueDrawing || (publicGame.turn.drawsTaken === 1 && card.color === "locomotive")}
-                  onClick={() => sendGameAction({ type: "draw_card", source: "market", marketIndex: index })}
-                  tag={card.color === "locomotive" ? "Ends draw" : undefined}
-                />
-              ))}
-            </div>
-            <Button disabled={!canContinueDrawing} onClick={() => sendGameAction({ type: "draw_card", source: "deck" })}>
-              Draw from deck
-            </Button>
-          </Panel>
         </aside>
 
         <main className="board-column">
@@ -875,7 +888,7 @@ export default function App(): JSX.Element {
           <Panel variant="status" className="action-panel">
             <SectionHeader
               eyebrow="Turn controls"
-              title="Action rail"
+              title="Actions"
               meta={publicGame.turn.summary ?? "Choose a route, city, or ticket action."}
             />
             {multiplayerError ? (
@@ -888,13 +901,10 @@ export default function App(): JSX.Element {
             ) : null}
 
             {publicGame.phase === "main" && !currentRoute && !currentCity ? (
-              <StateSurface
-                tone="neutral"
-                eyebrow="Inspect the board"
-                headline="Select a route or city."
-                copy="The action rail will show payment choices, tunnel reveals, and build options once you inspect a board element."
-                testId="action-empty-state"
-              />
+              <div className="action-empty-prompt" data-testid="action-empty-state">
+                <span className="action-empty-prompt__title">Select a route or city.</span>
+                <span className="action-empty-prompt__copy">Actions appear here once you inspect the board.</span>
+              </div>
             ) : null}
 
             {publicGame.phase === "gameOver" ? (
@@ -919,9 +929,9 @@ export default function App(): JSX.Element {
                 <Button variant="primary" disabled={!canAdvanceTurn} onClick={() => sendGameAction({ type: "advance_turn" })}>
                   End turn
                 </Button>
-                <Button disabled>
+                <span className="action-rail__timer">
                   {snapshot.room.turnTimeLimitSeconds === 0 ? "Untimed room" : `Timer ${snapshot.room.turnTimeLimitSeconds}s`}
-                </Button>
+                </span>
               </div>
             ) : null}
 
@@ -943,7 +953,7 @@ export default function App(): JSX.Element {
                     ) : null}
                   </div>
                   <p className="detail-card__prompt">
-                    {currentRouteOwner ? `Claimed by ${currentRouteOwner.name}.` : "Choose a payment color to claim this segment."}
+                    {currentRouteOwner ? `Claimed by ${currentRouteOwner.name}.` : "Choose a payment color."}
                   </p>
                 </div>
                 <div className="detail-card__decision-shelf chip-row">
@@ -969,11 +979,10 @@ export default function App(): JSX.Element {
               <SurfaceCard variant="detail" className="detail-card" eyebrow="City detail" title={currentCity.name}>
                 <div className="detail-card__summary">
                   <div className="detail-card__facts">
-                    <span className="detail-card__fact">station city</span>
                     <span className="detail-card__fact">borrow 1 rival link</span>
                     <span className="detail-card__fact">endgame only</span>
                   </div>
-                  <p className="detail-card__prompt">Choose a payment color to build a station here.</p>
+                  <p className="detail-card__prompt">Choose a payment color.</p>
                 </div>
                 <div className="detail-card__decision-shelf chip-row">
                   {currentCityOccupied ? (
