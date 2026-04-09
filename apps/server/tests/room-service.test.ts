@@ -789,6 +789,117 @@ describe("RoomService", () => {
     });
   });
 
+  it("only exposes review history after the match finishes", async () => {
+    const repository = new MemoryRoomRepository();
+    const service = new RoomService(repository, hudsonHustleReleasedConfigs);
+    const created = await service.createRoom({
+      hostName: "Ava",
+      playerCount: 2,
+      configId: "v0.4-flushing-newark-airport",
+      turnTimeLimitSeconds: 0
+    });
+    const joined = await service.joinRoom(created.roomCode, {
+      playerName: "Beau"
+    });
+
+    await service.setReady(created.roomCode, { seatId: created.seatId, playerSecret: created.playerSecret }, true);
+    await service.setReady(created.roomCode, { seatId: joined.seatId, playerSecret: joined.playerSecret }, true);
+    await service.startRoom(created.roomCode, { playerSecret: created.playerSecret });
+
+    await expect(
+      service.getReviewHistory(created.roomCode, {
+        seatId: created.seatId,
+        playerSecret: created.playerSecret
+      })
+    ).rejects.toMatchObject({
+      statusCode: 409,
+      code: "history_not_ready"
+    });
+  });
+
+  it("projects finished review history without exposing checkpoint snapshots", async () => {
+    const repository = new MemoryRoomRepository();
+    const service = new RoomService(repository, hudsonHustleReleasedConfigs);
+    const created = await service.createRoom({
+      hostName: "Ava",
+      playerCount: 2,
+      configId: "v0.4-flushing-newark-airport",
+      turnTimeLimitSeconds: 0
+    });
+    const joined = await service.joinRoom(created.roomCode, {
+      playerName: "Beau"
+    });
+
+    await service.setReady(created.roomCode, { seatId: created.seatId, playerSecret: created.playerSecret }, true);
+    await service.setReady(created.roomCode, { seatId: joined.seatId, playerSecret: joined.playerSecret }, true);
+    const started = await service.startRoom(created.roomCode, { playerSecret: created.playerSecret });
+
+    await service.applyAction(
+      created.roomCode,
+      { seatId: created.seatId, playerSecret: created.playerSecret },
+      {
+        roomCode: created.roomCode,
+        seatId: created.seatId,
+        playerSecret: created.playerSecret,
+        action: {
+          type: "select_initial_tickets",
+          keptTicketIds: started.snapshot.privateState?.pendingTickets.slice(0, 2).map((ticket) => ticket.id) ?? []
+        }
+      }
+    );
+
+    const guestSnapshot = await service.getSnapshot(created.roomCode, {
+      seatId: joined.seatId,
+      playerSecret: joined.playerSecret
+    });
+    await service.applyAction(
+      created.roomCode,
+      { seatId: joined.seatId, playerSecret: joined.playerSecret },
+      {
+        roomCode: created.roomCode,
+        seatId: joined.seatId,
+        playerSecret: joined.playerSecret,
+        action: {
+          type: "select_initial_tickets",
+          keptTicketIds: guestSnapshot.privateState?.pendingTickets.slice(0, 2).map((ticket) => ticket.id) ?? []
+        }
+      }
+    );
+
+    const room = (service as any).rooms.get(created.roomCode);
+    room.game.finalRoundRemaining = 0;
+    room.game.turn.stage = "awaitingHandoff";
+
+    await service.applyAction(
+      created.roomCode,
+      { seatId: created.seatId, playerSecret: created.playerSecret },
+      {
+        roomCode: created.roomCode,
+        seatId: created.seatId,
+        playerSecret: created.playerSecret,
+        action: {
+          type: "advance_turn"
+        }
+      }
+    );
+
+    const reviewHistory = await service.getReviewHistory(created.roomCode, {
+      seatId: joined.seatId,
+      playerSecret: joined.playerSecret
+    });
+
+    expect(reviewHistory).toMatchObject({
+      roomCode: created.roomCode,
+      status: "finished",
+      configId: "v0.4-flushing-newark-airport"
+    });
+    expect(reviewHistory.events.at(-1)?.eventType).toBe("game_finished");
+    expect(reviewHistory.checkpoints.at(-1)).toMatchObject({
+      checkpointType: "game_finished"
+    });
+    expect("snapshot" in (reviewHistory.checkpoints[0] ?? {})).toBe(false);
+  });
+
   it("restores an active timer after reloading a timed room from persistence", async () => {
     const repository = new MemoryRoomRepository();
     const service = new RoomService(repository, hudsonHustleReleasedConfigs);

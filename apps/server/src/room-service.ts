@@ -81,6 +81,31 @@ interface RoomAuth {
   playerSecret: string;
 }
 
+export interface RoomGameHistoryReviewCheckpoint {
+  roomCode: string;
+  snapshotVersion: number;
+  checkpointType: StoredGameHistoryCheckpointType;
+  createdAt: string;
+}
+
+export interface RoomGameHistoryReview {
+  roomCode: string;
+  status: RoomStatus;
+  configId: string;
+  configVersion: string;
+  configSummary: string;
+  mapName: string;
+  completedAt: string;
+  seats: Array<{
+    seatId: string;
+    playerId: string | null;
+    playerName: string | null;
+    controllerType: ControllerType;
+  }>;
+  events: StoredGameHistoryEvent[];
+  checkpoints: RoomGameHistoryReviewCheckpoint[];
+}
+
 function invariant(condition: unknown, message: string, statusCode = 400, code = "bad_request"): asserts condition {
   if (!condition) {
     throw new RoomServiceError(message, statusCode, code);
@@ -580,6 +605,36 @@ export class RoomService {
   async getGameHistory(roomCode: string): Promise<StoredGameHistory> {
     await this.getRoomOrThrow(roomCode);
     return this.repository.getGameHistory(roomCode);
+  }
+
+  async getReviewHistory(roomCode: string, auth: RoomAuth): Promise<RoomGameHistoryReview> {
+    const room = await this.getRoomOrThrow(roomCode);
+    this.getAuthorizedSeat(room, auth);
+    invariant(room.status === "finished", "Game history is only available after the game ends.", 409, "history_not_ready");
+
+    const history = await this.repository.getGameHistory(roomCode);
+    return {
+      roomCode: room.roomCode,
+      status: room.status,
+      configId: room.configId,
+      configVersion: room.configVersion,
+      configSummary: room.configSummary,
+      mapName: room.mapName,
+      completedAt: room.updatedAt,
+      seats: room.seats.map((seat) => ({
+        seatId: seat.seatId,
+        playerId: seat.playerId,
+        playerName: seat.playerName,
+        controllerType: seat.controllerType
+      })),
+      events: history.events,
+      checkpoints: history.checkpoints.map((checkpoint) => ({
+        roomCode: checkpoint.roomCode,
+        snapshotVersion: checkpoint.snapshotVersion,
+        checkpointType: checkpoint.checkpointType,
+        createdAt: checkpoint.createdAt
+      }))
+    };
   }
 
   async startRoom(roomCode: string, request: StartRoomRequest): Promise<StartRoomResponse> {
