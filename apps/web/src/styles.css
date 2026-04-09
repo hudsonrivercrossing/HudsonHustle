@@ -243,11 +243,6 @@ button {
   margin-top: var(--space-stack-sm);
 }
 
-.config-hover-card {
-  position: relative;
-  width: fit-content;
-}
-
 .score-guide {
   position: relative;
   width: fit-content;
@@ -881,9 +876,64 @@ h3 {
   margin-bottom: 18px;
 }
 
+.topbar-title-block {
+  display: grid;
+  gap: 10px;
+}
+
+.topbar-meta-row,
+.lobby-meta-row {
+  margin-top: 0;
+  gap: 8px;
+}
+
+.topbar-meta-row .utility-pill,
+.lobby-meta-row .utility-pill {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.36),
+    0 5px 12px rgba(62, 41, 20, 0.05);
+}
+
+.topbar-meta-row .utility-pill {
+  padding: 8px 12px 9px;
+}
+
+.topbar-meta-row .utility-pill__label,
+.lobby-meta-row .utility-pill__label {
+  letter-spacing: 0.14em;
+}
+
+.topbar-meta-row .utility-pill__value,
+.lobby-meta-row .utility-pill__value {
+  font-size: 0.86rem;
+}
+
 .topbar-actions {
   justify-content: flex-end;
   align-items: start;
+  gap: 10px;
+}
+
+.topbar-actions .system-button {
+  min-width: auto;
+}
+
+.topbar-actions__leave {
+  padding-inline: 14px;
+}
+
+.score-guide--subtle .score-guide__trigger.system-button {
+  min-height: 38px;
+  padding-inline: 12px;
+  font-size: 0.84rem;
+  font-weight: 680;
+}
+
+.score-guide--subtle .score-guide__trigger.system-button,
+.topbar-actions__leave {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.58),
+    0 5px 12px rgba(62, 41, 20, 0.05);
 }
 
 .game-layout {
@@ -928,6 +978,11 @@ h3 {
   justify-content: space-between;
   gap: 16px;
   align-items: start;
+}
+
+.lobby-header > div:first-child {
+  display: grid;
+  gap: 10px;
 }
 
 .timer-picker {
@@ -1029,6 +1084,14 @@ h3 {
 
 .reconnect-panel {
   margin-top: 18px;
+}
+
+.lobby-grid--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.lobby-seat-panel {
+  gap: var(--space-stack-md);
 }
 
 .seat-stack {
@@ -1219,17 +1282,17 @@ h3 {
 
 .identity-chip__pill {
   cursor: default;
-  padding: 11px 18px;
-  border-radius: 21px;
+  padding: 8px 14px;
+  border-radius: 18px;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.56),
-    0 6px 14px rgba(62, 41, 20, 0.06);
+    0 5px 12px rgba(62, 41, 20, 0.05);
 }
 
 .identity-chip__pill .utility-pill__value {
-  font-size: 0.97rem;
-  font-weight: 690;
-  letter-spacing: -0.018em;
+  font-size: 0.84rem;
+  font-weight: 680;
+  letter-spacing: -0.012em;
 }
 
 .identity-chip__panel {

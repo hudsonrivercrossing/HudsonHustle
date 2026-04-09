@@ -5,6 +5,7 @@ import { Chip } from "./system/Chip";
 import { Panel } from "./system/Panel";
 import { SectionHeader } from "./system/SectionHeader";
 import { StateSurface } from "./system/StateSurface";
+import { UtilityPill } from "./system/UtilityPill";
 
 interface LobbyScreenProps {
   room: RoomSummary;
@@ -56,35 +57,28 @@ export function LobbyScreen({
           <div>
             <p className="eyebrow">Room Lobby</p>
             <h1>Hudson Hustle</h1>
-            <p className="lead">
-              Share the room code, let everyone claim a seat, and start once the full table is ready.
-            </p>
+            <div className="utility-pill-group lobby-meta-row">
+              <UtilityPill label="Room" value={room.roomCode} tone="accent" />
+              <UtilityPill label="Map" value={room.mapName} />
+              <UtilityPill label="Timer" value={room.turnTimeLimitSeconds === 0 ? "Untimed" : `${room.turnTimeLimitSeconds}s`} />
+            </div>
             <StateSurface
               tone={lobbyTone}
               eyebrow={canStart ? "Ready to start" : localSeat?.isHost ? "Host status" : "Lobby status"}
               headline={lobbyHeadline}
               copy={lobbyCopy}
-              rightSlot={room.turnTimeLimitSeconds === 0 ? "Untimed" : `${room.turnTimeLimitSeconds}s turns`}
               testId="lobby-status-banner"
             />
           </div>
           <IdentityChip reconnectToken={reconnectToken} />
         </div>
 
-        <div className="lobby-grid">
-          <Panel variant="status">
-            <SectionHeader eyebrow="Session details" title="Room" meta={room.roomCode} />
-            <p className="muted-copy">Map: {room.mapName}</p>
-            <p className="muted-copy">Config: {room.configVersion} · {room.configId}</p>
-            <p className="muted-copy">Turn timer: {room.turnTimeLimitSeconds === 0 ? "Untimed" : `${room.turnTimeLimitSeconds}s`}</p>
-            {timer?.deadlineAt ? <p className="muted-copy">Next timer activates after game start.</p> : null}
-          </Panel>
-
-          <Panel variant="neutral">
+        <div className="lobby-grid lobby-grid--single">
+          <Panel variant="neutral" className="lobby-seat-panel">
             <SectionHeader
               eyebrow="Table state"
               title="Seats"
-              meta={`${occupiedCount}/${room.playerCount} occupied`}
+              meta={`${occupiedCount}/${room.playerCount} occupied · ${readyCount}/${room.playerCount} ready`}
             />
             <div className="seat-stack">
               {room.seats.map((seat) => (
@@ -129,6 +123,7 @@ export function LobbyScreen({
                 </article>
               ))}
             </div>
+            {timer?.deadlineAt ? <p className="muted-copy">Timer will activate when the next live turn begins.</p> : null}
           </Panel>
         </div>
 

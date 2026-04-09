@@ -722,19 +722,17 @@ export default function App(): JSX.Element {
   return (
     <div className="app-shell" data-config-theme={visuals.theme}>
       <header className="topbar">
-        <div>
+        <div className="topbar-title-block">
           <p className="eyebrow">Hudson Hustle Multiplayer</p>
           <h1>{mapConfig.name}</h1>
-          <div className="utility-pill-group">
-            <div className="config-hover-card">
-              <UtilityPill
-                label="Config"
-                value={`${snapshot.room.configVersion} · ${snapshot.room.configId}`}
-                tone="accent"
-                testId="config-utility-pill"
-              />
-              <span className="config-summary-tooltip">{snapshot.room.configSummary}</span>
-            </div>
+          <div className="utility-pill-group topbar-meta-row">
+            <UtilityPill
+              label="Config"
+              value={snapshot.room.configVersion}
+              tone="accent"
+              testId="config-utility-pill"
+            />
+            <UtilityPill label="Room" value={snapshot.room.roomCode} />
           </div>
           <StatusBanner
             tone={turnBannerTone}
@@ -746,9 +744,9 @@ export default function App(): JSX.Element {
           />
         </div>
         <div className="topbar-actions">
-          <ScoreGuide />
+          <ScoreGuide className="score-guide--subtle" />
           <IdentityChip reconnectToken={reconnectToken} />
-          <Button onClick={leaveRoom}>
+          <Button className="topbar-actions__leave" onClick={leaveRoom}>
             Leave room
           </Button>
         </div>
