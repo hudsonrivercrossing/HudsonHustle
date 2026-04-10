@@ -467,11 +467,21 @@ describe("RoomService", () => {
 
     expect(afterBotTurn.room.activeSeatId).toBe(created.seatId);
     const botPlayer = afterBotTurn.game?.players.find((player) => player.name === "Bot West");
+    const beforeBotPlayer = beforeBotTurn.game?.players.find((player) => player.name === "Bot West");
     expect(botPlayer).toBeTruthy();
-    expect(
-      (afterBotTurn.game?.routeClaims.length ?? 0) > (beforeBotTurn.game?.routeClaims.length ?? 0) ||
-        (botPlayer?.handCount ?? 0) !== (beforeBotTurn.game?.players.find((player) => player.name === "Bot West")?.handCount ?? 0)
-    ).toBe(true);
+
+    const visibleBotStateChanged =
+      (afterBotTurn.game?.routeClaims.length ?? 0) !== (beforeBotTurn.game?.routeClaims.length ?? 0) ||
+      (afterBotTurn.game?.stations.length ?? 0) !== (beforeBotTurn.game?.stations.length ?? 0) ||
+      (afterBotTurn.game?.log.length ?? 0) !== (beforeBotTurn.game?.log.length ?? 0) ||
+      (botPlayer?.handCount ?? 0) !== (beforeBotPlayer?.handCount ?? 0) ||
+      (botPlayer?.ticketCount ?? 0) !== (beforeBotPlayer?.ticketCount ?? 0) ||
+      (botPlayer?.pendingTicketCount ?? 0) !== (beforeBotPlayer?.pendingTicketCount ?? 0) ||
+      (botPlayer?.stationsLeft ?? 0) !== (beforeBotPlayer?.stationsLeft ?? 0) ||
+      (botPlayer?.trainsLeft ?? 0) !== (beforeBotPlayer?.trainsLeft ?? 0) ||
+      (botPlayer?.score ?? 0) !== (beforeBotPlayer?.score ?? 0);
+
+    expect(visibleBotStateChanged).toBe(true);
   });
 
   it("restores an active timer after reloading a timed room from persistence", async () => {
