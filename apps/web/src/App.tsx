@@ -663,6 +663,7 @@ export default function App(): JSX.Element {
           setSetupMode("gateway");
           setMultiplayerError(null);
         }}
+        onClearRoomPreview={() => setRoomPreview(null)}
         onPreviewRoom={(roomCode) => void previewRoom(roomCode)}
         onCreateRoom={(form) => void createRoom(form)}
         onJoinRoom={(form) => void joinRoom(form)}

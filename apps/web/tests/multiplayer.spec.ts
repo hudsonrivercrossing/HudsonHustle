@@ -38,9 +38,10 @@ async function openMultiplayerSetup(page: Page): Promise<void> {
   await waitForApi(page);
   await expect(page.getByRole("heading", { name: "Hudson Hustle" })).toBeVisible();
   await page.getByTestId("gateway-online").click();
-  await expect(page.getByRole("button", { name: "Create room" })).toBeVisible();
-  await expect(page.getByTestId("create-room-panel")).toBeVisible();
-  await expect(page.getByTestId("join-room-panel")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Online" })).toBeVisible();
+  await expect(page.getByTestId("online-mode-gateway")).toBeVisible();
+  await expect(page.getByTestId("online-start-game")).toBeVisible();
+  await expect(page.getByTestId("online-join-room")).toBeVisible();
 }
 
 async function openLocalSetup(page: Page, options?: { resetTutorial?: boolean }): Promise<void> {
@@ -53,10 +54,18 @@ async function openLocalSetup(page: Page, options?: { resetTutorial?: boolean })
   await expect(page.getByRole("heading", { name: "Local pass-and-play" })).toBeVisible();
 }
 
+async function openJoinRoomPanel(page: Page) {
+  await page.getByTestId("online-join-room").click();
+  const joinPanel = page.getByTestId("join-room-panel");
+  await expect(joinPanel).toBeVisible();
+  return joinPanel;
+}
+
 async function createRoom(
   page: Page,
   options?: { timerAdjustments?: number; expectedTimerText?: string; botSeats?: string[]; playerCount?: 2 | 3 | 4 }
 ): Promise<{ roomCode: string; seatId: string; playerSecret: string }> {
+  await page.getByTestId("online-start-game").click();
   const createPanel = page.getByTestId("create-room-panel");
   const timerAdjustments = options?.timerAdjustments ?? 2;
   const expectedTimerText = options?.expectedTimerText ?? "30s";
@@ -85,7 +94,7 @@ async function joinRoom(
   roomCode: string,
   options?: { seatId?: string; playerName?: string }
 ): Promise<{ roomCode: string; seatId: string; playerSecret: string }> {
-  const joinPanel = page.getByTestId("join-room-panel");
+  const joinPanel = await openJoinRoomPanel(page);
   const seatId = options?.seatId ?? "seat-2";
   const playerName = options?.playerName ?? "Guest";
   await joinPanel.getByLabel("Room code").fill(roomCode);
@@ -354,7 +363,7 @@ test("normal setup can create a mixed room with multiple bot seats and only leav
   await expect(hostPage.getByTestId("seat-row-seat-4")).toContainText("Open seat");
 
   await openMultiplayerSetup(guestPage);
-  const joinPanel = guestPage.getByTestId("join-room-panel");
+  const joinPanel = await openJoinRoomPanel(guestPage);
   await joinPanel.getByLabel("Room code").fill(roomCode);
   await joinPanel.getByRole("button", { name: "Preview room" }).click();
   await expect(guestPage.getByRole("button", { name: "seat-4" })).toBeVisible();
