@@ -21,6 +21,7 @@ interface MultiplayerSetupScreenProps {
   reconnectState: ReconnectState;
   roomPreview: RoomSummary | null;
   error: string | null;
+  isCreatingRoom?: boolean;
   onOpenLocal?: () => void;
   onBack?: () => void;
   onClearRoomPreview?: () => void;
@@ -39,6 +40,7 @@ export function MultiplayerSetupScreen({
   reconnectState,
   roomPreview,
   error,
+  isCreatingRoom = false,
   onOpenLocal,
   onBack,
   onClearRoomPreview,
@@ -138,7 +140,7 @@ export function MultiplayerSetupScreen({
         : "Enter a code, choose a seat, or restore a session.";
   const backLabel = stage === "gateway" ? "Back" : "Back";
   const showBanner =
-    stage === "join" && (Boolean(error) || reconnectState === "attempting-reconnect" || reconnectState === "reconnect-failed");
+    Boolean(error) || (stage === "join" && (reconnectState === "attempting-reconnect" || reconnectState === "reconnect-failed"));
   const railSteps =
     stage === "gateway"
       ? [
@@ -403,6 +405,7 @@ export function MultiplayerSetupScreen({
                     <Button onClick={() => setCreateStep(1)}>Back</Button>
                     <Button
                       variant="primary"
+                      disabled={isCreatingRoom}
                       onClick={() =>
                         onCreateRoom({
                           hostName: hostName.trim() || "Host",
@@ -413,7 +416,7 @@ export function MultiplayerSetupScreen({
                         })
                       }
                     >
-                      Create room
+                      {isCreatingRoom ? "Creating room..." : "Create room"}
                     </Button>
                   </div>
                 </Panel>
