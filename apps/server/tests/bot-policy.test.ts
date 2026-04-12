@@ -295,6 +295,35 @@ describe("chooseBotAction", () => {
     });
   });
 
+  it("does not choose a route claim longer than its remaining trains", () => {
+    const action = chooseBotAction({
+      config: baseConfig,
+      game: buildGame({
+        players: [
+          {
+            ...buildGame().players[0],
+            trainsLeft: 1
+          },
+          buildGame().players[1]
+        ]
+      }),
+      privateState: buildPrivateState({
+        hand: [
+          { id: "c1", color: "crimson" },
+          { id: "c2", color: "crimson" },
+          { id: "c3", color: "amber" },
+          { id: "c4", color: "rose" }
+        ]
+      })
+    });
+
+    expect(action).toEqual({
+      type: "draw_card",
+      source: "market",
+      marketIndex: 1
+    });
+  });
+
   it("draws a matching market color for its target path when no aligned claim is affordable", () => {
     const action = chooseBotAction({
       config: baseConfig,

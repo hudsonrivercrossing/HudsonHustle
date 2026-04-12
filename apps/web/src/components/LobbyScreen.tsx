@@ -5,6 +5,7 @@ import { Chip } from "./system/Chip";
 import { Panel } from "./system/Panel";
 import { SectionHeader } from "./system/SectionHeader";
 import { StateSurface } from "./system/StateSurface";
+import { UtilityPill } from "./system/UtilityPill";
 
 interface LobbyScreenProps {
   room: RoomSummary;
@@ -29,6 +30,7 @@ export function LobbyScreen({
   realtimeReady,
   realtimeMessage
 }: LobbyScreenProps): JSX.Element {
+  const setupHeroImageUrl = "/setup/landing-bg.png";
   const localSeat = room.seats.find((seat) => seat.seatId === localSeatId);
   const canStart = realtimeReady && localSeat?.isHost && room.seats.every((seat) => seat.playerName) && room.seats.every((seat) => seat.ready);
   const occupiedCount = room.seats.filter((seat) => seat.playerName).length;
@@ -50,41 +52,59 @@ export function LobbyScreen({
       : "Share the room code, mark yourself ready, and wait for the host to start.";
 
   return (
-    <main className="setup-shell">
-      <section className="setup-card">
-        <div className="lobby-header">
-          <div>
-            <p className="eyebrow">Room Lobby</p>
-            <h1>Hudson Hustle</h1>
-            <p className="lead">
-              Share the room code, let everyone claim a seat, and start once the full table is ready.
-            </p>
-            <StateSurface
-              tone={lobbyTone}
-              eyebrow={canStart ? "Ready to start" : localSeat?.isHost ? "Host status" : "Lobby status"}
-              headline={lobbyHeadline}
-              copy={lobbyCopy}
-              rightSlot={room.turnTimeLimitSeconds === 0 ? "Untimed" : `${room.turnTimeLimitSeconds}s turns`}
-              testId="lobby-status-banner"
-            />
+    <main
+      className="setup-shell setup-shell--mode setup-shell--atmospheric"
+      style={{
+        ["--setup-gateway-image" as string]: `url("${setupHeroImageUrl}")`
+      }}
+    >
+      <section className="setup-card setup-card--mode setup-card--atmospheric">
+        <aside className="setup-mode-rail lobby-mode-rail">
+          <div className="setup-mode-rail__copy">
+            <p className="setup-mode-rail__eyebrow">Room lobby</p>
+            <h1>Boarding</h1>
+            <p className="setup-mode-rail__lead">Seats, readiness, and departure stay here until the host starts the table.</p>
+          </div>
+          <div className="setup-mode-rail__track" aria-label="Lobby guide">
+            <div className="setup-mode-rail__step setup-mode-rail__step--current">
+              <span className="setup-mode-rail__step-index">NOW</span>
+              <div className="setup-mode-rail__step-copy">
+                <strong>{room.roomCode}</strong>
+                <span>{room.mapName}</span>
+              </div>
+            </div>
+            <div className="setup-mode-rail__step">
+              <span className="setup-mode-rail__step-index">SEATS</span>
+              <div className="setup-mode-rail__step-copy">
+                <strong>{occupiedCount}/{room.playerCount} occupied</strong>
+                <span>{readyCount}/{room.playerCount} ready</span>
+              </div>
+            </div>
+            <div className="setup-mode-rail__step">
+              <span className="setup-mode-rail__step-index">TIMER</span>
+              <div className="setup-mode-rail__step-copy">
+                <strong>{room.turnTimeLimitSeconds === 0 ? "Untimed" : `${room.turnTimeLimitSeconds}s`}</strong>
+                <span>{canStart ? "Ready to depart" : "Waiting in lobby"}</span>
+              </div>
+            </div>
           </div>
           <IdentityChip reconnectToken={reconnectToken} />
-        </div>
+        </aside>
 
-        <div className="lobby-grid">
-          <Panel variant="status">
-            <SectionHeader eyebrow="Session details" title="Room" meta={room.roomCode} />
-            <p className="muted-copy">Map: {room.mapName}</p>
-            <p className="muted-copy">Config: {room.configVersion} · {room.configId}</p>
-            <p className="muted-copy">Turn timer: {room.turnTimeLimitSeconds === 0 ? "Untimed" : `${room.turnTimeLimitSeconds}s`}</p>
-            {timer?.deadlineAt ? <p className="muted-copy">Next timer activates after game start.</p> : null}
-          </Panel>
+        <div className="setup-mode-stage lobby-mode-stage">
+          <StateSurface
+            tone={lobbyTone}
+            eyebrow={canStart ? "Ready to start" : localSeat?.isHost ? "Host status" : "Lobby status"}
+            headline={lobbyHeadline}
+            copy={lobbyCopy}
+            testId="lobby-status-banner"
+          />
 
-          <Panel variant="neutral">
+          <Panel variant="status" className="setup-wizard-card lobby-wizard-card lobby-seat-panel">
             <SectionHeader
-              eyebrow="Table state"
+              eyebrow="Now"
               title="Seats"
-              meta={`${occupiedCount}/${room.playerCount} occupied`}
+              meta={`${occupiedCount}/${room.playerCount} occupied · ${readyCount}/${room.playerCount} ready`}
             />
             <div className="seat-stack">
               {room.seats.map((seat) => (
@@ -129,19 +149,22 @@ export function LobbyScreen({
                 </article>
               ))}
             </div>
-          </Panel>
-        </div>
+            {timer?.deadlineAt ? <p className="muted-copy">Timer will activate when the next live turn begins.</p> : null}
 
-        <div className="setup-actions">
-          <Button disabled={!realtimeReady} onClick={() => onReadyChange(!localSeat?.ready)}>
-            {localSeat?.ready ? "Mark not ready" : "Mark ready"}
-          </Button>
-          {localSeat?.isHost ? (
-            <Button variant="primary" disabled={!canStart} onClick={onStart}>
-              Start game
-            </Button>
-          ) : null}
-          <Button onClick={onLeaveRoom}>Leave room</Button>
+            <div className="setup-mode-panel__actions setup-mode-panel__actions--split">
+              <Button onClick={onLeaveRoom}>Leave room</Button>
+              <div className="setup-actions">
+                <Button disabled={!realtimeReady} onClick={() => onReadyChange(!localSeat?.ready)}>
+                  {localSeat?.ready ? "Mark not ready" : "Mark ready"}
+                </Button>
+                {localSeat?.isHost ? (
+                  <Button variant="primary" disabled={!canStart} onClick={onStart}>
+                    Start game
+                  </Button>
+                ) : null}
+              </div>
+            </div>
+          </Panel>
         </div>
       </section>
     </main>

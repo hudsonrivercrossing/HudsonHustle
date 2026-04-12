@@ -25,9 +25,17 @@ jobs:
 
             function parseSections(markdown) {
               const sections = {};
-              const regex = /^###\s+(.+)\n([\s\S]*?)(?=^###\s+|\Z)/gm;
-              for (const match of markdown.matchAll(regex)) {
-                sections[match[1].trim()] = match[2].trim();
+              const headingRegex = /^###\s+(.+)$/gm;
+              const matches = [...markdown.matchAll(headingRegex)];
+
+              for (const [index, match] of matches.entries()) {
+                const heading = match[1]?.trim();
+                const start = (match.index ?? 0) + match[0].length;
+                const end = index + 1 < matches.length ? (matches[index + 1].index ?? markdown.length) : markdown.length;
+                if (!heading) {
+                  continue;
+                }
+                sections[heading] = markdown.slice(start, end).trim();
               }
               return sections;
             }
@@ -108,73 +116,45 @@ jobs:
               }
             }
 
-            const projectData = await github.graphql(
-              `
-                query($login: String!, $number: Int!, $cursor: String) {
-                  organization(login: $login) {
-                    projectV2(number: $number) {
-                      id
-                      fields(first: 50) {
-                        nodes {
-                          ... on ProjectV2FieldCommon {
-                            id
-                            name
-                          }
-                          ... on ProjectV2SingleSelectField {
-                            id
-                            name
-                            options {
-                              id
-                              name
-                            }
-                          }
-                        }
-                      }
-                      items(first: 100, after: $cursor) {
-                        pageInfo {
-                          hasNextPage
-                          endCursor
-                        }
+            try {
+              const roadmapOwner = "hudsonrivercrossing";
+              const roadmapProjectTitle = "Hudson Hustle Roadmap";
+
+              const projectData = await github.graphql(
+                `
+                  query($login: String!, $query: String!, $cursor: String) {
+                    organization(login: $login) {
+                      projectsV2(first: 20, query: $query) {
                         nodes {
                           id
-                          content {
-                            ... on Issue {
-                              number
+                          title
+                          fields(first: 50) {
+                            nodes {
+                              ... on ProjectV2FieldCommon {
+                                id
+                                name
+                              }
+                              ... on ProjectV2SingleSelectField {
+                                id
+                                name
+                                options {
+                                  id
+                                  name
+                                }
+                              }
                             }
                           }
-                        }
-                      }
-                    }
-                  }
-                }
-              `,
-              {
-                login: "hudsonrivercrossing",
-                number: 1,
-                cursor: null,
-              },
-            );
-
-            const project = projectData.organization.projectV2;
-            let projectItem = project.items.nodes.find((node) => node.content?.number === issue.number);
-            let nextCursor = project.items.pageInfo.hasNextPage ? project.items.pageInfo.endCursor : null;
-
-            while (!projectItem && nextCursor) {
-              const nextPage = await github.graphql(
-                `
-                  query($login: String!, $number: Int!, $cursor: String) {
-                    organization(login: $login) {
-                      projectV2(number: $number) {
-                        items(first: 100, after: $cursor) {
-                          pageInfo {
-                            hasNextPage
-                            endCursor
-                          }
-                          nodes {
-                            id
-                            content {
-                              ... on Issue {
-                                number
+                          items(first: 100, after: $cursor) {
+                            pageInfo {
+                              hasNextPage
+                              endCursor
+                            }
+                            nodes {
+                              id
+                              content {
+                                ... on Issue {
+                                  number
+                                }
                               }
                             }
                           }
@@ -184,74 +164,119 @@ jobs:
                   }
                 `,
                 {
-                  login: "hudsonrivercrossing",
-                  number: 1,
-                  cursor: nextCursor,
+                  login: roadmapOwner,
+                  query: roadmapProjectTitle,
+                  cursor: null,
                 },
               );
 
-              const page = nextPage.organization.projectV2.items;
-              projectItem = page.nodes.find((node) => node.content?.number === issue.number);
-              nextCursor = page.pageInfo.hasNextPage ? page.pageInfo.endCursor : null;
-            }
-
-            if (!projectItem) {
-              const addResult = await github.graphql(
-                `
-                  mutation($projectId: ID!, $contentId: ID!) {
-                    addProjectV2ItemById(input: { projectId: $projectId, contentId: $contentId }) {
-                      item {
-                        id
-                      }
-                    }
-                  }
-                `,
-                {
-                  projectId: project.id,
-                  contentId: issue.node_id,
-                },
+              const project = projectData.organization?.projectsV2?.nodes?.find(
+                (node) => node?.title === roadmapProjectTitle,
               );
 
-              projectItem = { id: addResult.addProjectV2ItemById.item.id };
-            }
-
-            const fieldsByName = new Map(project.fields.nodes.map((field) => [field.name, field]));
-
-            async function updateSingleSelect(fieldName, optionName) {
-              if (!optionName) return;
-              const field = fieldsByName.get(fieldName);
-              const option = field?.options?.find((entry) => entry.name === optionName);
-              if (!field || !option) {
-                core.info(`No matching field option for ${fieldName}: ${optionName}`);
+              if (!project) {
+                core.warning(`Roadmap project '${roadmapProjectTitle}' is not visible to this workflow. Skipping project sync.`);
                 return;
               }
 
-              await github.graphql(
-                `
-                  mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
-                    updateProjectV2ItemFieldValue(
-                      input: {
-                        projectId: $projectId
-                        itemId: $itemId
-                        fieldId: $fieldId
-                        value: { singleSelectOptionId: $optionId }
-                      }
-                    ) {
-                      projectV2Item {
-                        id
+              let projectItem = project.items.nodes.find((node) => node.content?.number === issue.number);
+              let nextCursor = project.items.pageInfo.hasNextPage ? project.items.pageInfo.endCursor : null;
+
+              while (!projectItem && nextCursor) {
+                const nextPage = await github.graphql(
+                  `
+                    query($projectId: ID!, $cursor: String) {
+                      node(id: $projectId) {
+                        ... on ProjectV2 {
+                          items(first: 100, after: $cursor) {
+                            pageInfo {
+                              hasNextPage
+                              endCursor
+                            }
+                            nodes {
+                              id
+                              content {
+                                ... on Issue {
+                                  number
+                                }
+                              }
+                            }
+                          }
+                        }
                       }
                     }
-                  }
-                `,
-                {
-                  projectId: project.id,
-                  itemId: projectItem.id,
-                  fieldId: field.id,
-                  optionId: option.id,
-                },
-              );
-            }
+                  `,
+                  {
+                    projectId: project.id,
+                    cursor: nextCursor,
+                  },
+                );
 
-            await updateSingleSelect("Track", area && areaMap[area] ? areaMap[area].track : undefined);
-            await updateSingleSelect("Horizon", horizon);
-            await updateSingleSelect("Priority", priority);
+                const page = nextPage.node.items;
+                projectItem = page.nodes.find((node) => node.content?.number === issue.number);
+                nextCursor = page.pageInfo.hasNextPage ? page.pageInfo.endCursor : null;
+              }
+
+              if (!projectItem) {
+                const addResult = await github.graphql(
+                  `
+                    mutation($projectId: ID!, $contentId: ID!) {
+                      addProjectV2ItemById(input: { projectId: $projectId, contentId: $contentId }) {
+                        item {
+                          id
+                        }
+                      }
+                    }
+                  `,
+                  {
+                    projectId: project.id,
+                    contentId: issue.node_id,
+                  },
+                );
+
+                projectItem = { id: addResult.addProjectV2ItemById.item.id };
+              }
+
+              const fieldsByName = new Map(project.fields.nodes.map((field) => [field.name, field]));
+
+              async function updateSingleSelect(fieldName, optionName) {
+                if (!optionName) return;
+                const field = fieldsByName.get(fieldName);
+                const option = field?.options?.find((entry) => entry.name === optionName);
+                if (!field || !option) {
+                  core.info(`No matching field option for ${fieldName}: ${optionName}`);
+                  return;
+                }
+
+                await github.graphql(
+                  `
+                    mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+                      updateProjectV2ItemFieldValue(
+                        input: {
+                          projectId: $projectId
+                          itemId: $itemId
+                          fieldId: $fieldId
+                          value: { singleSelectOptionId: $optionId }
+                        }
+                      ) {
+                        projectV2Item {
+                          id
+                        }
+                      }
+                    }
+                  `,
+                  {
+                    projectId: project.id,
+                    itemId: projectItem.id,
+                    fieldId: field.id,
+                    optionId: option.id,
+                  },
+                );
+              }
+
+              await updateSingleSelect("Track", area && areaMap[area] ? areaMap[area].track : undefined);
+              await updateSingleSelect("Horizon", horizon);
+              await updateSingleSelect("Priority", priority);
+            } catch (error) {
+              core.warning(`Roadmap project sync skipped: ${error instanceof Error ? error.message : String(error)}`);
+            }
