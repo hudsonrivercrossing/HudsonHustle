@@ -72,14 +72,16 @@ async function createRoom(
   const botSeats = new Set(options?.botSeats ?? []);
   const playerCount = options?.playerCount ?? 2;
   await createPanel.getByLabel("Your name").fill("Host");
+  await createPanel.getByRole("button", { name: "Continue to seats" }).click();
   await createPanel.getByLabel("Players").selectOption(String(playerCount));
-  for (let index = 0; index < timerAdjustments; index += 1) {
-    await createPanel.getByRole("button", { name: "+15" }).click();
-  }
-  await expect(createPanel.getByText(expectedTimerText)).toBeVisible();
   for (const seatId of botSeats) {
     await createPanel.getByTestId(`seat-plan-toggle-${seatId}`).click();
   }
+  await createPanel.getByRole("button", { name: "Continue to board" }).click();
+  for (let index = 0; index < timerAdjustments; index += 1) {
+    await createPanel.getByRole("button", { name: "+15" }).click();
+  }
+  await expect(createPanel.locator(".timer-picker__value")).toHaveText(expectedTimerText);
   await createPanel.getByRole("button", { name: "Create room" }).click();
   await expect(page.getByTestId("lobby-status-banner")).toBeVisible({ timeout: 10000 });
   await expect(page.getByTestId("seat-connected-seat-1")).toHaveText("Connected");
@@ -98,9 +100,10 @@ async function joinRoom(
   const seatId = options?.seatId ?? "seat-2";
   const playerName = options?.playerName ?? "Guest";
   await joinPanel.getByLabel("Room code").fill(roomCode);
-  await joinPanel.getByRole("button", { name: "Preview room" }).click();
+  await joinPanel.getByRole("button", { name: "Preview" }).click();
   await expect(page.getByRole("button", { name: seatId })).toBeVisible();
   await page.getByRole("button", { name: seatId }).click();
+  await joinPanel.getByRole("button", { name: "Continue to enter" }).click();
   await joinPanel.getByLabel("Your name").fill(playerName);
   await joinPanel.getByRole("button", { name: "Join room" }).click();
   await expect(page.getByTestId("lobby-status-banner")).toBeVisible({ timeout: 10000 });
@@ -131,6 +134,7 @@ test("multiplayer room lifecycle covers connected badges, private state, reconne
   await expect(hostPage.getByRole("button", { name: "Start game" })).toBeEnabled();
   await hostPage.getByRole("button", { name: "Start game" }).click();
   await clearInitialTicketChoice(hostPage);
+  await clearInitialTicketChoice(guestPage);
 
   await expect(hostPage.getByTestId("turn-status-banner")).toContainText("Your turn");
   await expect(hostPage.getByTestId("config-utility-pill")).toBeVisible();
@@ -365,11 +369,12 @@ test("normal setup can create a mixed room with multiple bot seats and only leav
   await openMultiplayerSetup(guestPage);
   const joinPanel = await openJoinRoomPanel(guestPage);
   await joinPanel.getByLabel("Room code").fill(roomCode);
-  await joinPanel.getByRole("button", { name: "Preview room" }).click();
+  await joinPanel.getByRole("button", { name: "Preview" }).click();
   await expect(guestPage.getByRole("button", { name: "seat-4" })).toBeVisible();
   await expect(guestPage.getByRole("button", { name: "seat-2" })).toHaveCount(0);
   await expect(guestPage.getByRole("button", { name: "seat-3" })).toHaveCount(0);
   await guestPage.getByRole("button", { name: "seat-4" }).click();
+  await joinPanel.getByRole("button", { name: "Continue to enter" }).click();
   await joinPanel.getByLabel("Your name").fill("Guest");
   await joinPanel.getByRole("button", { name: "Join room" }).click();
 
@@ -417,8 +422,13 @@ test("timed mixed rooms hand off through bot turns and still allow human reconne
     .toContain("Your turn");
 
   await guestPage.reload();
-  await expect(guestPage.getByTestId("turn-status-banner")).toBeVisible();
-  await expect(guestPage.getByTestId("turn-status-banner")).toContainText("Your turn");
+  await expect
+    .poll(async () => {
+      const pickerVisible = await guestPage.getByRole("button", { name: /Keep 2 tickets/ }).isVisible().catch(() => false);
+      const bannerText = await guestPage.getByTestId("turn-status-banner").textContent().catch(() => null);
+      return pickerVisible || (typeof bannerText === "string" && bannerText.includes("Your turn"));
+    }, { timeout: 10000 })
+    .toBe(true);
 
   await guestContext.close();
   await hostContext.close();
