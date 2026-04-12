@@ -127,7 +127,8 @@ export function MultiplayerSetupScreen({
         ? "Set the seats and create the room."
         : "Enter a code, choose a seat, or restore a session.";
   const backLabel = stage === "gateway" ? "Back" : "Back";
-  const showBanner = Boolean(error) || reconnectState === "attempting-reconnect" || reconnectState === "reconnect-failed";
+  const showBanner =
+    stage === "join" && (Boolean(error) || reconnectState === "attempting-reconnect" || reconnectState === "reconnect-failed");
   const railSteps =
     stage === "gateway"
       ? [
