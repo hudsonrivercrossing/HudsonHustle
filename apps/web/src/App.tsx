@@ -182,6 +182,7 @@ export default function App(): JSX.Element {
   const [roomPreview, setRoomPreview] = useState<RoomSnapshot["room"] | null>(null);
   const [reconnectState, setReconnectState] = useState<ReconnectState>("fresh");
   const [multiplayerError, setMultiplayerError] = useState<string | null>(null);
+  const [isCreatingRoom, setIsCreatingRoom] = useState(false);
   const [timer, setTimer] = useState<TimerUpdate | null>(null);
   const [timerNow, setTimerNow] = useState(() => Date.now());
   const [realtimeStatus, setRealtimeStatus] = useState<RealtimeStatus>("idle");
@@ -472,6 +473,8 @@ export default function App(): JSX.Element {
   }, [localIsActive, mapConfig, selectedRouteId, snapshot]);
 
   async function createRoom(form: CreateRoomRequest) {
+    setIsCreatingRoom(true);
+    setMultiplayerError(null);
     try {
       const response = await requestJson<CreateRoomResponse>("/rooms", {
         method: "POST",
@@ -489,7 +492,15 @@ export default function App(): JSX.Element {
       setSnapshot(response.snapshot);
       setMultiplayerError(null);
     } catch (caught) {
-      setMultiplayerError(caught instanceof Error ? caught.message : "Could not create the room.");
+      setMultiplayerError(
+        caught instanceof TypeError
+          ? "Could not reach the multiplayer server. Make sure the local backend is running and this web port is allowed."
+          : caught instanceof Error
+            ? caught.message
+            : "Could not create the room."
+      );
+    } finally {
+      setIsCreatingRoom(false);
     }
   }
 
@@ -655,6 +666,7 @@ export default function App(): JSX.Element {
         reconnectState={reconnectState}
         roomPreview={roomPreview}
         error={multiplayerError}
+        isCreatingRoom={isCreatingRoom}
         onOpenLocal={() => {
           setSetupMode("local");
           setMultiplayerError(null);
