@@ -196,6 +196,23 @@ test("invalid saved reconnect tokens fall back to the gateway instead of crashin
   await context.close();
 });
 
+test("switching from a failed join preview to create clears stale setup errors", async ({ browser }) => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+
+  await openMultiplayerSetup(page);
+  const joinPanel = await openJoinRoomPanel(page);
+  await joinPanel.getByLabel("Room code").fill("ABC123");
+  await joinPanel.getByRole("button", { name: "Preview" }).click();
+  await expect(page.getByText("Unknown room code.")).toBeVisible();
+
+  await page.getByRole("button", { name: "Start game" }).click();
+  await expect(page.getByTestId("create-room-panel")).toBeVisible();
+  await expect(page.getByText("Unknown room code.")).toHaveCount(0);
+
+  await context.close();
+});
+
 test("join flow clears stale seat selections when previewing a different room", async ({ browser }) => {
   const hostOneContext = await browser.newContext();
   const hostTwoContext = await browser.newContext();
