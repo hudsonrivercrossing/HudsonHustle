@@ -54,10 +54,24 @@ When your turn is finished, click `I'm done`. The app hides your private informa
 pnpm install
 ```
 
-### Run The Web App
+### Run Local Pass-And-Play
 ```bash
 pnpm dev
 ```
+
+### Run Multiplayer Locally
+Open two terminals:
+
+```bash
+pnpm dev:server
+pnpm dev:web
+```
+
+The local multiplayer defaults are:
+- web: `http://127.0.0.1:5173`
+- server: `http://127.0.0.1:8787`
+
+If Vite falls back to `5174`, the default local CORS examples allow that port too.
 
 ### Test
 ```bash

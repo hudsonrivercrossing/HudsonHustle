@@ -164,6 +164,7 @@ pnpm dev:web
 Defaults:
 - web: `http://127.0.0.1:5173`
 - server: `http://127.0.0.1:8787`
+- local CORS examples also allow `http://127.0.0.1:5174` for Vite fallback-port sessions
 
 ## First Branch-Based Deployment Checklist
 1. Create the `develop` branch in GitHub.
