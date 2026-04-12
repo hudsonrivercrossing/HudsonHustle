@@ -106,6 +106,22 @@ export interface RoomGameHistoryReview {
   checkpoints: RoomGameHistoryReviewCheckpoint[];
 }
 
+function getReviewCompletedAt(room: ServerRoom, history: StoredGameHistory): string {
+  const finishedEvent = [...history.events].reverse().find((event) => event.eventType === "game_finished");
+  if (finishedEvent) {
+    return finishedEvent.createdAt;
+  }
+
+  const finishedCheckpoint = [...history.checkpoints]
+    .reverse()
+    .find((checkpoint) => checkpoint.checkpointType === "game_finished");
+  if (finishedCheckpoint) {
+    return finishedCheckpoint.createdAt;
+  }
+
+  return room.updatedAt;
+}
+
 function invariant(condition: unknown, message: string, statusCode = 400, code = "bad_request"): asserts condition {
   if (!condition) {
     throw new RoomServiceError(message, statusCode, code);
@@ -620,7 +636,7 @@ export class RoomService {
       configVersion: room.configVersion,
       configSummary: room.configSummary,
       mapName: room.mapName,
-      completedAt: room.updatedAt,
+      completedAt: getReviewCompletedAt(room, history),
       seats: room.seats.map((seat) => ({
         seatId: seat.seatId,
         playerId: seat.playerId,

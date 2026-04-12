@@ -106,6 +106,16 @@ export function MultiplayerSetupScreen({
     }
   }, [joinStep, roomPreview, stage]);
 
+  useEffect(() => {
+    if (!preferredSeatId) {
+      return;
+    }
+
+    if (!roomPreview || !openSeats.some((seat) => seat.seatId === preferredSeatId)) {
+      setPreferredSeatId(undefined);
+    }
+  }, [openSeats, preferredSeatId, roomPreview]);
+
   function getStepStatus(index: number, currentStep: SetupFlowStep): SetupRailStepStatus {
     if (index < currentStep) {
       return "complete";
@@ -418,7 +428,15 @@ export function MultiplayerSetupScreen({
                   <SectionHeader eyebrow="Now" title="Room code" meta="Preview first" />
                   <div className="setup-mode-panel__field-grid setup-mode-panel__field-grid--launch">
                     <FormField label="Room code">
-                      <input value={joinRoomCode} onChange={(event) => setJoinRoomCode(event.target.value.toUpperCase())} maxLength={6} />
+                      <input
+                        value={joinRoomCode}
+                        onChange={(event) => {
+                          setJoinRoomCode(event.target.value.toUpperCase());
+                          setPreferredSeatId(undefined);
+                          onClearRoomPreview?.();
+                        }}
+                        maxLength={6}
+                      />
                     </FormField>
                     <Button className="join-preview-button" onClick={() => onPreviewRoom(joinRoomCode)}>
                       Preview
@@ -469,7 +487,11 @@ export function MultiplayerSetupScreen({
                   </div>
                   <div className="setup-mode-panel__actions setup-mode-panel__actions--split">
                     <Button onClick={() => setJoinStep(0)}>Back</Button>
-                    <Button variant="primary" disabled={!preferredSeatId} onClick={() => setJoinStep(2)}>
+                    <Button
+                      variant="primary"
+                      disabled={!roomPreview || !preferredSeatId || !openSeats.some((seat) => seat.seatId === preferredSeatId)}
+                      onClick={() => setJoinStep(2)}
+                    >
                       Continue to enter
                     </Button>
                   </div>

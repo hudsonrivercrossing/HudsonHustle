@@ -25,9 +25,17 @@ jobs:
 
             function parseSections(markdown) {
               const sections = {};
-              const regex = /^###\s+(.+)\n([\s\S]*?)(?=^###\s+|\Z)/gm;
-              for (const match of markdown.matchAll(regex)) {
-                sections[match[1].trim()] = match[2].trim();
+              const headingRegex = /^###\s+(.+)$/gm;
+              const matches = [...markdown.matchAll(headingRegex)];
+
+              for (const [index, match] of matches.entries()) {
+                const heading = match[1]?.trim();
+                const start = (match.index ?? 0) + match[0].length;
+                const end = index + 1 < matches.length ? (matches[index + 1].index ?? markdown.length) : markdown.length;
+                if (!heading) {
+                  continue;
+                }
+                sections[heading] = markdown.slice(start, end).trim();
               }
               return sections;
             }

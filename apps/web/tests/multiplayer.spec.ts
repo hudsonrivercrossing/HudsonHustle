@@ -196,6 +196,45 @@ test("invalid saved reconnect tokens fall back to the gateway instead of crashin
   await context.close();
 });
 
+test("join flow clears stale seat selections when previewing a different room", async ({ browser }) => {
+  const hostOneContext = await browser.newContext();
+  const hostTwoContext = await browser.newContext();
+  const guestContext = await browser.newContext();
+  const hostOnePage = await hostOneContext.newPage();
+  const hostTwoPage = await hostTwoContext.newPage();
+  const guestPage = await guestContext.newPage();
+
+  await openMultiplayerSetup(hostOnePage);
+  const firstRoom = await createRoom(hostOnePage, { playerCount: 3 });
+
+  await openMultiplayerSetup(hostTwoPage);
+  const secondRoom = await createRoom(hostTwoPage, { playerCount: 2 });
+
+  await openMultiplayerSetup(guestPage);
+  const joinPanel = await openJoinRoomPanel(guestPage);
+  await joinPanel.getByLabel("Room code").fill(firstRoom.roomCode);
+  await joinPanel.getByRole("button", { name: "Preview" }).click();
+  const seatThreeButton = guestPage.getByRole("button", { name: "seat-3" });
+  await seatThreeButton.click();
+  await expect(seatThreeButton).toHaveClass(/chip-button--selected/);
+
+  await guestPage.locator(".setup-mode-back").click();
+  await expect(guestPage.getByTestId("online-mode-gateway")).toBeVisible();
+  await guestPage.getByTestId("online-join-room").click();
+  const roomCodeField = guestPage.getByTestId("join-room-panel").getByLabel("Room code");
+  await expect(roomCodeField).toBeVisible();
+  await roomCodeField.fill(secondRoom.roomCode);
+  await guestPage.getByTestId("join-room-panel").getByRole("button", { name: "Preview" }).click();
+
+  await expect(joinPanel.getByText("Pick one")).toBeVisible();
+  await expect(joinPanel.getByRole("button", { name: "Continue to enter" })).toBeDisabled();
+  await expect(guestPage.getByRole("button", { name: "seat-2" })).toBeVisible();
+
+  await hostOneContext.close();
+  await hostTwoContext.close();
+  await guestContext.close();
+});
+
 test("initial multiplayer ticket choices can be confirmed independently without resetting another player's selection", async ({ browser }) => {
   const hostContext = await browser.newContext();
   const guestContext = await browser.newContext();

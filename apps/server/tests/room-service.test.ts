@@ -894,10 +894,23 @@ describe("RoomService", () => {
       configId: "v0.4-flushing-newark-airport"
     });
     expect(reviewHistory.events.at(-1)?.eventType).toBe("game_finished");
+    expect(reviewHistory.completedAt).toBe(reviewHistory.events.at(-1)?.createdAt);
     expect(reviewHistory.checkpoints.at(-1)).toMatchObject({
       checkpointType: "game_finished"
     });
     expect("snapshot" in (reviewHistory.checkpoints[0] ?? {})).toBe(false);
+
+    await service.connectSeat(created.roomCode, {
+      seatId: joined.seatId,
+      playerSecret: joined.playerSecret
+    });
+
+    const reviewHistoryAfterReconnect = await service.getReviewHistory(created.roomCode, {
+      seatId: joined.seatId,
+      playerSecret: joined.playerSecret
+    });
+
+    expect(reviewHistoryAfterReconnect.completedAt).toBe(reviewHistory.completedAt);
   });
 
   it("restores an active timer after reloading a timed room from persistence", async () => {
