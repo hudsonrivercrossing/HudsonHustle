@@ -50,3 +50,17 @@ export const gameEventsTable = pgTable("game_events", {
   payload: jsonb("payload").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull()
 });
+
+export const gameHistoryCheckpointsTable = pgTable(
+  "game_history_checkpoints",
+  {
+    roomCode: text("room_code").notNull(),
+    snapshotVersion: integer("snapshot_version").notNull(),
+    checkpointType: text("checkpoint_type").notNull(),
+    snapshot: jsonb("snapshot").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull()
+  },
+  (table) => ({
+    primaryKey: primaryKey({ columns: [table.roomCode, table.snapshotVersion] })
+  })
+);

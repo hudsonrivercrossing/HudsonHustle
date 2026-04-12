@@ -62,6 +62,7 @@ Your private ticket panel also acts as a live checklist:
 
 ## Claiming Routes
 - Spend cards that match the route length and color.
+- You must also have at least that many trains remaining. If a route is length `4`, you need `4` trains left to claim it.
 - Gray routes can be claimed with any one color set.
 - Longer routes score more points.
 - If a route is already claimed, it is gone for the rest of the game unless it is a still-open parallel route.

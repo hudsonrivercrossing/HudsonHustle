@@ -135,7 +135,7 @@ function chooseTicketAlignedClaim(context: BotDecisionContext, demand: RouteDema
     .map((entry) => ({
       route: entry.route,
       score: entry.score + entry.ticketIds.size * 18,
-      color: chooseAffordableColor(entry.route, context.privateState.hand)
+      color: chooseAffordableColor(entry.route, context.privateState.hand, context.game.players[context.game.activePlayerIndex]?.trainsLeft ?? 0)
     }))
     .filter((candidate): candidate is { route: RouteDef; score: number; color: TrainCardColor } => candidate.color !== null)
     .sort((left, right) => {
@@ -163,7 +163,7 @@ function chooseFallbackClaim(context: BotDecisionContext, demand: RouteDemand[])
   const candidates = getAvailableRoutes(context.config, context.game)
     .map((route) => ({
       route,
-      color: chooseAffordableColor(route, context.privateState.hand),
+      color: chooseAffordableColor(route, context.privateState.hand, context.game.players[context.game.activePlayerIndex]?.trainsLeft ?? 0),
       score: (fallbackBonus.get(route.id) ?? route.length * 2) - (route.type === "tunnel" ? 10 : 0)
     }))
     .filter((candidate): candidate is { route: RouteDef; color: TrainCardColor; score: number } => candidate.color !== null)
@@ -278,7 +278,11 @@ function dominantHandColor(hand: TrainCard[]): TrainCardColor | null {
     .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0]))[0]?.[0] ?? null;
 }
 
-function chooseAffordableColor(route: RouteDef, hand: TrainCard[]): TrainCardColor | null {
+function chooseAffordableColor(route: RouteDef, hand: TrainCard[], trainsLeft: number): TrainCardColor | null {
+  if (trainsLeft < route.length) {
+    return null;
+  }
+
   if (route.color !== "gray") {
     return canAffordRoute(route, route.color, hand) ? route.color : null;
   }

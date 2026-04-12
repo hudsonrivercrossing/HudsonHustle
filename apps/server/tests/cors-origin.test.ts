@@ -3,29 +3,33 @@ import { createCorsOriginMatcher, createSocketIoCorsOriginMatcher } from "../src
 
 describe("createCorsOriginMatcher", () => {
   it("allows exact local origins and wildcard vercel origins", async () => {
-    const matcher = createCorsOriginMatcher(["https://*.vercel.app", "http://127.0.0.1:5173"]);
+    const matcher = createCorsOriginMatcher(["https://*.vercel.app", "http://127.0.0.1:5173", "http://127.0.0.1:5174"]);
 
     const allowPreview = await resolveOriginCheck(matcher, "https://hudson-hustle-git-develop-djfan1s-projects.vercel.app");
     const allowLocal = await resolveOriginCheck(matcher, "http://127.0.0.1:5173");
+    const allowFallbackLocal = await resolveOriginCheck(matcher, "http://127.0.0.1:5174");
     const blockOther = await resolveOriginCheck(matcher, "https://example.com");
 
     expect(allowPreview).toBe(true);
     expect(allowLocal).toBe(true);
+    expect(allowFallbackLocal).toBe(true);
     expect(blockOther).toBe(false);
   });
 });
 
 describe("createSocketIoCorsOriginMatcher", () => {
   it("allows exact local origins and wildcard vercel origins via callback", async () => {
-    const matcher = createSocketIoCorsOriginMatcher(["https://*.vercel.app", "http://127.0.0.1:5173"]);
+    const matcher = createSocketIoCorsOriginMatcher(["https://*.vercel.app", "http://127.0.0.1:5173", "http://127.0.0.1:5174"]);
 
     const allowPreview = await resolveOriginCheck(matcher, "https://hudson-hustle-git-develop-djfan1s-projects.vercel.app");
     const allowLocal = await resolveOriginCheck(matcher, "http://127.0.0.1:5173");
+    const allowFallbackLocal = await resolveOriginCheck(matcher, "http://127.0.0.1:5174");
     const allowNoOrigin = await resolveOriginCheck(matcher, undefined);
     const blockOther = await resolveOriginCheck(matcher, "https://example.com");
 
     expect(allowPreview).toBe(true);
     expect(allowLocal).toBe(true);
+    expect(allowFallbackLocal).toBe(true);
     expect(allowNoOrigin).toBe(true);
     expect(blockOther).toBe(false);
   });

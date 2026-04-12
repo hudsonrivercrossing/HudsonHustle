@@ -28,7 +28,21 @@ import {
   getHudsonHustleReleasedConfigBundle,
   type HudsonHustleReleasedConfigSummary
 } from "@hudson-hustle/game-data";
-import type { RoomRepository, StoredRoomRecord, StoredSeatRecord } from "./persistence/types.js";
+import type {
+  RoomRepository,
+  StoredGameHistory,
+  StoredGameHistoryAction,
+  StoredGameHistoryActor,
+  StoredGameHistoryCheckpoint,
+  StoredGameHistoryCheckpointType,
+  StoredGameHistoryEvent,
+  StoredGameHistoryEventType,
+  StoredGameHistorySource,
+  StoredGameHistorySummary,
+  StoredGameHistoryUpdate,
+  StoredRoomRecord,
+  StoredSeatRecord
+} from "./persistence/types.js";
 import { chooseBotAction } from "./bot-policy.js";
 
 type RoomTimerCallback = (roomCode: string, deadlineAt: number | null) => void;
@@ -59,12 +73,69 @@ interface ServerRoom {
   snapshotVersion: number;
   game: GameState | null;
   seats: StoredSeatRecord[];
+  history: StoredGameHistory;
   deadlineAt: number | null;
 }
 
 interface RoomAuth {
   seatId: string;
   playerSecret: string;
+}
+
+export interface RoomGameHistoryReviewCheckpoint {
+  roomCode: string;
+  snapshotVersion: number;
+  checkpointType: StoredGameHistoryCheckpointType;
+  createdAt: string;
+}
+
+export type RoomGameHistoryReviewAction =
+  | Exclude<StoredGameHistoryAction, { type: "keep_drawn_tickets" } | { type: "select_initial_tickets" }>
+  | { type: "keep_drawn_tickets" }
+  | { type: "select_initial_tickets" };
+
+export interface RoomGameHistoryReviewEvent {
+  roomCode: string;
+  sequence: number;
+  eventType: StoredGameHistoryEventType;
+  payload: Omit<StoredGameHistoryEvent["payload"], "action"> & {
+    action: RoomGameHistoryReviewAction | null;
+  };
+  createdAt: string;
+}
+
+export interface RoomGameHistoryReview {
+  roomCode: string;
+  status: RoomStatus;
+  configId: string;
+  configVersion: string;
+  configSummary: string;
+  mapName: string;
+  completedAt: string;
+  seats: Array<{
+    seatId: string;
+    playerId: string | null;
+    playerName: string | null;
+    controllerType: ControllerType;
+  }>;
+  events: RoomGameHistoryReviewEvent[];
+  checkpoints: RoomGameHistoryReviewCheckpoint[];
+}
+
+function getReviewCompletedAt(room: ServerRoom, history: StoredGameHistory): string {
+  const finishedEvent = [...history.events].reverse().find((event) => event.eventType === "game_finished");
+  if (finishedEvent) {
+    return finishedEvent.createdAt;
+  }
+
+  const finishedCheckpoint = [...history.checkpoints]
+    .reverse()
+    .find((checkpoint) => checkpoint.checkpointType === "game_finished");
+  if (finishedCheckpoint) {
+    return finishedCheckpoint.createdAt;
+  }
+
+  return room.updatedAt;
 }
 
 function invariant(condition: unknown, message: string, statusCode = 400, code = "bad_request"): asserts condition {
@@ -169,10 +240,7 @@ function buildPrivateState(room: ServerRoom, seat: StoredSeatRecord): SeatPrivat
 }
 
 function buildRoomSummary(room: ServerRoom): RoomSummary {
-  const activeSeatId =
-    room.game === null
-      ? null
-      : room.seats.find((seat) => seat.playerId === room.game?.players[room.game.activePlayerIndex]?.id)?.seatId ?? null;
+  const activeSeatId = getActiveSeatIdForGame(room, room.game);
 
   return {
     roomCode: room.roomCode,
@@ -199,6 +267,189 @@ function buildRoomSummary(room: ServerRoom): RoomSummary {
   };
 }
 
+function getActiveSeatIdForGame(room: ServerRoom, game: GameState | null): string | null {
+  if (!game) {
+    return null;
+  }
+
+  return room.seats.find((seat) => seat.playerId === game.players[game.activePlayerIndex]?.id)?.seatId ?? null;
+}
+
+function buildHistoryActor(seat: StoredSeatRecord): StoredGameHistoryActor {
+  return {
+    seatId: seat.seatId,
+    playerId: seat.playerId,
+    controllerType: seat.controllerType,
+    ownership: seat.controllerState.ownership
+  };
+}
+
+function findPlayerBySeat(room: ServerRoom, game: GameState | null, seat: StoredSeatRecord) {
+  if (!game || !seat.playerId) {
+    return null;
+  }
+
+  return game.players.find((player) => player.id === seat.playerId) ?? null;
+}
+
+function buildFinalScoreSummary(game: GameState): StoredGameHistorySummary["finalScores"] {
+  return game.players.map((player) => ({
+    playerId: player.id,
+    score: player.score
+  }));
+}
+
+function buildHistorySummary(
+  room: ServerRoom,
+  seat: StoredSeatRecord,
+  action: StoredGameHistoryAction | null,
+  beforeGame: GameState | null,
+  afterGame: GameState | null
+): StoredGameHistorySummary | null {
+  if (!action) {
+    return null;
+  }
+
+  const summary: StoredGameHistorySummary = {};
+  const beforePlayer = findPlayerBySeat(room, beforeGame, seat);
+  const activeSeatChanged = getActiveSeatIdForGame(room, beforeGame) !== getActiveSeatIdForGame(room, afterGame);
+
+  switch (action.type) {
+    case "draw_card":
+      summary.drawSource = action.source;
+      summary.marketIndex = action.source === "market" ? action.marketIndex ?? null : null;
+      summary.turnCompleted = activeSeatChanged;
+      break;
+    case "claim_route":
+      summary.routeId = action.routeId;
+      summary.turnCompleted = activeSeatChanged;
+      break;
+    case "keep_drawn_tickets":
+      summary.keptTicketCount = action.keptTicketIds.length;
+      summary.discardedTicketCount = Math.max(0, (beforePlayer?.pendingTickets.length ?? action.keptTicketIds.length) - action.keptTicketIds.length);
+      summary.turnCompleted = activeSeatChanged;
+      break;
+    case "select_initial_tickets":
+      summary.keptTicketCount = action.keptTicketIds.length;
+      summary.discardedTicketCount = Math.max(0, (beforePlayer?.pendingTickets.length ?? action.keptTicketIds.length) - action.keptTicketIds.length);
+      break;
+    case "build_station":
+      summary.stationCityId = action.cityId;
+      summary.turnCompleted = activeSeatChanged;
+      break;
+    case "advance_turn":
+      summary.turnCompleted = activeSeatChanged;
+      break;
+    case "timeout_auto_draw":
+      summary.turnCompleted = action.completedTurn;
+      break;
+    case "draw_tickets":
+    case "cancel_ticket_draw":
+      break;
+  }
+
+  if (afterGame?.phase === "gameOver") {
+    summary.finalScores = buildFinalScoreSummary(afterGame);
+  }
+
+  return Object.keys(summary).length > 0 ? summary : null;
+}
+
+function determineCheckpointType(
+  beforeGame: GameState | null,
+  afterGame: GameState | null,
+  activeSeatIdBefore: string | null,
+  activeSeatIdAfter: string | null,
+  eventType: StoredGameHistoryEventType
+): StoredGameHistoryCheckpointType | null {
+  if (!afterGame) {
+    return null;
+  }
+
+  if (eventType === "game_started") {
+    return "game_started";
+  }
+
+  if (eventType === "game_finished" || afterGame.phase === "gameOver") {
+    return "game_finished";
+  }
+
+  if (beforeGame && activeSeatIdBefore !== activeSeatIdAfter && afterGame.phase === "main") {
+    return "turn_handoff";
+  }
+
+  return null;
+}
+
+function computeHistoryTurnPosition(
+  history: StoredGameHistory,
+  actorSeatId: string,
+  phaseBefore: GameState["phase"] | null,
+  playerCount: number
+): Pick<StoredGameHistoryEvent["payload"], "roundNumber" | "turnNumber" | "turnActionIndex"> {
+  if (phaseBefore !== "main" && phaseBefore !== "ticketChoice") {
+    return {
+      roundNumber: null,
+      turnNumber: null,
+      turnActionIndex: null
+    };
+  }
+
+  const latestTurnEvent = [...history.events].reverse().find((event) => event.payload.turnNumber !== null) ?? null;
+  if (!latestTurnEvent || latestTurnEvent.payload.actor.seatId !== actorSeatId) {
+    const turnNumber = (latestTurnEvent?.payload.turnNumber ?? 0) + 1;
+    return {
+      turnNumber,
+      turnActionIndex: 1,
+      roundNumber: Math.floor((turnNumber - 1) / playerCount) + 1
+    };
+  }
+
+  return {
+    turnNumber: latestTurnEvent.payload.turnNumber,
+    turnActionIndex: (latestTurnEvent.payload.turnActionIndex ?? 0) + 1,
+    roundNumber: latestTurnEvent.payload.roundNumber
+  };
+}
+
+function cloneStoredHistory(history: StoredGameHistory): StoredGameHistory {
+  return structuredClone(history) as StoredGameHistory;
+}
+
+function appendHistoryUpdate(history: StoredGameHistory, update: StoredGameHistoryUpdate): StoredGameHistory {
+  return {
+    events: [...history.events, ...(structuredClone(update.events) as StoredGameHistoryEvent[])],
+    checkpoints: [...history.checkpoints, ...(structuredClone(update.checkpoints) as StoredGameHistoryCheckpoint[])]
+  };
+}
+
+function sanitizeHistoryActionForReview(action: StoredGameHistoryAction | null): RoomGameHistoryReviewAction | null {
+  if (!action) {
+    return null;
+  }
+
+  switch (action.type) {
+    case "keep_drawn_tickets":
+    case "select_initial_tickets":
+      return { type: action.type };
+    default:
+      return structuredClone(action) as RoomGameHistoryReviewAction;
+  }
+}
+
+function buildReviewHistoryEvent(event: StoredGameHistoryEvent): RoomGameHistoryReviewEvent {
+  return {
+    roomCode: event.roomCode,
+    sequence: event.sequence,
+    eventType: event.eventType,
+    payload: {
+      ...structuredClone(event.payload),
+      action: sanitizeHistoryActionForReview(event.payload.action)
+    },
+    createdAt: event.createdAt
+  };
+}
+
 function toStoredRecord(room: ServerRoom): StoredRoomRecord {
   return {
     roomCode: room.roomCode,
@@ -219,9 +470,10 @@ function toStoredRecord(room: ServerRoom): StoredRoomRecord {
   };
 }
 
-function fromStoredRecord(record: StoredRoomRecord): ServerRoom {
+function fromStoredRecord(record: StoredRoomRecord, history: StoredGameHistory): ServerRoom {
   return {
     ...record,
+    history: cloneStoredHistory(history),
     deadlineAt: record.deadlineAt ? Date.parse(record.deadlineAt) : null
   };
 }
@@ -324,6 +576,10 @@ export class RoomService {
       snapshotVersion: 0,
       game: null,
       seats,
+      history: {
+        events: [],
+        checkpoints: []
+      },
       deadlineAt: null
     };
 
@@ -421,6 +677,41 @@ export class RoomService {
     return this.buildSnapshot(room, seat.seatId);
   }
 
+  async getGameHistory(roomCode: string): Promise<StoredGameHistory> {
+    const room = await this.getRoomOrThrow(roomCode);
+    return cloneStoredHistory(room.history);
+  }
+
+  async getReviewHistory(roomCode: string, auth: RoomAuth): Promise<RoomGameHistoryReview> {
+    const room = await this.getRoomOrThrow(roomCode);
+    this.getAuthorizedSeat(room, auth);
+    invariant(room.status === "finished", "Game history is only available after the game ends.", 409, "history_not_ready");
+
+    const history = cloneStoredHistory(room.history);
+    return {
+      roomCode: room.roomCode,
+      status: room.status,
+      configId: room.configId,
+      configVersion: room.configVersion,
+      configSummary: room.configSummary,
+      mapName: room.mapName,
+      completedAt: getReviewCompletedAt(room, history),
+      seats: room.seats.map((seat) => ({
+        seatId: seat.seatId,
+        playerId: seat.playerId,
+        playerName: seat.playerName,
+        controllerType: seat.controllerType
+      })),
+      events: history.events.map((event) => buildReviewHistoryEvent(event)),
+      checkpoints: history.checkpoints.map((checkpoint) => ({
+        roomCode: checkpoint.roomCode,
+        snapshotVersion: checkpoint.snapshotVersion,
+        checkpointType: checkpoint.checkpointType,
+        createdAt: checkpoint.createdAt
+      }))
+    };
+  }
+
   async startRoom(roomCode: string, request: StartRoomRequest): Promise<StartRoomResponse> {
     const room = await this.getRoomOrThrow(roomCode);
     const hostSeat = this.getAuthorizedSeat(room, { seatId: room.hostSeatId, playerSecret: request.playerSecret });
@@ -445,7 +736,15 @@ export class RoomService {
     });
 
     this.scheduleTimer(room);
-    await this.saveRoom(room);
+    const historyUpdate = this.buildHistoryUpdate(room, {
+      beforeGame: null,
+      seat: hostSeat,
+      source: "human_request",
+      action: null,
+      eventType: "game_started",
+      createdAt: room.updatedAt
+    });
+    await this.saveRoom(room, historyUpdate);
     await this.runServerControlledTurns(room);
     return {
       snapshot: this.buildSnapshot(room, hostSeat.seatId)
@@ -532,8 +831,17 @@ export class RoomService {
     invariant(room.game, "Missing game state.");
 
     const seat = this.getAuthorizedSeat(room, auth);
+    const beforeGame = structuredClone(room.game) as GameState;
     this.applySeatAction(room, seat, payload.action);
-    await this.saveRoom(room);
+    const historyUpdate = this.buildHistoryUpdate(room, {
+      beforeGame,
+      seat,
+      source: "human_request",
+      action: payload.action,
+      eventType: room.game?.phase === "gameOver" ? "game_finished" : "action_applied",
+      createdAt: room.updatedAt
+    });
+    await this.saveRoom(room, historyUpdate);
     await this.runServerControlledTurns(room);
     return this.buildSnapshot(room, seat.seatId);
   }
@@ -544,6 +852,11 @@ export class RoomService {
       if (!room.game || room.status !== "active") {
         return;
       }
+      const actingSeat = this.getActiveSeat(room);
+      if (!actingSeat) {
+        return;
+      }
+      const beforeGame = structuredClone(room.game) as GameState;
       const autoDrawsRemaining = timedAutoDrawsRemaining(room.game);
       if (room.turnTimeLimitSeconds <= 0 || room.game.phase !== "main" || autoDrawsRemaining === 0) {
         return;
@@ -563,10 +876,23 @@ export class RoomService {
       }
 
       room.game = nextGame;
+      room.status = nextGame.phase === "gameOver" ? "finished" : room.status;
       room.updatedAt = nowIso();
       room.snapshotVersion += 1;
       this.scheduleTimer(room);
-      await this.saveRoom(room);
+      const historyUpdate = this.buildHistoryUpdate(room, {
+        beforeGame,
+        seat: actingSeat,
+        source: "server_timeout",
+        action: {
+          type: "timeout_auto_draw",
+          drawCount: autoDrawsRemaining,
+          completedTurn: getActiveSeatIdForGame(room, beforeGame) !== getActiveSeatIdForGame(room, nextGame)
+        },
+        eventType: nextGame.phase === "gameOver" ? "game_finished" : "action_applied",
+        createdAt: room.updatedAt
+      });
+      await this.saveRoom(room, historyUpdate);
       await this.resumeServerControlledTurnsIfNeeded(room);
     } catch {
       this.timeouts.delete(roomCode);
@@ -577,9 +903,12 @@ export class RoomService {
   private async getRoomOrThrow(roomCode: string): Promise<ServerRoom> {
     let room = this.rooms.get(roomCode);
     if (!room) {
-      const stored = await this.repository.getRoom(roomCode);
+      const [stored, history] = await Promise.all([
+        this.repository.getRoom(roomCode),
+        this.repository.getGameHistory(roomCode)
+      ]);
       if (stored) {
-        room = fromStoredRecord(stored);
+        room = fromStoredRecord(stored, history);
         this.rooms.set(roomCode, room);
         const activeSeat = this.getActiveSeat(room);
         if (activeSeat?.controllerState.ownership === "server") {
@@ -617,9 +946,12 @@ export class RoomService {
     };
   }
 
-  private async saveRoom(room: ServerRoom): Promise<void> {
+  private async saveRoom(room: ServerRoom, historyUpdate?: StoredGameHistoryUpdate): Promise<void> {
+    if (historyUpdate) {
+      room.history = appendHistoryUpdate(room.history, historyUpdate);
+    }
     this.rooms.set(room.roomCode, room);
-    await this.repository.saveRoom(toStoredRecord(room));
+    await this.repository.saveRoom(toStoredRecord(room), historyUpdate);
     this.onRoomChanged?.(room.roomCode);
   }
 
@@ -734,9 +1066,18 @@ export class RoomService {
         return;
       }
 
+      const beforeGame = structuredClone(room.game) as GameState;
       const action = this.getNextServerControlledAction(room, activeSeat);
       this.applySeatAction(room, activeSeat, action);
-      await this.saveRoom(room);
+      const historyUpdate = this.buildHistoryUpdate(room, {
+        beforeGame,
+        seat: activeSeat,
+        source: "server_bot",
+        action,
+        eventType: room.game?.phase === "gameOver" ? "game_finished" : "action_applied",
+        createdAt: room.updatedAt
+      });
+      await this.saveRoom(room, historyUpdate);
     }
 
     throw new RoomServiceError("Server-controlled turn loop exceeded safety limit.", 500, "bot_loop_limit");
@@ -755,5 +1096,68 @@ export class RoomService {
     room.deadlineAt = null;
     this.onTimerChanged?.(room.roomCode, null);
     await this.runServerControlledTurns(room);
+  }
+
+  private buildHistoryUpdate(
+    room: ServerRoom,
+    params: {
+      beforeGame: GameState | null;
+      seat: StoredSeatRecord;
+      source: StoredGameHistorySource;
+      action: StoredGameHistoryAction | null;
+      eventType: StoredGameHistoryEventType;
+      createdAt: string;
+    }
+  ): StoredGameHistoryUpdate {
+    const afterGame = room.game;
+    const activeSeatIdBefore = getActiveSeatIdForGame(room, params.beforeGame);
+    const activeSeatIdAfter = getActiveSeatIdForGame(room, afterGame);
+    const turnPosition = computeHistoryTurnPosition(room.history, params.seat.seatId, params.beforeGame?.phase ?? null, room.playerCount);
+    const event: StoredGameHistoryEvent = {
+      roomCode: room.roomCode,
+      sequence: room.snapshotVersion,
+      eventType: params.eventType,
+      payload: {
+        schemaVersion: 1,
+        snapshotVersion: room.snapshotVersion,
+        phaseBefore: params.beforeGame?.phase ?? null,
+        phaseAfter: afterGame?.phase ?? null,
+        activeSeatIdBefore,
+        activeSeatIdAfter,
+        roundNumber: turnPosition.roundNumber,
+        turnNumber: turnPosition.turnNumber,
+        turnActionIndex: turnPosition.turnActionIndex,
+        actor: buildHistoryActor(params.seat),
+        source: params.source,
+        action: params.action,
+        summary: buildHistorySummary(room, params.seat, params.action, params.beforeGame, afterGame)
+      },
+      createdAt: params.createdAt
+    };
+
+    const checkpointType = determineCheckpointType(
+      params.beforeGame,
+      afterGame,
+      activeSeatIdBefore,
+      activeSeatIdAfter,
+      params.eventType
+    );
+    const checkpoints: StoredGameHistoryCheckpoint[] =
+      checkpointType && afterGame
+        ? [
+            {
+              roomCode: room.roomCode,
+              snapshotVersion: room.snapshotVersion,
+              checkpointType,
+              snapshot: structuredClone(afterGame) as GameState,
+              createdAt: params.createdAt
+            }
+          ]
+        : [];
+
+    return {
+      events: [event],
+      checkpoints
+    };
   }
 }
