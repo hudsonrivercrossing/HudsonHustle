@@ -109,12 +109,11 @@ button {
 }
 
 .setup-gateway__fallback::after {
-  bottom: 16%;
-  height: 2px;
-  background: linear-gradient(90deg, rgba(255, 217, 149, 0.04), rgba(255, 217, 149, 0.26), rgba(255, 217, 149, 0.06));
-  box-shadow:
-    0 32px 0 rgba(255, 217, 149, 0.06),
-    0 -86px 0 rgba(255, 255, 255, 0.02);
+  bottom: 0;
+  height: 38%;
+  background:
+    radial-gradient(circle at 28% 100%, rgba(255, 214, 142, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(7, 13, 19, 0), rgba(7, 13, 19, 0.18) 46%, rgba(7, 13, 19, 0.26));
 }
 
 .setup-gateway__video {
@@ -195,6 +194,8 @@ button {
 }
 
 .setup-gateway__choice {
+  position: relative;
+  overflow: hidden;
   display: grid;
   gap: 12px;
   align-content: end;
@@ -210,7 +211,9 @@ button {
     inset 0 -1px 0 rgba(255, 255, 255, 0.04),
     0 20px 36px rgba(6, 14, 22, 0.2);
   backdrop-filter: blur(12px) saturate(118%);
+  -webkit-backdrop-filter: blur(12px) saturate(118%);
   color: rgba(255, 249, 239, 0.98);
+  isolation: isolate;
   transition:
     transform 180ms ease,
     box-shadow 180ms ease,
@@ -223,6 +226,7 @@ button {
   content: "";
   position: absolute;
   inset: 0;
+  border-radius: inherit;
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.12), transparent 38%),
     linear-gradient(180deg, rgba(255, 213, 140, 0.08), transparent 54%);

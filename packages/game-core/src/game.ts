@@ -159,6 +159,10 @@ function getAvailableClaimColors(state: GameState, config: MapConfig, playerId: 
     }
   }
 
+  if (player.trainsLeft < route.length) {
+    return [];
+  }
+
   const candidateColors = route.color === "gray" ? [...trainCardColors] : [route.color];
   return candidateColors.filter((color) => canPay(player.hand, color, route.length, route.locomotiveCost ?? 0));
 }
@@ -520,6 +524,7 @@ export function reduceGame(state: GameState, action: GameAction, config: MapConf
 
       const expectedColor = route.color === "gray" ? action.color : route.color;
       invariant(expectedColor === action.color, "This route requires a different color.");
+      invariant(player.trainsLeft >= route.length, "You do not have enough trains left for that route.");
       invariant(canPay(player.hand, action.color, route.length, route.locomotiveCost ?? 0), "You cannot afford that route.");
 
       let tunnelExtraCost = 0;

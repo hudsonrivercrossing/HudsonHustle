@@ -653,6 +653,20 @@ describe("game-core", () => {
     expect(state.turn.stage).toBe("awaitingHandoff");
   });
 
+  it("does not let a player claim a route longer than their remaining trains", () => {
+    let state = finishInitialTickets(startGame(hudsonHustleMap, { playerNames: ["A", "B"], seed: 9 }));
+    state.players[0].trainsLeft = 1;
+    state = forcePlayerHand(state, ["obsidian", "obsidian", "amber", "amber"]);
+
+    expect(() =>
+      reduceGame(
+        state,
+        { type: "claim_route", routeId: "newark-penn-grove-st", color: "obsidian" },
+        hudsonHustleMap
+      )
+    ).toThrow("You do not have enough trains left for that route.");
+  });
+
   it("builds a station and consumes cards", () => {
     let state = finishInitialTickets(startGame(hudsonHustleMap, { playerNames: ["A", "B"], seed: 11 }));
     state = forcePlayerHand(state, ["rose", "amber", "cobalt"]);
