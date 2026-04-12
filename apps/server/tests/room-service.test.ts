@@ -898,6 +898,12 @@ describe("RoomService", () => {
     expect(reviewHistory.checkpoints.at(-1)).toMatchObject({
       checkpointType: "game_finished"
     });
+    expect(
+      reviewHistory.events.some(
+        (event) =>
+          event.payload.action?.type === "select_initial_tickets" && "keptTicketIds" in event.payload.action
+      )
+    ).toBe(false);
     expect("snapshot" in (reviewHistory.checkpoints[0] ?? {})).toBe(false);
 
     await service.connectSeat(created.roomCode, {

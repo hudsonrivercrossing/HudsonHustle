@@ -167,8 +167,8 @@ export async function createServerApp() {
     return roomService.getSnapshot(request.params.roomCode);
   });
 
-  app.get<{ Params: { roomCode: string }; Querystring: { seatId?: string; playerSecret?: string } }>("/rooms/:roomCode/history", async (request) => {
-    const { seatId, playerSecret } = request.query;
+  app.post<{ Params: { roomCode: string }; Body: { seatId?: string; playerSecret?: string } }>("/rooms/:roomCode/history", async (request) => {
+    const { seatId, playerSecret } = request.body ?? {};
     if (!seatId || !playerSecret) {
       throw new RoomServiceError("History review requires room credentials.", 400, "missing_credentials");
     }

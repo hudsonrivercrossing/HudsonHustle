@@ -86,8 +86,12 @@ describe("server app history route", () => {
       );
 
       const response = await app.inject({
-        method: "GET",
-        url: `/rooms/${created.roomCode}/history?seatId=${joined.seatId}&playerSecret=${joined.playerSecret}`
+        method: "POST",
+        url: `/rooms/${created.roomCode}/history`,
+        payload: {
+          seatId: joined.seatId,
+          playerSecret: joined.playerSecret
+        }
       });
 
       expect(response.statusCode).toBe(200);
@@ -107,7 +111,27 @@ describe("server app history route", () => {
 
     try {
       const response = await app.inject({
-        method: "GET",
+        method: "POST",
+        url: "/rooms/ABC123/history",
+        payload: {}
+      });
+
+      expect(response.statusCode).toBe(400);
+      expect(response.json()).toMatchObject({
+        code: "missing_credentials"
+      });
+    } finally {
+      await app.close();
+    }
+  });
+
+  it("returns missing_credentials when the history body is omitted entirely", async () => {
+    forceMemoryRepository();
+    const { app } = await createServerApp();
+
+    try {
+      const response = await app.inject({
+        method: "POST",
         url: "/rooms/ABC123/history"
       });
 

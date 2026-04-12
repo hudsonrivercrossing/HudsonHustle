@@ -73,6 +73,7 @@ interface ServerRoom {
   snapshotVersion: number;
   game: GameState | null;
   seats: StoredSeatRecord[];
+  history: StoredGameHistory;
   deadlineAt: number | null;
 }
 
@@ -85,6 +86,21 @@ export interface RoomGameHistoryReviewCheckpoint {
   roomCode: string;
   snapshotVersion: number;
   checkpointType: StoredGameHistoryCheckpointType;
+  createdAt: string;
+}
+
+export type RoomGameHistoryReviewAction =
+  | Exclude<StoredGameHistoryAction, { type: "keep_drawn_tickets" } | { type: "select_initial_tickets" }>
+  | { type: "keep_drawn_tickets" }
+  | { type: "select_initial_tickets" };
+
+export interface RoomGameHistoryReviewEvent {
+  roomCode: string;
+  sequence: number;
+  eventType: StoredGameHistoryEventType;
+  payload: Omit<StoredGameHistoryEvent["payload"], "action"> & {
+    action: RoomGameHistoryReviewAction | null;
+  };
   createdAt: string;
 }
 
@@ -102,7 +118,7 @@ export interface RoomGameHistoryReview {
     playerName: string | null;
     controllerType: ControllerType;
   }>;
-  events: StoredGameHistoryEvent[];
+  events: RoomGameHistoryReviewEvent[];
   checkpoints: RoomGameHistoryReviewCheckpoint[];
 }
 
@@ -396,6 +412,44 @@ function computeHistoryTurnPosition(
   };
 }
 
+function cloneStoredHistory(history: StoredGameHistory): StoredGameHistory {
+  return structuredClone(history) as StoredGameHistory;
+}
+
+function appendHistoryUpdate(history: StoredGameHistory, update: StoredGameHistoryUpdate): StoredGameHistory {
+  return {
+    events: [...history.events, ...(structuredClone(update.events) as StoredGameHistoryEvent[])],
+    checkpoints: [...history.checkpoints, ...(structuredClone(update.checkpoints) as StoredGameHistoryCheckpoint[])]
+  };
+}
+
+function sanitizeHistoryActionForReview(action: StoredGameHistoryAction | null): RoomGameHistoryReviewAction | null {
+  if (!action) {
+    return null;
+  }
+
+  switch (action.type) {
+    case "keep_drawn_tickets":
+    case "select_initial_tickets":
+      return { type: action.type };
+    default:
+      return structuredClone(action) as RoomGameHistoryReviewAction;
+  }
+}
+
+function buildReviewHistoryEvent(event: StoredGameHistoryEvent): RoomGameHistoryReviewEvent {
+  return {
+    roomCode: event.roomCode,
+    sequence: event.sequence,
+    eventType: event.eventType,
+    payload: {
+      ...structuredClone(event.payload),
+      action: sanitizeHistoryActionForReview(event.payload.action)
+    },
+    createdAt: event.createdAt
+  };
+}
+
 function toStoredRecord(room: ServerRoom): StoredRoomRecord {
   return {
     roomCode: room.roomCode,
@@ -416,9 +470,10 @@ function toStoredRecord(room: ServerRoom): StoredRoomRecord {
   };
 }
 
-function fromStoredRecord(record: StoredRoomRecord): ServerRoom {
+function fromStoredRecord(record: StoredRoomRecord, history: StoredGameHistory): ServerRoom {
   return {
     ...record,
+    history: cloneStoredHistory(history),
     deadlineAt: record.deadlineAt ? Date.parse(record.deadlineAt) : null
   };
 }
@@ -521,6 +576,10 @@ export class RoomService {
       snapshotVersion: 0,
       game: null,
       seats,
+      history: {
+        events: [],
+        checkpoints: []
+      },
       deadlineAt: null
     };
 
@@ -619,8 +678,8 @@ export class RoomService {
   }
 
   async getGameHistory(roomCode: string): Promise<StoredGameHistory> {
-    await this.getRoomOrThrow(roomCode);
-    return this.repository.getGameHistory(roomCode);
+    const room = await this.getRoomOrThrow(roomCode);
+    return cloneStoredHistory(room.history);
   }
 
   async getReviewHistory(roomCode: string, auth: RoomAuth): Promise<RoomGameHistoryReview> {
@@ -628,7 +687,7 @@ export class RoomService {
     this.getAuthorizedSeat(room, auth);
     invariant(room.status === "finished", "Game history is only available after the game ends.", 409, "history_not_ready");
 
-    const history = await this.repository.getGameHistory(roomCode);
+    const history = cloneStoredHistory(room.history);
     return {
       roomCode: room.roomCode,
       status: room.status,
@@ -643,7 +702,7 @@ export class RoomService {
         playerName: seat.playerName,
         controllerType: seat.controllerType
       })),
-      events: history.events,
+      events: history.events.map((event) => buildReviewHistoryEvent(event)),
       checkpoints: history.checkpoints.map((checkpoint) => ({
         roomCode: checkpoint.roomCode,
         snapshotVersion: checkpoint.snapshotVersion,
@@ -677,7 +736,7 @@ export class RoomService {
     });
 
     this.scheduleTimer(room);
-    const historyUpdate = await this.buildHistoryUpdate(room, {
+    const historyUpdate = this.buildHistoryUpdate(room, {
       beforeGame: null,
       seat: hostSeat,
       source: "human_request",
@@ -774,7 +833,7 @@ export class RoomService {
     const seat = this.getAuthorizedSeat(room, auth);
     const beforeGame = structuredClone(room.game) as GameState;
     this.applySeatAction(room, seat, payload.action);
-    const historyUpdate = await this.buildHistoryUpdate(room, {
+    const historyUpdate = this.buildHistoryUpdate(room, {
       beforeGame,
       seat,
       source: "human_request",
@@ -821,7 +880,7 @@ export class RoomService {
       room.updatedAt = nowIso();
       room.snapshotVersion += 1;
       this.scheduleTimer(room);
-      const historyUpdate = await this.buildHistoryUpdate(room, {
+      const historyUpdate = this.buildHistoryUpdate(room, {
         beforeGame,
         seat: actingSeat,
         source: "server_timeout",
@@ -844,9 +903,12 @@ export class RoomService {
   private async getRoomOrThrow(roomCode: string): Promise<ServerRoom> {
     let room = this.rooms.get(roomCode);
     if (!room) {
-      const stored = await this.repository.getRoom(roomCode);
+      const [stored, history] = await Promise.all([
+        this.repository.getRoom(roomCode),
+        this.repository.getGameHistory(roomCode)
+      ]);
       if (stored) {
-        room = fromStoredRecord(stored);
+        room = fromStoredRecord(stored, history);
         this.rooms.set(roomCode, room);
         const activeSeat = this.getActiveSeat(room);
         if (activeSeat?.controllerState.ownership === "server") {
@@ -885,6 +947,9 @@ export class RoomService {
   }
 
   private async saveRoom(room: ServerRoom, historyUpdate?: StoredGameHistoryUpdate): Promise<void> {
+    if (historyUpdate) {
+      room.history = appendHistoryUpdate(room.history, historyUpdate);
+    }
     this.rooms.set(room.roomCode, room);
     await this.repository.saveRoom(toStoredRecord(room), historyUpdate);
     this.onRoomChanged?.(room.roomCode);
@@ -1004,7 +1069,7 @@ export class RoomService {
       const beforeGame = structuredClone(room.game) as GameState;
       const action = this.getNextServerControlledAction(room, activeSeat);
       this.applySeatAction(room, activeSeat, action);
-      const historyUpdate = await this.buildHistoryUpdate(room, {
+      const historyUpdate = this.buildHistoryUpdate(room, {
         beforeGame,
         seat: activeSeat,
         source: "server_bot",
@@ -1033,7 +1098,7 @@ export class RoomService {
     await this.runServerControlledTurns(room);
   }
 
-  private async buildHistoryUpdate(
+  private buildHistoryUpdate(
     room: ServerRoom,
     params: {
       beforeGame: GameState | null;
@@ -1043,12 +1108,11 @@ export class RoomService {
       eventType: StoredGameHistoryEventType;
       createdAt: string;
     }
-  ): Promise<StoredGameHistoryUpdate> {
+  ): StoredGameHistoryUpdate {
     const afterGame = room.game;
     const activeSeatIdBefore = getActiveSeatIdForGame(room, params.beforeGame);
     const activeSeatIdAfter = getActiveSeatIdForGame(room, afterGame);
-    const history = await this.repository.getGameHistory(room.roomCode);
-    const turnPosition = computeHistoryTurnPosition(history, params.seat.seatId, params.beforeGame?.phase ?? null, room.playerCount);
+    const turnPosition = computeHistoryTurnPosition(room.history, params.seat.seatId, params.beforeGame?.phase ?? null, room.playerCount);
     const event: StoredGameHistoryEvent = {
       roomCode: room.roomCode,
       sequence: room.snapshotVersion,
