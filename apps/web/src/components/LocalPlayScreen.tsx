@@ -685,7 +685,7 @@ export function LocalPlayScreen({ onOpenMultiplayer, onReturnToGateway }: LocalP
                 <div className="detail-card__summary">
                   <div className="detail-card__facts">
                     <span className="detail-card__fact">{currentRoute.length} train{currentRoute.length === 1 ? "" : "s"}</span>
-                    <span className="detail-card__fact">{currentRoute.type}</span>
+                    <span className="detail-card__fact">{hudsonHustleMap.typeLabelOverrides?.[currentRoute.type] ?? currentRoute.type}</span>
                     <span className="detail-card__fact">{currentRoute.color === "gray" ? "gray route" : currentRoute.color}</span>
                     {currentRoute.locomotiveCost ? (
                       <span className="detail-card__fact">{currentRoute.locomotiveCost} locomotive{currentRoute.locomotiveCost === 1 ? "" : "s"}</span>
