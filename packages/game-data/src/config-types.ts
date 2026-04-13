@@ -84,7 +84,7 @@ export interface SnapshotMapStation {
   labelDx?: number;
   labelDy?: number;
   labelAnchor?: "start" | "middle" | "end";
-  authorityRef: StationAuthorityRef | null;
+  authorityRef?: StationAuthorityRef | null;
   notes?: string[];
 }
 
@@ -111,6 +111,7 @@ export interface SnapshotMap {
     padX: number;
     padY: number;
   };
+  typeLabelOverrides?: Record<string, string>;
   stations: SnapshotMapStation[];
   routes: SnapshotMapRoute[];
 }

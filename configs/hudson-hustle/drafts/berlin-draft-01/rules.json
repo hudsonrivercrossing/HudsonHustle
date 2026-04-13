@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "rulesetId": "hudson-hustle-working-rules",
+  "trainsPerPlayer": 28,
+  "stationsPerPlayer": 3,
+  "stationValue": 4,
+  "longestRouteBonus": 10,
+  "routeScoreTable": {
+    "1": 1,
+    "2": 2,
+    "3": 4,
+    "4": 7,
+    "5": 10,
+    "6": 15
+  },
+  "notes": [
+    "Berlin draft one intentionally reuses the current Hudson Hustle rules without modification."
+  ]
+}
