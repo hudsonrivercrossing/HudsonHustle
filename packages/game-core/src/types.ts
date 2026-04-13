@@ -64,6 +64,7 @@ export interface MapConfig {
     longestRouteBonus: number;
     stationValue: number;
   };
+  typeLabelOverrides?: Record<string, string>;
 }
 
 export interface TrainCard {

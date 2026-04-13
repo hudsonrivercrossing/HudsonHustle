@@ -1,0 +1,281 @@
+{
+  "schemaVersion": 1,
+  "ticketSetId": "berlin-draft-01-tickets",
+  "long": [
+    {
+      "id": "t-spandau-flughafen-ber",
+      "from": "spandau",
+      "to": "flughafen-ber",
+      "points": 15,
+      "notes": []
+    },
+    {
+      "id": "t-wannsee-ostkreuz",
+      "from": "wannsee",
+      "to": "ostkreuz",
+      "points": 13,
+      "notes": []
+    },
+    {
+      "id": "t-gesundbrunnen-wannsee",
+      "from": "gesundbrunnen",
+      "to": "wannsee",
+      "points": 12,
+      "notes": []
+    },
+    {
+      "id": "t-schoenhauser-allee-flughafen-ber",
+      "from": "schoenhauser-allee",
+      "to": "flughafen-ber",
+      "points": 13,
+      "notes": []
+    },
+    {
+      "id": "t-spandau-hermannplatz",
+      "from": "spandau",
+      "to": "hermannplatz",
+      "points": 12,
+      "notes": []
+    },
+    {
+      "id": "t-pankow-flughafen-ber",
+      "from": "pankow",
+      "to": "flughafen-ber",
+      "points": 14,
+      "notes": ["Far north to far south. Spans the full vertical extent of the map."]
+    }
+  ],
+  "regular": [
+    {
+      "id": "t-spandau-hauptbahnhof",
+      "from": "spandau",
+      "to": "hauptbahnhof",
+      "points": 8,
+      "notes": []
+    },
+    {
+      "id": "t-spandau-westkreuz",
+      "from": "spandau",
+      "to": "westkreuz",
+      "points": 5,
+      "notes": []
+    },
+    {
+      "id": "t-zoologischer-garten-friedrichstrasse",
+      "from": "zoologischer-garten",
+      "to": "friedrichstrasse",
+      "points": 6,
+      "notes": []
+    },
+    {
+      "id": "t-zoologischer-garten-brandenburger-tor",
+      "from": "zoologischer-garten",
+      "to": "brandenburger-tor",
+      "points": 5,
+      "notes": []
+    },
+    {
+      "id": "t-westkreuz-hauptbahnhof",
+      "from": "westkreuz",
+      "to": "hauptbahnhof",
+      "points": 7,
+      "notes": []
+    },
+    {
+      "id": "t-westkreuz-tempelhof",
+      "from": "westkreuz",
+      "to": "tempelhof",
+      "points": 8,
+      "notes": []
+    },
+    {
+      "id": "t-wannsee-zoologischer-garten",
+      "from": "wannsee",
+      "to": "zoologischer-garten",
+      "points": 6,
+      "notes": []
+    },
+    {
+      "id": "t-wannsee-suedkreuz",
+      "from": "wannsee",
+      "to": "suedkreuz",
+      "points": 8,
+      "notes": []
+    },
+    {
+      "id": "t-hauptbahnhof-alexanderplatz",
+      "from": "hauptbahnhof",
+      "to": "alexanderplatz",
+      "points": 5,
+      "notes": []
+    },
+    {
+      "id": "t-hauptbahnhof-hermannplatz",
+      "from": "hauptbahnhof",
+      "to": "hermannplatz",
+      "points": 7,
+      "notes": []
+    },
+    {
+      "id": "t-brandenburger-tor-alexanderplatz",
+      "from": "brandenburger-tor",
+      "to": "alexanderplatz",
+      "points": 4,
+      "notes": []
+    },
+    {
+      "id": "t-brandenburger-tor-tempelhof",
+      "from": "brandenburger-tor",
+      "to": "tempelhof",
+      "points": 6,
+      "notes": []
+    },
+    {
+      "id": "t-friedrichstrasse-ostkreuz",
+      "from": "friedrichstrasse",
+      "to": "ostkreuz",
+      "points": 7,
+      "notes": []
+    },
+    {
+      "id": "t-friedrichstrasse-schoenhauser-allee",
+      "from": "friedrichstrasse",
+      "to": "schoenhauser-allee",
+      "points": 5,
+      "notes": []
+    },
+    {
+      "id": "t-gesundbrunnen-hauptbahnhof",
+      "from": "gesundbrunnen",
+      "to": "hauptbahnhof",
+      "points": 5,
+      "notes": []
+    },
+    {
+      "id": "t-gesundbrunnen-alexanderplatz",
+      "from": "gesundbrunnen",
+      "to": "alexanderplatz",
+      "points": 7,
+      "notes": []
+    },
+    {
+      "id": "t-gesundbrunnen-hermannplatz",
+      "from": "gesundbrunnen",
+      "to": "hermannplatz",
+      "points": 9,
+      "notes": []
+    },
+    {
+      "id": "t-wedding-brandenburger-tor",
+      "from": "wedding",
+      "to": "brandenburger-tor",
+      "points": 5,
+      "notes": []
+    },
+    {
+      "id": "t-schoenhauser-allee-ostkreuz",
+      "from": "schoenhauser-allee",
+      "to": "ostkreuz",
+      "points": 5,
+      "notes": []
+    },
+    {
+      "id": "t-alexanderplatz-hermannplatz",
+      "from": "alexanderplatz",
+      "to": "hermannplatz",
+      "points": 6,
+      "notes": []
+    },
+    {
+      "id": "t-ostkreuz-tempelhof",
+      "from": "ostkreuz",
+      "to": "tempelhof",
+      "points": 6,
+      "notes": []
+    },
+    {
+      "id": "t-ostkreuz-flughafen-ber",
+      "from": "ostkreuz",
+      "to": "flughafen-ber",
+      "points": 8,
+      "notes": []
+    },
+    {
+      "id": "t-hermannplatz-flughafen-ber",
+      "from": "hermannplatz",
+      "to": "flughafen-ber",
+      "points": 9,
+      "notes": []
+    },
+    {
+      "id": "t-tempelhof-flughafen-ber",
+      "from": "tempelhof",
+      "to": "flughafen-ber",
+      "points": 8,
+      "notes": []
+    },
+    {
+      "id": "t-potsdamer-platz-alexanderplatz",
+      "from": "potsdamer-platz",
+      "to": "alexanderplatz",
+      "points": 5,
+      "notes": ["Central cross-city ticket."]
+    },
+    {
+      "id": "t-warschauer-strasse-spandau",
+      "from": "warschauer-strasse",
+      "to": "spandau",
+      "points": 10,
+      "notes": ["Full Stadtbahn east-to-west traversal."]
+    },
+    {
+      "id": "t-warschauer-strasse-westkreuz",
+      "from": "warschauer-strasse",
+      "to": "westkreuz",
+      "points": 8,
+      "notes": []
+    },
+    {
+      "id": "t-jungfernheide-ostkreuz",
+      "from": "jungfernheide",
+      "to": "ostkreuz",
+      "points": 9,
+      "notes": ["Cross-ring traversal."]
+    },
+    {
+      "id": "t-neukoelln-hauptbahnhof",
+      "from": "neukoelln",
+      "to": "hauptbahnhof",
+      "points": 8,
+      "notes": ["Southeast ring to central trunk."]
+    },
+    {
+      "id": "t-schoenberg-alexanderplatz",
+      "from": "schoenberg",
+      "to": "alexanderplatz",
+      "points": 7,
+      "notes": []
+    },
+    {
+      "id": "t-pankow-hauptbahnhof",
+      "from": "pankow",
+      "to": "hauptbahnhof",
+      "points": 7,
+      "notes": ["Northern spur to central trunk."]
+    },
+    {
+      "id": "t-olympiastadion-friedrichstrasse",
+      "from": "olympiastadion",
+      "to": "friedrichstrasse",
+      "points": 8,
+      "notes": ["Western branch to city center."]
+    },
+    {
+      "id": "t-frankfurter-allee-suedkreuz",
+      "from": "frankfurter-allee",
+      "to": "suedkreuz",
+      "points": 8,
+      "notes": ["East ring to south anchor."]
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "berlin",
+  "gameId": "hudson-hustle",
+  "version": "v1",
+  "status": "released",
+  "basedOn": "berlin-draft-01",
+  "createdAt": "2026-04-12",
+  "updatedAt": "2026-04-13T21:23:59.991Z",
+  "summary": "Expanded Berlin draft with 26 active stations, full Ringbahn representation, twin core routes, Potsdamer Platz, Warschauer Strasse, dual BER access, and both Hermannplatz and Hermannstrasse.",
+  "designGoals": [
+    "Represent Berlin's defining Ringbahn (S41/S42) as a complete playable ring connecting all four Kreuz stations.",
+    "Keep the Stadtbahn east-west trunk (Spandau to Ostkreuz) as the central corridor with twin competitive routes in the dense core.",
+    "Provide dual airport access to BER through Suedkreuz (primary) and Neukoelln (secondary) to avoid dead-end chokepoints.",
+    "Preserve both Hermannplatz (U-Bahn cultural hub) and Hermannstrasse (Ringbahn station) to represent the distinct U-Bahn and S-Bahn layers.",
+    "Keep draft one playable using proven Hudson Hustle rules and visual tokens."
+  ],
+  "changeSummary": [
+    "Expanded from 16 to 26 active stations by activating 4 previously inactive stations and adding 6 new ones.",
+    "Added full Ringbahn loop: Gesundbrunnen-Schoenhauser-FrankfurterAllee-Ostkreuz-Neukoelln-Hermannstrasse-Tempelhof-Suedkreuz-Schoenberg-Westkreuz-Jungfernheide-Westhafen-Wedding.",
+    "Added Potsdamer Platz as a central-south anchor connecting Hauptbahnhof, Brandenburger Tor, and Suedkreuz.",
+    "Added Warschauer Strasse to complete the Stadtbahn eastern extension through Friedrichshain.",
+    "Added twin routes at Hauptbahnhof-Friedrichstrasse and Friedrichstrasse-Alexanderplatz for core competitive tension.",
+    "Added second BER access through Neukoelln (length 4 tunnel) alongside the existing Suedkreuz route.",
+    "Removed three redundant direct routes (Westkreuz-Suedkreuz, Brandenburger Tor-Suedkreuz, Alexanderplatz-Ostkreuz) that are now better served by through-station paths.",
+    "Expanded ticket deck from 29 to 40 tickets (6 long + 34 regular) covering all new stations."
+  ],
+  "playtestFocus": [
+    "Check whether the full Ringbahn creates meaningful ring-vs-trunk routing decisions.",
+    "Check whether the twin core routes create competitive claiming tension without making the center too easy to traverse.",
+    "Check whether dual BER access (Suedkreuz tunnel + Neukoelln tunnel) provides enough airport ticket options.",
+    "Check whether Hermannplatz + Hermannstrasse as adjacent nodes feels meaningful or redundant.",
+    "Check whether western spurs (Olympiastadion, Spandau, Jungfernheide) feel distinct from the ring path.",
+    "Review overall board density: 26 stations and 42 routes may be too congested for readable SVG rendering."
+  ]
+}

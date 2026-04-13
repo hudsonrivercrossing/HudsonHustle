@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "visualSetId": "berlin-draft-01-visuals",
+  "boardStyle": "graph-first-transit-nostalgia",
+  "theme": "warm-transit-nostalgia",
+  "backdropMode": "none",
+  "boardLabelMode": "station-only",
+  "backdrop": {
+    "landAreas": [],
+    "waterAreas": [],
+    "shorelines": [],
+    "regionLabels": []
+  },
+  "palettes": {
+    "cards": {
+      "crimson": "#c95d72",
+      "amber": "#d6a436",
+      "emerald": "#2f988c",
+      "cobalt": "#4769d0",
+      "violet": "#8659c4",
+      "obsidian": "#39414f",
+      "ivory": "#efe2c7",
+      "rose": "#db82a5",
+      "locomotive": "#f5efe2"
+    },
+    "players": {
+      "harbor-blue": "#0f7b86",
+      "signal-red": "#c44c2d",
+      "path-green": "#2f8b57",
+      "ferry-gold": "#b58b1f"
+    }
+  },
+  "notes": [
+    "Berlin draft one inherits the current Hudson Hustle visual token system.",
+    "No Berlin-specific backdrop art is included in this first pass."
+  ]
+}
