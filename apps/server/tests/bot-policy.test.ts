@@ -141,7 +141,7 @@ describe("chooseBotAction", () => {
     });
   });
 
-  it("uses only currently available routes when choosing which drawn ticket to keep", () => {
+  it("uses only currently open routes when choosing which drawn ticket to keep", () => {
     const ticketChoiceConfig: MapConfig = {
       id: "ticket-choice-map",
       name: "Ticket Choice Map",

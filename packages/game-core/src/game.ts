@@ -147,16 +147,8 @@ function getAvailableClaimColors(state: GameState, config: MapConfig, playerId: 
   const player = state.players.find((item) => item.id === playerId);
   invariant(player, "Unknown player.");
 
-  const locked = state.routeClaims.some((claim) => claim.routeId === routeId);
-  if (locked) {
+  if (!isRouteOpen(state, config, route)) {
     return [];
-  }
-
-  if (route.twinGroup && state.players.length <= 3) {
-    const twinIds = config.routes.filter((item) => item.twinGroup === route.twinGroup).map((item) => item.id);
-    if (state.routeClaims.some((claim) => twinIds.includes(claim.routeId))) {
-      return [];
-    }
   }
 
   if (player.trainsLeft < route.length) {
@@ -165,6 +157,23 @@ function getAvailableClaimColors(state: GameState, config: MapConfig, playerId: 
 
   const candidateColors = route.color === "gray" ? [...trainCardColors] : [route.color];
   return candidateColors.filter((color) => canPay(player.hand, color, route.length, route.locomotiveCost ?? 0));
+}
+
+function isRouteOpen(state: GameState, config: MapConfig, route: RouteDef): boolean {
+  if (state.routeClaims.some((claim) => claim.routeId === route.id)) {
+    return false;
+  }
+
+  if (route.twinGroup && state.players.length <= 3) {
+    const twinIds = config.routes.filter((item) => item.twinGroup === route.twinGroup).map((item) => item.id);
+    return !state.routeClaims.some((claim) => twinIds.includes(claim.routeId));
+  }
+
+  return true;
+}
+
+function hasOpenRoute(state: GameState, config: MapConfig): boolean {
+  return config.routes.some((route) => isRouteOpen(state, config, route));
 }
 
 function drawTickets(state: GameState, count: number, bucket: "regular" | "long"): TicketDef[] {
@@ -377,8 +386,8 @@ function beginAwaitingHandoff(state: GameState, summary: string): void {
   state.turn.summary = summary;
 }
 
-function maybeTriggerFinalRound(state: GameState, player: PlayerState): void {
-  if (state.finalRoundRemaining === null && player.trainsLeft <= 2) {
+function maybeTriggerFinalRound(state: GameState, config: MapConfig, player: PlayerState): void {
+  if (state.finalRoundRemaining === null && (player.trainsLeft <= 2 || !hasOpenRoute(state, config))) {
     state.finalRoundRemaining = state.players.length - 1;
     state.finalRoundTriggeredBy = player.id;
     appendLog(state, `${player.name} triggered the final round.`);
@@ -565,7 +574,7 @@ export function reduceGame(state: GameState, action: GameAction, config: MapConf
         cardsSpent: payment.spent,
         tunnelExtraCost
       });
-      maybeTriggerFinalRound(nextState, player);
+      maybeTriggerFinalRound(nextState, config, player);
       beginAwaitingHandoff(nextState, `${player.name} claimed ${route.id}.`);
       appendLog(nextState, `${player.name} claimed ${route.id} for ${routeScoreTable[route.length] ?? route.length * 2} points.`);
       return nextState;

@@ -20,7 +20,7 @@ function forcePlayerHand(state: GameState, colors: Array<GameState["players"][nu
   return nextState;
 }
 
-function finishInitialTickets(state: GameState): GameState {
+function finishInitialTickets(state: GameState, config: MapConfig = hudsonHustleMap): GameState {
   let nextState = state;
   while (nextState.phase === "initialTickets") {
     const player = nextState.players[nextState.activePlayerIndex];
@@ -30,11 +30,64 @@ function finishInitialTickets(state: GameState): GameState {
         type: "select_initial_tickets",
         keptTicketIds: player.pendingTickets.slice(0, 2).map((ticket) => ticket.id)
       },
-      hudsonHustleMap
+      config
     );
   }
   return nextState;
 }
+
+const exhaustedDoubleRouteMap: MapConfig = {
+  id: "exhausted-double-route-test",
+  name: "Exhausted Double Route Test",
+  cities: [
+    { id: "alpha", name: "Alpha", x: 0, y: 0 },
+    { id: "bravo", name: "Bravo", x: 100, y: 0 }
+  ],
+  routes: [
+    {
+      id: "alpha-bravo-a",
+      from: "alpha",
+      to: "bravo",
+      length: 2,
+      color: "obsidian",
+      type: "normal",
+      twinGroup: "alpha-bravo"
+    },
+    {
+      id: "alpha-bravo-b",
+      from: "alpha",
+      to: "bravo",
+      length: 2,
+      color: "amber",
+      type: "normal",
+      twinGroup: "alpha-bravo"
+    }
+  ],
+  tickets: [
+    { id: "long-1", from: "alpha", to: "bravo", points: 5, bucket: "long" },
+    { id: "long-2", from: "alpha", to: "bravo", points: 5, bucket: "long" },
+    { id: "long-3", from: "alpha", to: "bravo", points: 5, bucket: "long" },
+    { id: "long-4", from: "alpha", to: "bravo", points: 5, bucket: "long" },
+    { id: "regular-1", from: "alpha", to: "bravo", points: 3, bucket: "regular" },
+    { id: "regular-2", from: "alpha", to: "bravo", points: 3, bucket: "regular" },
+    { id: "regular-3", from: "alpha", to: "bravo", points: 3, bucket: "regular" },
+    { id: "regular-4", from: "alpha", to: "bravo", points: 3, bucket: "regular" },
+    { id: "regular-5", from: "alpha", to: "bravo", points: 3, bucket: "regular" },
+    { id: "regular-6", from: "alpha", to: "bravo", points: 3, bucket: "regular" },
+    { id: "regular-7", from: "alpha", to: "bravo", points: 3, bucket: "regular" },
+    { id: "regular-8", from: "alpha", to: "bravo", points: 3, bucket: "regular" },
+    { id: "regular-9", from: "alpha", to: "bravo", points: 3, bucket: "regular" },
+    { id: "regular-10", from: "alpha", to: "bravo", points: 3, bucket: "regular" },
+    { id: "regular-11", from: "alpha", to: "bravo", points: 3, bucket: "regular" },
+    { id: "regular-12", from: "alpha", to: "bravo", points: 3, bucket: "regular" }
+  ],
+  settings: {
+    trainsPerPlayer: 8,
+    stationsPerPlayer: 3,
+    longestRouteBonus: 10,
+    stationValue: 4
+  }
+};
 
 function connectedCityCount(): number {
   const visited = new Set<string>();
@@ -650,6 +703,7 @@ describe("game-core", () => {
     );
     expect(state.routeClaims).toHaveLength(1);
     expect(state.players[0].trainsLeft).toBe(hudsonHustleMap.settings.trainsPerPlayer - 2);
+    expect(state.finalRoundRemaining).toBeNull();
     expect(state.turn.stage).toBe("awaitingHandoff");
   });
 
@@ -665,6 +719,42 @@ describe("game-core", () => {
         hudsonHustleMap
       )
     ).toThrow("You do not have enough trains left for that route.");
+  });
+
+  it("triggers the final round when no route remains open", () => {
+    let state = finishInitialTickets(
+      startGame(exhaustedDoubleRouteMap, { playerNames: ["A", "B"], seed: 9 }),
+      exhaustedDoubleRouteMap
+    );
+    state = forcePlayerHand(state, ["obsidian", "obsidian"]);
+
+    state = reduceGame(
+      state,
+      { type: "claim_route", routeId: "alpha-bravo-a", color: "obsidian" },
+      exhaustedDoubleRouteMap
+    );
+
+    expect(state.players[0].trainsLeft).toBe(6);
+    expect(state.finalRoundRemaining).toBe(1);
+    expect(state.finalRoundTriggeredBy).toBe("player-1");
+  });
+
+  it("does not trigger route-exhaustion endgame while a 4-player double route twin remains open", () => {
+    let state = finishInitialTickets(
+      startGame(exhaustedDoubleRouteMap, { playerNames: ["A", "B", "C", "D"], seed: 9 }),
+      exhaustedDoubleRouteMap
+    );
+    state = forcePlayerHand(state, ["obsidian", "obsidian"]);
+
+    state = reduceGame(
+      state,
+      { type: "claim_route", routeId: "alpha-bravo-a", color: "obsidian" },
+      exhaustedDoubleRouteMap
+    );
+
+    expect(state.players[0].trainsLeft).toBe(6);
+    expect(state.finalRoundRemaining).toBeNull();
+    expect(state.finalRoundTriggeredBy).toBeNull();
   });
 
   it("builds a station and consumes cards", () => {

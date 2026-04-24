@@ -29,7 +29,7 @@ Spend matching cards to take a route. Gray routes accept one color set. Ferries 
 Your destination tickets are your secret goals. Connect the two endpoints before the game ends to score them.
 
 ### Panel 4: Pass The Laptop
-When your turn is finished, click `I'm done`. The app hides your private information and shows a neutral takeover screen. The next player clicks `I'm ready`.
+When your turn is finished, click `I'm done`. The app hides your private information and shows a neutral takeover screen. The next player clicks `I'm ready`. The final round starts when a player runs low on trains or the board has no open routes left.
 
 ## Project Scope
 
