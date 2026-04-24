@@ -147,11 +147,11 @@ const tutorialSteps: TutorialStep[] = [
     summary:
       "The round table shows score, trains left, stations left, and ticket counts for every player. This is where you feel late-game pressure.",
     keyPoints: [
-      "The final round starts when a player ends a turn with two or fewer trains left.",
+      "The final round starts when a player ends a turn with two or fewer trains left, or when no route remains open.",
       "Unused stations are worth points, so building one is a tradeoff.",
       "Ticket counts can hint at who is still chasing risky plans."
     ],
-    tip: "Before drawing more tickets, glance at train counts so you do not overcommit late.",
+    tip: "Before drawing more tickets, glance at train counts and open routes so you do not overcommit late.",
     target: "scoreboard"
   },
   {
