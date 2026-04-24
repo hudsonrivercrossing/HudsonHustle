@@ -27,7 +27,7 @@
 - `3` stations per player.
 - Initial setup: one long ticket plus three regular tickets, keep at least two.
 - Standard route scoring curve: `1, 2, 4, 7, 10, 15`.
-- Final round triggers when a player ends a turn with `<= 2` trains.
+- Final round triggers when a player ends a turn with `<= 2` trains or when a route claim leaves no route open on the board.
 - Longest route bonus uses owned routes only.
 - Unused stations award endgame points.
 

@@ -123,7 +123,7 @@ Why stations are a tradeoff:
 - So a station is usually strongest when it saves a big ticket or bypasses a critical blockage.
 
 ## End Of The Game
-The final round starts when a player ends a turn with two or fewer trains remaining. Every other player gets one last turn.
+The final round starts when a player ends a turn with two or fewer trains remaining, or when a claimed route leaves no routes open on the board. Every other player gets one last turn.
 
 Then the game scores:
 1. route points already earned during play

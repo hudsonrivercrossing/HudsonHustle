@@ -115,6 +115,7 @@ Before acting, inspect:
   - claimed routes
   - still-open choke points
   - locked twin routes in `2-3` player games
+  - whether a claim would leave no route open and start the final round
   - face-up market cards
 - public opponent state:
   - claimed network shape

@@ -45,6 +45,6 @@ This file defines the shipped `v1.1` guided tutorial flow.
 7. Action rail
   - show where legal moves and payments are confirmed
 8. Round table pressure
-  - explain trains left, stations left, ticket counts, and endgame pressure
+  - explain trains left, open routes, stations left, ticket counts, and endgame pressure
 9. Pass-and-play handoff
   - reinforce the social rhythm of one shared laptop
