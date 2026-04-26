@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
+  chooseBotAction,
   getAffordableRouteColors,
   getAffordableStationColors,
   getCityName,
@@ -8,17 +9,18 @@ import {
   reduceGame,
   startGame,
   type GameAction,
-  type GameState
+  type GameState,
+  type PublicGameState,
+  type SeatPrivateState
 } from "@hudson-hustle/game-core";
 import {
   cardColorPalette,
-  hudsonHustleBackdrop,
-  hudsonHustleCurrentBackdropMode,
-  hudsonHustleCurrentBoardLabelMode,
   hudsonHustleCurrentConfigId,
   hudsonHustleCurrentConfigMeta,
-  hudsonHustleCurrentTheme,
-  hudsonHustleMap,
+  hudsonHustleReleasedConfigs,
+  getHudsonHustleMapByConfigId,
+  getHudsonHustleRegisteredConfig,
+  getHudsonHustleVisualsByConfigId,
   playerColorPalette
 } from "@hudson-hustle/game-data";
 import { BoardMap } from "./BoardMap";
@@ -43,9 +45,9 @@ const saveKey = "hudson-hustle-save-v1";
 const tutorialSeenKey = "hudson-hustle-onboarding-v1-1";
 
 type VisibilityMode = "visible" | "postTurn" | "handoff";
+type LocalStartSetup = { playerNames: string[]; botSeatIds: string[]; configId: string; turnTimeLimitSeconds: number };
 
 interface LocalPlayScreenProps {
-  onOpenMultiplayer: () => void;
   onReturnToGateway?: () => void;
 }
 
@@ -189,7 +191,63 @@ function readSavedGame(): GameState | null {
   }
 }
 
-export function LocalPlayScreen({ onOpenMultiplayer, onReturnToGateway }: LocalPlayScreenProps): JSX.Element {
+function configIdForSavedMap(mapId: string): string {
+  return hudsonHustleReleasedConfigs.find((config) => getHudsonHustleMapByConfigId(config.configId).id === mapId)?.configId ?? hudsonHustleCurrentConfigId;
+}
+
+function buildLocalPublicGameState(game: GameState): PublicGameState {
+  return {
+    version: game.version,
+    mapId: game.mapId,
+    players: game.players.map((player) => ({
+      id: player.id,
+      name: player.name,
+      color: player.color,
+      score: player.score,
+      trainsLeft: player.trainsLeft,
+      stationsLeft: player.stationsLeft,
+      handCount: player.hand.length,
+      ticketCount: player.tickets.length,
+      pendingTicketCount: player.pendingTickets.length,
+      endgame: player.endgame
+    })),
+    activePlayerIndex: game.activePlayerIndex,
+    phase: game.phase,
+    routeClaims: game.routeClaims,
+    stations: game.stations,
+    market: game.market,
+    discardCount: game.discardPile.length,
+    trainDeckCount: game.trainDeck.length,
+    regularTicketsCount: game.regularTickets.length,
+    longTicketsCount: game.longTickets.length,
+    discardedTicketsCount: game.discardedTickets.length,
+    turn: game.turn,
+    finalRoundRemaining: game.finalRoundRemaining,
+    finalRoundTriggeredBy: game.finalRoundTriggeredBy,
+    log: game.log
+  };
+}
+
+function buildLocalPrivateState(game: GameState): SeatPrivateState {
+  const player = getCurrentPlayer(game);
+  return {
+    seatId: `seat-${game.activePlayerIndex + 1}`,
+    playerId: player.id,
+    hand: player.hand,
+    tickets: player.tickets,
+    pendingTickets: player.pendingTickets
+  };
+}
+
+function botPlayerIdsFromSeatIds(botSeatIds: string[]): string[] {
+  return botSeatIds.map((seatId) => `player-${seatId.replace("seat-", "")}`);
+}
+
+function botPlayerIdsFromSavedGame(game: GameState): string[] {
+  return game.players.filter((player) => /^Bot\s+\d+/i.test(player.name)).map((player) => player.id);
+}
+
+export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JSX.Element {
   const [game, setGame] = useState<GameState | null>(null);
   const [visibility, setVisibility] = useState<VisibilityMode>("visible");
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
@@ -199,6 +257,13 @@ export function LocalPlayScreen({ onOpenMultiplayer, onReturnToGateway }: LocalP
   const [error, setError] = useState<string | null>(null);
   const [tutorialStepIndex, setTutorialStepIndex] = useState<number | null>(null);
   const [hasSavedGame, setHasSavedGame] = useState<boolean>(() => typeof window !== "undefined" && Boolean(readSavedGame()));
+  const [localConfigId, setLocalConfigId] = useState(hudsonHustleCurrentConfigId);
+  const [localTurnTimeLimitSeconds, setLocalTurnTimeLimitSeconds] = useState(0);
+  const [localBotPlayerIds, setLocalBotPlayerIds] = useState<string[]>([]);
+  const localMap = useMemo(() => getHudsonHustleMapByConfigId(localConfigId), [localConfigId]);
+  const localVisuals = useMemo(() => getHudsonHustleVisualsByConfigId(localConfigId), [localConfigId]);
+  const localConfigBundle = getHudsonHustleRegisteredConfig(localConfigId);
+  const localConfigMeta = localConfigBundle?.meta ?? hudsonHustleCurrentConfigMeta;
 
   useEffect(() => {
     const seenTutorial = window.localStorage.getItem(tutorialSeenKey);
@@ -216,6 +281,7 @@ export function LocalPlayScreen({ onOpenMultiplayer, onReturnToGateway }: LocalP
   }, [game]);
 
   const currentPlayer = game ? getCurrentPlayer(game) : null;
+  const isCurrentPlayerLocalBot = currentPlayer ? localBotPlayerIds.includes(currentPlayer.id) : false;
   const pendingTickets = currentPlayer?.pendingTickets ?? [];
 
   useEffect(() => {
@@ -228,36 +294,88 @@ export function LocalPlayScreen({ onOpenMultiplayer, onReturnToGateway }: LocalP
     setSelectedTicketIds(pendingTickets.slice(0, minimumKeep).map((ticket) => ticket.id));
   }, [game, pendingTickets]);
 
+  useEffect(() => {
+    if (!game || game.phase === "gameOver" || localBotPlayerIds.length === 0) {
+      return;
+    }
+
+    const activePlayer = getCurrentPlayer(game);
+    if (!localBotPlayerIds.includes(activePlayer.id)) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      setGame((current) => {
+        if (!current || current.phase === "gameOver") {
+          return current;
+        }
+
+        try {
+          let nextGame = current;
+          for (let steps = 0; steps < 8; steps += 1) {
+            const nextActivePlayer = getCurrentPlayer(nextGame);
+            if (!localBotPlayerIds.includes(nextActivePlayer.id) || nextGame.phase === "gameOver") {
+              break;
+            }
+
+            const action = chooseBotAction({
+              config: localMap,
+              game: buildLocalPublicGameState(nextGame),
+              privateState: buildLocalPrivateState(nextGame)
+            });
+            nextGame = reduceGame(nextGame, action, localMap);
+            if (nextGame.turn.stage === "awaitingHandoff") {
+              nextGame = reduceGame(nextGame, { type: "advance_turn" }, localMap);
+            }
+          }
+
+          setSelectedRouteId(null);
+          setSelectedCityId(null);
+          setRevealedDeckCard(null);
+          setError(null);
+          setVisibility(nextGame.phase === "gameOver" ? "visible" : "handoff");
+          return nextGame;
+        } catch (caught) {
+          setError(caught instanceof Error ? caught.message : "Local bot could not complete its turn.");
+          setVisibility("visible");
+          return current;
+        }
+      });
+    }, 350);
+
+    return () => window.clearTimeout(timeout);
+  }, [game, localBotPlayerIds, localMap]);
+
   const routeOptions = useMemo(() => {
     if (!game || !selectedRouteId) {
       return [];
     }
-    return getAffordableRouteColors(game, hudsonHustleMap, selectedRouteId);
-  }, [game, selectedRouteId]);
+    return getAffordableRouteColors(game, localMap, selectedRouteId);
+  }, [game, localMap, selectedRouteId]);
 
   const stationOptions = useMemo(() => {
     if (!game || !selectedCityId) {
       return [];
     }
-    return getAffordableStationColors(game, hudsonHustleMap);
-  }, [game, selectedCityId]);
+    return getAffordableStationColors(game, localMap);
+  }, [game, localMap, selectedCityId]);
 
   const ticketProgress = useMemo(() => {
     if (!game || !currentPlayer) {
       return [];
     }
 
-    return getTicketProgress(game, hudsonHustleMap, currentPlayer.id).sort(
+    return getTicketProgress(game, localMap, currentPlayer.id).sort(
       (left, right) => Number(left.completed) - Number(right.completed)
     );
-  }, [currentPlayer, game]);
+  }, [currentPlayer, game, localMap]);
 
   const currentRouteUnavailableReason = useMemo(() => {
     if (!game || !selectedRouteId) {
       return null;
     }
 
-    const currentRoute = hudsonHustleMap.routes.find((route) => route.id === selectedRouteId);
+    const currentRoute = localMap.routes.find((route) => route.id === selectedRouteId);
     if (!currentRoute) {
       return null;
     }
@@ -274,7 +392,7 @@ export function LocalPlayScreen({ onOpenMultiplayer, onReturnToGateway }: LocalP
     }
 
     if (currentRoute.twinGroup && game.players.length <= 3) {
-      const twinIds = hudsonHustleMap.routes
+      const twinIds = localMap.routes
         .filter((route) => route.twinGroup === currentRoute.twinGroup && route.id !== currentRoute.id)
         .map((route) => route.id);
       const twinClaim = game.routeClaims.find((claim) => twinIds.includes(claim.routeId));
@@ -285,10 +403,14 @@ export function LocalPlayScreen({ onOpenMultiplayer, onReturnToGateway }: LocalP
     }
 
     return "No affordable claim options right now.";
-  }, [game, selectedRouteId]);
+  }, [game, localMap, selectedRouteId]);
 
-  function startNewGame(playerNames: string[]) {
-    const nextGame = startGame(hudsonHustleMap, { playerNames });
+  function startNewGame(setup: LocalStartSetup) {
+    const nextMap = getHudsonHustleMapByConfigId(setup.configId);
+    const nextGame = startGame(nextMap, { playerNames: setup.playerNames });
+    setLocalConfigId(setup.configId);
+    setLocalTurnTimeLimitSeconds(setup.turnTimeLimitSeconds);
+    setLocalBotPlayerIds(botPlayerIdsFromSeatIds(setup.botSeatIds));
     setGame(nextGame);
     setVisibility("visible");
     setSelectedRouteId(null);
@@ -301,6 +423,8 @@ export function LocalPlayScreen({ onOpenMultiplayer, onReturnToGateway }: LocalP
     if (!saved) {
       return;
     }
+    setLocalConfigId(configIdForSavedMap(saved.mapId));
+    setLocalBotPlayerIds(botPlayerIdsFromSavedGame(saved));
     setGame(saved);
     setVisibility("visible");
     setSelectedRouteId(null);
@@ -312,6 +436,7 @@ export function LocalPlayScreen({ onOpenMultiplayer, onReturnToGateway }: LocalP
     window.localStorage.removeItem(saveKey);
     setHasSavedGame(false);
     setGame(null);
+    setLocalBotPlayerIds([]);
     setVisibility("visible");
     setSelectedRouteId(null);
     setSelectedCityId(null);
@@ -358,7 +483,7 @@ export function LocalPlayScreen({ onOpenMultiplayer, onReturnToGateway }: LocalP
 
     try {
       const activeBefore = getCurrentPlayer(game);
-      const nextGame = reduceGame(game, action, hudsonHustleMap);
+      const nextGame = reduceGame(game, action, localMap);
       setGame(nextGame);
       setError(null);
 
@@ -417,10 +542,9 @@ export function LocalPlayScreen({ onOpenMultiplayer, onReturnToGateway }: LocalP
           canResume={hasSavedGame}
           onResume={resumeGame}
           onOpenTutorial={openTutorial}
-          onOpenMultiplayer={onOpenMultiplayer}
           onBack={onReturnToGateway}
-          configLabel={`${hudsonHustleCurrentConfigMeta.version} · ${hudsonHustleCurrentConfigId}`}
-          configSummary={hudsonHustleCurrentConfigMeta.summary}
+          releasedConfigs={hudsonHustleReleasedConfigs}
+          initialConfigId={localConfigId}
         />
         {tutorial}
       </>
@@ -431,9 +555,9 @@ export function LocalPlayScreen({ onOpenMultiplayer, onReturnToGateway }: LocalP
   const tutorialTarget = tutorialStepIndex !== null ? tutorialSteps[tutorialStepIndex].target : null;
   const canTakeTurnAction = visibility === "visible" && game.phase === "main" && game.turn.stage === "idle";
   const marketDisabled = visibility !== "visible" || game.phase !== "main" || game.turn.stage === "awaitingHandoff";
-  const currentCity = selectedCityId ? hudsonHustleMap.cities.find((city) => city.id === selectedCityId) : null;
+  const currentCity = selectedCityId ? localMap.cities.find((city) => city.id === selectedCityId) : null;
   const currentCityOccupied = currentCity ? game.stations.some((station) => station.cityId === currentCity.id) : false;
-  const currentRoute = selectedRouteId ? hudsonHustleMap.routes.find((route) => route.id === selectedRouteId) : null;
+  const currentRoute = selectedRouteId ? localMap.routes.find((route) => route.id === selectedRouteId) : null;
   const currentRouteClaim = currentRoute ? game.routeClaims.find((claim) => claim.routeId === currentRoute.id) : null;
   const currentRouteOwner = currentRouteClaim ? game.players.find((player) => player.id === currentRouteClaim.playerId) : null;
   const localBannerTone =
@@ -465,19 +589,19 @@ export function LocalPlayScreen({ onOpenMultiplayer, onReturnToGateway }: LocalP
               : "Claim a route, build a station, or draw tickets on this turn.";
 
   return (
-    <div className="app-shell" data-config-theme={hudsonHustleCurrentTheme}>
+    <div className="app-shell" data-config-theme={localVisuals.theme}>
       <header className="topbar">
         <div>
           <p className="eyebrow">Hudson Hustle</p>
-          <h1>{hudsonHustleMap.name}</h1>
+          <h1>{localMap.name}</h1>
           <div className="utility-pill-group">
             <div className="config-hover-card">
               <UtilityPill
                 label="Config"
-                value={`${hudsonHustleCurrentConfigMeta.version} · ${hudsonHustleCurrentConfigId}`}
+                value={`${localConfigMeta.version} · ${localConfigId}`}
                 tone="accent"
               />
-              <span className="config-summary-tooltip">{hudsonHustleCurrentConfigMeta.summary}</span>
+              <span className="config-summary-tooltip">{localConfigMeta.summary}</span>
             </div>
           </div>
           <StatusBanner
@@ -485,7 +609,15 @@ export function LocalPlayScreen({ onOpenMultiplayer, onReturnToGateway }: LocalP
             eyebrow={localBannerEyebrow}
             headline={localBannerHeadline}
             copy={localBannerCopy}
-            timerLabel={game.phase === "gameOver" ? "Final" : visibility === "handoff" ? "Hidden" : null}
+            timerLabel={
+              game.phase === "gameOver"
+                ? "Final"
+                : visibility === "handoff"
+                  ? "Hidden"
+                  : localTurnTimeLimitSeconds === 0
+                    ? "Untimed"
+                    : `Timer ${localTurnTimeLimitSeconds}s`
+            }
           />
         </div>
         <div className="topbar-actions">
@@ -554,7 +686,7 @@ export function LocalPlayScreen({ onOpenMultiplayer, onReturnToGateway }: LocalP
                         </div>
                         <div className="row-object__main">
                           <span className="row-object__title ticket-route__cities">
-                            {getCityName(hudsonHustleMap, ticket.from)} <span className="ticket-arrow">to</span> {getCityName(hudsonHustleMap, ticket.to)}
+                            {getCityName(localMap, ticket.from)} <span className="ticket-arrow">to</span> {getCityName(localMap, ticket.to)}
                           </span>
                         </div>
                         <div className="row-object__stats">
@@ -598,10 +730,10 @@ export function LocalPlayScreen({ onOpenMultiplayer, onReturnToGateway }: LocalP
           <Panel variant="neutral" className={`board-panel ${tutorialTarget === "board" ? "panel--tutorial-focus" : ""}`}>
             <SectionHeader eyebrow="Public board" title="Board" meta="Click a route or city to inspect actions" />
             <BoardMap
-              config={hudsonHustleMap}
-              backdrop={hudsonHustleBackdrop}
-              backdropMode={hudsonHustleCurrentBackdropMode}
-              boardLabelMode={hudsonHustleCurrentBoardLabelMode}
+              config={localMap}
+              backdrop={localVisuals.backdrop}
+              backdropMode={localVisuals.backdropMode}
+              boardLabelMode={localVisuals.boardLabelMode}
               cardPalette={cardColorPalette}
               playerPalette={playerColorPalette}
               viewerPlayerId={game.players[game.activePlayerIndex]?.id}
@@ -657,7 +789,7 @@ export function LocalPlayScreen({ onOpenMultiplayer, onReturnToGateway }: LocalP
                       <p className="endgame-score">{player.score}</p>
                       <span className="endgame-score__label">points</span>
                     </div>
-                    <EndgameBreakdown player={player} config={hudsonHustleMap} />
+                    <EndgameBreakdown player={player} config={localMap} />
                   </SurfaceCard>
                 ))}
               </div>
@@ -680,12 +812,12 @@ export function LocalPlayScreen({ onOpenMultiplayer, onReturnToGateway }: LocalP
                 className="detail-card"
                 data-detail-kind="route"
                 eyebrow="Route detail"
-                title={`${getCityName(hudsonHustleMap, currentRoute.from)} → ${getCityName(hudsonHustleMap, currentRoute.to)}`}
+                title={`${getCityName(localMap, currentRoute.from)} → ${getCityName(localMap, currentRoute.to)}`}
               >
                 <div className="detail-card__summary">
                   <div className="detail-card__facts">
                     <span className="detail-card__fact">{currentRoute.length} train{currentRoute.length === 1 ? "" : "s"}</span>
-                    <span className="detail-card__fact">{hudsonHustleMap.typeLabelOverrides?.[currentRoute.type] ?? currentRoute.type}</span>
+                    <span className="detail-card__fact">{localMap.typeLabelOverrides?.[currentRoute.type] ?? currentRoute.type}</span>
                     <span className="detail-card__fact">{currentRoute.color === "gray" ? "gray route" : currentRoute.color}</span>
                     {currentRoute.locomotiveCost ? (
                       <span className="detail-card__fact">{currentRoute.locomotiveCost} locomotive{currentRoute.locomotiveCost === 1 ? "" : "s"}</span>
@@ -776,7 +908,7 @@ export function LocalPlayScreen({ onOpenMultiplayer, onReturnToGateway }: LocalP
         </ModalShell>
       ) : null}
 
-      {pendingTickets.length > 0 && visibility === "visible" ? (
+      {pendingTickets.length > 0 && visibility === "visible" && !isCurrentPlayerLocalBot ? (
         <TicketPicker
           title={game.phase === "initialTickets" ? `${activePlayer.name}, choose starting tickets` : `${activePlayer.name}, keep new tickets`}
           subtitle={
@@ -785,7 +917,7 @@ export function LocalPlayScreen({ onOpenMultiplayer, onReturnToGateway }: LocalP
               : "Keep at least one. This counts as your full turn."
           }
           tickets={pendingTickets}
-          config={hudsonHustleMap}
+          config={localMap}
           minimumKeep={game.phase === "initialTickets" ? 2 : 1}
           selectedIds={selectedTicketIds}
           onToggle={(ticketId) =>

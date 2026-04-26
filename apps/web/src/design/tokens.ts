@@ -1,6 +1,7 @@
 export const fontPair = {
   display: "Fraunces",
-  body: "Inter"
+  body: "IBM Plex Sans",
+  setup: "IBM Plex Sans"
 } as const;
 
 export const colorSystem = {
@@ -21,6 +22,26 @@ export const colorSystem = {
     base: "#2a6fb6",
     strong: "#1f5285",
     soft: "#7ea7cf"
+  },
+  setup: {
+    stationEnamel: "rgba(14, 21, 27, 0.94)",
+    stationEnamelSoft: "rgba(25, 34, 41, 0.9)",
+    ticketField: "#283239",
+    ticketFieldInk: "rgba(255, 249, 239, 0.94)",
+    departureCell: "#050a0d",
+    departureLetter: "#efbf4e",
+    tokenBrass: "#b78846",
+    tokenBlue: "#203d4c",
+    printedRule: "rgba(244, 235, 219, 0.16)",
+    metadataMuted: "rgba(244, 235, 219, 0.68)"
+  },
+  controls: {
+    face: "#23313a",
+    faceStrong: "#17232c",
+    metal: "rgba(244, 235, 219, 0.1)",
+    border: "rgba(244, 235, 219, 0.2)",
+    accent: "#b78846",
+    radius: 6
   },
   status: {
     danger: "#a13d2f",

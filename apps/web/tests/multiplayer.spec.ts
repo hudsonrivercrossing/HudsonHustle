@@ -51,7 +51,7 @@ async function openLocalSetup(page: Page, options?: { resetTutorial?: boolean })
     await page.evaluate((key) => window.localStorage.removeItem(key), TUTORIAL_SEEN_KEY);
   }
   await page.getByTestId("gateway-local").click();
-  await expect(page.getByRole("heading", { name: "Local pass-and-play" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pass-and-play" })).toBeVisible();
 }
 
 async function openJoinRoomPanel(page: Page) {
@@ -72,12 +72,13 @@ async function createRoom(
   const botSeats = new Set(options?.botSeats ?? []);
   const playerCount = options?.playerCount ?? 2;
   await createPanel.getByLabel("Your name").fill("Host");
-  await createPanel.getByRole("button", { name: "Continue to seats" }).click();
+  await createPanel.getByRole("button", { name: "Seat table" }).click();
   await createPanel.getByLabel("Players").selectOption(String(playerCount));
   for (const seatId of botSeats) {
     await createPanel.getByTestId(`seat-plan-toggle-${seatId}`).click();
   }
-  await createPanel.getByRole("button", { name: "Continue to board" }).click();
+  await createPanel.getByRole("button", { name: "Pick board" }).click();
+  await createPanel.getByRole("button", { name: "Set timer" }).click();
   for (let index = 0; index < timerAdjustments; index += 1) {
     await createPanel.getByRole("button", { name: "+15" }).click();
   }
@@ -103,7 +104,7 @@ async function joinRoom(
   await joinPanel.getByRole("button", { name: "Preview" }).click();
   await expect(page.getByRole("button", { name: seatId })).toBeVisible();
   await page.getByRole("button", { name: seatId }).click();
-  await joinPanel.getByRole("button", { name: "Continue to enter" }).click();
+  await joinPanel.getByRole("button", { name: "Enter table" }).click();
   await joinPanel.getByLabel("Your name").fill(playerName);
   await joinPanel.getByRole("button", { name: "Join room" }).click();
   await expect(page.getByTestId("lobby-status-banner")).toBeVisible({ timeout: 10000 });
@@ -235,7 +236,7 @@ test("join flow clears stale seat selections when previewing a different room", 
   await seatThreeButton.click();
   await expect(seatThreeButton).toHaveClass(/chip-button--selected/);
 
-  await guestPage.locator(".setup-mode-back").click();
+  await guestPage.locator(".setup-back-button").click();
   await expect(guestPage.getByTestId("online-mode-gateway")).toBeVisible();
   await guestPage.getByTestId("online-join-room").click();
   const roomCodeField = guestPage.getByTestId("join-room-panel").getByLabel("Room code");
@@ -243,8 +244,8 @@ test("join flow clears stale seat selections when previewing a different room", 
   await roomCodeField.fill(secondRoom.roomCode);
   await guestPage.getByTestId("join-room-panel").getByRole("button", { name: "Preview" }).click();
 
-  await expect(joinPanel.getByText("Pick one")).toBeVisible();
-  await expect(joinPanel.getByRole("button", { name: "Continue to enter" })).toBeDisabled();
+  await expect(guestPage.getByText("1 open").first()).toBeVisible();
+  await expect(guestPage.getByTestId("join-room-panel").getByRole("button", { name: "Enter table" })).toBeDisabled();
   await expect(guestPage.getByRole("button", { name: "seat-2" })).toBeVisible();
 
   await hostOneContext.close();
@@ -430,7 +431,7 @@ test("normal setup can create a mixed room with multiple bot seats and only leav
   await expect(guestPage.getByRole("button", { name: "seat-2" })).toHaveCount(0);
   await expect(guestPage.getByRole("button", { name: "seat-3" })).toHaveCount(0);
   await guestPage.getByRole("button", { name: "seat-4" }).click();
-  await joinPanel.getByRole("button", { name: "Continue to enter" }).click();
+  await joinPanel.getByRole("button", { name: "Enter table" }).click();
   await joinPanel.getByLabel("Your name").fill("Guest");
   await joinPanel.getByRole("button", { name: "Join room" }).click();
 
@@ -506,14 +507,14 @@ test("local tutorial and shell hierarchy keep ceremony and work roles distinct",
 
   await page.evaluate((key) => window.localStorage.setItem(key, "seen"), TUTORIAL_SEEN_KEY);
   await openLocalSetup(page);
-  await expect(page.getByRole("heading", { name: "Local pass-and-play" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pass-and-play" })).toBeVisible();
 
-  const setupHeadingFontFamily = await page.locator("main.setup-shell h1").evaluate((node) => {
+  const setupHeadingFontFamily = await page.locator("main.setup-board-shell h1").evaluate((node) => {
     return window.getComputedStyle(node).fontFamily;
   });
-  expect(setupHeadingFontFamily).toContain("Fraunces");
+  expect(setupHeadingFontFamily).toContain("IBM Plex Sans");
 
-  const playersSectionFontFamily = await page.getByRole("heading", { name: "Players" }).evaluate((node) => {
+  const playersSectionFontFamily = await page.getByRole("heading", { name: "Seats" }).evaluate((node) => {
     return window.getComputedStyle(node).fontFamily;
   });
   expect(playersSectionFontFamily).not.toContain("Fraunces");
