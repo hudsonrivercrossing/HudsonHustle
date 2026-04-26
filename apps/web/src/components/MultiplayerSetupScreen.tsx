@@ -331,7 +331,7 @@ export function MultiplayerSetupScreen({
                 </SetupActions>
               }
             >
-              <div className="setup-mode-panel__field-grid">
+              <div className="setup-field-grid">
                 <FormField label="Your name">
                   <input value={hostName} maxLength={24} onChange={(event) => setHostName(event.target.value)} />
                 </FormField>
@@ -353,7 +353,7 @@ export function MultiplayerSetupScreen({
                 </SetupActions>
               }
             >
-              <div className="setup-mode-panel__field-grid">
+              <div className="setup-field-grid">
                 <FormField label="Players">
                   <select value={playerCount} onChange={(event) => setPlayerCount(Number(event.target.value) as 2 | 3 | 4)}>
                     <option value={2}>2 players</option>
@@ -480,7 +480,7 @@ export function MultiplayerSetupScreen({
         <div className="setup-flow-grid setup-flow-grid--join" data-testid="join-room-panel">
           {joinStep === 0 ? (
             <SetupStepPanel eyebrow="Now" title="Room code" meta="Check the table before choosing a seat">
-              <div className="setup-mode-panel__field-grid setup-mode-panel__field-grid--launch">
+              <div className="setup-field-grid setup-field-grid--launch">
                 <FormField label="Room code">
                   <input
                     value={joinRoomCode}

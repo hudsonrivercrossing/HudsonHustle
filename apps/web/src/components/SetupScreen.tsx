@@ -120,7 +120,7 @@ export function SetupScreen({
               </SetupActions>
             }
           >
-            <div className="setup-mode-panel__field-grid">
+            <div className="setup-field-grid">
               <FormField label="Players">
                 <select
                   value={playerCount}

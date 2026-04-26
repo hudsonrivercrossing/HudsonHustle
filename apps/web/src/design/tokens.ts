@@ -35,6 +35,14 @@ export const colorSystem = {
     printedRule: "rgba(244, 235, 219, 0.16)",
     metadataMuted: "rgba(244, 235, 219, 0.68)"
   },
+  controls: {
+    face: "#23313a",
+    faceStrong: "#17232c",
+    metal: "rgba(244, 235, 219, 0.1)",
+    border: "rgba(244, 235, 219, 0.2)",
+    accent: "#b78846",
+    radius: 6
+  },
   status: {
     danger: "#a13d2f",
     warning: "#976125"

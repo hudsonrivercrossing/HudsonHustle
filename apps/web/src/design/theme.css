@@ -28,6 +28,11 @@
   --color-setup-token-blue: #203d4c;
   --color-setup-printed-rule: rgba(244, 235, 219, 0.16);
   --color-setup-metadata-muted: rgba(244, 235, 219, 0.68);
+  --color-control-face: #23313a;
+  --color-control-face-strong: #17232c;
+  --color-control-metal: rgba(244, 235, 219, 0.1);
+  --color-control-border: rgba(244, 235, 219, 0.2);
+  --color-control-accent: #b78846;
   --map-water: #77a8ba;
   --map-shore: rgba(72, 54, 34, 0.28);
   --color-danger: #a13d2f;
@@ -37,6 +42,7 @@
   --radius-lg: 24px;
   --radius-md: 18px;
   --radius-sm: 12px;
+  --radius-control: 6px;
 
   --layout-content-max-width: 1360px;
   --layout-setup-max-width: 880px;
@@ -81,6 +87,14 @@
   --setup-token-blue: var(--color-setup-token-blue);
   --setup-printed-rule: var(--color-setup-printed-rule);
   --setup-metadata-muted: var(--color-setup-metadata-muted);
+  --control-face: var(--color-control-face);
+  --control-face-strong: var(--color-control-face-strong);
+  --control-metal: var(--color-control-metal);
+  --control-border: var(--color-control-border);
+  --control-accent: var(--color-control-accent);
+  --control-radius: var(--radius-control);
+  --control-shadow: inset 0 1px 0 rgba(255, 249, 239, 0.1), 0 5px 0 rgba(5, 12, 17, 0.22);
+  --control-shadow-pressed: inset 0 2px 6px rgba(0, 0, 0, 0.22), 0 2px 0 rgba(5, 12, 17, 0.22);
   --danger: var(--color-danger);
   --warning: var(--color-warning);
   --surface-paper: var(--color-surface-paper);

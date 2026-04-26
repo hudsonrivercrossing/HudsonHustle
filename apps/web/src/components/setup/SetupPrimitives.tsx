@@ -314,7 +314,7 @@ export function SetupActions({ children }: { children: ReactNode }): JSX.Element
 
 export function SetupBackButton({ onClick, children = "Back" }: { onClick: () => void; children?: ReactNode }): JSX.Element {
   return (
-    <Button className="setup-back-button setup-mode-back" onClick={onClick}>
+    <Button className="setup-back-button" onClick={onClick}>
       {children}
     </Button>
   );

@@ -236,7 +236,7 @@ test("join flow clears stale seat selections when previewing a different room", 
   await seatThreeButton.click();
   await expect(seatThreeButton).toHaveClass(/chip-button--selected/);
 
-  await guestPage.locator(".setup-mode-back").click();
+  await guestPage.locator(".setup-back-button").click();
   await expect(guestPage.getByTestId("online-mode-gateway")).toBeVisible();
   await guestPage.getByTestId("online-join-room").click();
   const roomCodeField = guestPage.getByTestId("join-room-panel").getByLabel("Room code");
