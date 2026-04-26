@@ -28,7 +28,6 @@ export function SetupShell({
   title,
   lead,
   backgroundImageUrl,
-  steps,
   modeSwitch,
   backAction,
   identitySlot,
@@ -50,7 +49,6 @@ export function SetupShell({
             <h1>{title}</h1>
             <p>{lead}</p>
           </div>
-          <SetupStepper steps={steps} />
           {identitySlot ? <div className="setup-guide__identity">{identitySlot}</div> : null}
         </aside>
 
