@@ -4,6 +4,7 @@ import type { ReconnectState, RoomSummary } from "@hudson-hustle/game-core";
 import { FormField } from "./system/FormField";
 import { StateSurface } from "./system/StateSurface";
 import {
+  DepartureBoardTile,
   MapThumbnail,
   ModeSwitch,
   SetupActions,
@@ -11,6 +12,8 @@ import {
   SetupShell,
   SetupStepPanel,
   SetupSummaryRow,
+  TicketSlip,
+  TokenButton,
   type SetupStep
 } from "./setup/SetupPrimitives";
 import { Button } from "./system/Button";
@@ -93,9 +96,9 @@ export function MultiplayerSetupScreen({
   const setupBannerCopy = error
     ? error
     : reconnectState === "reconnect-failed"
-      ? "Saved reconnect token failed. Use the manual reconnect field below."
+      ? "Saved room recovery failed. Enter the room code again to board."
       : reconnectState === "attempting-reconnect"
-        ? "Checking the saved reconnect token first."
+        ? "Checking the saved room session first."
         : "Host a table or join one by room code.";
 
   useEffect(() => {
@@ -212,11 +215,13 @@ export function MultiplayerSetupScreen({
           version={selectedConfig?.version}
         />
       ) : (
-        <div className="setup-room-code-plate setup-room-code-plate--table" aria-label="Table setup ticket">
-          <span>{createStep === 0 ? "Host" : "Seats"}</span>
-          <strong>{createStep === 0 ? hostName.trim() || "Host" : `${Math.max(1, playerCount - plannedBotCount)} human`}</strong>
-          {createStep >= 1 ? <em>{plannedBotCount} bot</em> : null}
-        </div>
+        <TicketSlip
+          className="setup-room-code-plate--table"
+          ariaLabel="Table setup ticket"
+          label={createStep === 0 ? "Host" : "Seats"}
+          value={createStep === 0 ? hostName.trim() || "Host" : `${Math.max(1, playerCount - plannedBotCount)} human`}
+          detail={createStep >= 1 ? `${plannedBotCount} bot` : undefined}
+        />
       )}
       {createStep >= 1 ? (
         <div className="setup-summary-stack">
@@ -241,10 +246,7 @@ export function MultiplayerSetupScreen({
       {previewConfig ? (
         <MapThumbnail configId={previewConfig.configId} mapName={previewConfig.mapName} version={previewConfig.version} />
       ) : (
-        <div className="setup-room-code-plate" aria-label="No room preview yet">
-          <span>Room</span>
-          <strong>{joinRoomCode || "------"}</strong>
-        </div>
+        <TicketSlip ariaLabel="No room preview yet" label="Room" value={joinRoomCode || "------"} />
       )}
       {joinStep > 0 || roomPreview ? (
         <div className="setup-summary-stack">
@@ -286,35 +288,31 @@ export function MultiplayerSetupScreen({
 
       {stage === "gateway" ? (
         <div className="setup-entry-grid setup-entry-grid--artifacts" data-testid="online-mode-gateway">
-          <button
-            type="button"
-            className="setup-entry-artifact"
+          <DepartureBoardTile
             onClick={() => {
               onClearRoomPreview?.();
               setCreateStep(0);
               setStage("create");
             }}
-            data-testid="online-start-game"
-          >
-            <span className="setup-entry-artifact__kicker">Host flow</span>
-            <strong>Start game</strong>
-            <span>Build the table, set seats, then share the code.</span>
-            <em>Room board</em>
-          </button>
-          <button
-            type="button"
-            className="setup-entry-artifact"
+            testId="online-start-game"
+            ariaLabel="Start an online room"
+            kicker="Host flow"
+            code="START_"
+            copy="Seat the table, pick the board, then share the code."
+            status="Room board"
+          />
+          <DepartureBoardTile
             onClick={() => {
               setJoinStep(roomPreview ? 1 : 0);
               setStage("join");
             }}
-            data-testid="online-join-room"
-          >
-            <span className="setup-entry-artifact__kicker">Guest flow</span>
-            <strong>Join room</strong>
-            <span>Preview the room, claim a seat, and enter.</span>
-            <em>Code ticket</em>
-          </button>
+            testId="online-join-room"
+            ariaLabel="Join an online room"
+            kicker="Guest flow"
+            code="JOIN__"
+            copy="Preview the table, claim a seat, and board."
+            status="Code ticket"
+          />
         </div>
       ) : null}
 
@@ -328,7 +326,7 @@ export function MultiplayerSetupScreen({
               actions={
                 <SetupActions>
                   <Button variant="primary" onClick={() => setCreateStep(1)}>
-                    Continue to seats
+                    Seat table
                   </Button>
                 </SetupActions>
               }
@@ -350,7 +348,7 @@ export function MultiplayerSetupScreen({
                 <SetupActions>
                   <Button onClick={() => setCreateStep(0)}>Back</Button>
                   <Button variant="primary" onClick={() => setCreateStep(2)}>
-                    Continue to board
+                    Pick board
                   </Button>
                 </SetupActions>
               }
@@ -378,20 +376,20 @@ export function MultiplayerSetupScreen({
                         </span>
                       </div>
                       {isHostSeat ? (
-                        <span className="chip-button seat-plan__toggle seat-plan__toggle--fixed">Host</span>
+                        <TokenButton label="Host" tone="host" className="seat-plan__toggle seat-plan__toggle--fixed" />
                       ) : (
-                        <button
-                          type="button"
-                          className={`chip-button seat-plan__toggle ${isBotSeat ? "chip-button--selected" : ""}`}
-                          data-testid={`seat-plan-toggle-${seatId}`}
+                        <TokenButton
+                          label={isBotSeat ? "Bot" : "Open"}
+                          tone={isBotSeat ? "bot" : "open"}
+                          selected={isBotSeat}
+                          className="seat-plan__toggle"
+                          testId={`seat-plan-toggle-${seatId}`}
                           onClick={() =>
                             setBotSeatIds((current) =>
                               current.includes(seatId) ? current.filter((entry) => entry !== seatId) : [...current, seatId]
                             )
                           }
-                        >
-                          {isBotSeat ? "Bot" : "Open"}
-                        </button>
+                        />
                       )}
                     </div>
                   );
@@ -410,7 +408,7 @@ export function MultiplayerSetupScreen({
                 <SetupActions>
                   <Button onClick={() => setCreateStep(1)}>Back</Button>
                   <Button variant="primary" onClick={() => setCreateStep(3)}>
-                    Continue to timer
+                    Set timer
                   </Button>
                 </SetupActions>
               }
@@ -522,7 +520,7 @@ export function MultiplayerSetupScreen({
                     disabled={!roomPreview || !preferredSeatId || !openSeats.some((seat) => seat.seatId === preferredSeatId)}
                     onClick={() => setJoinStep(2)}
                   >
-                    Continue to enter
+                    Enter table
                   </Button>
                 </SetupActions>
               }
@@ -530,13 +528,13 @@ export function MultiplayerSetupScreen({
               {roomPreview ? (
                 <div className="seat-choice-row">
                   {openSeats.map((seat) => (
-                    <Button
+                    <TokenButton
                       key={seat.seatId}
-                      className={`chip-button ${preferredSeatId === seat.seatId ? "chip-button--selected" : ""}`}
+                      label={seat.seatId}
+                      tone="open"
+                      selected={preferredSeatId === seat.seatId}
                       onClick={() => setPreferredSeatId(seat.seatId)}
-                    >
-                      {seat.seatId}
-                    </Button>
+                    />
                   ))}
                 </div>
               ) : null}

@@ -59,12 +59,18 @@ These should stay rare and legible. They are not decorative palette colors.
 - `setup.backdrop-veil`: dim atmospheric image layer behind the counter
 - `setup.station-enamel`: dark signage/control/panel surface
 - `setup.ticket-field`: muted dark printed field surface for inputs, selects, and room-code plates
+- `setup.departure-cell`: near-black flip-board cell for gateway and room-status board artifacts
 - `setup.token-accent`: restrained brass/blue selected state for mode switches, chips, timer controls, and primary setup actions
 - `setup.printed-rule`: subtle rule line and dashed divider
 - `setup.route-line-accent`: small route-line color accent inside thumbnails and markers
 - `setup.metadata-muted`: compact setup metadata and secondary labels
 
-These roles support the board-game setup table. Setup panels should read as station enamel, not bright cream cards. Inputs, selects, and room-code plates should use the darker ticket-field material; cream fields are reserved for future literal ticket/paper artifacts only when surrounded by a lighter layout. These roles should not become a second app-wide palette.
+These roles support the board-game setup table. Setup panels should read as station enamel, not bright cream cards. Inputs, selects, room-code plates, and ticket slips should use the darker ticket-field material; cream fields are reserved for future literal ticket/paper artifacts only when surrounded by a lighter layout. Departure-board cells should be nearly black with a restrained amber letter, not glowing neon. These roles should not become a second app-wide palette.
+
+Setup material hierarchy:
+- station enamel: main setup/lobby panels and preview trays
+- muted ticket field: inputs, selects, room code, and short ticket slips
+- token brass/blue: selected seat tokens, active mode, focus ring, and primary launch action
 
 ## Usage Rules
 

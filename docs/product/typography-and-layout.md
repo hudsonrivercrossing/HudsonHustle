@@ -49,10 +49,11 @@ Rule of thumb:
 
 Setup hierarchy:
 - `SetupShell` uses compact `IBM Plex Sans` placards so the active panel stays primary.
-- `SetupStepPanel` titles, controls, labels, summary rows, seat rows, room codes, timers, and mode switches use `IBM Plex Sans` to avoid a generic AI-product feel and lean into transit manual / station hardware language.
+- `StationPlate` / `SetupStepPanel` titles, controls, labels, summary rows, seat rows, room codes, timers, and mode switches use `IBM Plex Sans` to avoid a generic AI-product feel and lean into transit manual / station hardware language.
 - Reserve `Fraunces` for true ceremony outside the setup console, not routine setup page identity.
 - Gateway and setup copy should use game-table verbs such as seat, board, pass, claim, launch, and guide. Avoid generic app verbs like configure, submit, or continue when a more table-native command is clear.
 - Active gameplay now uses the same operational sans as setup so controls, buttons, and roster objects feel like one product instead of two UI systems.
+- Departure-board tile text is uppercase, short, and mechanical. The six-cell code is the title; do not repeat the same word as a second heading below it.
 
 ## Hierarchy
 

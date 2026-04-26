@@ -98,7 +98,25 @@ interface SetupStepPanelProps {
 
 export function SetupStepPanel({ eyebrow, title, meta, children, actions, className }: SetupStepPanelProps): JSX.Element {
   return (
-    <section className={["setup-step-panel", className].filter(Boolean).join(" ")}>
+    <StationPlate eyebrow={eyebrow} title={title} meta={meta} actions={actions} className={className}>
+      {children}
+    </StationPlate>
+  );
+}
+
+interface StationPlateProps {
+  eyebrow: string;
+  title: string;
+  meta?: string;
+  children: ReactNode;
+  actions?: ReactNode;
+  className?: string;
+  variant?: "setup" | "lobby";
+}
+
+export function StationPlate({ eyebrow, title, meta, children, actions, className, variant = "setup" }: StationPlateProps): JSX.Element {
+  return (
+    <section className={["station-plate", `station-plate--${variant}`, "setup-step-panel", className].filter(Boolean).join(" ")}>
       <header className="setup-step-panel__header">
         <span>{eyebrow}</span>
         <div>
@@ -109,6 +127,51 @@ export function SetupStepPanel({ eyebrow, title, meta, children, actions, classN
       <div className="setup-step-panel__body">{children}</div>
       {actions ? <footer className="setup-step-panel__actions">{actions}</footer> : null}
     </section>
+  );
+}
+
+interface DepartureBoardTileProps {
+  kicker: string;
+  code: string;
+  copy: string;
+  status: string;
+  disabled?: boolean;
+  onClick?: () => void;
+  ariaLabel: string;
+  testId?: string;
+  className?: string;
+}
+
+export function DepartureBoardTile({
+  kicker,
+  code,
+  copy,
+  status,
+  disabled = false,
+  onClick,
+  ariaLabel,
+  testId,
+  className
+}: DepartureBoardTileProps): JSX.Element {
+  const cells = Array.from(code.padEnd(6, " ").slice(0, 6));
+  return (
+    <button
+      type="button"
+      className={["departure-board-tile", "setup-entry-artifact", className].filter(Boolean).join(" ")}
+      onClick={onClick}
+      disabled={disabled}
+      data-testid={testId}
+      aria-label={ariaLabel}
+    >
+      <span className="departure-board-tile__kicker setup-entry-artifact__kicker">{kicker}</span>
+      <span className="departure-board-tile__code setup-entry-artifact__split" aria-hidden="true">
+        {cells.map((cell, index) => (
+          <span key={`${cell}-${index}`}>{cell === "_" || cell === " " ? "\u00A0" : cell}</span>
+        ))}
+      </span>
+      <span className="departure-board-tile__copy setup-entry-artifact__copy">{copy}</span>
+      <em>{status}</em>
+    </button>
   );
 }
 
@@ -149,6 +212,66 @@ export function SetupSummaryRow({ label, value, detail }: SetupSummaryRowProps):
       <strong>{value}</strong>
       {detail ? <em>{detail}</em> : null}
     </div>
+  );
+}
+
+interface TicketSlipProps {
+  label: string;
+  value: ReactNode;
+  detail?: ReactNode;
+  tone?: "neutral" | "disabled" | "active";
+  className?: string;
+  ariaLabel?: string;
+}
+
+export function TicketSlip({ label, value, detail, tone = "neutral", className, ariaLabel }: TicketSlipProps): JSX.Element {
+  return (
+    <div
+      className={["ticket-slip", `ticket-slip--${tone}`, "setup-room-code-plate", className].filter(Boolean).join(" ")}
+      aria-label={ariaLabel}
+    >
+      <span>{label}</span>
+      <strong>{value}</strong>
+      {detail ? <em>{detail}</em> : null}
+    </div>
+  );
+}
+
+interface TokenButtonProps {
+  label: string;
+  selected?: boolean;
+  disabled?: boolean;
+  tone?: "human" | "bot" | "open" | "host";
+  onClick?: () => void;
+  testId?: string;
+  className?: string;
+}
+
+export function TokenButton({
+  label,
+  selected = false,
+  disabled = false,
+  tone = "open",
+  onClick,
+  testId,
+  className
+}: TokenButtonProps): JSX.Element {
+  const classes = [
+    "token-button",
+    `token-button--${tone}`,
+    selected ? "token-button--selected chip-button--selected" : "",
+    "chip-button",
+    className
+  ].filter(Boolean).join(" ");
+
+  if (!onClick) {
+    return <span className={classes}>{label}</span>;
+  }
+
+  return (
+    <button type="button" className={classes} disabled={disabled} data-testid={testId} onClick={onClick}>
+      {label}
+    </button>
   );
 }
 

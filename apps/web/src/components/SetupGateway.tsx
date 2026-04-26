@@ -1,4 +1,4 @@
-import { SetupShell, type SetupStep } from "./setup/SetupPrimitives";
+import { DepartureBoardTile, SetupShell, type SetupStep } from "./setup/SetupPrimitives";
 
 interface SetupGatewayProps {
   onChooseLocal: () => void;
@@ -23,65 +23,38 @@ export function SetupGateway({ onChooseLocal, onChooseOnline }: SetupGatewayProp
       className="setup-board-shell--gateway"
     >
       <div className="setup-entry-grid setup-entry-grid--gateway">
-        <button
-          type="button"
-          className="setup-entry-artifact setup-entry-artifact--local"
+        <DepartureBoardTile
+          className="setup-entry-artifact--local"
           onClick={onChooseLocal}
-          data-testid="gateway-local"
-          aria-label="Choose Local mode"
-        >
-          <span className="setup-entry-artifact__kicker">Table mode</span>
-          <span className="setup-entry-artifact__split" aria-hidden="true">
-            <span>L</span>
-            <span>O</span>
-            <span>C</span>
-            <span>A</span>
-            <span>L</span>
-            <span></span>
-          </span>
-          <span className="setup-entry-artifact__copy">One laptop. Human and bot seats.</span>
-          <em>Pass-and-play</em>
-        </button>
+          testId="gateway-local"
+          ariaLabel="Choose Local mode"
+          kicker="Table mode"
+          code="LOCAL_"
+          copy="One screen. Human and bot seats."
+          status="Pass-and-play"
+        />
 
-        <button
-          type="button"
-          className="setup-entry-artifact setup-entry-artifact--online"
+        <DepartureBoardTile
+          className="setup-entry-artifact--online"
           onClick={onChooseOnline}
-          data-testid="gateway-online"
-          aria-label="Choose Online mode"
-        >
-          <span className="setup-entry-artifact__kicker">Live room</span>
-          <span className="setup-entry-artifact__split" aria-hidden="true">
-            <span>O</span>
-            <span>N</span>
-            <span>L</span>
-            <span>I</span>
-            <span>N</span>
-            <span>E</span>
-          </span>
-          <span className="setup-entry-artifact__copy">Create or join by room code.</span>
-          <em>Claim a seat</em>
-        </button>
+          testId="gateway-online"
+          ariaLabel="Choose Online mode"
+          kicker="Live room"
+          code="ONLINE"
+          copy="Create a room, claim a seat, start together."
+          status="Room code"
+        />
 
-        <button
-          type="button"
-          className="setup-entry-artifact setup-entry-artifact--rules"
+        <DepartureBoardTile
+          className="setup-entry-artifact--rules"
           disabled
-          data-testid="gateway-onboarding"
-          aria-label="Rules tour coming soon"
-        >
-          <span className="setup-entry-artifact__kicker">First ride</span>
-          <span className="setup-entry-artifact__split" aria-hidden="true">
-            <span>G</span>
-            <span>U</span>
-            <span>I</span>
-            <span>D</span>
-            <span>E</span>
-            <span></span>
-          </span>
-          <span className="setup-entry-artifact__copy">Guided rulebook table.</span>
-          <em>Boarding soon</em>
-        </button>
+          testId="gateway-onboarding"
+          ariaLabel="Rules tour coming soon"
+          kicker="First ride"
+          code="GUIDE_"
+          copy="Learn the routes before the table opens."
+          status="Boarding soon"
+        />
       </div>
     </SetupShell>
   );

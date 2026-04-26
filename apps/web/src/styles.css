@@ -4107,16 +4107,18 @@ h3 {
 .setup-board-shell {
   --setup-ticket-paper: #ded3bd;
   --setup-ticket-paper-deep: #c8baa0;
-  --setup-ticket-field: #283239;
-  --setup-ticket-field-ink: rgba(255, 249, 239, 0.94);
+  --setup-ticket-field: var(--color-setup-ticket-field);
+  --setup-ticket-field-ink: var(--color-setup-ticket-field-ink);
   --setup-station-sign: #17212a;
   --setup-station-sign-strong: #0d141b;
-  --setup-station-enamel: rgba(14, 21, 27, 0.94);
-  --setup-station-enamel-soft: rgba(25, 34, 41, 0.9);
-  --setup-rule: rgba(84, 61, 35, 0.2);
-  --setup-brass: #b78846;
-  --setup-token-blue: #203d4c;
-  --setup-metadata: rgba(69, 52, 34, 0.72);
+  --setup-station-enamel: var(--color-setup-station-enamel);
+  --setup-station-enamel-soft: var(--color-setup-station-enamel-soft);
+  --setup-rule: var(--color-setup-printed-rule);
+  --setup-brass: var(--color-setup-token-brass);
+  --setup-token-blue: var(--color-setup-token-blue);
+  --setup-metadata: var(--color-setup-metadata-muted);
+  --setup-departure-cell: var(--color-setup-departure-cell);
+  --setup-departure-letter: var(--color-setup-departure-letter);
   font-family: var(--font-setup);
   min-height: 100vh;
   min-height: 100svh;
@@ -4444,6 +4446,7 @@ h3 {
   box-shadow: 0 8px 16px rgba(6, 12, 18, 0.14);
 }
 
+.station-plate,
 .setup-step-panel {
   position: relative;
   overflow: hidden;
@@ -4451,7 +4454,7 @@ h3 {
   gap: 18px;
   padding: 18px;
   border-radius: 8px;
-  border: 1px solid rgba(244, 235, 219, 0.16);
+  border: 1px solid var(--setup-rule);
   background:
     linear-gradient(180deg, var(--setup-station-enamel-soft), var(--setup-station-enamel)),
     rgba(16, 23, 29, 0.9);
@@ -4461,6 +4464,7 @@ h3 {
   color: rgba(255, 249, 239, 0.94);
 }
 
+.station-plate::before,
 .setup-step-panel::before {
   content: "";
   position: absolute;
@@ -4472,6 +4476,7 @@ h3 {
   opacity: 0.72;
 }
 
+.station-plate > *,
 .setup-step-panel > * {
   position: relative;
   z-index: 1;
@@ -4483,7 +4488,7 @@ h3 {
   gap: 14px;
   align-items: start;
   padding-bottom: 14px;
-  border-bottom: 1px solid rgba(244, 235, 219, 0.14);
+  border-bottom: 1px solid var(--setup-rule);
 }
 
 .setup-step-panel__header > span {
@@ -4514,7 +4519,7 @@ h3 {
 
 .setup-step-panel__actions {
   padding-top: 14px;
-  border-top: 1px solid rgba(244, 235, 219, 0.14);
+  border-top: 1px solid var(--setup-rule);
 }
 
 .setup-actions--station {
@@ -4542,6 +4547,13 @@ h3 {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.12),
     0 6px 0 rgba(7, 20, 28, 0.22);
+}
+
+.setup-board-shell button:focus-visible,
+.setup-board-shell input:focus-visible,
+.setup-board-shell select:focus-visible,
+.setup-board-shell .token-button:focus-visible {
+  outline-color: rgba(229, 195, 132, 0.72);
 }
 
 .setup-board-shell .secondary-button {
@@ -4622,25 +4634,56 @@ h3 {
 }
 
 .setup-step-panel .chip-button,
-.setup-step-panel .system-chip {
+.setup-step-panel .system-chip,
+.setup-board-shell .token-button {
   border-radius: 5px;
 }
 
 .setup-step-panel .chip-button::before,
-.setup-step-panel .system-chip::before {
+.setup-step-panel .system-chip::before,
+.setup-board-shell .token-button::before {
   display: none;
 }
 
-.setup-step-panel .chip-button {
+.setup-step-panel .chip-button,
+.setup-board-shell .token-button {
+  min-width: 88px;
+  min-height: 38px;
+  padding: 8px 13px;
   background: rgba(207, 197, 178, 0.11);
   border: 1px solid rgba(244, 235, 219, 0.2);
   color: rgba(255, 249, 239, 0.92);
   box-shadow: none;
+  font-size: 0.78rem;
+  font-weight: 780;
+  letter-spacing: 0.02em;
+  line-height: 1;
 }
 
-.setup-step-panel .chip-button--selected {
+.setup-step-panel .chip-button--selected,
+.setup-board-shell .token-button--selected {
   border-color: rgba(229, 195, 132, 0.42);
   background: rgba(183, 136, 70, 0.24);
+}
+
+.setup-board-shell .token-button--host {
+  border-color: rgba(244, 235, 219, 0.24);
+  background: rgba(255, 249, 238, 0.1);
+}
+
+.setup-board-shell .token-button--human {
+  border-color: rgba(126, 167, 207, 0.24);
+  background: rgba(32, 61, 76, 0.3);
+}
+
+.setup-board-shell .token-button--bot {
+  border-color: rgba(183, 136, 70, 0.36);
+  background: rgba(183, 136, 70, 0.18);
+}
+
+.setup-board-shell .token-button--open {
+  border-color: rgba(244, 235, 219, 0.2);
+  background: rgba(255, 249, 238, 0.08);
 }
 
 .setup-step-panel .seat-plan__toggle--fixed {
@@ -4929,6 +4972,10 @@ h3 {
   box-shadow: 0 16px 30px rgba(5, 10, 15, 0.16);
 }
 
+.departure-board-tile {
+  cursor: pointer;
+}
+
 .setup-board-shell--gateway .setup-entry-artifact {
   min-height: 166px;
   align-content: start;
@@ -4963,8 +5010,8 @@ h3 {
   place-items: center;
   border-radius: 4px;
   background:
-    linear-gradient(180deg, rgba(9, 14, 18, 0.98), rgba(4, 8, 11, 0.98));
-  color: #efbf4e;
+    linear-gradient(180deg, color-mix(in srgb, var(--setup-departure-cell) 84%, #17222c), var(--setup-departure-cell));
+  color: var(--setup-departure-letter);
   font-size: 1.2rem;
   font-weight: 860;
   letter-spacing: 0.1em;
@@ -4975,6 +5022,7 @@ h3 {
 
 .setup-board-shell--gateway .setup-entry-artifact__copy {
   margin-top: 4px;
+  max-width: 26ch;
   color: rgba(255, 249, 239, 0.78);
   font-size: 0.74rem;
   line-height: 1.22;
@@ -5118,6 +5166,11 @@ h3 {
   line-height: 1.35;
 }
 
+.setup-entry-artifact .setup-entry-artifact__split span {
+  color: var(--setup-departure-letter);
+  line-height: 1;
+}
+
 .setup-entry-artifact em {
   width: fit-content;
   padding: 7px 10px;
@@ -5131,6 +5184,7 @@ h3 {
   text-transform: uppercase;
 }
 
+.ticket-slip,
 .setup-room-code-plate {
   display: grid;
   gap: 8px;
@@ -5141,6 +5195,16 @@ h3 {
   background:
     linear-gradient(180deg, rgba(207, 197, 178, 0.16), rgba(207, 197, 178, 0.08)),
     rgba(255, 249, 238, 0.06);
+}
+
+.ticket-slip--active {
+  border-style: solid;
+  border-color: rgba(229, 195, 132, 0.34);
+  background: rgba(183, 136, 70, 0.12);
+}
+
+.ticket-slip--disabled {
+  opacity: 0.62;
 }
 
 .setup-room-code-plate--table {
@@ -5195,6 +5259,7 @@ h3 {
   line-height: 1.4;
 }
 
+.ticket-slip span,
 .setup-room-code-plate span {
   color: rgba(244, 235, 219, 0.58);
   font-size: 0.66rem;
@@ -5203,10 +5268,17 @@ h3 {
   text-transform: uppercase;
 }
 
+.ticket-slip strong,
 .setup-room-code-plate strong {
   color: rgba(255, 249, 239, 0.92);
   font-size: 1.6rem;
   letter-spacing: 0.12em;
+}
+
+.ticket-slip em,
+.setup-room-code-plate em {
+  color: rgba(244, 235, 219, 0.72);
+  font-style: normal;
 }
 
 .room-preview--ticket {

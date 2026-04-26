@@ -48,6 +48,7 @@ Use medium padding for operational panels and secondary shell surfaces.
 ### Setup
 - setup should feel like a compact station counter console, not a landing page
 - main gateway is the exception: it may use a cinematic masthead composition with a wide Fraunces title top-left, open atmospheric center, and equal-size departure-board choices anchored low-left on the screen
+- gateway departure-board choices should sit as one table cluster, equal-sized, with the six-cell code doing the identity work; avoid spreading them into a generic three-column website grid
 - setup shells use narrower width and tighter counter/preflight clustering
 - status should appear early, near the title block
 - setup/lobby refresh uses three desktop zones:
@@ -55,6 +56,7 @@ Use medium padding for operational panels and secondary shell surfaces.
   - step panel: primary interactive object, maxing around a compact counter width rather than sprawling full-screen
   - preflight tray: about `220px` to `250px`, sticky on desktop and visually close to the step panel
 - gateway can widen beyond the setup console width when showing three entry artifacts, but the cards should remain table choices rather than marketing tiles
+- setup console surfaces use station plates plus a close preflight tray; the tray should feel attached to the active counter, not like a separate third column
 - mobile setup stacks as title/context, current step panel, then preflight tray
 - do not keep a large persistent step rail if it reads as a separate component competing with the setup panel
 - preflight is progressive: show established table facts only, not a repeated pending checklist

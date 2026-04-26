@@ -32,6 +32,7 @@ Locked decisions:
   - near-complete shell/system consistency across setup, lobby, active play, and overlays
 - current setup/lobby slice:
   - station-counter and game-table preflight refresh using shared setup primitives
+  - current hardening pass moves setup/gateway/lobby from skinned generic web panels toward Hudson-specific board-game objects: departure boards, station plates, ticket slips, and table tokens
   - setup and lobby should use station-enamel panels, muted ticket fields, token accents, progressive summary rows, and map thumbnails
   - SetupShell identity should stay a compact placard, not a large hero column
   - Local setup should use the same setup/lobby primitives and Seats → Map → Timer rhythm as Online so the first table choice does not split into two visual systems
@@ -101,5 +102,9 @@ Only extract primitives proven necessary by the current slice:
   - `ModeSwitch`
   - `SetupSummaryRow`
   - `MapThumbnail`
+  - `DepartureBoardTile`
+  - `StationPlate`
+  - `TicketSlip`
+  - `TokenButton`
 
 Do not build a broad component library ahead of proof.

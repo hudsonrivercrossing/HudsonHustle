@@ -6,6 +6,8 @@ import {
   SetupShell,
   SetupStepPanel,
   SetupSummaryRow,
+  TicketSlip,
+  TokenButton,
   type SetupStep
 } from "./setup/SetupPrimitives";
 import { Button } from "./system/Button";
@@ -72,11 +74,13 @@ export function SetupScreen({
       {step >= 1 ? (
         <MapThumbnail configId={selectedConfig?.configId ?? configId} mapName={selectedConfig?.mapName ?? "Hudson Hustle"} version={selectedConfig?.version} />
       ) : (
-        <div className="setup-room-code-plate setup-room-code-plate--table" aria-label="Local table seats">
-          <span>Seats</span>
-          <strong>{plannedHumanCount} human</strong>
-          <em>{plannedBotCount} bot</em>
-        </div>
+        <TicketSlip
+          className="setup-room-code-plate--table"
+          ariaLabel="Local table seats"
+          label="Seats"
+          value={`${plannedHumanCount} human`}
+          detail={`${plannedBotCount} bot`}
+        />
       )}
       <div className="setup-summary-stack">
         {step >= 1 ? <SetupSummaryRow label="Map" value={selectedConfig?.mapName ?? "Map"} /> : null}
@@ -111,7 +115,7 @@ export function SetupScreen({
                 <Button onClick={onOpenTutorial}>Rules guide</Button>
                 {canResume ? <Button onClick={onResume}>Resume saved game</Button> : null}
                 <Button variant="primary" onClick={() => setStep(1)}>
-                  Continue to map
+                  Pick board
                 </Button>
               </SetupActions>
             }
@@ -168,20 +172,20 @@ export function SetupScreen({
                     )}
                     <div className="seat-choice-row">
                       {isFirstSeat ? (
-                        <span className="chip-button seat-plan__toggle seat-plan__toggle--fixed setup-seat-token">Human</span>
+                        <TokenButton label="Human" tone="human" className="seat-plan__toggle seat-plan__toggle--fixed setup-seat-token" />
                       ) : (
-                        <button
-                          type="button"
-                          className={`chip-button seat-plan__toggle ${isBotSeat ? "chip-button--selected" : ""}`}
-                          data-testid={`local-seat-plan-toggle-${seatId}`}
+                        <TokenButton
+                          label={isBotSeat ? "Bot" : "Human"}
+                          tone={isBotSeat ? "bot" : "human"}
+                          selected={isBotSeat}
+                          className="seat-plan__toggle"
+                          testId={`local-seat-plan-toggle-${seatId}`}
                           onClick={() =>
                             setBotSeatIds((current) =>
                               current.includes(seatId) ? current.filter((entry) => entry !== seatId) : [...current, seatId]
                             )
                           }
-                        >
-                          {isBotSeat ? "Bot" : "Human"}
-                        </button>
+                        />
                       )}
                     </div>
                   </div>
@@ -200,7 +204,7 @@ export function SetupScreen({
               <SetupActions>
                 <Button onClick={() => setStep(0)}>Back</Button>
                 <Button variant="primary" onClick={() => setStep(2)}>
-                  Continue to timer
+                  Set timer
                 </Button>
               </SetupActions>
             }
