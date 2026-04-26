@@ -1,67 +1,88 @@
+import { SetupShell, type SetupStep } from "./setup/SetupPrimitives";
+
 interface SetupGatewayProps {
   onChooseLocal: () => void;
   onChooseOnline: () => void;
 }
 
 export function SetupGateway({ onChooseLocal, onChooseOnline }: SetupGatewayProps): JSX.Element {
-  const setupHeroVideoUrl = import.meta.env.VITE_SETUP_HERO_VIDEO_URL?.trim() ?? "";
   const setupHeroImageUrl = "/setup/landing-bg.png";
+  const gatewaySteps: SetupStep[] = [
+    { label: "Choose table", meta: "Local or online", status: "current" },
+    { label: "Set seats", meta: "Players and bots", status: "upcoming" },
+    { label: "Start route", meta: "Board preflight", status: "upcoming" }
+  ];
 
   return (
-    <main className="setup-gateway">
-      <div className="setup-gateway__media" aria-hidden="true">
-        <div
-          className="setup-gateway__fallback"
-          style={{
-            ["--setup-gateway-image" as string]: `url("${setupHeroImageUrl}")`
-          }}
-        />
-        {setupHeroVideoUrl ? (
-          <video
-            className="setup-gateway__video"
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="auto"
-          >
-            <source src={setupHeroVideoUrl} type="video/mp4" />
-          </video>
-        ) : null}
+    <SetupShell
+      eyebrow="NYC / NJ transit strategy"
+      title="Hudson Hustle"
+      lead="Choose your line"
+      backgroundImageUrl={setupHeroImageUrl}
+      steps={gatewaySteps}
+      className="setup-board-shell--gateway"
+    >
+      <div className="setup-entry-grid setup-entry-grid--gateway">
+        <button
+          type="button"
+          className="setup-entry-artifact setup-entry-artifact--local"
+          onClick={onChooseLocal}
+          data-testid="gateway-local"
+          aria-label="Choose Local mode"
+        >
+          <span className="setup-entry-artifact__kicker">Table mode</span>
+          <span className="setup-entry-artifact__split" aria-hidden="true">
+            <span>L</span>
+            <span>O</span>
+            <span>C</span>
+            <span>A</span>
+            <span>L</span>
+            <span></span>
+          </span>
+          <span className="setup-entry-artifact__copy">One laptop. Human and bot seats.</span>
+          <em>Pass-and-play</em>
+        </button>
+
+        <button
+          type="button"
+          className="setup-entry-artifact setup-entry-artifact--online"
+          onClick={onChooseOnline}
+          data-testid="gateway-online"
+          aria-label="Choose Online mode"
+        >
+          <span className="setup-entry-artifact__kicker">Live room</span>
+          <span className="setup-entry-artifact__split" aria-hidden="true">
+            <span>O</span>
+            <span>N</span>
+            <span>L</span>
+            <span>I</span>
+            <span>N</span>
+            <span>E</span>
+          </span>
+          <span className="setup-entry-artifact__copy">Create or join by room code.</span>
+          <em>Claim a seat</em>
+        </button>
+
+        <button
+          type="button"
+          className="setup-entry-artifact setup-entry-artifact--rules"
+          disabled
+          data-testid="gateway-onboarding"
+          aria-label="Rules tour coming soon"
+        >
+          <span className="setup-entry-artifact__kicker">First ride</span>
+          <span className="setup-entry-artifact__split" aria-hidden="true">
+            <span>G</span>
+            <span>U</span>
+            <span>I</span>
+            <span>D</span>
+            <span>E</span>
+            <span></span>
+          </span>
+          <span className="setup-entry-artifact__copy">Guided rulebook table.</span>
+          <em>Boarding soon</em>
+        </button>
       </div>
-      <div className="setup-gateway__veil" aria-hidden="true" />
-
-      <section className="setup-gateway__content">
-        <div className="setup-gateway__masthead">
-          <p className="setup-gateway__eyebrow">NYC / NJ transit strategy</p>
-          <h1>Hudson Hustle</h1>
-          <p className="setup-gateway__lead">Choose your line.</p>
-        </div>
-
-        <div className="setup-gateway__choice-band">
-          <button
-            type="button"
-            className="setup-gateway__choice setup-gateway__choice--local"
-            onClick={onChooseLocal}
-            data-testid="gateway-local"
-            aria-label="Choose Local mode"
-          >
-            <strong className="setup-gateway__choice-title">Local</strong>
-            <span className="setup-gateway__choice-meta">One screen</span>
-          </button>
-
-          <button
-            type="button"
-            className="setup-gateway__choice setup-gateway__choice--online"
-            onClick={onChooseOnline}
-            data-testid="gateway-online"
-            aria-label="Choose Online mode"
-          >
-            <strong className="setup-gateway__choice-title">Online</strong>
-            <span className="setup-gateway__choice-meta">Room code</span>
-          </button>
-        </div>
-      </section>
-    </main>
+    </SetupShell>
   );
 }

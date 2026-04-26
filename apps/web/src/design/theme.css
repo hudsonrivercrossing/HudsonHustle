@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,500..700,0&family=Inter:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,500..700,0&family=IBM+Plex+Sans:wght@400;500;600;700;800&display=swap");
 
 :root {
   color-scheme: light;
@@ -41,7 +41,8 @@
   --space-panel-xl: 40px;
 
   --font-display: "Fraunces", Georgia, serif;
-  --font-body: "Inter", "Segoe UI", sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", sans-serif;
+  --font-setup: "IBM Plex Sans", "Segoe UI", sans-serif;
 
   --type-display-xl: clamp(2.8rem, 4.6vw, 4.4rem);
   --type-display-lg: clamp(1.45rem, 2.4vw, 1.95rem);

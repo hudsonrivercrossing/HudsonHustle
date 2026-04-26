@@ -1,5 +1,6 @@
 import { randomBytes, randomUUID } from "node:crypto";
 import {
+  chooseBotAction,
   getCurrentPlayer,
   type ControllerType,
   type GameAction,
@@ -43,7 +44,6 @@ import type {
   StoredRoomRecord,
   StoredSeatRecord
 } from "./persistence/types.js";
-import { chooseBotAction } from "./bot-policy.js";
 
 type RoomTimerCallback = (roomCode: string, deadlineAt: number | null) => void;
 

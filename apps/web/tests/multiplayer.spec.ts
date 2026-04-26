@@ -51,7 +51,7 @@ async function openLocalSetup(page: Page, options?: { resetTutorial?: boolean })
     await page.evaluate((key) => window.localStorage.removeItem(key), TUTORIAL_SEEN_KEY);
   }
   await page.getByTestId("gateway-local").click();
-  await expect(page.getByRole("heading", { name: "Local pass-and-play" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pass-and-play" })).toBeVisible();
 }
 
 async function openJoinRoomPanel(page: Page) {
@@ -78,6 +78,7 @@ async function createRoom(
     await createPanel.getByTestId(`seat-plan-toggle-${seatId}`).click();
   }
   await createPanel.getByRole("button", { name: "Continue to board" }).click();
+  await createPanel.getByRole("button", { name: "Continue to timer" }).click();
   for (let index = 0; index < timerAdjustments; index += 1) {
     await createPanel.getByRole("button", { name: "+15" }).click();
   }
@@ -243,8 +244,8 @@ test("join flow clears stale seat selections when previewing a different room", 
   await roomCodeField.fill(secondRoom.roomCode);
   await guestPage.getByTestId("join-room-panel").getByRole("button", { name: "Preview" }).click();
 
-  await expect(joinPanel.getByText("Pick one")).toBeVisible();
-  await expect(joinPanel.getByRole("button", { name: "Continue to enter" })).toBeDisabled();
+  await expect(guestPage.getByText("1 open").first()).toBeVisible();
+  await expect(guestPage.getByTestId("join-room-panel").getByRole("button", { name: "Continue to enter" })).toBeDisabled();
   await expect(guestPage.getByRole("button", { name: "seat-2" })).toBeVisible();
 
   await hostOneContext.close();
@@ -506,14 +507,14 @@ test("local tutorial and shell hierarchy keep ceremony and work roles distinct",
 
   await page.evaluate((key) => window.localStorage.setItem(key, "seen"), TUTORIAL_SEEN_KEY);
   await openLocalSetup(page);
-  await expect(page.getByRole("heading", { name: "Local pass-and-play" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pass-and-play" })).toBeVisible();
 
-  const setupHeadingFontFamily = await page.locator("main.setup-shell h1").evaluate((node) => {
+  const setupHeadingFontFamily = await page.locator("main.setup-board-shell h1").evaluate((node) => {
     return window.getComputedStyle(node).fontFamily;
   });
-  expect(setupHeadingFontFamily).toContain("Fraunces");
+  expect(setupHeadingFontFamily).toContain("IBM Plex Sans");
 
-  const playersSectionFontFamily = await page.getByRole("heading", { name: "Players" }).evaluate((node) => {
+  const playersSectionFontFamily = await page.getByRole("heading", { name: "Seats" }).evaluate((node) => {
     return window.getComputedStyle(node).fontFamily;
   });
   expect(playersSectionFontFamily).not.toContain("Fraunces");

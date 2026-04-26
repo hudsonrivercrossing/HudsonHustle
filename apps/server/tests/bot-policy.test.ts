@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { MapConfig, PublicGameState, SeatPrivateState, TrainCard } from "@hudson-hustle/game-core";
-import { chooseBotAction } from "../src/bot-policy";
+import { chooseBotAction } from "@hudson-hustle/game-core";
 
 const baseConfig: MapConfig = {
   id: "test-map",

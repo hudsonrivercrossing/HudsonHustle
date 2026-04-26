@@ -1,12 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
 import type { HudsonHustleReleasedConfigSummary } from "@hudson-hustle/game-data";
 import type { ReconnectState, RoomSummary } from "@hudson-hustle/game-core";
-import { Button } from "./system/Button";
-import { Chip } from "./system/Chip";
 import { FormField } from "./system/FormField";
-import { Panel } from "./system/Panel";
-import { SectionHeader } from "./system/SectionHeader";
 import { StateSurface } from "./system/StateSurface";
+import {
+  MapThumbnail,
+  ModeSwitch,
+  SetupActions,
+  SetupBackButton,
+  SetupShell,
+  SetupStepPanel,
+  SetupSummaryRow,
+  type SetupStep
+} from "./setup/SetupPrimitives";
+import { Button } from "./system/Button";
 
 interface CreateRoomForm {
   hostName: string;
@@ -28,12 +35,10 @@ interface MultiplayerSetupScreenProps {
   onPreviewRoom: (roomCode: string) => void;
   onCreateRoom: (form: CreateRoomForm) => void;
   onJoinRoom: (form: { roomCode: string; playerName: string; preferredSeatId?: string }) => void;
-  onManualReconnect: (reconnectToken: string) => void;
 }
 
 type OnlineSetupStage = "gateway" | "create" | "join";
-type SetupFlowStep = 0 | 1 | 2;
-type SetupRailStepStatus = "current" | "complete" | "upcoming";
+type SetupFlowStep = 0 | 1 | 2 | 3;
 
 export function MultiplayerSetupScreen({
   releasedConfigs,
@@ -46,8 +51,7 @@ export function MultiplayerSetupScreen({
   onClearRoomPreview,
   onPreviewRoom,
   onCreateRoom,
-  onJoinRoom,
-  onManualReconnect
+  onJoinRoom
 }: MultiplayerSetupScreenProps): JSX.Element {
   const setupHeroImageUrl = "/setup/landing-bg.png";
   const latestConfigId = releasedConfigs.at(-1)?.configId ?? "v0.4-flushing-newark-airport";
@@ -61,7 +65,6 @@ export function MultiplayerSetupScreen({
   const [joinPlayerName, setJoinPlayerName] = useState("Player");
   const [preferredSeatId, setPreferredSeatId] = useState<string | undefined>(undefined);
 
-  const [manualReconnectToken, setManualReconnectToken] = useState("");
   const [stage, setStage] = useState<OnlineSetupStage>(() =>
     reconnectState === "attempting-reconnect" || reconnectState === "reconnect-failed" ? "join" : "gateway"
   );
@@ -118,7 +121,7 @@ export function MultiplayerSetupScreen({
     }
   }, [openSeats, preferredSeatId, roomPreview]);
 
-  function getStepStatus(index: number, currentStep: SetupFlowStep): SetupRailStepStatus {
+  function getStepStatus(index: number, currentStep: SetupFlowStep): SetupStep["status"] {
     if (index < currentStep) {
       return "complete";
     }
@@ -134,14 +137,19 @@ export function MultiplayerSetupScreen({
     stage === "gateway" ? "Online" : stage === "create" ? "Start game" : "Join room";
   const subtitle =
     stage === "gateway"
-      ? "Choose how this table begins."
+      ? "Host a room or board by code."
       : stage === "create"
-        ? "Set the seats and create the room."
-        : "Enter a code, choose a seat, or restore a session.";
+        ? "Seat the crew, pick the board, and send the room code."
+        : "Punch in the code, claim a seat, and board before departure.";
   const backLabel = stage === "gateway" ? "Back" : "Back";
   const showBanner =
     Boolean(error) || (stage === "join" && (reconnectState === "attempting-reconnect" || reconnectState === "reconnect-failed"));
-  const railSteps =
+  const selectedConfig = releasedConfigs.find((config) => config.configId === configId);
+  const previewConfig =
+    roomPreview
+      ? { configId: roomPreview.configId, version: roomPreview.configVersion, mapName: roomPreview.mapName, summary: "" }
+      : null;
+  const railSteps: SetupStep[] =
     stage === "gateway"
       ? [
           { label: "Choose line", meta: "Host or guest", status: "current" as const },
@@ -152,7 +160,8 @@ export function MultiplayerSetupScreen({
         ? [
             { label: "Host", meta: "Who is starting", status: getStepStatus(0, createStep) },
             { label: "Seats", meta: "Players and bots", status: getStepStatus(1, createStep) },
-            { label: "Board", meta: "Map and timer", status: getStepStatus(2, createStep) }
+          { label: "Map", meta: "Choose board", status: getStepStatus(2, createStep) },
+          { label: "Timer", meta: "Launch check", status: getStepStatus(3, createStep) }
           ]
         : [
             { label: "Room code", meta: "Preview first", status: getStepStatus(0, joinStep) },
@@ -168,396 +177,404 @@ export function MultiplayerSetupScreen({
     onClearRoomPreview?.();
   }
 
-  return (
-    <main
-      className="setup-shell setup-shell--mode setup-shell--atmospheric"
-      style={{
-        ["--setup-gateway-image" as string]: `url("${setupHeroImageUrl}")`
-      }}
-    >
-      <section className="setup-card setup-card--mode setup-card--atmospheric">
-        <aside className="setup-mode-rail">
-          <div className="setup-mode-rail__copy">
-            <p className="setup-mode-rail__eyebrow">Station guide</p>
-            <h1>{title}</h1>
-            <p className="setup-mode-rail__lead">{subtitle}</p>
-          </div>
-          <div className="setup-mode-rail__track" aria-label="Setup flow">
-            {railSteps.map((step, index) => (
-              <div key={step.label} className={`setup-mode-rail__step setup-mode-rail__step--${step.status}`}>
-                <span className="setup-mode-rail__step-index">{step.status === "complete" ? "OK" : `0${index + 1}`}</span>
-                <div className="setup-mode-rail__step-copy">
-                  <strong>{step.label}</strong>
-                  <span>{step.meta}</span>
-                </div>
-                <em className="setup-mode-rail__step-state">
-                  {step.status === "current" ? "Now" : step.status === "complete" ? "Done" : "Next"}
-                </em>
-              </div>
-            ))}
-          </div>
-        </aside>
+  function chooseStage(nextStage: OnlineSetupStage): void {
+    if (nextStage === "create") {
+      onClearRoomPreview?.();
+      setCreateStep(0);
+      setStage("create");
+      return;
+    }
+    if (nextStage === "join") {
+      setStage("join");
+      setJoinStep(roomPreview ? 1 : 0);
+    }
+  }
 
-        <div className="setup-mode-stage">
-          <div className="setup-mode-stage__header">
-            <div className="setup-mode-stage__switches">
-              {stage === "gateway" ? null : (
-                <>
-                  <button
-                    type="button"
-                    className={`setup-mode-switch ${stage === "create" ? "setup-mode-switch--active" : ""}`}
-                    onClick={() => {
-                      onClearRoomPreview?.();
-                      setCreateStep(0);
-                      setStage("create");
-                    }}
-                  >
-                    Start game
-                  </button>
-                  <button
-                    type="button"
-                    className={`setup-mode-switch ${stage === "join" ? "setup-mode-switch--active" : ""}`}
-                    onClick={() => {
-                      setStage("join");
-                      setJoinStep(roomPreview ? 1 : 0);
-                    }}
-                  >
-                    Join room
-                  </button>
-                </>
-              )}
-            </div>
-            <div className="setup-mode-switches">
-              {stage === "gateway"
-                ? onBack
-                  ? <Button className="setup-mode-back" onClick={onBack}>{backLabel}</Button>
-                  : null
-                : <Button className="setup-mode-back" onClick={returnToGateway}>{backLabel}</Button>}
-            </div>
-          </div>
+  const modeSwitch =
+    stage === "gateway" ? null : (
+      <ModeSwitch
+        value={stage}
+        options={[
+          { value: "create", label: "Start game" },
+          { value: "join", label: "Join room" }
+        ]}
+        onChange={chooseStage}
+      />
+    );
 
-          {showBanner ? (
-            <div className="setup-mode-toolbar">
-              <StateSurface
-                tone={setupBannerTone}
-                eyebrow={setupBannerEyebrow}
-                headline={setupBannerHeadline}
-                copy={setupBannerCopy}
-              />
-            </div>
+  const createPreflight = (
+    <div className="setup-preflight-card">
+      <span className="setup-preflight-card__eyebrow">{createStep >= 3 ? "Table preflight" : "Table ticket"}</span>
+      {createStep >= 2 ? (
+        <MapThumbnail
+          configId={selectedConfig?.configId ?? configId}
+          mapName={selectedConfig?.mapName ?? "Hudson Hustle"}
+          version={selectedConfig?.version}
+        />
+      ) : (
+        <div className="setup-room-code-plate setup-room-code-plate--table" aria-label="Table setup ticket">
+          <span>{createStep === 0 ? "Host" : "Seats"}</span>
+          <strong>{createStep === 0 ? hostName.trim() || "Host" : `${Math.max(1, playerCount - plannedBotCount)} human`}</strong>
+          {createStep >= 1 ? <em>{plannedBotCount} bot</em> : null}
+        </div>
+      )}
+      {createStep >= 1 ? (
+        <div className="setup-summary-stack">
+          <SetupSummaryRow label="Host" value={hostName.trim() || "Host"} />
+          {createStep >= 2 ? (
+            <SetupSummaryRow label="Seats" value={`${Math.max(1, playerCount - plannedBotCount)} human`} detail={`${plannedBotCount} bot`} />
           ) : null}
-
-          {stage === "gateway" ? (
-            <div className="setup-entry-grid" data-testid="online-mode-gateway">
-              <button
-                type="button"
-                className="setup-entry-card"
-                onClick={() => {
-                  onClearRoomPreview?.();
-                  setCreateStep(0);
-                  setStage("create");
-                }}
-                data-testid="online-start-game"
-              >
-                <span className="setup-entry-card__eyebrow">Host flow</span>
-                <strong className="setup-entry-card__title">Start game</strong>
-                <span className="setup-entry-card__copy">Build the table, set seats, then share the code.</span>
-              </button>
-              <button
-                type="button"
-                className="setup-entry-card"
-                onClick={() => {
-                  setJoinStep(roomPreview ? 1 : 0);
-                  setStage("join");
-                }}
-                data-testid="online-join-room"
-              >
-                <span className="setup-entry-card__eyebrow">Guest flow</span>
-                <strong className="setup-entry-card__title">Join room</strong>
-                <span className="setup-entry-card__copy">Preview the room, claim a seat, and enter.</span>
-              </button>
-            </div>
-          ) : null}
-
-          {stage === "create" ? (
-            <div className="setup-flow-grid setup-flow-grid--create" data-testid="create-room-panel">
-              {createStep === 0 ? (
-                <Panel variant="status" className="setup-wizard-card">
-                  <SectionHeader eyebrow="Now" title="Host" meta="Who is starting this room" />
-                  <div className="setup-mode-panel__field-grid">
-                    <FormField label="Your name">
-                      <input value={hostName} maxLength={24} onChange={(event) => setHostName(event.target.value)} />
-                    </FormField>
-                  </div>
-                  <div className="setup-mode-summary setup-mode-summary--compact">
-                    <div className="setup-mode-summary__item">
-                      <span>Host</span>
-                      <strong>{hostName.trim() || "Host"}</strong>
-                    </div>
-                  </div>
-                  <div className="setup-mode-panel__actions">
-                    <Button variant="primary" onClick={() => setCreateStep(1)}>
-                      Continue to seats
-                    </Button>
-                  </div>
-                </Panel>
-              ) : null}
-
-              {createStep === 1 ? (
-                <Panel variant="status" className="setup-wizard-card">
-                  <SectionHeader eyebrow="Now" title="Seats" meta={`${plannedBotCount} bot · ${plannedHumanOpenSeats} human open`} />
-                  <div className="setup-mode-panel__field-grid">
-                    <FormField label="Players">
-                      <select value={playerCount} onChange={(event) => setPlayerCount(Number(event.target.value) as 2 | 3 | 4)}>
-                        <option value={2}>2 players</option>
-                        <option value={3}>3 players</option>
-                        <option value={4}>4 players</option>
-                      </select>
-                    </FormField>
-                  </div>
-
-                  <div className="seat-plan">
-                    {setupSeatIds.map((seatId, index) => {
-                      const isHostSeat = seatId === "seat-1";
-                      const isBotSeat = botSeatIds.includes(seatId);
-                      return (
-                        <div key={seatId} className={`seat-plan__row ${isBotSeat ? "seat-plan__row--bot" : ""}`} data-testid={`seat-plan-${seatId}`}>
-                          <div className="seat-plan__copy">
-                            <strong className="seat-plan__title">{seatId}</strong>
-                            <span className="seat-plan__meta">
-                              {isHostSeat ? "Host seat" : isBotSeat ? `Bot ${index}` : "Open human seat"}
-                            </span>
-                          </div>
-                          {isHostSeat ? (
-                            <Chip tone="info">Host</Chip>
-                          ) : (
-                            <button
-                              type="button"
-                              className={`chip-button seat-plan__toggle ${isBotSeat ? "chip-button--selected" : ""}`}
-                              data-testid={`seat-plan-toggle-${seatId}`}
-                              onClick={() =>
-                                setBotSeatIds((current) =>
-                                  current.includes(seatId) ? current.filter((entry) => entry !== seatId) : [...current, seatId]
-                                )
-                              }
-                            >
-                              {isBotSeat ? "Bot" : "Open"}
-                            </button>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <div className="setup-mode-summary setup-mode-summary--compact">
-                    <div className="setup-mode-summary__item">
-                      <span>Human seats</span>
-                      <strong>{Math.max(1, playerCount - plannedBotCount)}</strong>
-                    </div>
-                    <div className="setup-mode-summary__item">
-                      <span>Bot seats</span>
-                      <strong>{plannedBotCount}</strong>
-                    </div>
-                  </div>
-                  <div className="setup-mode-panel__actions setup-mode-panel__actions--split">
-                    <Button onClick={() => setCreateStep(0)}>Back</Button>
-                    <Button variant="primary" onClick={() => setCreateStep(2)}>
-                      Continue to board
-                    </Button>
-                  </div>
-                </Panel>
-              ) : null}
-
-              {createStep === 2 ? (
-                <Panel variant="status" className="setup-wizard-card">
-                  <SectionHeader eyebrow="Now" title="Board" meta="Map, timer, and launch" />
-                  <div className="setup-mode-panel__field-grid setup-mode-panel__field-grid--split">
-                    <FormField label="Map">
-                      <select value={configId} onChange={(event) => setConfigId(event.target.value)}>
-                        {releasedConfigs.map((config) => (
-                          <option key={config.configId} value={config.configId}>
-                            {config.version} · {config.mapName}
-                          </option>
-                        ))}
-                      </select>
-                    </FormField>
-                    <FormField as="div" label="Timer" className="form-field--timer">
-                      <div className="timer-picker">
-                        <Button onClick={() => setTurnTimeLimitSeconds((current) => Math.max(0, current - 15))}>−15</Button>
-                        <output className="timer-picker__value" aria-live="polite">
-                          {turnTimeLimitSeconds === 0 ? "Untimed" : `${turnTimeLimitSeconds}s`}
-                        </output>
-                        <Button onClick={() => setTurnTimeLimitSeconds((current) => current + 15)}>+15</Button>
-                      </div>
-                    </FormField>
-                  </div>
-                  <div className="setup-mode-summary setup-mode-summary--compact">
-                    <div className="setup-mode-summary__item">
-                      <span>Map</span>
-                      <strong>{releasedConfigs.find((config) => config.configId === configId)?.mapName ?? "Map"}</strong>
-                    </div>
-                    <div className="setup-mode-summary__item">
-                      <span>Timer</span>
-                      <strong>{turnTimeLimitSeconds === 0 ? "Untimed" : `${turnTimeLimitSeconds}s`}</strong>
-                    </div>
-                  </div>
-                  <div className="setup-mode-panel__actions setup-mode-panel__actions--split">
-                    <Button onClick={() => setCreateStep(1)}>Back</Button>
-                    <Button
-                      variant="primary"
-                      disabled={isCreatingRoom}
-                      onClick={() =>
-                        onCreateRoom({
-                          hostName: hostName.trim() || "Host",
-                          playerCount,
-                          configId,
-                          turnTimeLimitSeconds,
-                          botSeatIds: botSeatIds.filter((seatId) => setupSeatIds.includes(seatId))
-                        })
-                      }
-                    >
-                      {isCreatingRoom ? "Creating room..." : "Create room"}
-                    </Button>
-                  </div>
-                </Panel>
-              ) : null}
-            </div>
-          ) : null}
-
-          {stage === "join" ? (
-            <div className="setup-flow-grid setup-flow-grid--join" data-testid="join-room-panel">
-              {joinStep === 0 ? (
-                <Panel variant="status" className="setup-wizard-card">
-                  <SectionHeader eyebrow="Now" title="Room code" meta="Preview first" />
-                  <div className="setup-mode-panel__field-grid setup-mode-panel__field-grid--launch">
-                    <FormField label="Room code">
-                      <input
-                        value={joinRoomCode}
-                        onChange={(event) => {
-                          setJoinRoomCode(event.target.value.toUpperCase());
-                          setPreferredSeatId(undefined);
-                          onClearRoomPreview?.();
-                        }}
-                        maxLength={6}
-                      />
-                    </FormField>
-                    <Button className="join-preview-button" onClick={() => onPreviewRoom(joinRoomCode)}>
-                      Preview
-                    </Button>
-                  </div>
-                  {roomPreview ? (
-                    <div className="room-preview">
-                      <p className="muted-copy">
-                        {roomPreview.configVersion} · {roomPreview.mapName} · {roomPreview.turnTimeLimitSeconds === 0 ? "Untimed" : `${roomPreview.turnTimeLimitSeconds}s`}
-                      </p>
-                    </div>
-                  ) : null}
-                  <div className="setup-mode-summary setup-mode-summary--compact">
-                    <div className="setup-mode-summary__item">
-                      <span>Room</span>
-                      <strong>{joinRoomCode || "------"}</strong>
-                    </div>
-                  </div>
-                </Panel>
-              ) : null}
-
-              {joinStep === 1 ? (
-                <Panel variant="status" className="setup-wizard-card">
-                  <SectionHeader eyebrow="Now" title="Seat" meta={roomPreview ? `${openSeats.length} open` : "Preview a room to reveal seats."} />
-                  {roomPreview ? (
-                    <div className="seat-choice-row">
-                      {openSeats.map((seat) => (
-                        <Button
-                          key={seat.seatId}
-                          className={`chip-button ${preferredSeatId === seat.seatId ? "chip-button--selected" : ""}`}
-                          onClick={() => setPreferredSeatId(seat.seatId)}
-                        >
-                          {seat.seatId}
-                        </Button>
-                      ))}
-                    </div>
-                  ) : null}
-                  {roomPreview && openSeats.length === 0 ? <p className="muted-copy room-preview__empty">No open human seats left in this room.</p> : null}
-                  <div className="setup-mode-summary setup-mode-summary--compact">
-                    <div className="setup-mode-summary__item">
-                      <span>Room</span>
-                      <strong>{joinRoomCode || "------"}</strong>
-                    </div>
-                    <div className="setup-mode-summary__item">
-                      <span>Chosen seat</span>
-                      <strong>{preferredSeatId ?? "Pick one"}</strong>
-                    </div>
-                  </div>
-                  <div className="setup-mode-panel__actions setup-mode-panel__actions--split">
-                    <Button onClick={() => setJoinStep(0)}>Back</Button>
-                    <Button
-                      variant="primary"
-                      disabled={!roomPreview || !preferredSeatId || !openSeats.some((seat) => seat.seatId === preferredSeatId)}
-                      onClick={() => setJoinStep(2)}
-                    >
-                      Continue to enter
-                    </Button>
-                  </div>
-                </Panel>
-              ) : null}
-
-              {joinStep === 2 ? (
-                <Panel variant="status" className="setup-wizard-card">
-                  <SectionHeader eyebrow="Now" title="Enter room" meta="Name first, recovery second" />
-                  <FormField label="Your name">
-                    <input value={joinPlayerName} maxLength={24} onChange={(event) => setJoinPlayerName(event.target.value)} />
-                  </FormField>
-
-                  <details className="setup-recovery-details">
-                    <summary>Use reconnect token instead</summary>
-                    <div className="setup-subsection setup-subsection--compact">
-                      <FormField label="Reconnect token">
-                        <input
-                          value={manualReconnectToken}
-                          onChange={(event) => setManualReconnectToken(event.target.value)}
-                          placeholder="hh1."
-                          autoCapitalize="off"
-                          autoCorrect="off"
-                          spellCheck={false}
-                        />
-                      </FormField>
-                      <Button disabled={!manualReconnectToken.trim()} onClick={() => onManualReconnect(manualReconnectToken)}>
-                        Reconnect
-                      </Button>
-                    </div>
-                  </details>
-
-                  <div className="setup-mode-summary setup-mode-summary--compact">
-                    <div className="setup-mode-summary__item">
-                      <span>Room</span>
-                      <strong>{joinRoomCode || "------"}</strong>
-                    </div>
-                    <div className="setup-mode-summary__item">
-                      <span>Seat</span>
-                      <strong>{preferredSeatId ?? "Pick one"}</strong>
-                    </div>
-                  </div>
-                  <div className="setup-mode-panel__actions setup-mode-panel__actions--split">
-                    <Button onClick={() => setJoinStep(1)}>Back</Button>
-                    <Button
-                      variant="primary"
-                      onClick={() =>
-                        onJoinRoom({
-                          roomCode: joinRoomCode,
-                          playerName: joinPlayerName.trim() || "Player",
-                          preferredSeatId
-                        })
-                      }
-                    >
-                      Join room
-                    </Button>
-                  </div>
-                </Panel>
-              ) : null}
-            </div>
+          {createStep >= 3 ? (
+            <>
+              <SetupSummaryRow label="Map" value={selectedConfig?.mapName ?? "Map"} />
+              <SetupSummaryRow label="Timer" value={turnTimeLimitSeconds === 0 ? "Untimed" : `${turnTimeLimitSeconds}s`} />
+            </>
           ) : null}
         </div>
-      </section>
-    </main>
+      ) : null}
+    </div>
+  );
+
+  const joinPreflight = (
+    <div className="setup-preflight-card">
+      <span className="setup-preflight-card__eyebrow">{roomPreview ? "Room board" : "Room ticket"}</span>
+      {previewConfig ? (
+        <MapThumbnail configId={previewConfig.configId} mapName={previewConfig.mapName} version={previewConfig.version} />
+      ) : (
+        <div className="setup-room-code-plate" aria-label="No room preview yet">
+          <span>Room</span>
+          <strong>{joinRoomCode || "------"}</strong>
+        </div>
+      )}
+      {joinStep > 0 || roomPreview ? (
+        <div className="setup-summary-stack">
+          <SetupSummaryRow label="Room" value={joinRoomCode || "------"} />
+          {roomPreview ? <SetupSummaryRow label="Status" value={`${openSeats.length} open`} /> : null}
+          {joinStep >= 2 ? <SetupSummaryRow label="Seat" value={preferredSeatId ?? "Pick one"} /> : null}
+        </div>
+      ) : null}
+    </div>
+  );
+
+  return (
+    <SetupShell
+      eyebrow="Station counter"
+      title={title}
+      lead={subtitle}
+      backgroundImageUrl={setupHeroImageUrl}
+      steps={railSteps}
+      modeSwitch={modeSwitch}
+      backAction={
+        stage === "gateway"
+          ? onBack
+            ? <SetupBackButton onClick={onBack}>{backLabel}</SetupBackButton>
+            : null
+          : <SetupBackButton onClick={returnToGateway}>{backLabel}</SetupBackButton>
+      }
+      preflight={stage === "create" ? createPreflight : stage === "join" ? joinPreflight : undefined}
+    >
+      {showBanner ? (
+        <div className="setup-counter__status">
+          <StateSurface
+            tone={setupBannerTone}
+            eyebrow={setupBannerEyebrow}
+            headline={setupBannerHeadline}
+            copy={setupBannerCopy}
+          />
+        </div>
+      ) : null}
+
+      {stage === "gateway" ? (
+        <div className="setup-entry-grid setup-entry-grid--artifacts" data-testid="online-mode-gateway">
+          <button
+            type="button"
+            className="setup-entry-artifact"
+            onClick={() => {
+              onClearRoomPreview?.();
+              setCreateStep(0);
+              setStage("create");
+            }}
+            data-testid="online-start-game"
+          >
+            <span className="setup-entry-artifact__kicker">Host flow</span>
+            <strong>Start game</strong>
+            <span>Build the table, set seats, then share the code.</span>
+            <em>Room board</em>
+          </button>
+          <button
+            type="button"
+            className="setup-entry-artifact"
+            onClick={() => {
+              setJoinStep(roomPreview ? 1 : 0);
+              setStage("join");
+            }}
+            data-testid="online-join-room"
+          >
+            <span className="setup-entry-artifact__kicker">Guest flow</span>
+            <strong>Join room</strong>
+            <span>Preview the room, claim a seat, and enter.</span>
+            <em>Code ticket</em>
+          </button>
+        </div>
+      ) : null}
+
+      {stage === "create" ? (
+        <div className="setup-flow-grid setup-flow-grid--create" data-testid="create-room-panel">
+          {createStep === 0 ? (
+            <SetupStepPanel
+              eyebrow="Now"
+              title="Host"
+              meta="Name the room captain"
+              actions={
+                <SetupActions>
+                  <Button variant="primary" onClick={() => setCreateStep(1)}>
+                    Continue to seats
+                  </Button>
+                </SetupActions>
+              }
+            >
+              <div className="setup-mode-panel__field-grid">
+                <FormField label="Your name">
+                  <input value={hostName} maxLength={24} onChange={(event) => setHostName(event.target.value)} />
+                </FormField>
+              </div>
+            </SetupStepPanel>
+          ) : null}
+
+          {createStep === 1 ? (
+            <SetupStepPanel
+              eyebrow="Now"
+              title="Seats"
+              meta={`${plannedBotCount} bot · ${plannedHumanOpenSeats} human open`}
+              actions={
+                <SetupActions>
+                  <Button onClick={() => setCreateStep(0)}>Back</Button>
+                  <Button variant="primary" onClick={() => setCreateStep(2)}>
+                    Continue to board
+                  </Button>
+                </SetupActions>
+              }
+            >
+              <div className="setup-mode-panel__field-grid">
+                <FormField label="Players">
+                  <select value={playerCount} onChange={(event) => setPlayerCount(Number(event.target.value) as 2 | 3 | 4)}>
+                    <option value={2}>2 players</option>
+                    <option value={3}>3 players</option>
+                    <option value={4}>4 players</option>
+                  </select>
+                </FormField>
+              </div>
+
+              <div className="seat-plan">
+                {setupSeatIds.map((seatId, index) => {
+                  const isHostSeat = seatId === "seat-1";
+                  const isBotSeat = botSeatIds.includes(seatId);
+                  return (
+                    <div key={seatId} className={`seat-plan__row ${isBotSeat ? "seat-plan__row--bot" : ""}`} data-testid={`seat-plan-${seatId}`}>
+                      <div className="seat-plan__copy">
+                        <strong className="seat-plan__title">{seatId}</strong>
+                        <span className="seat-plan__meta">
+                          {isHostSeat ? "Host seat" : isBotSeat ? `Bot ${index}` : "Open human seat"}
+                        </span>
+                      </div>
+                      {isHostSeat ? (
+                        <span className="chip-button seat-plan__toggle seat-plan__toggle--fixed">Host</span>
+                      ) : (
+                        <button
+                          type="button"
+                          className={`chip-button seat-plan__toggle ${isBotSeat ? "chip-button--selected" : ""}`}
+                          data-testid={`seat-plan-toggle-${seatId}`}
+                          onClick={() =>
+                            setBotSeatIds((current) =>
+                              current.includes(seatId) ? current.filter((entry) => entry !== seatId) : [...current, seatId]
+                            )
+                          }
+                        >
+                          {isBotSeat ? "Bot" : "Open"}
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+            </SetupStepPanel>
+          ) : null}
+
+          {createStep === 2 ? (
+            <SetupStepPanel
+              eyebrow="Now"
+              title="Map"
+              meta="Choose the board"
+              actions={
+                <SetupActions>
+                  <Button onClick={() => setCreateStep(1)}>Back</Button>
+                  <Button variant="primary" onClick={() => setCreateStep(3)}>
+                    Continue to timer
+                  </Button>
+                </SetupActions>
+              }
+            >
+              <div className="setup-board-preflight">
+                <MapThumbnail
+                  configId={selectedConfig?.configId ?? configId}
+                  mapName={selectedConfig?.mapName ?? "Hudson Hustle"}
+                  version={selectedConfig?.version}
+                />
+                <div className="setup-board-preflight__controls">
+                  <FormField label="Map">
+                    <select value={configId} onChange={(event) => setConfigId(event.target.value)}>
+                      {releasedConfigs.map((config) => (
+                        <option key={config.configId} value={config.configId}>
+                          {config.version} · {config.mapName}
+                        </option>
+                      ))}
+                    </select>
+                  </FormField>
+                </div>
+              </div>
+            </SetupStepPanel>
+          ) : null}
+
+          {createStep === 3 ? (
+            <SetupStepPanel
+              eyebrow="Now"
+              title="Timer"
+              meta="Set the pace and launch"
+              actions={
+                <SetupActions>
+                  <Button onClick={() => setCreateStep(2)}>Back</Button>
+                  <Button
+                    variant="primary"
+                    disabled={isCreatingRoom}
+                    onClick={() =>
+                      onCreateRoom({
+                        hostName: hostName.trim() || "Host",
+                        playerCount,
+                        configId,
+                        turnTimeLimitSeconds,
+                        botSeatIds: botSeatIds.filter((seatId) => setupSeatIds.includes(seatId))
+                      })
+                    }
+                  >
+                    {isCreatingRoom ? "Creating room..." : "Create room"}
+                  </Button>
+                </SetupActions>
+              }
+            >
+              <div className="setup-timer-preflight">
+                <FormField as="div" label="Timer" className="form-field--timer">
+                  <div className="timer-picker">
+                    <Button onClick={() => setTurnTimeLimitSeconds((current) => Math.max(0, current - 15))}>-15</Button>
+                    <output className="timer-picker__value" aria-live="polite">
+                      {turnTimeLimitSeconds === 0 ? "Untimed" : `${turnTimeLimitSeconds}s`}
+                    </output>
+                    <Button onClick={() => setTurnTimeLimitSeconds((current) => current + 15)}>+15</Button>
+                  </div>
+                </FormField>
+              </div>
+            </SetupStepPanel>
+          ) : null}
+        </div>
+      ) : null}
+
+      {stage === "join" ? (
+        <div className="setup-flow-grid setup-flow-grid--join" data-testid="join-room-panel">
+          {joinStep === 0 ? (
+            <SetupStepPanel eyebrow="Now" title="Room code" meta="Check the table before choosing a seat">
+              <div className="setup-mode-panel__field-grid setup-mode-panel__field-grid--launch">
+                <FormField label="Room code">
+                  <input
+                    value={joinRoomCode}
+                    onChange={(event) => {
+                      setJoinRoomCode(event.target.value.toUpperCase());
+                      setPreferredSeatId(undefined);
+                      onClearRoomPreview?.();
+                    }}
+                    maxLength={6}
+                  />
+                </FormField>
+                <Button className="join-preview-button" onClick={() => onPreviewRoom(joinRoomCode)}>
+                  Preview
+                </Button>
+              </div>
+              {roomPreview ? (
+                <div className="room-preview room-preview--ticket">
+                  <MapThumbnail configId={roomPreview.configId} mapName={roomPreview.mapName} version={roomPreview.configVersion} />
+                  <p className="muted-copy">
+                    {roomPreview.turnTimeLimitSeconds === 0 ? "Untimed" : `${roomPreview.turnTimeLimitSeconds}s`} · {openSeats.length} open
+                  </p>
+                </div>
+              ) : null}
+            </SetupStepPanel>
+          ) : null}
+
+          {joinStep === 1 ? (
+            <SetupStepPanel
+              eyebrow="Now"
+              title="Seat"
+              meta={roomPreview ? `${openSeats.length} open` : "Preview a room to reveal seats."}
+              actions={
+                <SetupActions>
+                  <Button onClick={() => setJoinStep(0)}>Back</Button>
+                  <Button
+                    variant="primary"
+                    disabled={!roomPreview || !preferredSeatId || !openSeats.some((seat) => seat.seatId === preferredSeatId)}
+                    onClick={() => setJoinStep(2)}
+                  >
+                    Continue to enter
+                  </Button>
+                </SetupActions>
+              }
+            >
+              {roomPreview ? (
+                <div className="seat-choice-row">
+                  {openSeats.map((seat) => (
+                    <Button
+                      key={seat.seatId}
+                      className={`chip-button ${preferredSeatId === seat.seatId ? "chip-button--selected" : ""}`}
+                      onClick={() => setPreferredSeatId(seat.seatId)}
+                    >
+                      {seat.seatId}
+                    </Button>
+                  ))}
+                </div>
+              ) : null}
+              {roomPreview && openSeats.length === 0 ? <p className="muted-copy room-preview__empty">No open human seats left in this room.</p> : null}
+            </SetupStepPanel>
+          ) : null}
+
+          {joinStep === 2 ? (
+            <SetupStepPanel
+              eyebrow="Now"
+              title="Enter room"
+              meta="Name the seat and enter"
+              actions={
+                <SetupActions>
+                  <Button onClick={() => setJoinStep(1)}>Back</Button>
+                  <Button
+                    variant="primary"
+                    onClick={() =>
+                      onJoinRoom({
+                        roomCode: joinRoomCode,
+                        playerName: joinPlayerName.trim() || "Player",
+                        preferredSeatId
+                      })
+                    }
+                  >
+                    Join room
+                  </Button>
+                </SetupActions>
+              }
+            >
+              <FormField label="Your name">
+                <input value={joinPlayerName} maxLength={24} onChange={(event) => setJoinPlayerName(event.target.value)} />
+              </FormField>
+
+            </SetupStepPanel>
+          ) : null}
+        </div>
+      ) : null}
+    </SetupShell>
   );
 }

@@ -30,7 +30,6 @@ import {
 } from "@hudson-hustle/game-data";
 import { BoardMap } from "./components/BoardMap";
 import { EndgameBreakdown } from "./components/EndgameBreakdown";
-import { IdentityChip } from "./components/IdentityChip";
 import { LocalPlayScreen } from "./components/LocalPlayScreen";
 import { LobbyScreen } from "./components/LobbyScreen";
 import { MultiplayerSetupScreen } from "./components/MultiplayerSetupScreen";
@@ -47,7 +46,7 @@ import { SurfaceCard } from "./components/system/SurfaceCard";
 import { StateSurface } from "./components/system/StateSurface";
 import { StatusBanner } from "./components/system/StatusBanner";
 import { UtilityPill } from "./components/system/UtilityPill";
-import { decodeReconnectToken, encodeReconnectToken, readReconnectCredentials, type ReconnectCredentials } from "./reconnect-token";
+import { encodeReconnectToken, readReconnectCredentials, type ReconnectCredentials } from "./reconnect-token";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8787";
 const wsUrl = import.meta.env.VITE_WS_URL ?? apiBaseUrl;
@@ -387,13 +386,6 @@ export default function App(): JSX.Element {
     return snapshot.game.players[snapshot.game.activePlayerIndex]?.id === snapshot.privateState.playerId;
   }, [snapshot]);
 
-  const reconnectToken = useMemo(() => {
-    if (!credentials) {
-      return "";
-    }
-    return encodeReconnectToken(credentials);
-  }, [credentials]);
-
   useEffect(() => {
     const pending = snapshot?.privateState?.pendingTickets ?? [];
     const pendingKey = pending.map((ticket) => ticket.id).join("|");
@@ -540,41 +532,6 @@ export default function App(): JSX.Element {
     }
   }
 
-  async function manualReconnect(reconnectToken: string) {
-    try {
-      const form = decodeReconnectToken(reconnectToken);
-      const response = await requestJson<RejoinRoomResponse>(`/rooms/${form.roomCode}/rejoin`, {
-        method: "POST",
-        body: JSON.stringify({
-          seatId: form.seatId,
-          playerSecret: form.playerSecret
-        } satisfies RejoinRoomRequest)
-      });
-      const nextCredentials = {
-        roomCode: response.roomCode,
-        seatId: response.seatId,
-        playerSecret: response.playerSecret
-      };
-      awaitingSocketHandshakeRef.current = true;
-      setSetupMode("multiplayer");
-      setCredentials(nextCredentials);
-      saveSession(nextCredentials);
-      setSnapshot(response.snapshot);
-      setMultiplayerError(null);
-    } catch (caught) {
-      if (caught instanceof Error && caught.message.startsWith("Reconnect token")) {
-        setReconnectState("reconnect-failed");
-        setMultiplayerError(caught.message);
-        return;
-      }
-      if (caught instanceof ApiError && (caught.status === 403 || caught.status === 404)) {
-        saveSession(null);
-      }
-      setReconnectState("reconnect-failed");
-      setMultiplayerError(caught instanceof Error ? caught.message : "Could not reconnect.");
-    }
-  }
-
   async function startRoom() {
     if (!credentials || !snapshot) {
       return;
@@ -654,7 +611,6 @@ export default function App(): JSX.Element {
     if (setupMode === "local") {
       return (
         <LocalPlayScreen
-          onOpenMultiplayer={() => setSetupMode("multiplayer")}
           onReturnToGateway={() => setSetupMode("gateway")}
         />
       );
@@ -682,7 +638,6 @@ export default function App(): JSX.Element {
         onPreviewRoom={(roomCode) => void previewRoom(roomCode)}
         onCreateRoom={(form) => void createRoom(form)}
         onJoinRoom={(form) => void joinRoom(form)}
-        onManualReconnect={(reconnectToken) => void manualReconnect(reconnectToken)}
       />
     );
   }
@@ -692,7 +647,6 @@ export default function App(): JSX.Element {
       <LobbyScreen
         room={snapshot.room}
         localSeatId={credentials.seatId}
-        reconnectToken={reconnectToken}
         onReadyChange={sendReady}
         onStart={() => void startRoom()}
         onLeaveRoom={leaveRoom}
@@ -761,7 +715,6 @@ export default function App(): JSX.Element {
         </div>
         <div className="topbar-actions">
           <ScoreGuide className="score-guide--subtle" />
-          <IdentityChip reconnectToken={reconnectToken} />
           <Button className="topbar-actions__leave" onClick={leaveRoom}>
             Leave room
           </Button>

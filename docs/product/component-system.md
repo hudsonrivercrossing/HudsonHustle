@@ -20,6 +20,13 @@ Minimum system layer:
 - `ModalShell`
 - `UtilityPill`
 - `StateSurface`
+- setup/lobby slice primitives:
+  - `SetupShell`
+  - `SetupStepper`
+  - `SetupStepPanel`
+  - `ModeSwitch`
+  - `SetupSummaryRow`
+  - `MapThumbnail`
 
 These primitives now also govern:
 - active game side-panel headers
@@ -37,6 +44,96 @@ Alongside the React primitives, `v2.1` now also treats two CSS object families a
 - `artifact / inventory family`
 
 These are not broad React primitives. They are shared anatomy and token rules reused across several surfaces.
+
+## Setup / Lobby Slice Primitives
+
+Use these primitives for the pre-game station-counter flow and lobby only. They should make setup feel like board-game table preparation, not like generic app onboarding.
+
+### SetupShell
+
+Owns the atmospheric background, veil, compact station placard, main counter, optional identity slot, and optional preflight tray.
+
+Use it for:
+- setup gateway
+- local pass-and-play setup
+- online start/join setup
+- multiplayer lobby
+
+Do not use it for:
+- active gameplay board layout
+- modal overlays
+- generic nested panels
+
+The placard is page identity only. It should stay visually subordinate to the active setup panel so setup reads as a console cluster, not a landing-page hero.
+
+### SetupStepper
+
+Displays setup progress when a screen truly needs explicit status.
+
+States:
+- `current`
+- `complete`
+- `upcoming`
+
+It is status/progress, not a card navigation system. Do not render it as a large persistent rail when the current panel title and actions already make the flow clear. In setup/lobby, prefer no persistent progress rail unless testing proves players need more orientation.
+
+### SetupStepPanel
+
+The focused station-enamel setup artifact for one step at a time.
+
+Use it for:
+- host name
+- seats
+- map selection
+- timer selection / launch
+- room code
+- seat choice
+- enter room
+- lobby seat readiness
+
+Setup step titles and SetupShell placards use `IBM Plex Sans`. Do not use display-scale Fraunces in the setup console unless a future gateway-specific treatment proves it is needed.
+
+Local setup should use the same step pattern as Online where feasible:
+- Seats
+- Map
+- Timer / launch
+
+Local seat setup should be a compact seat ledger, not nested form cards. Player rows carry one name field and one human/bot token; local has no host role in the setup surface. Bot seats in local pass-and-play use the shared `game-core` bot policy and advance automatically until the next human seat is active.
+
+The local timer is a table pace label unless a future local timer runner is added; online timers remain authoritative server timers.
+
+### ModeSwitch
+
+Use this as the station-sign segmented control for switching between start and join flow.
+It replaces glossy setup pills and should keep a clear active state without heavy shine.
+
+### SetupSummaryRow
+
+Use for compact setup facts:
+- host
+- map
+- timer
+- human seats
+- bot seats
+- room code
+
+It belongs to setup/lobby preflight and summary areas. It should not replace score rows or gameplay stat rows.
+
+Preflight must be progressive. Early setup steps should show only facts the player has actually established; avoid static all-step checklists full of repeated pending values. Local setup follows the same rule: do not show a map thumbnail before the player reaches or confirms the map step.
+
+Gateway entry artifacts may include disabled stakeholder cards for near-term flows, such as a rules/onboarding tour, but they must be visually marked as unavailable and must not imply a working path before implementation.
+
+The main gateway is allowed to be more cinematic than setup steps: full subway backdrop, a wide Fraunces `Hudson Hustle` masthead, and equal-size departure-board entry tiles anchored low-left on the screen. On gateway tiles, the flip-board code should be the strongest local marker, with the title and metadata secondary. Do not carry that hero treatment into the step-by-step setup console.
+
+### MapThumbnail
+
+Use for small map previews in setup and lobby.
+
+Current implementation uses local CSS/SVG placeholders:
+- Berlin uses a darker urban route-map placeholder.
+- NYC/NJ uses a Hudson/harbor route-line placeholder.
+
+It is a preview identity artifact, not the active game map.
 
 ## Row / Roster Object Family
 
@@ -153,7 +250,7 @@ It is the more expansive sibling of `StatusBanner`.
 - `Panel` = structural shell surface
 - `SurfaceCard` = nested authored detail surface
 - `UtilityPill` = shell chrome only
-- `Inter` = work
+- `IBM Plex Sans` = active gameplay work and setup/lobby station-counter work
 - `Fraunces` = ceremony
 
 Do not start by building:

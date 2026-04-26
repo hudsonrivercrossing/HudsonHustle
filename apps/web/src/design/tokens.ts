@@ -1,6 +1,7 @@
 export const fontPair = {
   display: "Fraunces",
-  body: "Inter"
+  body: "IBM Plex Sans",
+  setup: "IBM Plex Sans"
 } as const;
 
 export const colorSystem = {

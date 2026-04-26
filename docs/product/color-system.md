@@ -55,6 +55,17 @@ Blue remains the active shell accent because it reads clearly against the warm p
 
 These should stay rare and legible. They are not decorative palette colors.
 
+### Setup / Lobby
+- `setup.backdrop-veil`: dim atmospheric image layer behind the counter
+- `setup.station-enamel`: dark signage/control/panel surface
+- `setup.ticket-field`: muted dark printed field surface for inputs, selects, and room-code plates
+- `setup.token-accent`: restrained brass/blue selected state for mode switches, chips, timer controls, and primary setup actions
+- `setup.printed-rule`: subtle rule line and dashed divider
+- `setup.route-line-accent`: small route-line color accent inside thumbnails and markers
+- `setup.metadata-muted`: compact setup metadata and secondary labels
+
+These roles support the board-game setup table. Setup panels should read as station enamel, not bright cream cards. Inputs, selects, and room-code plates should use the darker ticket-field material; cream fields are reserved for future literal ticket/paper artifacts only when surrounded by a lighter layout. These roles should not become a second app-wide palette.
+
 ## Usage Rules
 
 ### Shell
