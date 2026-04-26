@@ -20,6 +20,7 @@ Minimum system layer:
 - `ModalShell`
 - `UtilityPill`
 - `StateSurface`
+- `GuidebookScreen`
 - setup/lobby slice primitives:
   - `SetupShell`
   - `SetupStepper`
@@ -40,7 +41,8 @@ These primitives now also govern:
 - in-action payment choice chips
 - setup/lobby/reconnect state surfaces
 - shell utility chrome
-- modal and tutorial framing
+- modal framing
+- guidebook / rulebook framing
 
 Alongside the React primitives, `v2.1` now also treats two CSS object families as system-level contracts:
 - `row / roster object family`
@@ -230,13 +232,23 @@ Use `ChoiceChipButton` for compact action choices inside a detail surface, such 
 
 It belongs to the action/detail family, not the global button family.
 
+## Guidebook Screen
+
+Use `GuidebookScreen` for the in-app rules teach.
+
+Use it for:
+- main gateway `GUIDE_`
+- active local and online board `Guide`
+- local setup guide access
+
+It is a compact pocket rulebook with Back, previous/next arrows, and one rule card at a time. It should not use sidebar navigation, target highlighting, or a large board preview. It is informational only and must not change gameplay, room, timer, bot, or reconnect state.
+
 ## Modal Shell
 
 Use `ModalShell` for:
 - ticket choice overlays
 - handoff overlays
 - draw reveal moments
-- tutorial overlays
 
 It unifies:
 - backdrop tone

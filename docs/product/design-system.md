@@ -36,7 +36,8 @@ Locked decisions:
   - setup and lobby should use station-enamel panels, muted ticket fields, token accents, progressive summary rows, and map thumbnails
   - SetupShell identity should stay a compact placard, not a large hero column
   - Local setup should use the same setup/lobby primitives and Seats → Map → Timer rhythm as Online so the first table choice does not split into two visual systems
-  - Gateway can reserve a disabled rules/onboarding stakeholder artifact for the next onboarding branch
+  - Gateway `GUIDE_` opens the active guidebook branch: a compact step-by-step rulebook, not the old auto-opening tutorial
+  - Guidebook access also belongs in active local and online board topbar controls
 - map remains conservative and map-first during this phase
 
 ## Structure

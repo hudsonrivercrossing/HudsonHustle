@@ -25,7 +25,7 @@ import {
 } from "@hudson-hustle/game-data";
 import { BoardMap } from "./BoardMap";
 import { EndgameBreakdown } from "./EndgameBreakdown";
-import { OnboardingTutorial, type TutorialStep } from "./OnboardingTutorial";
+import { GuidebookScreen } from "./GuidebookScreen";
 import { ScoreGuide } from "./ScoreGuide";
 import { SetupScreen } from "./SetupScreen";
 import { TicketPicker } from "./TicketPicker";
@@ -42,7 +42,6 @@ import { StatusBanner } from "./system/StatusBanner";
 import { UtilityPill } from "./system/UtilityPill";
 
 const saveKey = "hudson-hustle-save-v1";
-const tutorialSeenKey = "hudson-hustle-onboarding-v1-1";
 
 type VisibilityMode = "visible" | "postTurn" | "handoff";
 type LocalStartSetup = { playerNames: string[]; botSeatIds: string[]; configId: string; turnTimeLimitSeconds: number };
@@ -50,126 +49,6 @@ type LocalStartSetup = { playerNames: string[]; botSeatIds: string[]; configId: 
 interface LocalPlayScreenProps {
   onReturnToGateway?: () => void;
 }
-
-const tutorialSteps: TutorialStep[] = [
-  {
-    id: "setup",
-    title: "Set up your first table",
-    summary:
-      "Start with two to four players, enter names, and begin a local pass-and-play match. Before the first real turn, each player privately reviews starting tickets and keeps at least two.",
-    keyPoints: [
-      "The game is built for one shared laptop in v1.",
-      "Each player starts with transit cards plus a private ticket choice.",
-      "Short player names make the handoff screens easier to read."
-    ],
-    tip: "Use short names for your first game so the handoff screen is easy to scan.",
-    target: "setup"
-  },
-  {
-    id: "board",
-    title: "Read the public board first",
-    summary:
-      "The board is the shared public surface. Everyone can always see claimed routes, stations, choke points, and the overall shape of the map.",
-    keyPoints: [
-      "The board tells you where the scarce crossings are.",
-      "Clicking a route or city opens the related action details.",
-      "You should usually read the board before looking at your hand."
-    ],
-    tip: "Try clicking a short route first so you can see how the action rail responds.",
-    target: "board"
-  },
-  {
-    id: "hand",
-    title: "Your hand and tickets stay private",
-    summary:
-      "Your transit cards are the resources you spend. Your tickets are your hidden goals. Only the active player should see these panels during local play.",
-    keyPoints: [
-      "Cards let you claim routes on the board.",
-      "Tickets tell you which places you are trying to connect.",
-      "The ticket panel doubles as a live checklist, showing Pending versus Connected."
-    ],
-    tip: "Think of the hand as your resources and the ticket panel as your secret map plan.",
-    target: "hand"
-  },
-  {
-    id: "market",
-    title: "Build resources from the market",
-    summary:
-      "Most turns let you draw two transit cards. You can take face-up cards from the market or draw blind from the deck.",
-    keyPoints: [
-      "Face-up locomotives are powerful, so taking one ends that draw action immediately.",
-      "The deck is better when you want flexibility.",
-      "The market is better when you need a specific color soon."
-    ],
-    tip: "Use the market when you need a specific color and the deck when you need flexibility.",
-    target: "market"
-  },
-  {
-    id: "route-types",
-    title: "Route types change how you pay",
-    summary:
-      "Not every route is just a normal color match. Some routes add risk or reserve locomotives before you can claim them.",
-    keyPoints: [
-      "Normal routes only care about length and color.",
-      "Tunnels can cost extra after the reveal, so claiming them with the exact minimum is risky.",
-      "Ferries require locomotives as part of the payment, not as an optional bonus."
-    ],
-    tip: "Before committing to a tunnel or ferry, check whether your hand can survive the special rule, not just the printed length.",
-    target: "action"
-  },
-  {
-    id: "stations",
-    title: "Stations are endgame rescue tools",
-    summary:
-      "A station does not help you claim routes right now. It matters later, when the game checks whether your tickets connect at the end.",
-    keyPoints: [
-      "Your first station is cheap and your third is expensive.",
-      "Each station can borrow only one adjacent rival route for ticket scoring.",
-      "Unused stations are worth points, so building one is a tradeoff, not an automatic upgrade."
-    ],
-    tip: "Use a station when it saves a big ticket or bypasses a critical blockage, not just because you can afford it.",
-    target: "action"
-  },
-  {
-    id: "action",
-    title: "Commit through the action rail",
-    summary:
-      "The action rail is where your choice becomes a committed move. It explains what the selected route or city means and shows legal payments.",
-    keyPoints: [
-      "On your turn, choose one major action: draw cards, claim a route, draw tickets, or build a station.",
-      "Gray routes still require cards of one color set.",
-      "This is where tunnel risk, ferry locomotive requirements, and station payment colors become concrete."
-    ],
-    tip: "If a route or city is selected and you can afford it, the action rail will show the payment choices.",
-    target: "action"
-  },
-  {
-    id: "scoreboard",
-    title: "Track endgame pressure",
-    summary:
-      "The round table shows score, trains left, stations left, and ticket counts for every player. This is where you feel late-game pressure.",
-    keyPoints: [
-      "The final round starts when a player ends a turn with two or fewer trains left, or when no route remains open.",
-      "Unused stations are worth points, so building one is a tradeoff.",
-      "Ticket counts can hint at who is still chasing risky plans."
-    ],
-    tip: "Before drawing more tickets, glance at train counts and open routes so you do not overcommit late.",
-    target: "scoreboard"
-  },
-  {
-    id: "handoff",
-    title: "Pass-and-play stays lightweight",
-    summary:
-      "When a turn ends, the app hides private information before the next player takes over. This keeps same-laptop play clean and social without extra friction.",
-    keyPoints: [
-      "Click `I'm done` when your turn is fully complete.",
-      "The screen switches to a neutral takeover state with no private cards or tickets visible.",
-      "The next player clicks `I'm ready` to reveal only their own information."
-    ],
-    tip: "Treat the handoff overlay as part of the social rhythm of the game, not an interruption.",
-    target: "handoff"
-  }
-];
 
 function formatFaceLabel(face: string): string {
   return face
@@ -255,7 +134,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   const [selectedTicketIds, setSelectedTicketIds] = useState<string[]>([]);
   const [revealedDeckCard, setRevealedDeckCard] = useState<keyof typeof cardColorPalette | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [tutorialStepIndex, setTutorialStepIndex] = useState<number | null>(null);
+  const [guideOpen, setGuideOpen] = useState(false);
   const [hasSavedGame, setHasSavedGame] = useState<boolean>(() => typeof window !== "undefined" && Boolean(readSavedGame()));
   const [localConfigId, setLocalConfigId] = useState(hudsonHustleCurrentConfigId);
   const [localTurnTimeLimitSeconds, setLocalTurnTimeLimitSeconds] = useState(0);
@@ -264,13 +143,6 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   const localVisuals = useMemo(() => getHudsonHustleVisualsByConfigId(localConfigId), [localConfigId]);
   const localConfigBundle = getHudsonHustleRegisteredConfig(localConfigId);
   const localConfigMeta = localConfigBundle?.meta ?? hudsonHustleCurrentConfigMeta;
-
-  useEffect(() => {
-    const seenTutorial = window.localStorage.getItem(tutorialSeenKey);
-    if (!seenTutorial) {
-      setTutorialStepIndex(0);
-    }
-  }, []);
 
   useEffect(() => {
     if (!game) {
@@ -445,37 +317,6 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
     setError(null);
   }
 
-  function openTutorial() {
-    setTutorialStepIndex(0);
-  }
-
-  function closeTutorial() {
-    window.localStorage.setItem(tutorialSeenKey, "seen");
-    setTutorialStepIndex(null);
-  }
-
-  function nextTutorialStep() {
-    setTutorialStepIndex((current) => {
-      if (current === null) {
-        return 0;
-      }
-      return Math.min(current + 1, tutorialSteps.length - 1);
-    });
-  }
-
-  function previousTutorialStep() {
-    setTutorialStepIndex((current) => {
-      if (current === null) {
-        return 0;
-      }
-      return Math.max(current - 1, 0);
-    });
-  }
-
-  function jumpToTutorialStep(index: number) {
-    setTutorialStepIndex(index);
-  }
-
   function applyAction(action: GameAction) {
     if (!game) {
       return;
@@ -523,36 +364,25 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
     }
   }
 
-  const tutorial = tutorialStepIndex !== null ? (
-    <OnboardingTutorial
-      steps={tutorialSteps}
-      stepIndex={tutorialStepIndex}
-      onClose={closeTutorial}
-      onNext={nextTutorialStep}
-      onPrevious={previousTutorialStep}
-      onJumpTo={jumpToTutorialStep}
-    />
-  ) : null;
+  if (guideOpen) {
+    return <GuidebookScreen onBack={() => setGuideOpen(false)} />;
+  }
 
   if (!game) {
     return (
-      <>
-        <SetupScreen
-          onStart={startNewGame}
-          canResume={hasSavedGame}
-          onResume={resumeGame}
-          onOpenTutorial={openTutorial}
-          onBack={onReturnToGateway}
-          releasedConfigs={hudsonHustleReleasedConfigs}
-          initialConfigId={localConfigId}
-        />
-        {tutorial}
-      </>
+      <SetupScreen
+        onStart={startNewGame}
+        canResume={hasSavedGame}
+        onResume={resumeGame}
+        onOpenGuide={() => setGuideOpen(true)}
+        onBack={onReturnToGateway}
+        releasedConfigs={hudsonHustleReleasedConfigs}
+        initialConfigId={localConfigId}
+      />
     );
   }
 
   const activePlayer = getCurrentPlayer(game);
-  const tutorialTarget = tutorialStepIndex !== null ? tutorialSteps[tutorialStepIndex].target : null;
   const canTakeTurnAction = visibility === "visible" && game.phase === "main" && game.turn.stage === "idle";
   const marketDisabled = visibility !== "visible" || game.phase !== "main" || game.turn.stage === "awaitingHandoff";
   const currentCity = selectedCityId ? localMap.cities.find((city) => city.id === selectedCityId) : null;
@@ -622,8 +452,8 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
         </div>
         <div className="topbar-actions">
           <ScoreGuide />
-          <Button onClick={openTutorial}>
-            Tutorial
+          <Button onClick={() => setGuideOpen(true)}>
+            Guide
           </Button>
           <Button onClick={resetGame}>
             Back to setup
@@ -631,9 +461,9 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
         </div>
       </header>
 
-      <div className={`game-layout ${visibility !== "visible" ? "game-layout--obscured" : ""} ${tutorialTarget ? "game-layout--tutorial" : ""}`}>
+      <div className={`game-layout ${visibility !== "visible" ? "game-layout--obscured" : ""}`}>
         <aside className="side-panel">
-          <Panel variant="status" className={tutorialTarget === "scoreboard" ? "panel--tutorial-focus" : ""}>
+          <Panel variant="status">
             <SectionHeader
               eyebrow="Table status"
               title="Round table"
@@ -661,7 +491,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
           {visibility === "visible" ? (
             <>
               <div className="side-panel__private-stack">
-                <Panel variant="private-info" className={tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}>
+                <Panel variant="private-info">
                   <SectionHeader title="Hand" meta={`${activePlayer.hand.length} cards`} density="compact" />
                   <div className="card-grid">
                     {activePlayer.hand.map((card) => (
@@ -670,7 +500,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
                   </div>
                 </Panel>
 
-                <Panel variant="private-info" className={tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}>
+                <Panel variant="private-info">
                   <SectionHeader
                     title="Tickets"
                     meta={`${ticketProgress.filter((entry) => entry.completed).length}/${ticketProgress.length} connected`}
@@ -705,7 +535,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
             </Panel>
           )}
 
-          <Panel variant="neutral" className={`side-panel__supply-panel ${tutorialTarget === "market" ? "panel--tutorial-focus" : ""}`}>
+          <Panel variant="neutral" className="side-panel__supply-panel">
             <SectionHeader title="Market" meta={`${game.trainDeck.length} deck`} density="compact" />
             <div className="market-grid">
               {game.market.map((card, index) => (
@@ -727,7 +557,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
         </aside>
 
         <main className="board-column">
-          <Panel variant="neutral" className={`board-panel ${tutorialTarget === "board" ? "panel--tutorial-focus" : ""}`}>
+          <Panel variant="neutral" className="board-panel">
             <SectionHeader eyebrow="Public board" title="Board" meta="Click a route or city to inspect actions" />
             <BoardMap
               config={localMap}
@@ -760,7 +590,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
             />
           </Panel>
 
-          <Panel variant="status" className={`action-panel ${tutorialTarget === "action" ? "panel--tutorial-focus" : ""}`}>
+          <Panel variant="status" className="action-panel">
             <SectionHeader eyebrow="Turn controls" title="Action rail" meta={game.turn.summary ?? "Choose one action for this turn."} />
             {error ? (
               <StateSurface
@@ -889,7 +719,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
       </div>
 
       {visibility === "postTurn" && game.phase !== "gameOver" ? (
-        <ModalShell tone={tutorialTarget === "handoff" ? "tutorial" : "default"} width="md" align="center">
+        <ModalShell width="md" align="center">
             <SectionHeader eyebrow="Turn complete" title={`${activePlayer.name}, pass the laptop.`} density="ceremony" />
             <p>{game.turn.summary ?? "Your action is locked in."}</p>
             <Button variant="primary" onClick={() => applyAction({ type: "advance_turn" })}>
@@ -899,7 +729,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
       ) : null}
 
       {visibility === "handoff" && game.phase !== "gameOver" ? (
-        <ModalShell tone={tutorialTarget === "handoff" ? "tutorial" : "default"} width="md" align="center">
+        <ModalShell width="md" align="center">
             <SectionHeader eyebrow="Next player" title={`${activePlayer.name}, take over.`} density="ceremony" />
             <p>The board is safe to look at. Private cards and tickets stay hidden until you are ready.</p>
             <Button variant="primary" onClick={() => setVisibility("visible")}>
@@ -944,8 +774,6 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
             </Button>
         </ModalShell>
       ) : null}
-
-      {tutorial}
     </div>
   );
 }

@@ -30,6 +30,7 @@ import {
 } from "@hudson-hustle/game-data";
 import { BoardMap } from "./components/BoardMap";
 import { EndgameBreakdown } from "./components/EndgameBreakdown";
+import { GuidebookScreen } from "./components/GuidebookScreen";
 import { LocalPlayScreen } from "./components/LocalPlayScreen";
 import { LobbyScreen } from "./components/LobbyScreen";
 import { MultiplayerSetupScreen } from "./components/MultiplayerSetupScreen";
@@ -52,7 +53,7 @@ const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8787";
 const wsUrl = import.meta.env.VITE_WS_URL ?? apiBaseUrl;
 const sessionKey = "hudson-hustle-multiplayer-session-v2";
 type RealtimeStatus = "idle" | "connecting" | "subscribed" | "failed";
-type SetupMode = "gateway" | "local" | "multiplayer";
+type SetupMode = "gateway" | "local" | "multiplayer" | "guide";
 
 class ApiError extends Error {
   constructor(
@@ -188,6 +189,7 @@ export default function App(): JSX.Element {
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
   const [selectedTicketIds, setSelectedTicketIds] = useState<string[]>([]);
+  const [guideOpen, setGuideOpen] = useState(false);
   const socketRef = useRef<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null);
   const awaitingSocketHandshakeRef = useRef(false);
   const lastPendingTicketKeyRef = useRef("");
@@ -604,8 +606,13 @@ export default function App(): JSX.Element {
             setSetupMode("multiplayer");
             setMultiplayerError(null);
           }}
+          onOpenGuide={() => setSetupMode("guide")}
         />
       );
+    }
+
+    if (setupMode === "guide") {
+      return <GuidebookScreen onBack={() => setSetupMode("gateway")} />;
     }
 
     if (setupMode === "local") {
@@ -655,6 +662,10 @@ export default function App(): JSX.Element {
         realtimeMessage={realtimeMessage}
       />
     );
+  }
+
+  if (guideOpen) {
+    return <GuidebookScreen onBack={() => setGuideOpen(false)} />;
   }
 
   const publicGame = snapshot.game;
@@ -715,6 +726,7 @@ export default function App(): JSX.Element {
         </div>
         <div className="topbar-actions">
           <ScoreGuide className="score-guide--subtle" />
+          <Button onClick={() => setGuideOpen(true)}>Guide</Button>
           <Button className="topbar-actions__leave" onClick={leaveRoom}>
             Leave room
           </Button>

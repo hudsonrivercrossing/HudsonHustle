@@ -25,7 +25,7 @@ interface SetupScreenProps {
   onStart: (setup: LocalStartSetup) => void;
   canResume: boolean;
   onResume: () => void;
-  onOpenTutorial: () => void;
+  onOpenGuide: () => void;
   onBack?: () => void;
   releasedConfigs: HudsonHustleReleasedConfigSummary[];
   initialConfigId: string;
@@ -35,7 +35,7 @@ export function SetupScreen({
   onStart,
   canResume,
   onResume,
-  onOpenTutorial,
+  onOpenGuide,
   onBack,
   releasedConfigs,
   initialConfigId
@@ -112,7 +112,7 @@ export function SetupScreen({
             meta={`${plannedBotCount} bot · ${Math.max(0, plannedHumanCount - 1)} human open`}
             actions={
               <SetupActions>
-                <Button onClick={onOpenTutorial}>Rules guide</Button>
+                <Button onClick={onOpenGuide}>Guide</Button>
                 {canResume ? <Button onClick={onResume}>Resume saved game</Button> : null}
                 <Button variant="primary" onClick={() => setStep(1)}>
                   Pick board
