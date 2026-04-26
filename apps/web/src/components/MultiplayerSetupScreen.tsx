@@ -102,9 +102,15 @@ export function MultiplayerSetupScreen({
         : "Host a table or join one by room code.";
 
   useEffect(() => {
-    if (reconnectState === "attempting-reconnect" || reconnectState === "reconnect-failed") {
+    if (reconnectState === "attempting-reconnect") {
       setStage("join");
       setJoinStep(2);
+      return;
+    }
+
+    if (reconnectState === "reconnect-failed") {
+      setStage("join");
+      setJoinStep(0);
     }
   }, [reconnectState]);
 
