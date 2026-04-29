@@ -6053,7 +6053,8 @@ h3 {
 }
 
 .app-shell--gameplay-hud .inspector-dock .supply-dock--board .section-header {
-  padding-inline: 1px;
+  padding-inline: 8px 1px;
+  overflow: visible;
 }
 
 .app-shell--gameplay-hud .inspector-dock .supply-dock--board .system-button {
@@ -6211,6 +6212,10 @@ h3 {
   display: none;
 }
 
+.app-shell--gameplay-hud .detail-card__decision-shelf .muted-copy {
+  grid-column: 1 / -1;
+}
+
 .app-shell--gameplay-hud .choice-chip-button {
   width: 100%;
   min-width: 0;
@@ -6226,9 +6231,10 @@ h3 {
 }
 
 .app-shell--gameplay-hud .ticket-choice-sheet {
-  top: 56px;
+  top: 80px;
   right: 18px;
   width: min(304px, calc(100vw - 36px));
+  max-height: calc(100vh - 104px);
 }
 
 .app-shell--gameplay-hud .ticket-choice-sheet__panel {
@@ -6465,6 +6471,258 @@ h3 {
 
 .app-shell--gameplay-hud .inspector-dock .supply-dock--board .system-button {
   min-height: 40px;
+}
+
+/* Visual Language Path: make the gameplay HUD read as tabletop pieces, not SaaS cards. */
+.app-shell--gameplay-hud {
+  --hud-paper: #e8dcc2;
+  --hud-paper-deep: #c9b895;
+  --hud-ink: #241d15;
+  --hud-ink-soft: #5f5343;
+  --hud-brass: #b79b61;
+  --hud-brass-dark: #6d5830;
+  --hud-wood: #16100b;
+  --hud-wood-light: #2a2117;
+  --hud-shadow: rgba(0, 0, 0, 0.42);
+  --hud-grain:
+    linear-gradient(90deg, rgba(255, 248, 232, 0.035) 1px, transparent 1px) 0 0 / 17px 17px,
+    linear-gradient(180deg, rgba(255, 248, 232, 0.035) 1px, transparent 1px) 0 0 / 17px 17px;
+}
+
+.app-shell--gameplay-hud .private-hand-rail,
+.app-shell--gameplay-hud .ticket-dock,
+.app-shell--gameplay-hud .inspector-dock,
+.app-shell--gameplay-hud .player-roster--top {
+  border-color: color-mix(in srgb, var(--hud-brass) 42%, rgba(0, 0, 0, 0.34));
+  border-radius: 12px;
+  background:
+    var(--hud-grain),
+    linear-gradient(180deg, rgba(37, 31, 23, 0.94), rgba(12, 10, 8, 0.94));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 235, 194, 0.08),
+    inset 0 10px 18px rgba(255, 235, 194, 0.035),
+    0 18px 36px var(--hud-shadow);
+  backdrop-filter: none;
+}
+
+.app-shell--gameplay-hud .private-hand-rail::before,
+.app-shell--gameplay-hud .ticket-dock::before,
+.app-shell--gameplay-hud .inspector-dock::before,
+.app-shell--gameplay-hud .player-roster--top::before {
+  background:
+    linear-gradient(135deg, rgba(232, 220, 194, 0.08), transparent 28%),
+    radial-gradient(circle at 18% 0%, rgba(183, 155, 97, 0.12), transparent 30%);
+  opacity: 1;
+}
+
+.app-shell--gameplay-hud .section-header__title,
+.app-shell--gameplay-hud .surface-card__title {
+  color: var(--hud-paper);
+  letter-spacing: 0;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.34);
+}
+
+.app-shell--gameplay-hud .section-header__eyebrow,
+.app-shell--gameplay-hud .surface-card__eyebrow,
+.app-shell--gameplay-hud .section-header__meta {
+  color: color-mix(in srgb, var(--hud-paper) 62%, var(--hud-brass) 38%);
+}
+
+.app-shell--gameplay-hud .hand-color-slot,
+.app-shell--gameplay-hud .inspector-dock .market-color-slot {
+  isolation: isolate;
+  overflow: hidden;
+  border-width: 1px;
+  border-radius: 8px;
+  border-color: color-mix(in srgb, var(--hand-slot-color) 46%, var(--hud-brass-dark));
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--hand-slot-color) 46%, transparent) 0 10px, transparent 10px),
+    linear-gradient(180deg, rgba(232, 220, 194, 0.18), rgba(14, 19, 20, 0.1)),
+    var(--hud-grain),
+    linear-gradient(180deg, #272b2b, #111514);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 244, 217, 0.08),
+    inset 0 -10px 18px rgba(0, 0, 0, 0.18),
+    0 5px 0 rgba(0, 0, 0, 0.2);
+}
+
+.app-shell--gameplay-hud .hand-color-slot::before,
+.app-shell--gameplay-hud .market-color-slot::before {
+  content: "";
+  position: absolute;
+  inset: 7px 7px 6px 16px;
+  z-index: -1;
+  border: 1px solid rgba(232, 220, 194, 0.13);
+  border-radius: 5px;
+  background:
+    linear-gradient(135deg, rgba(232, 220, 194, 0.08), transparent 38%),
+    linear-gradient(180deg, rgba(232, 220, 194, 0.045), transparent);
+}
+
+.app-shell--gameplay-hud .hand-color-slot--empty {
+  border-style: dashed;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--hand-slot-color) 30%, transparent) 0 8px, transparent 8px),
+    var(--hud-grain),
+    linear-gradient(180deg, rgba(28, 29, 27, 0.62), rgba(11, 13, 12, 0.68));
+  opacity: 0.82;
+}
+
+.app-shell--gameplay-hud .hand-color-slot__count,
+.app-shell--gameplay-hud .market-color-slot__count {
+  min-width: 34px;
+  min-height: 30px;
+  border: 1px solid color-mix(in srgb, var(--hand-slot-color) 50%, var(--hud-paper));
+  border-radius: 4px;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--hand-slot-color) 36%, var(--hud-paper) 64%), color-mix(in srgb, var(--hand-slot-color) 28%, var(--hud-paper-deep) 72%));
+  color: var(--hud-ink);
+  font-size: 0.96rem;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 1px 0 rgba(255, 248, 232, 0.38);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 248, 232, 0.42),
+    0 2px 0 rgba(0, 0, 0, 0.18);
+}
+
+.app-shell--gameplay-hud .hand-color-slot--empty .hand-color-slot__count {
+  border-color: rgba(232, 220, 194, 0.2);
+  background: rgba(232, 220, 194, 0.1);
+  color: color-mix(in srgb, var(--hand-slot-color) 58%, var(--hud-paper));
+}
+
+.app-shell--gameplay-hud .hand-color-slot__label,
+.app-shell--gameplay-hud .market-color-slot__label {
+  color: var(--hud-paper);
+  font-size: 0.48rem;
+  font-weight: 900;
+  letter-spacing: 0.075em;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.52);
+}
+
+.app-shell--gameplay-hud .ticket-row {
+  border-radius: 5px;
+  border-color: rgba(92, 70, 46, 0.36);
+  background:
+    linear-gradient(90deg, rgba(109, 88, 48, 0.26) 0 1px, transparent 1px) 0 0 / 10px 100%,
+    linear-gradient(180deg, rgba(246, 237, 215, 0.95), rgba(214, 199, 166, 0.92));
+  color: var(--hud-ink);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 248, 232, 0.38),
+    0 4px 0 rgba(0, 0, 0, 0.18);
+}
+
+.app-shell--gameplay-hud .ticket-route__cities {
+  color: var(--hud-ink);
+  text-shadow: none;
+}
+
+.app-shell--gameplay-hud .ticket-arrow {
+  color: var(--hud-brass-dark);
+}
+
+.app-shell--gameplay-hud .ticket-status {
+  min-width: 31px;
+  border-radius: 3px;
+  border-color: rgba(92, 70, 46, 0.34);
+  background:
+    linear-gradient(180deg, rgba(255, 248, 232, 0.3), rgba(109, 88, 48, 0.12));
+  color: var(--hud-brass-dark);
+}
+
+.app-shell--gameplay-hud .ticket-row .ticket-points {
+  border-radius: 3px;
+  background: rgba(36, 29, 21, 0.12);
+  color: var(--hud-ink);
+}
+
+.app-shell--gameplay-hud .inspector-tabs {
+  gap: 7px;
+  padding-top: 2px;
+}
+
+.app-shell--gameplay-hud .inspector-tabs__tab {
+  border-radius: 6px 10px 10px 6px;
+  border-color: rgba(183, 155, 97, 0.42);
+  background:
+    linear-gradient(90deg, rgba(183, 155, 97, 0.2), transparent 34%),
+    var(--hud-grain),
+    linear-gradient(180deg, #201a12, #0d0b08);
+  color: color-mix(in srgb, var(--hud-paper) 74%, var(--hud-brass) 26%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 244, 217, 0.06),
+    3px 3px 0 rgba(0, 0, 0, 0.24);
+  clip-path: polygon(0 0, 82% 0, 100% 8px, 100% calc(100% - 8px), 82% 100%, 0 100%);
+}
+
+.app-shell--gameplay-hud .inspector-tabs__tab--active {
+  border-color: rgba(109, 88, 48, 0.55);
+  background:
+    linear-gradient(180deg, #efe3c6, #cdbb92);
+  color: var(--hud-ink);
+  transform: rotate(180deg) translateX(-4px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 248, 232, 0.44),
+    5px 3px 0 rgba(0, 0, 0, 0.28);
+}
+
+.app-shell--gameplay-hud .system-button,
+.app-shell--gameplay-hud .score-guide__trigger.system-button,
+.app-shell--gameplay-hud .choice-chip-button {
+  border-radius: 5px;
+  border-color: rgba(183, 155, 97, 0.38);
+  background:
+    var(--hud-grain),
+    linear-gradient(180deg, #2b312f, #111715);
+  color: var(--hud-paper);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 244, 217, 0.07),
+    0 4px 0 rgba(0, 0, 0, 0.24);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.48);
+}
+
+.app-shell--gameplay-hud .primary-button {
+  background:
+    linear-gradient(180deg, #d6c391, #8c713b);
+  color: var(--hud-ink);
+  text-shadow: 0 1px 0 rgba(255, 248, 232, 0.34);
+}
+
+.app-shell--gameplay-hud .inspector-dock--build .detail-card {
+  color: var(--hud-paper);
+}
+
+.app-shell--gameplay-hud .detail-card__fact {
+  border-radius: 4px;
+  background:
+    linear-gradient(180deg, rgba(232, 220, 194, 0.16), rgba(12, 10, 8, 0.12));
+  color: color-mix(in srgb, var(--hud-paper) 72%, var(--hud-brass) 28%);
+}
+
+.app-shell--gameplay-hud .detail-card__prompt,
+.app-shell--gameplay-hud .muted-copy {
+  color: color-mix(in srgb, var(--hud-paper) 78%, #ffffff 22%);
+}
+
+.app-shell--gameplay-hud .game-over-layer,
+.app-shell--gameplay-hud .leave-confirm-card,
+.app-shell--gameplay-hud .ticket-choice-sheet__panel {
+  border-radius: 12px;
+  border-color: rgba(183, 155, 97, 0.34);
+  background:
+    var(--hud-grain),
+    linear-gradient(180deg, rgba(37, 31, 23, 0.97), rgba(10, 8, 6, 0.96));
+  color: var(--hud-paper);
+  backdrop-filter: none;
+}
+
+.app-shell--gameplay-hud .game-over-layer .endgame-card {
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(232, 220, 194, 0.1), rgba(12, 10, 8, 0.2)),
+    var(--hud-grain),
+    linear-gradient(180deg, #211b14, #100d09);
 }
 
 @media (prefers-reduced-motion: reduce) {

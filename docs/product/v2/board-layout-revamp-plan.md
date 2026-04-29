@@ -37,6 +37,53 @@ Basemap direction:
 - It can use station positions as anchors and place local landmarks between stations/routes.
 - Phase 1 should not overbuild basemap tooling. Keep a placeholder/background layer that can later accept custom art.
 
+## Visual Language Path
+
+Goal:
+- move the active game board away from a polished dark web dashboard and toward an immersive tabletop game surface
+- preserve the current layout architecture while changing the material language of the HUD pieces
+- keep all gameplay controls stable, readable, and deterministic
+
+Items:
+- **Physical board pieces, not web panels**
+  - reduce repeated generic rounded cards
+  - make outer modules feel like board-edge instruments: ticket wallets, card racks, metal labels, and compact wooden scoring rails
+
+- **Material hierarchy**
+  - keep the map as the main stage
+  - use warm paper, ink, aged brass, dark wood, and subtle grain for hand, tickets, market, and action surfaces
+  - reduce glassmorphism, dashboard glow, and identical dark-blue panels
+
+- **Card slot language**
+  - make Hand and Market feel like train-card racks or punched ticket inventories instead of generic color tiles
+  - render counts as printed stamps or punched tokens instead of glowing center dots
+  - use route colors as enamel insets or card bands, not only circular badges
+
+- **Right rail tab spine**
+  - make Market, Build, and Chat feel like physical side tabs or drawer ears
+  - active tab should look like a pulled-out paper/brass label rather than a standard web tab
+
+Critique items to resolve:
+- **P1: Too many identical rounded rectangles**
+  - unified large radii create an AI/card-grid feeling
+  - target shape language: outer modules 10-12px, card racks 6-8px, tickets 3-6px, tabs as cut labels or paper tags
+
+- **P1: Right rail still reads like web UI**
+  - tabs, buttons, and cards all look like dashboard controls
+  - target treatment: a physical sidebar spine with inserted trays
+
+- **P1: Market/Hand cards lack tactile identity**
+  - current cards are legible but generic
+  - target treatment: fixed train-card racks with printed count stamps while preserving count stability
+
+- **P2: Material palette is too uniform**
+  - the board uses too much dark glass
+  - target palette: warm paper, aged brass, inked borders, dark wood, and subtle grain
+
+- **P2: Typography is readable but not game-native**
+  - text is clear but still app-like
+  - target type treatment: printed-ticket small caps for labels, station-sign/enamel plaque treatment for primary actions, tabular printed numerals for counts
+
 ## Component Inventory
 
 ### 1. Board Stage
