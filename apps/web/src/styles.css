@@ -6725,6 +6725,139 @@ h3 {
     linear-gradient(180deg, #211b14, #100d09);
 }
 
+/* Angular tabletop correction: avoid the repeated rounded-card silhouette. */
+.app-shell--gameplay-hud .private-hand-rail,
+.app-shell--gameplay-hud .ticket-dock,
+.app-shell--gameplay-hud .inspector-dock,
+.app-shell--gameplay-hud .player-roster--top,
+.app-shell--gameplay-hud .game-over-layer,
+.app-shell--gameplay-hud .leave-confirm-card,
+.app-shell--gameplay-hud .ticket-choice-sheet__panel {
+  border-radius: 3px;
+  clip-path: polygon(
+    10px 0,
+    calc(100% - 10px) 0,
+    100% 10px,
+    100% calc(100% - 10px),
+    calc(100% - 10px) 100%,
+    10px 100%,
+    0 calc(100% - 10px),
+    0 10px
+  );
+}
+
+.app-shell--gameplay-hud .private-hand-rail::after,
+.app-shell--gameplay-hud .ticket-dock::after,
+.app-shell--gameplay-hud .inspector-dock::after,
+.app-shell--gameplay-hud .player-roster--top::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 7px;
+  border: 1px solid rgba(183, 155, 97, 0.16);
+  clip-path: polygon(
+    7px 0,
+    calc(100% - 7px) 0,
+    100% 7px,
+    100% calc(100% - 7px),
+    calc(100% - 7px) 100%,
+    7px 100%,
+    0 calc(100% - 7px),
+    0 7px
+  );
+}
+
+.app-shell--gameplay-hud .player-roster--top .player-roster__row,
+.app-shell--gameplay-hud .hand-color-slot,
+.app-shell--gameplay-hud .inspector-dock .market-color-slot,
+.app-shell--gameplay-hud .system-button,
+.app-shell--gameplay-hud .score-guide__trigger.system-button,
+.app-shell--gameplay-hud .choice-chip-button,
+.app-shell--gameplay-hud .ticket-dock__pager-button.system-button {
+  border-radius: 2px;
+  clip-path: polygon(
+    7px 0,
+    calc(100% - 7px) 0,
+    100% 7px,
+    100% calc(100% - 7px),
+    calc(100% - 7px) 100%,
+    7px 100%,
+    0 calc(100% - 7px),
+    0 7px
+  );
+}
+
+.app-shell--gameplay-hud .hand-color-slot::before,
+.app-shell--gameplay-hud .market-color-slot::before {
+  border-radius: 1px;
+  clip-path: polygon(
+    5px 0,
+    calc(100% - 5px) 0,
+    100% 5px,
+    100% calc(100% - 5px),
+    calc(100% - 5px) 100%,
+    5px 100%,
+    0 calc(100% - 5px),
+    0 5px
+  );
+}
+
+.app-shell--gameplay-hud .hand-color-slot__count,
+.app-shell--gameplay-hud .market-color-slot__count,
+.app-shell--gameplay-hud .ticket-row .ticket-points,
+.app-shell--gameplay-hud .ticket-status,
+.app-shell--gameplay-hud .detail-card__fact {
+  border-radius: 1px;
+}
+
+.app-shell--gameplay-hud .ticket-row {
+  border-radius: 1px;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 9px) 0,
+    100% 50%,
+    calc(100% - 9px) 100%,
+    0 100%
+  );
+}
+
+.app-shell--gameplay-hud .inspector-tabs__tab {
+  border-radius: 0;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 9px) 0,
+    100% 9px,
+    100% calc(100% - 9px),
+    calc(100% - 9px) 100%,
+    0 100%
+  );
+}
+
+.app-shell--gameplay-hud .inspector-tabs__tab--active {
+  clip-path: polygon(
+    0 0,
+    calc(100% - 13px) 0,
+    100% 13px,
+    100% calc(100% - 13px),
+    calc(100% - 13px) 100%,
+    0 100%
+  );
+}
+
+.app-shell--gameplay-hud .game-over-layer .endgame-card {
+  border-radius: 2px;
+  clip-path: polygon(
+    8px 0,
+    calc(100% - 8px) 0,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    0 calc(100% - 8px),
+    0 8px
+  );
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
