@@ -644,7 +644,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
           </Button>
           <ScoreGuide className="score-guide--subtle" label="Score" />
           <Button onClick={() => setShowLeaveConfirm(true)}>
-            Leave game
+            Leave room
           </Button>
         </div>
       </header>

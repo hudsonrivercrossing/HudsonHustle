@@ -7189,6 +7189,221 @@ h3 {
   stroke-width: 30px;
 }
 
+/* Gameplay HUD correction pass: translucent map, tighter right rail, equal cards, and calmer type. */
+.app-shell--gameplay-hud {
+  --game-right-rail: clamp(342px, 23.5vw, 378px);
+  --hud-type-label: 0.67rem;
+  --hud-type-small: 0.76rem;
+  --hud-type-body: 0.9rem;
+  --hud-type-title: 1.02rem;
+  font-size: var(--hud-type-body);
+  font-kerning: normal;
+  font-feature-settings: "kern" 1, "tnum" 1;
+}
+
+.app-shell--gameplay-hud .section-header__title,
+.app-shell--gameplay-hud .surface-card__title,
+.app-shell--gameplay-hud .row-object__title {
+  font-size: var(--hud-type-title);
+  font-weight: 820;
+  line-height: 1.08;
+  letter-spacing: -0.005em;
+}
+
+.app-shell--gameplay-hud .section-header__eyebrow,
+.app-shell--gameplay-hud .surface-card__eyebrow {
+  font-size: var(--hud-type-label);
+  letter-spacing: 0.095em;
+}
+
+.app-shell--gameplay-hud .section-header__meta,
+.app-shell--gameplay-hud .row-object__meta,
+.app-shell--gameplay-hud .muted-copy {
+  font-size: var(--hud-type-small);
+  line-height: 1.26;
+}
+
+.app-shell--gameplay-hud .topbar-actions {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.app-shell--gameplay-hud .topbar-actions .score-guide {
+  width: 100%;
+}
+
+.app-shell--gameplay-hud .topbar-actions .system-button,
+.app-shell--gameplay-hud .topbar-actions .score-guide__trigger.system-button {
+  inline-size: 100%;
+  block-size: 52px;
+  min-block-size: 52px;
+  padding: 6px 7px;
+  font-size: 0.76rem;
+  font-weight: 830;
+}
+
+.app-shell--gameplay-hud .score-guide {
+  z-index: 600;
+}
+
+.app-shell--gameplay-hud .score-guide__panel {
+  z-index: 700;
+  position: absolute;
+  width: min(340px, calc(100vw - 28px));
+  border-radius: 8px;
+  border-color: rgba(183, 155, 97, 0.48);
+  background:
+    var(--hud-grain),
+    linear-gradient(180deg, rgba(31, 25, 18, 0.985), rgba(10, 8, 6, 0.985));
+  color: var(--hud-paper);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 244, 217, 0.08),
+    0 24px 54px rgba(0, 0, 0, 0.54);
+}
+
+.app-shell--gameplay-hud .board-stage {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.app-shell--gameplay-hud .board-stage::before,
+.app-shell--gameplay-hud .board-stage::after {
+  display: none;
+}
+
+.app-shell--gameplay-hud .board-shell {
+  border-radius: 0;
+  border: 0;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(255, 247, 226, 0.18), transparent 31%),
+    radial-gradient(circle at 82% 82%, rgba(80, 111, 108, 0.12), transparent 35%),
+    repeating-linear-gradient(90deg, rgba(69, 50, 31, 0.035) 0 1px, transparent 1px 24px),
+    linear-gradient(180deg, rgba(217, 200, 166, 0.7), rgba(199, 181, 143, 0.58));
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.app-shell--gameplay-hud .board-map > rect:first-child {
+  fill: rgba(217, 200, 166, 0.54) !important;
+}
+
+.app-shell--gameplay-hud .board-map--full .landform,
+.app-shell--gameplay-hud .board-map--muted .landform,
+.app-shell--gameplay-hud .landform {
+  fill: rgba(238, 222, 190, 0.2);
+  stroke: rgba(75, 54, 32, 0.08);
+}
+
+.app-shell--gameplay-hud .water-body {
+  fill: rgba(91, 126, 128, 0.18);
+  stroke: rgba(232, 220, 194, 0.11);
+}
+
+.app-shell--gameplay-hud .shoreline {
+  stroke: rgba(74, 55, 36, 0.13);
+  opacity: 0.34;
+}
+
+.app-shell--gameplay-hud .board-label {
+  fill: #241a11;
+  stroke: rgba(249, 240, 218, 0.96);
+  stroke-width: 5.2px;
+}
+
+.app-shell--gameplay-hud .city-hitbox {
+  fill: #fbf1dc;
+  stroke: #332317;
+}
+
+.app-shell--gameplay-hud .inspector-dock {
+  grid-template-columns: minmax(0, 1fr) 36px;
+  column-gap: 9px;
+  padding: 12px 9px 12px 12px;
+  overflow: visible;
+}
+
+.app-shell--gameplay-hud .inspector-tabs {
+  width: 36px;
+  min-width: 36px;
+  right: 8px;
+}
+
+.app-shell--gameplay-hud .inspector-tabs__tab {
+  width: 36px;
+  min-width: 36px;
+  min-height: 82px;
+  padding: 8px 5px;
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
+}
+
+.app-shell--gameplay-hud .inspector-tabs__tab--active {
+  transform: rotate(180deg) translateX(-4px);
+}
+
+.app-shell--gameplay-hud .inspector-dock .supply-dock--board {
+  padding: 0;
+  overflow: visible;
+}
+
+.app-shell--gameplay-hud .inspector-dock .supply-dock--board .section-header {
+  padding-inline: 0;
+}
+
+.app-shell--gameplay-hud .private-hand-rail__slots,
+.app-shell--gameplay-hud .inspector-dock .supply-dock__market {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.app-shell--gameplay-hud .hand-color-slot,
+.app-shell--gameplay-hud .inspector-dock .market-color-slot {
+  min-height: 78px;
+  height: 78px;
+  padding: 9px 7px 8px;
+}
+
+.app-shell--gameplay-hud .inspector-dock .market-color-slot {
+  width: 100%;
+}
+
+.app-shell--gameplay-hud .hand-color-slot--locomotive,
+.app-shell--gameplay-hud .market-color-slot--locomotive {
+  border-color: rgba(232, 220, 194, 0.72);
+  background:
+    linear-gradient(
+      90deg,
+      #c65f6e 0 12.5%,
+      #d9ad4f 12.5% 25%,
+      #5aa79a 25% 37.5%,
+      #5c77ca 37.5% 50%,
+      #8d65c5 50% 62.5%,
+      #68737e 62.5% 75%,
+      #efe2bf 75% 87.5%,
+      #cf7aa0 87.5% 100%
+    ) 0 0 / 12px 100% no-repeat,
+    repeating-linear-gradient(135deg, rgba(255, 248, 232, 0.06) 0 1px, transparent 1px 7px),
+    linear-gradient(180deg, rgba(231, 221, 198, 0.18), rgba(10, 13, 12, 0.08)),
+    linear-gradient(180deg, #2b2d2a, #10120f);
+}
+
+.app-shell--gameplay-hud .hand-color-slot--locomotive .hand-color-slot__count,
+.app-shell--gameplay-hud .market-color-slot--locomotive .market-color-slot__count {
+  background:
+    linear-gradient(180deg, #f0e6cb, #b7a875);
+  color: #241d15;
+}
+
+.app-shell--gameplay-hud .ticket-dock {
+  height: 100%;
+  max-height: none;
+  align-self: stretch;
+}
+
+.app-shell--gameplay-hud .ticket-dock__scroll {
+  min-height: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
