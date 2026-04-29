@@ -157,6 +157,7 @@ interface BoardMapProps {
   };
   selectedRouteId: string | null;
   selectedCityId: string | null;
+  highlightedCityIds?: string[];
   onSelectRoute: (routeId: string) => void;
   onSelectCity: (cityId: string) => void;
 }
@@ -172,6 +173,7 @@ export function BoardMap({
   game,
   selectedRouteId,
   selectedCityId,
+  highlightedCityIds = [],
   onSelectRoute,
   onSelectCity
 }: BoardMapProps): JSX.Element {
@@ -198,6 +200,7 @@ export function BoardMap({
         ? backdrop.regionLabels.filter((label) => label.id !== "new-jersey")
         : backdrop.regionLabels;
   const regionLabelClassSuffix = boardLabelMode === "minimal-region-labels" ? " region-label--minimal" : "";
+  const highlightedCitySet = new Set(highlightedCityIds);
 
   return (
     <div className="board-shell">
@@ -343,15 +346,24 @@ export function BoardMap({
         {config.cities.map((city) => {
           const station = game.stations.find((item) => item.cityId === city.id);
           const selected = selectedCityId === city.id;
+          const highlighted = highlightedCitySet.has(city.id);
           const labelDx = city.labelDx ?? 14;
           const labelDy = city.labelDy ?? -14;
           const labelAnchor = city.labelAnchor ?? "start";
           return (
-            <g key={city.id}>
+            <g key={city.id} className={highlighted ? "city-node city-node--highlighted" : "city-node"}>
+              {highlighted ? (
+                <circle
+                  cx={city.x}
+                  cy={city.y}
+                  r="25"
+                  className="city-highlight-ring"
+                />
+              ) : null}
               <circle
                 cx={city.x}
                 cy={city.y}
-                r={selected ? 15 : 12}
+                r={highlighted ? 17 : selected ? 15 : 12}
                 fill="#f8f5ef"
                 stroke="#453221"
                 strokeWidth="3"
@@ -375,7 +387,7 @@ export function BoardMap({
                 x={city.x + labelDx}
                 y={city.y + labelDy}
                 textAnchor={labelAnchor}
-                className="board-label"
+                className={highlighted ? "board-label board-label--highlighted" : "board-label"}
               >
                 {city.label ?? city.name}
               </text>

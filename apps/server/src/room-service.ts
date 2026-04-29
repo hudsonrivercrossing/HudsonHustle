@@ -16,6 +16,8 @@ import {
   type PublicPlayerState,
   type RejoinRoomRequest,
   type RejoinRoomResponse,
+  type RestartRoomRequest,
+  type RestartRoomResponse,
   type RoomSeatSummary,
   type RoomSnapshot,
   type RoomStatus,
@@ -732,6 +734,45 @@ export class RoomService {
     room.updatedAt = nowIso();
     room.seats.forEach((seat, index) => {
       seat.playerId = nextGame.players[index]?.id ?? null;
+      seat.updatedAt = room.updatedAt;
+    });
+
+    this.scheduleTimer(room);
+    const historyUpdate = this.buildHistoryUpdate(room, {
+      beforeGame: null,
+      seat: hostSeat,
+      source: "human_request",
+      action: null,
+      eventType: "game_started",
+      createdAt: room.updatedAt
+    });
+    await this.saveRoom(room, historyUpdate);
+    await this.runServerControlledTurns(room);
+    return {
+      snapshot: this.buildSnapshot(room, hostSeat.seatId)
+    };
+  }
+
+  async restartRoom(roomCode: string, request: RestartRoomRequest): Promise<RestartRoomResponse> {
+    const room = await this.getRoomOrThrow(roomCode);
+    const hostSeat = this.getAuthorizedSeat(room, { seatId: room.hostSeatId, playerSecret: request.playerSecret });
+    invariant(hostSeat.isHost, "Only the host can restart the room.");
+    invariant(room.status === "finished" || room.game?.phase === "gameOver", "The game is not finished yet.");
+    invariant(
+      room.seats.every((seat) => seat.playerName && (!seatRequiresPlayerSecret(seat.controllerType) || seat.playerSecret)),
+      "All seats must be filled before restarting."
+    );
+
+    const nextGame = startGame(getHudsonHustleMapByConfigId(room.configId), {
+      playerNames: room.seats.map((seat) => seat.playerName ?? seat.seatId)
+    });
+
+    room.game = nextGame;
+    room.status = "active";
+    room.updatedAt = nowIso();
+    room.seats.forEach((seat, index) => {
+      seat.playerId = nextGame.players[index]?.id ?? null;
+      seat.ready = true;
       seat.updatedAt = room.updatedAt;
     });
 

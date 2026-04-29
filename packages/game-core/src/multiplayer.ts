@@ -124,6 +124,14 @@ export interface StartRoomResponse {
   snapshot: RoomSnapshot;
 }
 
+export interface RestartRoomRequest {
+  playerSecret: string;
+}
+
+export interface RestartRoomResponse {
+  snapshot: RoomSnapshot;
+}
+
 export interface RoomSubscribePayload {
   roomCode: string;
   seatId: string;
@@ -138,6 +146,18 @@ export interface GameActionPayload extends RoomSubscribePayload {
   action: GameAction;
 }
 
+export interface ChatMessage {
+  id: string;
+  seatId: string;
+  playerName: string;
+  message: string;
+  createdAt: string;
+}
+
+export interface ChatMessagePayload extends RoomSubscribePayload {
+  message: string;
+}
+
 export interface TimerUpdate {
   activeSeatId: string | null;
   deadlineAt: number | null;
@@ -148,6 +168,7 @@ export interface ClientToServerEvents {
   "room:subscribe": (payload: RoomSubscribePayload) => void;
   "player:ready": (payload: ReadyPayload) => void;
   "game:action": (payload: GameActionPayload) => void;
+  "chat:message": (payload: ChatMessagePayload) => void;
 }
 
 export interface ServerToClientEvents {
@@ -157,4 +178,5 @@ export interface ServerToClientEvents {
   "game:error": (payload: { message: string }) => void;
   "game:timer": (payload: TimerUpdate) => void;
   "game:reconnected": (snapshot: RoomSnapshot) => void;
+  "chat:update": (messages: ChatMessage[]) => void;
 }

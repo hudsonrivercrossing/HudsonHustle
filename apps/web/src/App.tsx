@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from "react";
 import { io, type Socket } from "socket.io-client";
 import {
+  type ChatMessage,
   getAffordableRouteColors,
   getAffordableStationColors,
   getCityName,
@@ -16,11 +17,14 @@ import {
   type ReconnectState,
   type RejoinRoomRequest,
   type RejoinRoomResponse,
+  type RestartRoomRequest,
+  type RestartRoomResponse,
   type RoomSnapshot,
   type ServerToClientEvents,
   type StartRoomRequest,
   type TicketDef,
-  type TimerUpdate
+  type TimerUpdate,
+  type TrainCardColor
 } from "@hudson-hustle/game-core";
 import {
   getHudsonHustleMapByConfigId,
@@ -30,22 +34,29 @@ import {
 } from "@hudson-hustle/game-data";
 import { BoardMap } from "./components/BoardMap";
 import { EndgameBreakdown } from "./components/EndgameBreakdown";
+import {
+  BoardStage,
+  GameOverLayer,
+  InspectorDock,
+  NotificationPipe,
+  PlayerRoster,
+  PrivateHandRail,
+  SupplyDock,
+  TicketChoiceSheet,
+  TicketDock,
+  formatCardLabel,
+  type GameplayNotification
+} from "./components/GameplayHud";
 import { LocalPlayScreen } from "./components/LocalPlayScreen";
 import { LobbyScreen } from "./components/LobbyScreen";
 import { MultiplayerSetupScreen } from "./components/MultiplayerSetupScreen";
 import { ScoreGuide } from "./components/ScoreGuide";
 import { SetupGateway } from "./components/SetupGateway";
-import { TicketPicker } from "./components/TicketPicker";
-import { TransitCard } from "./components/TransitCard";
 import { Button } from "./components/system/Button";
-import { Chip } from "./components/system/Chip";
 import { ChoiceChipButton } from "./components/system/ChoiceChipButton";
-import { Panel } from "./components/system/Panel";
+import { ModalShell } from "./components/system/ModalShell";
 import { SectionHeader } from "./components/system/SectionHeader";
 import { SurfaceCard } from "./components/system/SurfaceCard";
-import { StateSurface } from "./components/system/StateSurface";
-import { StatusBanner } from "./components/system/StatusBanner";
-import { UtilityPill } from "./components/system/UtilityPill";
 import { encodeReconnectToken, readReconnectCredentials, type ReconnectCredentials } from "./reconnect-token";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8787";
@@ -183,14 +194,23 @@ export default function App(): JSX.Element {
   const [multiplayerError, setMultiplayerError] = useState<string | null>(null);
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
   const [timer, setTimer] = useState<TimerUpdate | null>(null);
-  const [timerNow, setTimerNow] = useState(() => Date.now());
   const [realtimeStatus, setRealtimeStatus] = useState<RealtimeStatus>("idle");
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
   const [selectedTicketIds, setSelectedTicketIds] = useState<string[]>([]);
+  const [focusedTicket, setFocusedTicket] = useState<TicketDef | null>(null);
+  const [pinnedTicket, setPinnedTicket] = useState<TicketDef | null>(null);
+  const [paymentPreview, setPaymentPreview] = useState<{ color: TrainCardColor; totalCost: number; minimumLocomotives?: number } | null>(null);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [notifications, setNotifications] = useState<GameplayNotification[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const socketRef = useRef<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null);
   const awaitingSocketHandshakeRef = useRef(false);
   const lastPendingTicketKeyRef = useRef("");
+  const notificationIdRef = useRef(0);
+  const lastAnnouncedLogRef = useRef<string | null>(null);
+  const lastAnnouncedLogLengthRef = useRef(0);
+  const timerWarningRef = useRef<string | null>(null);
 
   useEffect(() => {
     void requestJson<HudsonHustleReleasedConfigSummary[]>("/released-configs")
@@ -199,6 +219,10 @@ export default function App(): JSX.Element {
         setReleasedConfigs(hudsonHustleReleasedConfigs);
       });
   }, []);
+
+  useEffect(() => {
+    setShowLeaveConfirm(false);
+  }, [credentials?.roomCode, snapshot?.room.status]);
 
   useEffect(() => {
     const saved = readSession();
@@ -274,6 +298,7 @@ export default function App(): JSX.Element {
     });
 
     socket.on("game:update:public", (game) => {
+      announceGameLog(game);
       setSnapshot((current) => (current ? { ...current, game } : current));
     });
 
@@ -293,6 +318,10 @@ export default function App(): JSX.Element {
       setTimer(nextTimer);
     });
 
+    socket.on("chat:update", (messages) => {
+      setChatMessages(messages);
+    });
+
     socket.on("game:error", (payload) => {
       resolveHandshake();
       setRealtimeStatus("failed");
@@ -301,6 +330,7 @@ export default function App(): JSX.Element {
         setReconnectState("reconnect-failed");
       }
       setMultiplayerError(payload.message);
+      pushNotification(payload.message, "warning");
     });
 
     socket.on("connect_error", (connectError) => {
@@ -335,21 +365,6 @@ export default function App(): JSX.Element {
       : realtimeStatus === "failed"
         ? "Realtime connection failed. Seat presence and ready/start controls are disabled until the live room link recovers."
         : null;
-
-  useEffect(() => {
-    if (!timer?.deadlineAt) {
-      return;
-    }
-
-    setTimerNow(Date.now());
-    const interval = window.setInterval(() => {
-      setTimerNow(Date.now());
-    }, 1000);
-
-    return () => {
-      window.clearInterval(interval);
-    };
-  }, [timer?.deadlineAt]);
 
   const mapConfig = useMemo(() => {
     if (!snapshot) {
@@ -401,6 +416,74 @@ export default function App(): JSX.Element {
     const minimumKeep = snapshot?.game?.phase === "initialTickets" ? 2 : 1;
     setSelectedTicketIds(pending.slice(0, minimumKeep).map((ticket) => ticket.id));
   }, [snapshot?.game?.phase, snapshot?.privateState?.pendingTickets]);
+
+  function pushNotification(message: string, tone: GameplayNotification["tone"] = "neutral") {
+    notificationIdRef.current += 1;
+    const id = `multi-${Date.now()}-${notificationIdRef.current}`;
+    setNotifications((current) => [...current.slice(-3), { id, message, tone }]);
+    window.setTimeout(() => {
+      setNotifications((current) => current.filter((notification) => notification.id !== id));
+    }, 4200);
+  }
+
+  function announceGameLog(game: PublicGameState) {
+    const latestLog = game.log.at(-1);
+    if (!latestLog) {
+      return;
+    }
+
+    if (!lastAnnouncedLogRef.current) {
+      lastAnnouncedLogRef.current = latestLog;
+      lastAnnouncedLogLengthRef.current = game.log.length;
+      return;
+    }
+
+    if (game.log.length <= lastAnnouncedLogLengthRef.current) {
+      return;
+    }
+
+    lastAnnouncedLogRef.current = latestLog;
+    lastAnnouncedLogLengthRef.current = game.log.length;
+    pushNotification(latestLog, game.phase === "gameOver" ? "success" : "neutral");
+  }
+
+  useEffect(() => {
+    const latestLog = snapshot?.game?.log.at(-1);
+    if (!snapshot?.game || !latestLog) {
+      return;
+    }
+
+    if (!lastAnnouncedLogRef.current) {
+      lastAnnouncedLogRef.current = latestLog;
+      lastAnnouncedLogLengthRef.current = snapshot.game.log.length;
+      return;
+    }
+
+    if (snapshot.game.log.length <= lastAnnouncedLogLengthRef.current) {
+      return;
+    }
+
+    lastAnnouncedLogRef.current = latestLog;
+    lastAnnouncedLogLengthRef.current = snapshot.game.log.length;
+    pushNotification(latestLog, snapshot.game.phase === "gameOver" ? "success" : "neutral");
+  }, [snapshot?.game?.log.length, snapshot?.game?.phase]);
+
+  useEffect(() => {
+    if (!timer || !credentials || timer.activeSeatId !== credentials.seatId || !timer.secondsRemaining) {
+      timerWarningRef.current = null;
+      return;
+    }
+
+    const deadlineKey = `${timer.deadlineAt ?? "no-deadline"}`;
+    if (timer.secondsRemaining <= 10 && timerWarningRef.current !== deadlineKey) {
+      timerWarningRef.current = deadlineKey;
+      pushNotification("10 seconds left.", "warning");
+    }
+
+    if (timer.secondsRemaining > 10) {
+      timerWarningRef.current = null;
+    }
+  }, [credentials, timer]);
 
   const ticketProgress = useMemo(() => {
     if (!projectedGame || !mapConfig || !localPlayer) {
@@ -550,6 +633,31 @@ export default function App(): JSX.Element {
     }
   }
 
+  async function restartRoom() {
+    if (!credentials || !snapshot) {
+      return;
+    }
+    try {
+      const response = await requestJson<RestartRoomResponse>(`/rooms/${snapshot.room.roomCode}/restart`, {
+        method: "POST",
+        body: JSON.stringify({
+          playerSecret: credentials.playerSecret
+        } satisfies RestartRoomRequest)
+      });
+      setSnapshot(response.snapshot);
+      setSelectedRouteId(null);
+      setSelectedCityId(null);
+      setFocusedTicket(null);
+      setPinnedTicket(null);
+      setPaymentPreview(null);
+      setMultiplayerError(null);
+      pushNotification("New game started with the same room settings.", "success");
+    } catch (caught) {
+      setMultiplayerError(caught instanceof Error ? caught.message : "Could not restart the room.");
+      pushNotification(caught instanceof Error ? caught.message : "Could not restart the room.", "warning");
+    }
+  }
+
   function sendReady(ready: boolean) {
     if (!credentials) {
       return;
@@ -564,10 +672,21 @@ export default function App(): JSX.Element {
     if (!credentials) {
       return;
     }
+    setPaymentPreview(null);
     setMultiplayerError(null);
     socketRef.current?.emit("game:action", {
       ...credentials,
       action
+    });
+  }
+
+  function sendChatMessage(message: string) {
+    if (!credentials) {
+      return;
+    }
+    socketRef.current?.emit("chat:message", {
+      ...credentials,
+      message
     });
   }
 
@@ -670,52 +789,30 @@ export default function App(): JSX.Element {
     (publicGame.turn.stage === "idle" || publicGame.turn.stage === "drawing") &&
     !publicGame.turn.tookFaceUpLocomotive &&
     publicGame.turn.drawsTaken < 2;
-  const canAdvanceTurn = localIsActive && publicGame.turn.stage === "awaitingHandoff";
   const localPendingTickets = snapshot.privateState?.pendingTickets ?? [];
-  const activePlayer = publicGame.players[publicGame.activePlayerIndex];
-  const turnBannerTone = localIsActive ? "active" : "waiting";
-  const turnBannerLabel = localIsActive ? "Your turn" : "Waiting";
-  const turnBannerCopy = !localIsActive
-    ? `Waiting for ${activePlayer?.name ?? "the active player"} to finish their move.`
-    : publicGame.turn.stage === "drawing"
-      ? "Your draw is still in progress. Take the second card or finish the draw."
-      : publicGame.turn.stage === "awaitingHandoff"
-        ? "Your action is complete. End your turn to pass play to the next seat."
-        : "Claim a route, build a station, or draw cards before the timer runs out.";
-  const timerCopy =
-    timer?.deadlineAt
-      ? `${Math.max(0, Math.ceil((timer.deadlineAt - timerNow) / 1000))}s left`
-      : snapshot.room.turnTimeLimitSeconds === 0
-        ? "Untimed room"
-        : `Timer ${snapshot.room.turnTimeLimitSeconds}s`;
+  const currentStationCost = mapConfig.settings.stationsPerPlayer - localPlayer.stationsLeft + 1;
+  const highlightedTicket = focusedTicket ?? pinnedTicket;
+  const highlightedCityIds = highlightedTicket ? [highlightedTicket.from, highlightedTicket.to] : [];
 
   return (
-    <div className="app-shell" data-config-theme={visuals.theme}>
-      <header className="topbar">
-        <div className="topbar-title-block">
-          <p className="eyebrow">Hudson Hustle Multiplayer</p>
-          <h1>{mapConfig.name}</h1>
-          <div className="utility-pill-group topbar-meta-row">
-            <UtilityPill
-              label="Config"
-              value={snapshot.room.configVersion}
-              tone="accent"
-              testId="config-utility-pill"
-            />
-            <UtilityPill label="Room" value={snapshot.room.roomCode} />
-          </div>
-          <StatusBanner
-            tone={turnBannerTone}
-            eyebrow={turnBannerLabel}
-            headline={localIsActive ? "Make your move." : `${activePlayer?.name ?? "Another player"} is acting.`}
-            copy={turnBannerCopy}
-            timerLabel={timerCopy}
-            testId="turn-status-banner"
-          />
-        </div>
+    <div className="app-shell app-shell--gameplay-hud" data-config-theme={visuals.theme}>
+      <header className="topbar topbar--gameplay-actions">
+        <div className="topbar-private-spacer" aria-hidden="true" />
+        <PlayerRoster
+          players={snapshot.game.players}
+          activePlayerIndex={snapshot.game.activePlayerIndex}
+          playerPalette={visuals.palettes.players}
+          timer={
+            timer?.secondsRemaining === null || timer?.secondsRemaining === undefined
+              ? null
+              : { activePlayerIndex: snapshot.game.activePlayerIndex, secondsRemaining: timer.secondsRemaining }
+          }
+          className="player-roster--top"
+        />
         <div className="topbar-actions">
-          <ScoreGuide className="score-guide--subtle" />
-          <Button className="topbar-actions__leave" onClick={leaveRoom}>
+          <Button disabled>Guide</Button>
+          <ScoreGuide className="score-guide--subtle" label="Score" />
+          <Button className="topbar-actions__leave" onClick={() => setShowLeaveConfirm(true)}>
             Leave room
           </Button>
         </div>
@@ -723,106 +820,21 @@ export default function App(): JSX.Element {
 
       <div className="game-layout">
         <aside className="side-panel">
-          <Panel variant="status" className="round-table-panel">
-            <SectionHeader
-              eyebrow="Table status"
-              title="Table"
-              meta={`${activePlayer?.name ?? "Unknown"} active`}
-              density="ceremony"
-            />
-            <div className="scoreboard">
-              {snapshot.game.players.map((player, index) => (
-                <article key={player.id} className={`player-strip ${index === snapshot.game?.activePlayerIndex ? "player-strip--active" : ""}`}>
-                  <span className="player-swatch row-object__lead" style={{ background: visuals.palettes.players[player.color] }} />
-                  <div className="row-object__main">
-                    <strong className="row-object__title">{player.name}</strong>
-                    <span className="row-object__meta">
-                      {index === snapshot.game?.activePlayerIndex ? "Active now" : `${player.ticketCount} tickets`}
-                    </span>
-                  </div>
-                  <div className="row-object__stats">
-                    <span className="row-object__stat row-object__stat--strong">{player.score} pts</span>
-                    <span className="row-object__stat">{player.trainsLeft} trains</span>
-                    <span className="row-object__stat row-object__stat--muted">{player.stationsLeft} stations</span>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </Panel>
-
           <div className="side-panel__private-stack">
-            <Panel variant="private-info" className="card-economy-panel">
-              <SectionHeader title="Cards" meta={`${localPlayer.hand.length} hand · ${publicGame.trainDeckCount} deck`} density="compact" />
-              <div className="card-economy-panel__section">
-                <div className="card-economy-panel__section-header">
-                  <span className="card-economy-panel__label">Hand</span>
-                  <span className="card-economy-panel__meta">{localPlayer.hand.length} cards</span>
-                </div>
-                <div className="card-grid">
-                  {localPlayer.hand.map((card) => (
-                    <TransitCard key={card.id} className="artifact-card artifact-card--hand" color={card.color} context="hand" />
-                  ))}
-                </div>
-              </div>
-
-              <div className="card-economy-panel__section">
-                <div className="card-economy-panel__section-header">
-                  <span className="card-economy-panel__label">Market</span>
-                  <span className="card-economy-panel__meta">{publicGame.trainDeckCount} deck</span>
-                </div>
-                <div className="market-grid market-grid--compact">
-                  {publicGame.market.map((card, index) => (
-                    <TransitCard
-                      key={card.id}
-                      className="market-card artifact-card artifact-card--market"
-                      color={card.color}
-                      context="market"
-                      disabled={!canContinueDrawing || (publicGame.turn.drawsTaken === 1 && card.color === "locomotive")}
-                      onClick={() => sendGameAction({ type: "draw_card", source: "market", marketIndex: index })}
-                      tag={card.color === "locomotive" ? "Ends draw" : undefined}
-                    />
-                  ))}
-                </div>
-                <div className="card-economy-panel__actions">
-                  <Button disabled={!canContinueDrawing} onClick={() => sendGameAction({ type: "draw_card", source: "deck" })}>
-                    Draw from deck
-                  </Button>
-                </div>
-              </div>
-            </Panel>
-
-            <Panel variant="private-info">
-              <SectionHeader
-                title="Tickets"
-                meta={`${ticketProgress.filter((entry) => entry.completed).length}/${ticketProgress.length} connected`}
-                density="compact"
-              />
-              <div className="ticket-stack">
-                {ticketProgress.map(({ ticket, completed }) => (
-                  <div key={ticket.id} className={`ticket-row ${completed ? "ticket-row--done" : ""}`}>
-                    <div className="row-object__lead">
-                      <Chip className={`ticket-status ${completed ? "ticket-status--done" : ""}`} tone={completed ? "success" : "warning"}>
-                        {completed ? "Connected" : "Pending"}
-                      </Chip>
-                    </div>
-                    <div className="row-object__main">
-                      <span className="row-object__title ticket-route__cities">
-                        {getCityName(mapConfig, ticket.from)} <span className="ticket-arrow">to</span> {getCityName(mapConfig, ticket.to)}
-                      </span>
-                    </div>
-                    <div className="row-object__stats">
-                      <strong className="ticket-points row-object__stat row-object__stat--strong">{ticket.points}</strong>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Panel>
+            <PrivateHandRail hand={localPlayer.hand} cardPalette={visuals.palettes.cards} paymentPreview={paymentPreview} />
+            <TicketDock
+              ticketProgress={ticketProgress}
+              config={mapConfig}
+              focusedTicketId={focusedTicket?.id ?? null}
+              pinnedTicketId={pinnedTicket?.id ?? null}
+              onFocusTicket={setFocusedTicket}
+              onTogglePinnedTicket={(ticket) => setPinnedTicket((current) => current?.id === ticket.id ? null : ticket)}
+            />
           </div>
         </aside>
 
         <main className="board-column">
-          <Panel variant="neutral" className="board-panel">
-            <SectionHeader eyebrow="Public board" title="Board" meta="All players see the same network state." />
+          <BoardStage className="board-panel">
             <BoardMap
               config={mapConfig}
               backdrop={visuals.backdrop}
@@ -843,73 +855,54 @@ export default function App(): JSX.Element {
               }}
               selectedRouteId={selectedRouteId}
               selectedCityId={selectedCityId}
+              highlightedCityIds={highlightedCityIds}
               onSelectRoute={(routeId) => {
                 setSelectedRouteId(routeId);
                 setSelectedCityId(null);
+                setPaymentPreview(null);
               }}
               onSelectCity={(cityId) => {
                 setSelectedCityId(cityId);
                 setSelectedRouteId(null);
+                setPaymentPreview(null);
               }}
             />
-          </Panel>
+          </BoardStage>
 
-          <Panel variant="status" className="action-panel">
-            <SectionHeader
-              eyebrow="Turn controls"
-              title="Actions"
-              meta={publicGame.turn.summary ?? "Choose a route, city, or ticket action."}
-            />
-            {multiplayerError ? (
-              <StateSurface
-                tone="failure"
-                eyebrow="Action issue"
-                headline="This move could not complete."
-                copy={multiplayerError}
+          <InspectorDock
+            summary={publicGame.turn.summary}
+            className="action-panel"
+            activeBuildKey={selectedRouteId ?? selectedCityId}
+            chatMessages={chatMessages}
+            onSendChat={sendChatMessage}
+            marketContent={
+              <SupplyDock
+                market={publicGame.market}
+                deckCount={publicGame.trainDeckCount}
+                cardPalette={visuals.palettes.cards}
+                disabled={!canContinueDrawing}
+                isMarketCardDisabled={(card) => publicGame.turn.drawsTaken === 1 && card.color === "locomotive"}
+                onDrawFromMarket={(marketIndex) => sendGameAction({ type: "draw_card", source: "market", marketIndex })}
+                onDrawFromDeck={() => sendGameAction({ type: "draw_card", source: "deck" })}
+                onDrawTickets={() => sendGameAction({ type: "draw_tickets" })}
+                drawTicketsDisabled={!canTakeTurnAction}
+                className="supply-dock--board"
               />
-            ) : null}
-
-            {publicGame.phase === "main" && !currentRoute && !currentCity ? (
+            }
+            buildContent={
+              <>
+                {publicGame.phase === "main" && !currentRoute && !currentCity ? (
               <div className="action-empty-prompt" data-testid="action-empty-state">
-                <span className="action-empty-prompt__title">Select a route or city.</span>
-                <span className="action-empty-prompt__copy">Actions appear here once you inspect the board.</span>
+                <span className="action-empty-prompt__title">Select a route or station.</span>
+                <span className="action-empty-prompt__copy">Build options appear here.</span>
               </div>
-            ) : null}
+                ) : null}
 
-            {publicGame.phase === "gameOver" ? (
-              <div className="endgame-grid">
-                {projectedGame.players.map((player) => (
-                  <SurfaceCard key={player.id} as="article" variant="summary" title={player.name} className="endgame-card">
-                    <div className="endgame-card__hero">
-                      <p className="endgame-score">{player.score}</p>
-                      <span className="endgame-score__label">points</span>
-                    </div>
-                    <EndgameBreakdown player={player} config={mapConfig} />
-                  </SurfaceCard>
-                ))}
-              </div>
-            ) : null}
-
-            {publicGame.phase === "main" ? (
-              <div className="action-rail">
-                <Button disabled={!canTakeTurnAction} onClick={() => sendGameAction({ type: "draw_tickets" })}>
-                  Draw tickets
-                </Button>
-                <Button variant="primary" disabled={!canAdvanceTurn} onClick={() => sendGameAction({ type: "advance_turn" })}>
-                  End turn
-                </Button>
-                <span className="action-rail__timer">
-                  {snapshot.room.turnTimeLimitSeconds === 0 ? "Untimed room" : `Timer ${snapshot.room.turnTimeLimitSeconds}s`}
-                </span>
-              </div>
-            ) : null}
-
-            {currentRoute && publicGame.phase === "main" ? (
+                {currentRoute && publicGame.phase === "main" ? (
               <SurfaceCard
                 variant="detail"
                 className="detail-card"
                 data-detail-kind="route"
-                eyebrow="Route detail"
                 title={`${getCityName(mapConfig, currentRoute.from)} → ${getCityName(mapConfig, currentRoute.to)}`}
               >
                 <div className="detail-card__summary">
@@ -932,9 +925,17 @@ export default function App(): JSX.Element {
                         key={color}
                         style={{ ["--choice-chip-accent" as string]: visuals.palettes.cards[color] }}
                         disabled={!canTakeTurnAction}
+                        onMouseEnter={() =>
+                          setPaymentPreview({ color, totalCost: currentRoute.length, minimumLocomotives: currentRoute.locomotiveCost ?? 0 })
+                        }
+                        onMouseLeave={() => setPaymentPreview(null)}
+                        onFocus={() =>
+                          setPaymentPreview({ color, totalCost: currentRoute.length, minimumLocomotives: currentRoute.locomotiveCost ?? 0 })
+                        }
+                        onBlur={() => setPaymentPreview(null)}
                         onClick={() => sendGameAction({ type: "claim_route", routeId: currentRoute.id, color })}
                       >
-                        Claim with {color}
+                        Claim {formatCardLabel(color)}
                       </ChoiceChipButton>
                     ))
                   ) : (
@@ -942,14 +943,13 @@ export default function App(): JSX.Element {
                   )}
                 </div>
               </SurfaceCard>
-            ) : null}
+                ) : null}
 
-            {currentCity && publicGame.phase === "main" ? (
-              <SurfaceCard variant="detail" className="detail-card" eyebrow="City detail" title={currentCity.name}>
+                {currentCity && publicGame.phase === "main" ? (
+              <SurfaceCard variant="detail" className="detail-card" title={currentCity.name}>
                 <div className="detail-card__summary">
                   <div className="detail-card__facts">
-                    <span className="detail-card__fact">borrow 1 rival link</span>
-                    <span className="detail-card__fact">endgame only</span>
+                    <span className="detail-card__fact">Station</span>
                   </div>
                   <p className="detail-card__prompt">Choose a payment color.</p>
                 </div>
@@ -962,9 +962,13 @@ export default function App(): JSX.Element {
                         key={color}
                         style={{ ["--choice-chip-accent" as string]: visuals.palettes.cards[color] }}
                         disabled={!canTakeTurnAction}
+                        onMouseEnter={() => setPaymentPreview({ color, totalCost: currentStationCost })}
+                        onMouseLeave={() => setPaymentPreview(null)}
+                        onFocus={() => setPaymentPreview({ color, totalCost: currentStationCost })}
+                        onBlur={() => setPaymentPreview(null)}
                         onClick={() => sendGameAction({ type: "build_station", cityId: currentCity.id, color })}
                       >
-                        Build with {color}
+                        Build {formatCardLabel(color)}
                       </ChoiceChipButton>
                     ))
                   ) : (
@@ -974,13 +978,45 @@ export default function App(): JSX.Element {
                   )}
                 </div>
               </SurfaceCard>
-            ) : null}
-          </Panel>
+                ) : null}
+              </>
+            }
+          />
         </main>
       </div>
 
+      {publicGame.phase === "gameOver" ? (
+        <GameOverLayer
+          title="Final board locked."
+          subtitle="Review the completed routes, station saves, and ticket swings before leaving the room."
+          actions={
+            <>
+              <Button disabled>Share result</Button>
+              <Button variant="primary" onClick={() => void restartRoom()}>
+                Play again
+              </Button>
+              <Button variant="primary" onClick={() => setShowLeaveConfirm(true)}>
+                Leave room
+              </Button>
+            </>
+          }
+        >
+          <div className="endgame-grid">
+            {projectedGame.players.map((player) => (
+              <SurfaceCard key={player.id} as="article" variant="summary" title={player.name} className="endgame-card">
+                <div className="endgame-card__hero">
+                  <p className="endgame-score">{player.score}</p>
+                  <span className="endgame-score__label">points</span>
+                </div>
+                <EndgameBreakdown player={player} config={mapConfig} />
+              </SurfaceCard>
+            ))}
+          </div>
+        </GameOverLayer>
+      ) : null}
+
       {localPendingTickets.length > 0 ? (
-        <TicketPicker
+        <TicketChoiceSheet
           title={publicGame.phase === "initialTickets" ? "Choose starting tickets" : "Keep new tickets"}
           subtitle={
             publicGame.phase === "initialTickets"
@@ -991,6 +1027,8 @@ export default function App(): JSX.Element {
           config={mapConfig}
           minimumKeep={publicGame.phase === "initialTickets" ? 2 : 1}
           selectedIds={selectedTicketIds}
+          focusedTicketId={focusedTicket?.id ?? null}
+          onFocusTicket={setFocusedTicket}
           onToggle={(ticketId) =>
             setSelectedTicketIds((current) =>
               current.includes(ticketId) ? current.filter((id) => id !== ticketId) : [...current, ticketId]
@@ -1005,6 +1043,23 @@ export default function App(): JSX.Element {
           }
         />
       ) : null}
+
+      {showLeaveConfirm ? (
+        <ModalShell width="md" align="center" cardClassName="leave-confirm-card">
+          <SectionHeader eyebrow="Leave room" title="Leave this game?" density="ceremony" />
+          <p>You will return to setup and clear this room from the current browser.</p>
+          <div className="setup-actions">
+            <Button onClick={() => setShowLeaveConfirm(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={leaveRoom}>
+              Leave
+            </Button>
+          </div>
+        </ModalShell>
+      ) : null}
+
+      <NotificationPipe notifications={notifications} />
     </div>
   );
 }

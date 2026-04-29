@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   chooseBotAction,
   getAffordableRouteColors,
@@ -11,35 +11,43 @@ import {
   type GameAction,
   type GameState,
   type PublicGameState,
-  type SeatPrivateState
+  type SeatPrivateState,
+  type TicketDef,
+  type TrainCardColor
 } from "@hudson-hustle/game-core";
 import {
   cardColorPalette,
   hudsonHustleCurrentConfigId,
-  hudsonHustleCurrentConfigMeta,
   hudsonHustleReleasedConfigs,
   getHudsonHustleMapByConfigId,
-  getHudsonHustleRegisteredConfig,
   getHudsonHustleVisualsByConfigId,
   playerColorPalette
 } from "@hudson-hustle/game-data";
 import { BoardMap } from "./BoardMap";
 import { EndgameBreakdown } from "./EndgameBreakdown";
+import {
+  BoardStage,
+  GameOverLayer,
+  InspectorDock,
+  NotificationPipe,
+  PlayerRoster,
+  PrivateHandRail,
+  SupplyDock,
+  TicketChoiceSheet,
+  TicketDock,
+  formatCardLabel,
+  type GameplayNotification
+} from "./GameplayHud";
 import { OnboardingTutorial, type TutorialStep } from "./OnboardingTutorial";
 import { ScoreGuide } from "./ScoreGuide";
 import { SetupScreen } from "./SetupScreen";
-import { TicketPicker } from "./TicketPicker";
 import { TransitCard } from "./TransitCard";
 import { Button } from "./system/Button";
-import { Chip } from "./system/Chip";
 import { ChoiceChipButton } from "./system/ChoiceChipButton";
 import { ModalShell } from "./system/ModalShell";
 import { Panel } from "./system/Panel";
 import { SectionHeader } from "./system/SectionHeader";
 import { SurfaceCard } from "./system/SurfaceCard";
-import { StateSurface } from "./system/StateSurface";
-import { StatusBanner } from "./system/StatusBanner";
-import { UtilityPill } from "./system/UtilityPill";
 
 const saveKey = "hudson-hustle-save-v1";
 const tutorialSeenKey = "hudson-hustle-onboarding-v1-1";
@@ -147,7 +155,7 @@ const tutorialSteps: TutorialStep[] = [
     id: "scoreboard",
     title: "Track endgame pressure",
     summary:
-      "The round table shows score, trains left, stations left, and ticket counts for every player. This is where you feel late-game pressure.",
+      "The player roster shows trains left, stations left, ticket counts, and whose turn is active. This is where you feel late-game pressure without exposing private hands.",
     keyPoints: [
       "The final round starts when a player ends a turn with two or fewer trains left, or when no route remains open.",
       "Unused stations are worth points, so building one is a tradeoff.",
@@ -253,17 +261,21 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
   const [selectedTicketIds, setSelectedTicketIds] = useState<string[]>([]);
+  const [focusedTicket, setFocusedTicket] = useState<TicketDef | null>(null);
+  const [pinnedTicket, setPinnedTicket] = useState<TicketDef | null>(null);
+  const [paymentPreview, setPaymentPreview] = useState<{ color: TrainCardColor; totalCost: number; minimumLocomotives?: number } | null>(null);
   const [revealedDeckCard, setRevealedDeckCard] = useState<keyof typeof cardColorPalette | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
   const [tutorialStepIndex, setTutorialStepIndex] = useState<number | null>(null);
   const [hasSavedGame, setHasSavedGame] = useState<boolean>(() => typeof window !== "undefined" && Boolean(readSavedGame()));
   const [localConfigId, setLocalConfigId] = useState(hudsonHustleCurrentConfigId);
   const [localTurnTimeLimitSeconds, setLocalTurnTimeLimitSeconds] = useState(0);
   const [localBotPlayerIds, setLocalBotPlayerIds] = useState<string[]>([]);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [notifications, setNotifications] = useState<GameplayNotification[]>([]);
+  const notificationIdRef = useRef(0);
   const localMap = useMemo(() => getHudsonHustleMapByConfigId(localConfigId), [localConfigId]);
   const localVisuals = useMemo(() => getHudsonHustleVisualsByConfigId(localConfigId), [localConfigId]);
-  const localConfigBundle = getHudsonHustleRegisteredConfig(localConfigId);
-  const localConfigMeta = localConfigBundle?.meta ?? hudsonHustleCurrentConfigMeta;
 
   useEffect(() => {
     const seenTutorial = window.localStorage.getItem(tutorialSeenKey);
@@ -280,9 +292,38 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
     setHasSavedGame(true);
   }, [game]);
 
+  function pushNotification(message: string, tone: GameplayNotification["tone"] = "neutral") {
+    notificationIdRef.current += 1;
+    const id = `local-${Date.now()}-${notificationIdRef.current}`;
+    setNotifications((current) => [...current.slice(-3), { id, message, tone }]);
+    window.setTimeout(() => {
+      setNotifications((current) => current.filter((notification) => notification.id !== id));
+    }, 4200);
+  }
+
+  function announceGameChange(previous: GameState, nextGame: GameState) {
+    const nextLog = nextGame.log.at(-1);
+
+    if (nextGame.phase === "gameOver" && previous.phase !== "gameOver") {
+      pushNotification("Final scores are in.", "success");
+      return;
+    }
+
+    if (nextGame.finalRoundTriggeredBy && previous.finalRoundTriggeredBy !== nextGame.finalRoundTriggeredBy) {
+      const triggerPlayer = nextGame.players.find((player) => player.id === nextGame.finalRoundTriggeredBy);
+      pushNotification(`${triggerPlayer?.name ?? "A player"} triggered the final round.`, "warning");
+      return;
+    }
+
+    if (nextLog && nextGame.log.length > previous.log.length && nextLog !== "Game setup complete.") {
+      pushNotification(nextLog);
+    }
+  }
+
   const currentPlayer = game ? getCurrentPlayer(game) : null;
   const isCurrentPlayerLocalBot = currentPlayer ? localBotPlayerIds.includes(currentPlayer.id) : false;
   const pendingTickets = currentPlayer?.pendingTickets ?? [];
+  const pendingTicketIds = useMemo(() => pendingTickets.map((ticket) => ticket.id).join("|"), [pendingTickets]);
 
   useEffect(() => {
     if (!game || pendingTickets.length === 0) {
@@ -292,7 +333,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
 
     const minimumKeep = game.phase === "initialTickets" ? 2 : 1;
     setSelectedTicketIds(pendingTickets.slice(0, minimumKeep).map((ticket) => ticket.id));
-  }, [game, pendingTickets]);
+  }, [game?.phase, pendingTicketIds]);
 
   useEffect(() => {
     if (!game || game.phase === "gameOver" || localBotPlayerIds.length === 0) {
@@ -329,14 +370,20 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
             }
           }
 
+          announceGameChange(current, nextGame);
           setSelectedRouteId(null);
           setSelectedCityId(null);
+          setFocusedTicket(null);
+          setPinnedTicket(null);
+          setPaymentPreview(null);
           setRevealedDeckCard(null);
           setError(null);
           setVisibility(nextGame.phase === "gameOver" ? "visible" : "handoff");
           return nextGame;
         } catch (caught) {
-          setError(caught instanceof Error ? caught.message : "Local bot could not complete its turn.");
+          const message = caught instanceof Error ? caught.message : "Local bot could not complete its turn.";
+          setError(message);
+          pushNotification(message, "warning");
           setVisibility("visible");
           return current;
         }
@@ -415,6 +462,10 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
     setVisibility("visible");
     setSelectedRouteId(null);
     setSelectedCityId(null);
+    setFocusedTicket(null);
+    setPinnedTicket(null);
+    setPaymentPreview(null);
+    setNotifications([]);
     setError(null);
   }
 
@@ -429,6 +480,10 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
     setVisibility("visible");
     setSelectedRouteId(null);
     setSelectedCityId(null);
+    setFocusedTicket(null);
+    setPinnedTicket(null);
+    setPaymentPreview(null);
+    setNotifications([]);
     setError(null);
   }
 
@@ -441,8 +496,13 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
     setSelectedRouteId(null);
     setSelectedCityId(null);
     setSelectedTicketIds([]);
+    setFocusedTicket(null);
+    setPinnedTicket(null);
+    setPaymentPreview(null);
     setRevealedDeckCard(null);
+    setNotifications([]);
     setError(null);
+    setShowLeaveConfirm(false);
   }
 
   function openTutorial() {
@@ -486,6 +546,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
       const nextGame = reduceGame(game, action, localMap);
       setGame(nextGame);
       setError(null);
+      announceGameChange(game, nextGame);
 
       if (action.type === "draw_card" && action.source === "deck") {
         const activeAfter = nextGame.players[nextGame.activePlayerIndex];
@@ -517,9 +578,12 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
         setVisibility("postTurn");
       } else {
         setVisibility("visible");
+        setPaymentPreview(null);
       }
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Something went wrong.");
+      const message = caught instanceof Error ? caught.message : "Something went wrong.";
+      setError(message);
+      pushNotification(message, "warning");
     }
   }
 
@@ -560,144 +624,51 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   const currentRoute = selectedRouteId ? localMap.routes.find((route) => route.id === selectedRouteId) : null;
   const currentRouteClaim = currentRoute ? game.routeClaims.find((claim) => claim.routeId === currentRoute.id) : null;
   const currentRouteOwner = currentRouteClaim ? game.players.find((player) => player.id === currentRouteClaim.playerId) : null;
-  const localBannerTone =
-    error ? "failure" : game.phase === "gameOver" ? "neutral" : visibility === "postTurn" ? "warning" : visibility === "handoff" ? "waiting" : "active";
-  const localBannerEyebrow =
-    game.phase === "gameOver" ? "Final scores" : visibility === "postTurn" ? "Turn complete" : visibility === "handoff" ? "Next player" : "Local turn";
-  const localBannerHeadline =
-    error
-      ? "Local game needs attention."
-      : game.phase === "gameOver"
-        ? "Match complete."
-        : visibility === "postTurn"
-          ? `${activePlayer.name}, pass the laptop.`
-          : visibility === "handoff"
-            ? `${activePlayer.name}, take over.`
-            : `${activePlayer.name}, make your move.`;
-  const localBannerCopy = error
-    ? error
-    : game.phase === "gameOver"
-      ? "Review the final table, then head back to setup when you are ready for another match."
-      : visibility === "postTurn"
-        ? game.turn.summary ?? "Your action is locked in. End the handoff once the next player is ready."
-        : visibility === "handoff"
-          ? "The board is safe to view. Private hands and tickets remain hidden until the next player continues."
-          : game.turn.stage === "drawing"
-            ? "Finish the current draw before taking another action."
-            : game.turn.stage === "awaitingHandoff"
-              ? "Your action is complete. End the turn to pass the laptop."
-              : "Claim a route, build a station, or draw tickets on this turn.";
+  const currentStationCost = localMap.settings.stationsPerPlayer - activePlayer.stationsLeft + 1;
+  const highlightedTicket = focusedTicket ?? pinnedTicket;
+  const highlightedCityIds = highlightedTicket ? [highlightedTicket.from, highlightedTicket.to] : [];
 
   return (
-    <div className="app-shell" data-config-theme={localVisuals.theme}>
-      <header className="topbar">
-        <div>
-          <p className="eyebrow">Hudson Hustle</p>
-          <h1>{localMap.name}</h1>
-          <div className="utility-pill-group">
-            <div className="config-hover-card">
-              <UtilityPill
-                label="Config"
-                value={`${localConfigMeta.version} · ${localConfigId}`}
-                tone="accent"
-              />
-              <span className="config-summary-tooltip">{localConfigMeta.summary}</span>
-            </div>
-          </div>
-          <StatusBanner
-            tone={localBannerTone}
-            eyebrow={localBannerEyebrow}
-            headline={localBannerHeadline}
-            copy={localBannerCopy}
-            timerLabel={
-              game.phase === "gameOver"
-                ? "Final"
-                : visibility === "handoff"
-                  ? "Hidden"
-                  : localTurnTimeLimitSeconds === 0
-                    ? "Untimed"
-                    : `Timer ${localTurnTimeLimitSeconds}s`
-            }
-          />
-        </div>
+    <div className="app-shell app-shell--gameplay-hud" data-config-theme={localVisuals.theme}>
+      <header className="topbar topbar--gameplay-actions">
+        <div className="topbar-private-spacer" aria-hidden="true" />
+        <PlayerRoster
+          players={game.players}
+          activePlayerIndex={game.activePlayerIndex}
+          playerPalette={playerColorPalette}
+          className={`player-roster--top ${tutorialTarget === "scoreboard" ? "panel--tutorial-focus" : ""}`}
+        />
         <div className="topbar-actions">
-          <ScoreGuide />
           <Button onClick={openTutorial}>
-            Tutorial
+            Guide
           </Button>
-          <Button onClick={resetGame}>
-            Back to setup
+          <ScoreGuide className="score-guide--subtle" label="Score" />
+          <Button onClick={() => setShowLeaveConfirm(true)}>
+            Leave game
           </Button>
         </div>
       </header>
 
       <div className={`game-layout ${visibility !== "visible" ? "game-layout--obscured" : ""} ${tutorialTarget ? "game-layout--tutorial" : ""}`}>
         <aside className="side-panel">
-          <Panel variant="status" className={tutorialTarget === "scoreboard" ? "panel--tutorial-focus" : ""}>
-            <SectionHeader
-              eyebrow="Table status"
-              title="Round table"
-              meta={game.phase === "gameOver" ? "Final score" : `${activePlayer.name}'s turn`}
-              density="ceremony"
-            />
-            <div className="scoreboard">
-              {game.players.map((player, index) => (
-                <article key={player.id} className={`player-strip ${index === game.activePlayerIndex ? "player-strip--active" : ""}`}>
-                  <span className="player-swatch row-object__lead" style={{ background: playerColorPalette[player.color] }} />
-                  <div className="row-object__main">
-                    <strong className="row-object__title">{player.name}</strong>
-                    <span className="row-object__meta">{player.tickets.length} tickets</span>
-                  </div>
-                  <div className="row-object__stats">
-                    <span className="row-object__stat row-object__stat--strong">{player.score} pts</span>
-                    <span className="row-object__stat">{player.trainsLeft} trains</span>
-                    <span className="row-object__stat">{player.stationsLeft} stations</span>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </Panel>
-
           {visibility === "visible" ? (
-            <>
-              <div className="side-panel__private-stack">
-                <Panel variant="private-info" className={tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}>
-                  <SectionHeader title="Hand" meta={`${activePlayer.hand.length} cards`} density="compact" />
-                  <div className="card-grid">
-                    {activePlayer.hand.map((card) => (
-                      <TransitCard key={card.id} className="artifact-card artifact-card--hand" color={card.color} context="hand" />
-                    ))}
-                  </div>
-                </Panel>
-
-                <Panel variant="private-info" className={tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}>
-                  <SectionHeader
-                    title="Tickets"
-                    meta={`${ticketProgress.filter((entry) => entry.completed).length}/${ticketProgress.length} connected`}
-                    density="compact"
-                  />
-                  <div className="ticket-stack">
-                    {ticketProgress.map(({ ticket, completed }) => (
-                      <div key={ticket.id} className={`ticket-row ${completed ? "ticket-row--done" : ""}`}>
-                        <div className="row-object__lead">
-                          <Chip className={`ticket-status ${completed ? "ticket-status--done" : ""}`} tone={completed ? "success" : "warning"}>
-                            {completed ? "Connected" : "Pending"}
-                          </Chip>
-                        </div>
-                        <div className="row-object__main">
-                          <span className="row-object__title ticket-route__cities">
-                            {getCityName(localMap, ticket.from)} <span className="ticket-arrow">to</span> {getCityName(localMap, ticket.to)}
-                          </span>
-                        </div>
-                        <div className="row-object__stats">
-                          <strong className="ticket-points row-object__stat row-object__stat--strong">{ticket.points}</strong>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </Panel>
-              </div>
-            </>
+            <div className="side-panel__private-stack">
+              <PrivateHandRail
+                hand={activePlayer.hand}
+                cardPalette={cardColorPalette}
+                paymentPreview={paymentPreview}
+                className={tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}
+              />
+              <TicketDock
+                ticketProgress={ticketProgress}
+                config={localMap}
+                focusedTicketId={focusedTicket?.id ?? null}
+                pinnedTicketId={pinnedTicket?.id ?? null}
+                onFocusTicket={setFocusedTicket}
+                onTogglePinnedTicket={(ticket) => setPinnedTicket((current) => current?.id === ticket.id ? null : ticket)}
+                className={tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}
+              />
+            </div>
           ) : (
             <Panel variant="alert" className="hidden-panel">
               <SectionHeader eyebrow="Privacy shield" title="Private info hidden" density="standard" />
@@ -705,30 +676,10 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
             </Panel>
           )}
 
-          <Panel variant="neutral" className={`side-panel__supply-panel ${tutorialTarget === "market" ? "panel--tutorial-focus" : ""}`}>
-            <SectionHeader title="Market" meta={`${game.trainDeck.length} deck`} density="compact" />
-            <div className="market-grid">
-              {game.market.map((card, index) => (
-                <TransitCard
-                  key={card.id}
-                  className="market-card artifact-card artifact-card--market"
-                  color={card.color}
-                  context="market"
-                  disabled={marketDisabled}
-                  onClick={() => applyAction({ type: "draw_card", source: "market", marketIndex: index })}
-                  tag={card.color === "locomotive" ? "Ends draw" : undefined}
-                />
-              ))}
-            </div>
-            <Button disabled={marketDisabled} onClick={() => applyAction({ type: "draw_card", source: "deck" })}>
-              Draw from deck
-            </Button>
-          </Panel>
         </aside>
 
         <main className="board-column">
-          <Panel variant="neutral" className={`board-panel ${tutorialTarget === "board" ? "panel--tutorial-focus" : ""}`}>
-            <SectionHeader eyebrow="Public board" title="Board" meta="Click a route or city to inspect actions" />
+          <BoardStage className={`board-panel ${tutorialTarget === "board" ? "panel--tutorial-focus" : ""}`}>
             <BoardMap
               config={localMap}
               backdrop={localVisuals.backdrop}
@@ -749,69 +700,51 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
               }}
               selectedRouteId={selectedRouteId}
               selectedCityId={selectedCityId}
+              highlightedCityIds={highlightedCityIds}
               onSelectRoute={(routeId) => {
                 setSelectedRouteId(routeId);
                 setSelectedCityId(null);
+                setPaymentPreview(null);
               }}
               onSelectCity={(cityId) => {
                 setSelectedCityId(cityId);
                 setSelectedRouteId(null);
+                setPaymentPreview(null);
               }}
             />
-          </Panel>
+          </BoardStage>
 
-          <Panel variant="status" className={`action-panel ${tutorialTarget === "action" ? "panel--tutorial-focus" : ""}`}>
-            <SectionHeader eyebrow="Turn controls" title="Action rail" meta={game.turn.summary ?? "Choose one action for this turn."} />
-            {error ? (
-              <StateSurface
-                tone="failure"
-                eyebrow="Action issue"
-                headline="This move could not complete."
-                copy={error}
+          <InspectorDock
+            summary={game.turn.summary}
+            className={`action-panel ${tutorialTarget === "action" ? "panel--tutorial-focus" : ""}`}
+            activeBuildKey={selectedRouteId ?? selectedCityId}
+            marketContent={
+              <SupplyDock
+                market={game.market}
+                deckCount={game.trainDeck.length}
+                cardPalette={cardColorPalette}
+                disabled={marketDisabled}
+                onDrawFromMarket={(marketIndex) => applyAction({ type: "draw_card", source: "market", marketIndex })}
+                onDrawFromDeck={() => applyAction({ type: "draw_card", source: "deck" })}
+                onDrawTickets={() => applyAction({ type: "draw_tickets" })}
+                drawTicketsDisabled={!canTakeTurnAction}
+                className={`supply-dock--board ${tutorialTarget === "market" ? "panel--tutorial-focus" : ""}`}
               />
-            ) : null}
+            }
+            buildContent={
+              <>
+                {game.phase === "main" && visibility === "visible" && !currentRoute && !currentCity ? (
+                  <div className="action-empty-prompt" data-testid="action-empty-state">
+                    <span className="action-empty-prompt__title">Select a route or station.</span>
+                    <span className="action-empty-prompt__copy">Build options appear here.</span>
+                  </div>
+                ) : null}
 
-            {game.phase === "main" && visibility === "visible" && !currentRoute && !currentCity ? (
-              <StateSurface
-                tone="neutral"
-                eyebrow="Inspect the board"
-                headline="Select a route or city."
-                copy="The action rail will show legal payments and build options once you inspect a board element."
-                testId="action-empty-state"
-              />
-            ) : null}
-
-            {game.phase === "gameOver" ? (
-              <div className="endgame-grid">
-                {game.players.map((player) => (
-                  <SurfaceCard key={player.id} as="article" variant="summary" eyebrow="Final score" title={player.name} className="endgame-card">
-                    <div className="endgame-card__hero">
-                      <p className="endgame-score">{player.score}</p>
-                      <span className="endgame-score__label">points</span>
-                    </div>
-                    <EndgameBreakdown player={player} config={localMap} />
-                  </SurfaceCard>
-                ))}
-              </div>
-            ) : null}
-
-            {game.phase === "main" && visibility === "visible" ? (
-              <div className="action-rail">
-                <Button disabled={!canTakeTurnAction} onClick={() => applyAction({ type: "draw_tickets" })}>
-                  Draw tickets
-                </Button>
-                <Button disabled>
-                  Score updates automatically
-                </Button>
-              </div>
-            ) : null}
-
-            {currentRoute && game.phase === "main" && visibility === "visible" ? (
+                {currentRoute && game.phase === "main" && visibility === "visible" ? (
               <SurfaceCard
                 variant="detail"
                 className="detail-card"
                 data-detail-kind="route"
-                eyebrow="Route detail"
                 title={`${getCityName(localMap, currentRoute.from)} → ${getCityName(localMap, currentRoute.to)}`}
               >
                 <div className="detail-card__summary">
@@ -824,7 +757,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
                     ) : null}
                   </div>
                   <p className="detail-card__prompt">
-                    {currentRouteOwner ? `Claimed by ${currentRouteOwner.name}.` : "Choose a payment color to claim this segment."}
+                    {currentRouteOwner ? `Claimed by ${currentRouteOwner.name}.` : "Choose payment color."}
                   </p>
                 </div>
                 <div className="detail-card__decision-shelf chip-row">
@@ -834,9 +767,17 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
                         key={color}
                         style={{ ["--choice-chip-accent" as string]: cardColorPalette[color] }}
                         disabled={!canTakeTurnAction}
+                        onMouseEnter={() =>
+                          setPaymentPreview({ color, totalCost: currentRoute.length, minimumLocomotives: currentRoute.locomotiveCost ?? 0 })
+                        }
+                        onMouseLeave={() => setPaymentPreview(null)}
+                        onFocus={() =>
+                          setPaymentPreview({ color, totalCost: currentRoute.length, minimumLocomotives: currentRoute.locomotiveCost ?? 0 })
+                        }
+                        onBlur={() => setPaymentPreview(null)}
                         onClick={() => applyAction({ type: "claim_route", routeId: currentRoute.id, color })}
                       >
-                        Claim with {color}
+                        Claim {formatCardLabel(color)}
                       </ChoiceChipButton>
                     ))
                   ) : (
@@ -844,17 +785,15 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
                   )}
                 </div>
               </SurfaceCard>
-            ) : null}
+                ) : null}
 
-            {currentCity && game.phase === "main" && visibility === "visible" ? (
-              <SurfaceCard variant="detail" className="detail-card" eyebrow="City detail" title={currentCity.name}>
+                {currentCity && game.phase === "main" && visibility === "visible" ? (
+              <SurfaceCard variant="detail" className="detail-card" title={currentCity.name}>
                 <div className="detail-card__summary">
                   <div className="detail-card__facts">
-                    <span className="detail-card__fact">station city</span>
-                    <span className="detail-card__fact">borrow 1 rival link</span>
-                    <span className="detail-card__fact">endgame only</span>
+                    <span className="detail-card__fact">Station</span>
                   </div>
-                  <p className="detail-card__prompt">Choose a payment color to build a station here.</p>
+                  <p className="detail-card__prompt">Choose payment color.</p>
                 </div>
                 <div className="detail-card__decision-shelf chip-row">
                   {currentCityOccupied ? (
@@ -865,9 +804,13 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
                         key={color}
                         style={{ ["--choice-chip-accent" as string]: cardColorPalette[color] }}
                         disabled={!canTakeTurnAction}
+                        onMouseEnter={() => setPaymentPreview({ color, totalCost: currentStationCost })}
+                        onMouseLeave={() => setPaymentPreview(null)}
+                        onFocus={() => setPaymentPreview({ color, totalCost: currentStationCost })}
+                        onBlur={() => setPaymentPreview(null)}
                         onClick={() => applyAction({ type: "build_station", cityId: currentCity.id, color })}
                       >
-                        Build with {color}
+                        Build {formatCardLabel(color)}
                       </ChoiceChipButton>
                     ))
                   ) : (
@@ -877,16 +820,45 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
                   )}
                 </div>
               </SurfaceCard>
-            ) : null}
+                ) : null}
 
-            {game.turn.latestTunnelReveal.length > 0 && visibility === "visible" ? (
+                {game.turn.latestTunnelReveal.length > 0 && visibility === "visible" ? (
               <SurfaceCard variant="detail" className="detail-card detail-card--tunnel" eyebrow="Tunnel check" title="Tunnel reveal">
                 <p>{game.turn.latestTunnelReveal.join(", ")}</p>
               </SurfaceCard>
-            ) : null}
-          </Panel>
+                ) : null}
+              </>
+            }
+          />
         </main>
       </div>
+
+      {game.phase === "gameOver" ? (
+        <GameOverLayer
+          title="Final board locked."
+          subtitle="Review the completed routes, station saves, and ticket swings before leaving the table."
+          actions={
+            <>
+              <Button disabled>Share result</Button>
+              <Button variant="primary" onClick={resetGame}>
+                Play again
+              </Button>
+            </>
+          }
+        >
+          <div className="endgame-grid">
+            {game.players.map((player) => (
+              <SurfaceCard key={player.id} as="article" variant="summary" eyebrow="Final score" title={player.name} className="endgame-card">
+                <div className="endgame-card__hero">
+                  <p className="endgame-score">{player.score}</p>
+                  <span className="endgame-score__label">points</span>
+                </div>
+                <EndgameBreakdown player={player} config={localMap} />
+              </SurfaceCard>
+            ))}
+          </div>
+        </GameOverLayer>
+      ) : null}
 
       {visibility === "postTurn" && game.phase !== "gameOver" ? (
         <ModalShell tone={tutorialTarget === "handoff" ? "tutorial" : "default"} width="md" align="center">
@@ -909,7 +881,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
       ) : null}
 
       {pendingTickets.length > 0 && visibility === "visible" && !isCurrentPlayerLocalBot ? (
-        <TicketPicker
+        <TicketChoiceSheet
           title={game.phase === "initialTickets" ? `${activePlayer.name}, choose starting tickets` : `${activePlayer.name}, keep new tickets`}
           subtitle={
             game.phase === "initialTickets"
@@ -920,6 +892,8 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
           config={localMap}
           minimumKeep={game.phase === "initialTickets" ? 2 : 1}
           selectedIds={selectedTicketIds}
+          focusedTicketId={focusedTicket?.id ?? null}
+          onFocusTicket={setFocusedTicket}
           onToggle={(ticketId) =>
             setSelectedTicketIds((current) =>
               current.includes(ticketId) ? current.filter((id) => id !== ticketId) : [...current, ticketId]
@@ -945,6 +919,22 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
         </ModalShell>
       ) : null}
 
+      {showLeaveConfirm ? (
+        <ModalShell width="md" align="center" cardClassName="leave-confirm-card">
+          <SectionHeader eyebrow="Leave game" title="Leave this game?" density="ceremony" />
+          <p>Your local match will return to setup.</p>
+          <div className="setup-actions">
+            <Button onClick={() => setShowLeaveConfirm(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" onClick={resetGame}>
+              Leave
+            </Button>
+          </div>
+        </ModalShell>
+      ) : null}
+
+      <NotificationPipe notifications={notifications} />
       {tutorial}
     </div>
   );

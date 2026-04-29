@@ -2,10 +2,12 @@ import Fastify from "fastify";
 import cors from "@fastify/cors";
 import { Server as SocketIOServer } from "socket.io";
 import type {
+  ChatMessage,
   ClientToServerEvents,
   CreateRoomRequest,
   JoinRoomRequest,
   RejoinRoomRequest,
+  RestartRoomRequest,
   ServerToClientEvents,
   StartRoomRequest
 } from "@hudson-hustle/game-core";
@@ -90,6 +92,7 @@ export async function createServerApp() {
   let io: SocketIOServer<ClientToServerEvents, ServerToClientEvents>;
   const seatConnectionCounts = new Map<string, number>();
   const roomDeadlines = new Map<string, number | null>();
+  const roomChatMessages = new Map<string, ChatMessage[]>();
 
   const roomService = new RoomService(
     repository,
@@ -157,6 +160,10 @@ export async function createServerApp() {
 
   app.post<{ Params: { roomCode: string }; Body: StartRoomRequest }>("/rooms/:roomCode/start", async (request) => {
     return roomService.startRoom(request.params.roomCode, request.body);
+  });
+
+  app.post<{ Params: { roomCode: string }; Body: RestartRoomRequest }>("/rooms/:roomCode/restart", async (request) => {
+    return roomService.restartRoom(request.params.roomCode, request.body);
   });
 
   app.get<{ Params: { roomCode: string }; Querystring: { seatId?: string; playerSecret?: string } }>("/rooms/:roomCode", async (request) => {
@@ -228,6 +235,7 @@ export async function createServerApp() {
               ? Math.max(0, Math.ceil(((roomDeadlines.get(payload.roomCode) ?? 0) - Date.now()) / 1000))
               : null
         });
+        socket.emit("chat:update", roomChatMessages.get(payload.roomCode) ?? []);
       } catch (error) {
         socket.emit("game:error", {
           message: error instanceof Error ? error.message : "Could not subscribe to the room."
@@ -260,6 +268,34 @@ export async function createServerApp() {
       } catch (error) {
         socket.emit("game:error", {
           message: error instanceof Error ? error.message : "Could not apply that action."
+        });
+      }
+    });
+
+    socket.on("chat:message", async (payload) => {
+      try {
+        const message = payload.message.trim().slice(0, 280);
+        if (!message) {
+          return;
+        }
+        const snapshot = await roomService.getSnapshot(payload.roomCode, {
+          seatId: payload.seatId,
+          playerSecret: payload.playerSecret
+        });
+        const seat = snapshot.room.seats.find((entry) => entry.seatId === payload.seatId);
+        const nextMessage: ChatMessage = {
+          id: `${Date.now()}-${payload.seatId}-${Math.random().toString(36).slice(2, 8)}`,
+          seatId: payload.seatId,
+          playerName: seat?.playerName ?? "Player",
+          message,
+          createdAt: new Date().toISOString()
+        };
+        const nextMessages = [...(roomChatMessages.get(payload.roomCode) ?? []), nextMessage].slice(-50);
+        roomChatMessages.set(payload.roomCode, nextMessages);
+        io.to(payload.roomCode).emit("chat:update", nextMessages);
+      } catch (error) {
+        socket.emit("game:error", {
+          message: error instanceof Error ? error.message : "Could not send chat message."
         });
       }
     });
