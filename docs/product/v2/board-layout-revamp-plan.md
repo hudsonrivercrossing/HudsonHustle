@@ -84,6 +84,38 @@ Critique items to resolve:
   - text is clear but still app-like
   - target type treatment: printed-ticket small caps for labels, station-sign/enamel plaque treatment for primary actions, tabular printed numerals for counts
 
+Execution checklist:
+- [x] Replace repeated rounded-card silhouettes with cut-corner tray shapes.
+  - Outer HUD modules should read as board-edge trays, not soft web cards.
+  - Player boxes, hand slots, market slots, buttons, modals, and ticket rows should not share the same pill/rounded geometry.
+
+- [x] Give the right rail a physical tab spine.
+  - Market, Build, and Chat should feel like drawer tabs attached to the rail.
+  - Active tab should feel pulled out in paper/brass, with a harder label shape.
+  - Tabs must not overlap the market tray or create horizontal overflow.
+
+- [x] Convert Hand and Market into card-rack language.
+  - Slots keep fixed dimensions for stability.
+  - Route color becomes an enamel/card-edge band plus inset frame.
+  - Counts become printed rectangular stamps, not glowing circles.
+  - Locomotive must separate from Ivory with a cooler steel-blue treatment.
+
+- [x] Convert Tickets into printed ticket strips.
+  - Pending/completed state should become a small printed side mark.
+  - Points should look like an inked punch box.
+  - Rows use hard ticket cuts instead of large rounded cards.
+
+- [x] Tighten material hierarchy and palette.
+  - Reduce dark-blue glass panels.
+  - Use warm paper, aged brass, dark wood, inked borders, and subtle grain.
+  - Keep the board/map as the visual center; HUD pieces should feel mounted around it.
+
+- [x] Tune typography and action surfaces.
+  - Labels use printed-ticket small caps.
+  - Counts use tabular printed numerals.
+  - Buttons use station-sign/enamel plaque styling.
+  - Game over and leave confirmation should inherit the same tabletop material system.
+
 ## Component Inventory
 
 ### 1. Board Stage

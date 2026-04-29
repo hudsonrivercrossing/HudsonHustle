@@ -150,6 +150,7 @@ export function PrivateHandRail({ hand, cardPalette, paymentPreview = null, clas
               key={face}
               className={[
                 "hand-color-slot",
+                `hand-color-slot--${face}`,
                 count === 0 ? "hand-color-slot--empty" : "",
                 spendCount > 0 ? "hand-color-slot--spending" : ""
               ].filter(Boolean).join(" ")}
@@ -364,7 +365,7 @@ function MarketColorSlot({
   return (
     <button
       type="button"
-      className="market-color-slot"
+      className={`market-color-slot market-color-slot--${card.color}`}
       style={{ ["--hand-slot-color" as string]: slotColor }}
       disabled={disabled}
       onClick={onClick}
