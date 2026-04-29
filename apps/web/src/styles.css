@@ -7037,6 +7037,158 @@ h3 {
   border: 1px solid rgba(183, 155, 97, 0.24);
 }
 
+/* Mixed shape refinement: use the shape that matches each tabletop object. */
+.app-shell--gameplay-hud .private-hand-rail {
+  border-radius: 12px;
+  clip-path: none;
+}
+
+.app-shell--gameplay-hud .player-roster--top {
+  border-radius: 10px;
+  clip-path: none;
+}
+
+.app-shell--gameplay-hud .inspector-dock {
+  border-radius: 7px;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 12px) 0,
+    100% 12px,
+    100% 100%,
+    0 100%
+  );
+}
+
+.app-shell--gameplay-hud .ticket-dock {
+  border-radius: 4px;
+  clip-path: polygon(
+    8px 0,
+    100% 0,
+    100% calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    0 100%,
+    0 8px
+  );
+}
+
+.app-shell--gameplay-hud .game-over-layer,
+.app-shell--gameplay-hud .leave-confirm-card,
+.app-shell--gameplay-hud .ticket-choice-sheet__panel {
+  border-radius: 10px;
+  clip-path: none;
+}
+
+.app-shell--gameplay-hud .player-roster--top .player-roster__row {
+  border-radius: 5px;
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+}
+
+.app-shell--gameplay-hud .hand-color-slot,
+.app-shell--gameplay-hud .inspector-dock .market-color-slot {
+  border-radius: 7px;
+  clip-path: none;
+}
+
+.app-shell--gameplay-hud .system-button,
+.app-shell--gameplay-hud .score-guide__trigger.system-button,
+.app-shell--gameplay-hud .choice-chip-button,
+.app-shell--gameplay-hud .ticket-dock__pager-button.system-button {
+  border-radius: 4px;
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+}
+
+.app-shell--gameplay-hud .ticket-row {
+  border-radius: 2px;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 10px) 0,
+    100% 50%,
+    calc(100% - 10px) 100%,
+    0 100%
+  );
+}
+
+.app-shell--gameplay-hud .inspector-tabs__tab {
+  border-radius: 0;
+}
+
+/* Warm tabletop basemap: quieter surface, stronger gameplay contrast. */
+.app-shell--gameplay-hud .board-stage {
+  background:
+    linear-gradient(180deg, rgba(34, 27, 18, 0.92), rgba(17, 13, 9, 0.9));
+}
+
+.app-shell--gameplay-hud .board-shell {
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 21% 18%, rgba(255, 247, 226, 0.22), transparent 29%),
+    radial-gradient(circle at 83% 78%, rgba(82, 103, 94, 0.16), transparent 34%),
+    repeating-linear-gradient(90deg, rgba(69, 50, 31, 0.05) 0 1px, transparent 1px 24px),
+    linear-gradient(180deg, #d9c8a6, #c7b58f);
+  box-shadow:
+    inset 0 0 0 1px rgba(70, 48, 28, 0.2),
+    inset 0 0 0 8px rgba(255, 246, 222, 0.12),
+    0 18px 44px rgba(0, 0, 0, 0.36);
+  backdrop-filter: none;
+}
+
+.app-shell--gameplay-hud .board-map > rect:first-child {
+  fill: #d9c8a6 !important;
+}
+
+.app-shell--gameplay-hud .board-map--full .landform,
+.app-shell--gameplay-hud .board-map--muted .landform,
+.app-shell--gameplay-hud .landform {
+  fill: rgba(238, 222, 190, 0.28);
+  stroke: rgba(75, 54, 32, 0.1);
+}
+
+.app-shell--gameplay-hud .water-body {
+  fill: rgba(97, 127, 125, 0.24);
+  stroke: rgba(232, 220, 194, 0.16);
+}
+
+.app-shell--gameplay-hud .shoreline {
+  stroke: rgba(74, 55, 36, 0.18);
+  opacity: 0.42;
+}
+
+.app-shell--gameplay-hud .region-label {
+  fill: rgba(62, 45, 28, 0.16);
+}
+
+.app-shell--gameplay-hud .board-label {
+  fill: #2b2117;
+  stroke: rgba(247, 238, 214, 0.94);
+  stroke-width: 4.8px;
+}
+
+.app-shell--gameplay-hud .board-label--highlighted {
+  fill: #174f73;
+  stroke: rgba(245, 236, 209, 0.98);
+}
+
+.app-shell--gameplay-hud .city-hitbox {
+  fill: #f6eddb;
+  stroke: #3b2a1d;
+  stroke-width: 3.2px;
+}
+
+.app-shell--gameplay-hud .city-node > circle:nth-of-type(2) {
+  fill: #493626;
+  opacity: 0.92;
+}
+
+.app-shell--gameplay-hud .city-highlight-ring {
+  fill: rgba(23, 79, 115, 0.14);
+  stroke: rgba(23, 79, 115, 0.76);
+}
+
+.app-shell--gameplay-hud .route-selection {
+  stroke: rgba(23, 79, 115, 0.32);
+  stroke-width: 30px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

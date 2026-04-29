@@ -116,6 +116,17 @@ Execution checklist:
   - Buttons use station-sign/enamel plaque styling.
   - Game over and leave confirmation should inherit the same tabletop material system.
 
+- [x] Refine the shape language so it is varied, not uniformly angular.
+  - Outer trays may keep modest softened corners where they feel like mounted wood or leather.
+  - Tickets should stay harder and more paper-like.
+  - Side tabs should keep the strongest cut-corner silhouette.
+  - Hand/Market slots should balance soft handled cards with hard inset rails.
+
+- [x] Replace the temporary glass basemap with a warmer tabletop basemap.
+  - Board surface should harmonize with paper/brass/dark wood HUD pieces.
+  - Land/water/shoreline colors should be quiet enough to stay behind gameplay.
+  - Route segments, station rings, labels, and selected/highlight states must keep strong contrast.
+
 ## Component Inventory
 
 ### 1. Board Stage
