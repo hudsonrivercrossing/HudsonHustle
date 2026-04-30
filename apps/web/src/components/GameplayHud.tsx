@@ -264,10 +264,10 @@ export function TicketChoiceSheet({
       <div className="ticket-choice-sheet__panel">
         <div className="ticket-picker ticket-picker--rail">
           <SectionHeader
-            eyebrow="Private choice"
+            eyebrow=" "
             title={title}
             meta={`Keep ${minimumKeep}+ · ${selectedCount}/${tickets.length}`}
-            density="compact"
+            // density="compact"
           />
 
           <div className="ticket-picker__tray">
