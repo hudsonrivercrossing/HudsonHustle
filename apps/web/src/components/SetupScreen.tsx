@@ -6,10 +6,10 @@ import {
   SetupShell,
   SetupStepPanel,
   SetupSummaryRow,
-  TicketSlip,
+  SetupTicketSlip,
   TokenButton,
   type SetupStep
-} from "./setup/SetupPrimitives";
+} from "./setup";
 import { Button } from "./system/Button";
 import { FormField } from "./system/FormField";
 import type { HudsonHustleReleasedConfigSummary } from "@hudson-hustle/game-data";
@@ -74,7 +74,7 @@ export function SetupScreen({
       {step >= 1 ? (
         <MapThumbnail configId={selectedConfig?.configId ?? configId} mapName={selectedConfig?.mapName ?? "Hudson Hustle"} version={selectedConfig?.version} />
       ) : (
-        <TicketSlip
+        <SetupTicketSlip
           className="setup-room-code-plate--table"
           ariaLabel="Local table seats"
           label="Seats"

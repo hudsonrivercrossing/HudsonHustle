@@ -134,13 +134,10 @@ test("multiplayer room lifecycle covers connected badges, private state, reconne
   await clearInitialTicketChoice(guestPage);
 
   await expect(hostPage.getByTestId("turn-status-banner")).toContainText("Your turn");
-  await expect(hostPage.getByTestId("config-utility-pill")).toBeVisible();
-  await expect(hostPage.getByRole("button", { name: "Scoring" })).toBeVisible();
-
-  const roundTableFontFamily = await hostPage.locator(".round-table-panel .section-header__title").evaluate((node) => {
-    return window.getComputedStyle(node).fontFamily;
-  });
-  expect(roundTableFontFamily).toContain("Fraunces");
+  await expect(hostPage.locator(".player-roster--top")).toBeVisible();
+  await expect(hostPage.getByRole("button", { name: "Guide" })).toBeVisible();
+  await expect(hostPage.getByRole("button", { name: "Score" })).toBeVisible();
+  await expect(hostPage.getByRole("button", { name: "Leave room" })).toBeVisible();
 
   const hostTimerBadge = hostPage.getByTestId("turn-timer-badge");
   await expect(hostTimerBadge).toHaveText(/^(Timer 30s|\d+s left)$/);
@@ -264,19 +261,19 @@ test("initial multiplayer ticket choices can be confirmed independently without 
   await guestPage.getByRole("button", { name: "Mark ready" }).click();
   await hostPage.getByRole("button", { name: "Start game" }).click();
 
-  const guestTickets = guestPage.locator(".ticket-card");
+  const guestTickets = guestPage.locator(".ticket-row--choice");
   await expect(guestTickets).toHaveCount(4);
   await guestTickets.nth(2).click();
   await guestTickets.nth(1).click();
-  await expect(guestTickets.nth(0)).toHaveClass(/ticket-card--selected/);
-  await expect(guestTickets.nth(1)).not.toHaveClass(/ticket-card--selected/);
-  await expect(guestTickets.nth(2)).toHaveClass(/ticket-card--selected/);
+  await expect(guestTickets.nth(0)).toHaveClass(/ticket-row--selected/);
+  await expect(guestTickets.nth(1)).not.toHaveClass(/ticket-row--selected/);
+  await expect(guestTickets.nth(2)).toHaveClass(/ticket-row--selected/);
 
   await hostPage.getByRole("button", { name: /Keep 2 tickets/ }).click();
   await expect(hostPage.getByRole("button", { name: /Keep 2 tickets/ })).toHaveCount(0);
-  await expect(guestTickets.nth(0)).toHaveClass(/ticket-card--selected/);
-  await expect(guestTickets.nth(1)).not.toHaveClass(/ticket-card--selected/);
-  await expect(guestTickets.nth(2)).toHaveClass(/ticket-card--selected/);
+  await expect(guestTickets.nth(0)).toHaveClass(/ticket-row--selected/);
+  await expect(guestTickets.nth(1)).not.toHaveClass(/ticket-row--selected/);
+  await expect(guestTickets.nth(2)).toHaveClass(/ticket-row--selected/);
 
   await guestPage.getByRole("button", { name: /Keep 2 tickets/ }).click();
   await expect(hostPage.getByTestId("turn-status-banner")).toContainText("Your turn");
@@ -337,7 +334,7 @@ test("drawing tickets in multiplayer offers no cancel path and still requires a 
   await expect(hostPage.getByRole("button", { name: "Back" })).toHaveCount(0);
   await expect(hostPage.getByRole("button", { name: /Keep 1 ticket/ })).toBeVisible();
 
-  const pickerCards = hostPage.locator(".ticket-card");
+  const pickerCards = hostPage.locator(".ticket-row--choice");
   await expect(pickerCards).toHaveCount(3);
   await pickerCards.nth(0).click();
   await expect(hostPage.getByRole("button", { name: /Keep 0 tickets/ })).toBeDisabled();
@@ -499,13 +496,12 @@ test("guidebook opens from gateway and local setup without old tutorial chrome",
   await waitForApi(page);
   await page.getByTestId("gateway-onboarding").click();
   await expect(page.getByTestId("guidebook-screen")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "First ride rulebook" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Win the table" })).toBeVisible();
   await expect(page.locator(".tutorial-nav")).toHaveCount(0);
   await page.getByRole("button", { name: "Next guide step" }).click();
   await expect(page.getByRole("heading", { name: "Take one action" })).toBeVisible();
 
-  const guideFontFamily = await page.locator(".guidebook-copy h2").evaluate((node) => {
+  const guideFontFamily = await page.locator(".guidebook-copy h1").evaluate((node) => {
     return window.getComputedStyle(node).fontFamily;
   });
   expect(guideFontFamily).toContain("Fraunces");
@@ -540,7 +536,7 @@ test("guidebook opens from gateway and local setup without old tutorial chrome",
   await page.getByRole("button", { name: "Guide" }).click();
   await expect(page.getByTestId("guidebook-screen")).toBeVisible();
   await page.getByRole("button", { name: "Back" }).click();
-  await expect(page.getByText("Claim a route, build a station, or draw tickets on this turn.")).toBeVisible();
+  await expect(page.locator(".player-roster--top")).toBeVisible();
 
   await context.close();
 });

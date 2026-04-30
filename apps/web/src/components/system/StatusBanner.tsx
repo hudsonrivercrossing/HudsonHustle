@@ -12,6 +12,9 @@ interface StatusBannerProps {
   rightSlot?: ReactNode;
 }
 
+/**
+ * @deprecated Gameplay no longer uses this banner. Keep temporarily for setup/lobby comparison.
+ */
 export function StatusBanner({
   tone = "neutral",
   eyebrow,

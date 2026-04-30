@@ -77,6 +77,34 @@ export const layoutRhythm = {
   }
 } as const;
 
+export const materialTokens = {
+  surface: {
+    ink: "rgba(11, 18, 23, 0.92)",
+    rail: "rgba(21, 31, 38, 0.88)",
+    table: "rgba(28, 24, 18, 0.72)",
+    overlay: "rgba(5, 10, 13, 0.78)"
+  },
+  material: {
+    brass: "#b78846",
+    inkBorder: "rgba(241, 226, 197, 0.22)",
+    enamel: "#1b2a33"
+  },
+  radius: {
+    ticket: 8,
+    slot: 10,
+    panel: 14,
+    modal: 18
+  },
+  zIndex: {
+    dropdown: 20,
+    sticky: 40,
+    overlay: 80,
+    modal: 100,
+    toast: 120,
+    tooltip: 140
+  }
+} as const;
+
 export const statusBannerTones = ["neutral", "active", "waiting", "warning", "failure"] as const;
 export type StatusBannerTone = (typeof statusBannerTones)[number];
 

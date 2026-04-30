@@ -214,7 +214,7 @@ export function SetupSummaryRow({ label, value, detail }: SetupSummaryRowProps):
   );
 }
 
-interface TicketSlipProps {
+interface SetupTicketSlipProps {
   label: string;
   value: ReactNode;
   detail?: ReactNode;
@@ -223,7 +223,7 @@ interface TicketSlipProps {
   ariaLabel?: string;
 }
 
-export function TicketSlip({ label, value, detail, tone = "neutral", className, ariaLabel }: TicketSlipProps): JSX.Element {
+export function SetupTicketSlip({ label, value, detail, tone = "neutral", className, ariaLabel }: SetupTicketSlipProps): JSX.Element {
   return (
     <div
       className={["ticket-slip", `ticket-slip--${tone}`, "setup-room-code-plate", className].filter(Boolean).join(" ")}

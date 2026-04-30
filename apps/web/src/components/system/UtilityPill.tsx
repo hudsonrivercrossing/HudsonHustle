@@ -7,6 +7,10 @@ interface UtilityPillProps {
   testId?: string;
 }
 
+/**
+ * @deprecated Use Badge for compact status or a feature-specific chrome component for session metadata.
+ * UtilityPill is kept temporarily for showcase comparison.
+ */
 export function UtilityPill({
   value,
   label,

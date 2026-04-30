@@ -9,18 +9,27 @@ During `v2.1`, only extract primitives that are proven by the first slice.
 ## Current Primitive Direction
 
 Minimum system layer:
-- `StatusBanner`
+- `Badge`
 - `Panel`
-- optional `Chip/Badge`
-- optional `SectionHeader`
+- `SectionHeader`
 - `Button`
 - `FormField`
 - `SurfaceCard`
 - `ChoiceChipButton`
 - `ModalShell`
-- `UtilityPill`
 - `StateSurface`
 - `GuidebookScreen`
+- deprecated compatibility primitives:
+  - `Chip`
+  - `StatusBanner`
+  - `UtilityPill`
+- gameplay slice primitives:
+  - `CardSlot`
+  - `TicketSlip`
+  - `SeatTile`
+  - `SideTabRail`
+  - `NotificationStack`
+  - `GameOverPanel`
 - setup/lobby slice primitives:
   - `SetupShell`
   - `SetupStepper`
@@ -29,7 +38,7 @@ Minimum system layer:
   - `SetupSummaryRow`
   - `MapThumbnail`
   - `DepartureBoardTile`
-  - `TicketSlip`
+  - `SetupTicketSlip`
   - `TokenButton`
 
 These primitives now also govern:
@@ -154,7 +163,7 @@ Gateway entry artifacts may include disabled stakeholder cards for near-term flo
 
 The main gateway is allowed to be more cinematic than setup steps: full subway backdrop, a wide Fraunces `Hudson Hustle` masthead, and equal-size departure-board entry tiles anchored low-left on the screen. On gateway tiles, the flip-board code should be the strongest local marker, with the title and metadata secondary. Do not carry that hero treatment into the step-by-step setup console.
 
-### TicketSlip
+### SetupTicketSlip
 
 Use for compact table facts that read like a punched ticket or room slip:
 - room code plates
@@ -162,6 +171,53 @@ Use for compact table facts that read like a punched ticket or room slip:
 - short confirmation summaries
 
 Do not use it as the main setup panel and do not use bright cream ticket material inside the dark setup console. The current setup ticket slip is a muted dark field.
+
+## Gameplay Slice Primitives
+
+Gameplay primitives live under `components/system/game`. They are reusable board-game objects, not reducers or gameplay rules.
+
+### CardSlot
+
+Use for fixed-size train card color slots in:
+- active player hand
+- public market
+
+The feature layer supplies the card face, count, disabled state, and spend preview. `CardSlot` owns the stable tactile slot anatomy so hand and market stop drifting apart.
+
+### TicketSlip
+
+Use for destination tickets in:
+- left ticket dock
+- draw-ticket choice sheet
+
+It owns status label placement, route text, points, focus, and selected treatment. Setup room-code slips use `SetupTicketSlip` instead.
+
+### SeatTile
+
+Use for player roster slots in the active board top row.
+
+It owns active state, timer placement, player color mark, placeholder state, and compact train/station metadata. It should remain small enough that the board keeps priority.
+
+### SideTabRail
+
+Use for right rail module tabs such as:
+- Market
+- Build
+- Chat
+
+It owns tablist semantics and the physical side-tab spine. It does not own panel content.
+
+### NotificationStack
+
+Use for transient gameplay notifications.
+
+The feature layer owns message timing and generation. `NotificationStack` owns stacking, tone classes, and `aria-live`.
+
+### GameOverPanel
+
+Use for the final-score overlay shell.
+
+The feature layer passes score cards as children so scoring details and data formatting stay feature-owned.
 
 ### TokenButton
 
@@ -281,6 +337,8 @@ It provides the stable label/control wrapper. It does not replace every custom c
 
 ## Utility Pill
 
+Deprecated. Prefer `Badge` for compact status or a feature-specific chrome component for session metadata.
+
 Use `UtilityPill` for compact chrome metadata and session affordances such as:
 - active config labels
 - reconnect/session entry points
@@ -318,6 +376,8 @@ Do not start by building:
 - full card library
 
 ## Status Banner
+
+Deprecated. Gameplay has moved to `SeatTile` plus notification/status surfaces. Keep this temporarily for showcase comparison.
 
 The first `v2.1` implementation slice is the `status/banner system`.
 
@@ -418,7 +478,8 @@ Chips and badges should:
 
 Boundary with `UtilityPill`:
 - `UtilityPill` = shell chrome metadata, session identity, utility entry points
-- `Chip` = object-level compact state, ownership, readiness, or row metadata
+- `Badge` = object-level compact state, ownership, readiness, or row metadata
+- `Chip` = deprecated compatibility alias for `Badge`
 
 Relationship:
 - they should feel like near relatives inside the same material system

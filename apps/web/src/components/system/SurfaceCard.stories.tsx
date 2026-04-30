@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { Badge } from "./Badge";
 import { Button } from "./Button";
-import { Chip } from "./Chip";
 import { ChoiceChipButton } from "./ChoiceChipButton";
 import { Panel } from "./Panel";
 import { SectionHeader } from "./SectionHeader";
@@ -32,9 +32,9 @@ const meta = {
           Use this for route detail, city detail, tunnel reveal, and endgame summary moments.
         </p>
         <div className="chip-row">
-          <Chip tone="info">Rail</Chip>
-          <Chip tone="success">Claimable</Chip>
-          <Chip tone="warning">10 points</Chip>
+          <Badge tone="info">Rail</Badge>
+          <Badge tone="success">Claimable</Badge>
+          <Badge tone="warning">10 points</Badge>
         </div>
         <div className="chip-row">
           <ChoiceChipButton style={{ ["--choice-chip-accent" as string]: "#3d7e52" }}>Claim with green</ChoiceChipButton>

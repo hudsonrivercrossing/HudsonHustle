@@ -12,6 +12,18 @@ import {
 import { Button } from "./system/Button";
 import { Panel } from "./system/Panel";
 import { SectionHeader } from "./system/SectionHeader";
+import {
+  CardSlot,
+  GameOverPanel,
+  NotificationStack,
+  SeatTile,
+  SideTabRail,
+  TicketSlip,
+  formatCardLabel,
+  type GameplayNotification
+} from "./system/game";
+
+export { formatCardLabel, type GameplayNotification } from "./system/game";
 
 type InspectorTab = "market" | "build" | "chat";
 
@@ -56,42 +68,24 @@ export function PlayerRoster({ players, activePlayerIndex, playerPalette, timer 
           const isActive = index === activePlayerIndex;
           const slotTimer = timer?.activePlayerIndex === index ? formatRosterTimer(timer.secondsRemaining) : null;
           return player ? (
-            <article key={player.id} className={`player-strip player-roster__row ${isActive ? "player-strip--active" : ""}`}>
-              <span className="player-swatch row-object__lead" style={{ background: playerPalette[player.color] }} />
-              {slotTimer ? <span className="player-roster__timer">{slotTimer}</span> : null}
-              <div className="row-object__main">
-                <strong className="row-object__title">{player.name}</strong>
-                <span className="row-object__meta">{isActive ? "Active" : `${player.tickets?.length ?? player.ticketCount ?? 0} tickets`}</span>
-              </div>
-              <div className="row-object__stats">
-                <span className="row-object__stat">{player.trainsLeft} trains</span>
-                <span className="row-object__stat">{player.stationsLeft} stations</span>
-              </div>
-            </article>
+            <SeatTile
+              key={player.id}
+              name={player.name}
+              color={playerPalette[player.color]}
+              ticketCount={player.tickets?.length ?? player.ticketCount ?? 0}
+              trainsLeft={player.trainsLeft}
+              stationsLeft={player.stationsLeft}
+              active={isActive}
+              timerLabel={slotTimer}
+            />
           ) : (
-            <article key={`empty-seat-${index}`} className="player-strip player-roster__row player-roster__row--placeholder" aria-label="Empty player slot">
-              <span className="player-swatch row-object__lead" />
-              <div className="row-object__main">
-                <strong className="row-object__title">Open</strong>
-                <span className="row-object__meta">Seat {index + 1}</span>
-              </div>
-            </article>
+            <SeatTile key={`empty-seat-${index}`} placeholder seatLabel={`Seat ${index + 1}`} />
           );
         })}
       </div>
       <span className="player-roster__active-label">{players[activePlayerIndex]?.name ?? "Player"} active{timerLabel ? ` · ${timerLabel}` : ""}</span>
     </Panel>
   );
-}
-
-export function formatCardLabel(color: TrainCardFace): string {
-  if (color === "locomotive") {
-    return "Locomotive";
-  }
-  return color
-    .split("-")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
 }
 
 function countHandByFace(hand: TrainCard[]): Record<TrainCardFace, number> {
@@ -146,22 +140,14 @@ export function PrivateHandRail({ hand, cardPalette, paymentPreview = null, clas
           const afterCount = count - spendCount;
           const slotColor = face === "locomotive" ? "#91a8bd" : cardPalette[face];
           return (
-            <div
+            <CardSlot
               key={face}
-              className={[
-                "hand-color-slot",
-                `hand-color-slot--${face}`,
-                count === 0 ? "hand-color-slot--empty" : "",
-                spendCount > 0 ? "hand-color-slot--spending" : ""
-              ].filter(Boolean).join(" ")}
-              style={{ ["--hand-slot-color" as string]: slotColor }}
-            >
-              <span className="hand-color-slot__count">{paymentPreview && spendCount > 0 ? afterCount : count}</span>
-              <span className="hand-color-slot__label">{formatCardLabel(face)}</span>
-              <span className={`hand-color-slot__spend ${spendCount > 0 ? "" : "hand-color-slot__spend--empty"}`}>
-                {spendCount > 0 ? `-${spendCount}` : "0"}
-              </span>
-            </div>
+              mode="hand"
+              face={face}
+              accentColor={slotColor}
+              count={paymentPreview && spendCount > 0 ? afterCount + spendCount : count}
+              spendDelta={spendCount}
+            />
           );
         })}
       </div>
@@ -225,33 +211,19 @@ export function TicketDock({
       </div>
       <div className="ticket-stack ticket-dock__scroll">
         {visibleTickets.map(({ ticket, completed }) => (
-          <button
+          <TicketSlip
             key={ticket.id}
-            type="button"
-            className={[
-              "ticket-row",
-              "ticket-row--button",
-              completed ? "ticket-row--done ticket-row--compact" : "",
-              focusedTicketId === ticket.id || pinnedTicketId === ticket.id ? "ticket-row--focused" : ""
-            ].filter(Boolean).join(" ")}
+            fromLabel={getCityName(config, ticket.from)}
+            toLabel={getCityName(config, ticket.to)}
+            points={ticket.points}
+            status={completed ? "connected" : "open"}
+            focused={focusedTicketId === ticket.id || pinnedTicketId === ticket.id}
             onMouseEnter={() => onFocusTicket?.(ticket)}
             onMouseLeave={() => onFocusTicket?.(null)}
             onFocus={() => onFocusTicket?.(ticket)}
             onBlur={() => onFocusTicket?.(null)}
             onClick={() => onTogglePinnedTicket?.(ticket)}
-          >
-            <span className={`ticket-status row-object__lead ${completed ? "ticket-status--done" : ""}`}>
-              {completed ? "Done" : "Open"}
-            </span>
-            <div className="row-object__main">
-              <span className="row-object__title ticket-route__cities">
-                {getCityName(config, ticket.from)} <span className="ticket-arrow">to</span> {getCityName(config, ticket.to)}
-              </span>
-            </div>
-            <div className="row-object__stats">
-              <strong className="ticket-points row-object__stat row-object__stat--strong">{ticket.points}</strong>
-            </div>
-          </button>
+          />
         ))}
         {Array.from({ length: Math.max(0, pageSize - visibleTickets.length) }, (_, index) => (
           <div key={`ticket-placeholder-${index}`} className="ticket-row ticket-row--placeholder" aria-hidden="true" />
@@ -304,33 +276,22 @@ export function TicketChoiceSheet({
                 const selected = selectedIds.includes(ticket.id);
                 const focused = focusedTicketId === ticket.id;
                 return (
-                  <button
+                  <TicketSlip
                     key={ticket.id}
+                    fromLabel={getCityName(config, ticket.from)}
+                    toLabel={getCityName(config, ticket.to)}
+                    points={ticket.points}
+                    status={selected ? "keep" : "review"}
+                    focused={focused}
                     className={[
-                      "ticket-row",
-                      "ticket-row--button",
                       "ticket-row--choice",
-                      selected ? "ticket-row--selected" : "",
-                      focused ? "ticket-row--focused" : ""
                     ].filter(Boolean).join(" ")}
                     onMouseEnter={() => onFocusTicket?.(ticket)}
                     onMouseLeave={() => onFocusTicket?.(null)}
                     onFocus={() => onFocusTicket?.(ticket)}
                     onBlur={() => onFocusTicket?.(null)}
                     onClick={() => onToggle(ticket.id)}
-                  >
-                    <span className={`ticket-status row-object__lead ${selected ? "ticket-status--done" : ""}`}>
-                      {selected ? "Keep" : "Review"}
-                    </span>
-                    <div className="row-object__main">
-                      <span className="row-object__title ticket-route__cities">
-                        {getCityName(config, ticket.from)} <span className="ticket-arrow">to</span> {getCityName(config, ticket.to)}
-                      </span>
-                    </div>
-                    <div className="row-object__stats">
-                      <strong className="ticket-points row-object__stat row-object__stat--strong">{ticket.points}</strong>
-                    </div>
-                  </button>
+                  />
                 );
               })}
             </div>
@@ -346,33 +307,6 @@ export function TicketChoiceSheet({
         </div>
       </div>
     </div>
-  );
-}
-
-function MarketColorSlot({
-  card,
-  disabled,
-  cardPalette,
-  onClick
-}: {
-  card: TrainCard;
-  disabled: boolean;
-  cardPalette: Record<string, string>;
-  onClick: () => void;
-}): JSX.Element {
-  const slotColor = card.color === "locomotive" ? "#91a8bd" : cardPalette[card.color];
-
-  return (
-    <button
-      type="button"
-      className={`market-color-slot market-color-slot--${card.color}`}
-      style={{ ["--hand-slot-color" as string]: slotColor }}
-      disabled={disabled}
-      onClick={onClick}
-    >
-      <span className="market-color-slot__count">{card.color === "locomotive" ? "L" : "1"}</span>
-      <span className="market-color-slot__label">{formatCardLabel(card.color)}</span>
-    </button>
   );
 }
 
@@ -406,10 +340,11 @@ export function SupplyDock({
       <SectionHeader title="Market" meta={`${deckCount} deck`} density="compact" />
       <div className="market-grid supply-dock__market">
         {market.map((card, index) => (
-          <MarketColorSlot
+          <CardSlot
             key={card.id}
-            card={card}
-            cardPalette={cardPalette}
+            mode="market"
+            face={card.color}
+            accentColor={card.color === "locomotive" ? "#91a8bd" : cardPalette[card.color]}
             disabled={disabled || Boolean(isMarketCardDisabled?.(card, index))}
             onClick={() => onDrawFromMarket(index)}
           />
@@ -470,35 +405,16 @@ export function InspectorDock({
 
   return (
     <Panel variant="status" className={["inspector-dock", `inspector-dock--${activeTab}`, className].filter(Boolean).join(" ")}>
-      <div className="inspector-tabs" role="tablist" aria-label="Right rail modules">
-        <button
-          type="button"
-          className={`inspector-tabs__tab ${activeTab === "market" ? "inspector-tabs__tab--active" : ""}`}
-          role="tab"
-          aria-selected={activeTab === "market"}
-          onClick={() => setActiveTab("market")}
-        >
-          Market
-        </button>
-        <button
-          type="button"
-          className={`inspector-tabs__tab ${activeTab === "build" ? "inspector-tabs__tab--active" : ""}`}
-          role="tab"
-          aria-selected={activeTab === "build"}
-          onClick={() => setActiveTab("build")}
-        >
-          Build
-        </button>
-        <button
-          type="button"
-          className={`inspector-tabs__tab ${activeTab === "chat" ? "inspector-tabs__tab--active" : ""}`}
-          role="tab"
-          aria-selected={activeTab === "chat"}
-          onClick={() => setActiveTab("chat")}
-        >
-          Chat
-        </button>
-      </div>
+      <SideTabRail
+        ariaLabel="Right rail modules"
+        activeTab={activeTab}
+        onChange={setActiveTab}
+        tabs={[
+          { id: "market", label: "Market" },
+          { id: "build", label: "Build" },
+          { id: "chat", label: "Chat" }
+        ]}
+      />
       {summary ? <p className="inspector-dock__summary">{summary}</p> : null}
       {activeTab === "market" ? (
         <div className="inspector-dock__body" role="tabpanel" aria-label="Market">
@@ -555,32 +471,12 @@ export function InspectorDock({
   );
 }
 
-export type GameplayNotification = {
-  id: string;
-  message: string;
-  tone?: "neutral" | "success" | "warning";
-};
-
 interface NotificationPipeProps {
   notifications: GameplayNotification[];
 }
 
 export function NotificationPipe({ notifications }: NotificationPipeProps): JSX.Element {
-  return (
-    <div className="notification-pipe" aria-live="polite" aria-atomic="false">
-      {notifications.map((notification) => (
-        <div
-          key={notification.id}
-          className={[
-            "notification-pipe__item",
-            notification.tone ? `notification-pipe__item--${notification.tone}` : ""
-          ].filter(Boolean).join(" ")}
-        >
-          {notification.message}
-        </div>
-      ))}
-    </div>
-  );
+  return <NotificationStack notifications={notifications} />;
 }
 
 interface GameOverLayerProps {
@@ -591,14 +487,5 @@ interface GameOverLayerProps {
 }
 
 export function GameOverLayer({ title, subtitle, actions, children }: GameOverLayerProps): JSX.Element {
-  return (
-    <section className="game-over-layer" aria-label="Final scoreboard">
-      <div className="game-over-layer__header">
-        <SectionHeader eyebrow="Game over" title={title} density="ceremony" />
-        <p>{subtitle}</p>
-        <div className="game-over-layer__actions">{actions}</div>
-      </div>
-      <div className="game-over-layer__scores">{children}</div>
-    </section>
-  );
+  return <GameOverPanel title={title} subtitle={subtitle} actions={actions}>{children}</GameOverPanel>;
 }

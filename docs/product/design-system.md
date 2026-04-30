@@ -51,6 +51,7 @@ Stable design-system docs:
 - [Map Language Boundary](/Users/djfan/Workspace/HudsonHustle/docs/product/map-language-boundary.md)
 - [Design Implementation Backlog](/Users/djfan/Workspace/HudsonHustle/docs/product/design-implementation-backlog.md)
 - [Design Showcases](/Users/djfan/Workspace/HudsonHustle/docs/product/showcase/README.md)
+- [System Design Revamp Plan](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/system-design-revamp-plan.md)
 
 Versioned rationale and decision trail:
 - [V2.1 Design Lock](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.1-design-lock.md)
@@ -83,19 +84,30 @@ When design implementation is in progress, code should organize around:
 - `apps/web/src/design/tokens.ts`
 - `apps/web/src/design/theme.css`
 - `apps/web/src/components/system/`
+- `apps/web/src/components/system/game/`
+- `apps/web/src/components/setup/`
 
 Only extract primitives proven necessary by the current slice:
-- `StatusBanner`
+- `Badge`
 - `StateSurface`
 - `Panel`
-- `Chip`
 - `SectionHeader`
 - `Button`
 - `FormField`
 - `SurfaceCard`
 - `ChoiceChipButton`
 - `ModalShell`
-- `UtilityPill`
+- deprecated compatibility primitives:
+  - `Chip`
+  - `StatusBanner`
+  - `UtilityPill`
+- gameplay primitives proven by the board layout revamp:
+  - `CardSlot`
+  - `TicketSlip`
+  - `SeatTile`
+  - `SideTabRail`
+  - `NotificationStack`
+  - `GameOverPanel`
 - setup/lobby primitives proven by the current slice:
   - `SetupShell`
   - `SetupStepper`
@@ -105,7 +117,7 @@ Only extract primitives proven necessary by the current slice:
   - `MapThumbnail`
   - `DepartureBoardTile`
   - `StationPlate`
-  - `TicketSlip`
+  - `SetupTicketSlip`
   - `TokenButton`
 
 Do not build a broad component library ahead of proof.

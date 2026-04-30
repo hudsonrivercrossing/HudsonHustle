@@ -7,9 +7,9 @@ import {
   SetupStepPanel,
   SetupSummaryRow,
   type SetupStep
-} from "./setup/SetupPrimitives";
+} from "./setup";
+import { Badge } from "./system/Badge";
 import { Button } from "./system/Button";
-import { Chip } from "./system/Chip";
 import { StateSurface } from "./system/StateSurface";
 
 interface LobbyScreenProps {
@@ -134,26 +134,26 @@ export function LobbyScreen({
               </div>
               <div className="row-object__stats seat-status-stack">
                 {seat.playerName === null ? (
-                  <Chip tone="neutral" className="seat-ready">
+                  <Badge tone="neutral" className="seat-ready">
                     Open
-                  </Chip>
+                  </Badge>
                 ) : seat.controllerType === "bot" ? (
                   <>
-                    <Chip tone="info" className="seat-ready">
+                    <Badge tone="info" className="seat-ready">
                       Bot
-                    </Chip>
-                    <Chip tone="success" className="seat-ready" data-testid={`seat-connected-${seat.seatId}`}>
+                    </Badge>
+                    <Badge tone="success" className="seat-ready" data-testid={`seat-connected-${seat.seatId}`}>
                       Server
-                    </Chip>
+                    </Badge>
                   </>
                 ) : (
                   <>
-                    <Chip tone={seat.ready ? "success" : "warning"} className="seat-ready">
+                    <Badge tone={seat.ready ? "success" : "warning"} className="seat-ready">
                       {seat.ready ? "Ready" : "Waiting"}
-                    </Chip>
-                    <Chip tone={seat.connected ? "info" : "danger"} className="seat-ready" data-testid={`seat-connected-${seat.seatId}`}>
+                    </Badge>
+                    <Badge tone={seat.connected ? "info" : "danger"} className="seat-ready" data-testid={`seat-connected-${seat.seatId}`}>
                       {seat.connected ? "Connected" : "Offline"}
-                    </Chip>
+                    </Badge>
                   </>
                 )}
               </div>

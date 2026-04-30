@@ -1,4 +1,4 @@
-import { DepartureBoardTile, SetupShell, type SetupStep } from "./setup/SetupPrimitives";
+import { DepartureBoardTile, SetupShell, type SetupStep } from "./setup";
 
 interface SetupGatewayProps {
   onChooseLocal: () => void;
