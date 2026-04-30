@@ -16,7 +16,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Overlay shell for ticket choice, handoff, reveal, and tutorial moments. The shell is the full-screen layer; the inner card is the modal surface."
+          "Overlay shell for ticket choice, handoff, and reveal moments. The shell is the full-screen layer; the inner card is the modal surface."
       }
     }
   },
@@ -39,7 +39,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-export const Tutorial: Story = {
+export const Ceremony: Story = {
   args: {
     tone: "tutorial",
     width: "lg",
@@ -47,13 +47,13 @@ export const Tutorial: Story = {
   },
   render: ({ tone, width, align }) => (
     <ModalShell tone={tone} width={width} align={align}>
-      <SectionHeader eyebrow="First game guide" title="Learn the board in a few minutes" meta="Guided tutorial" density="ceremony" />
+      <SectionHeader eyebrow="Table moment" title="Choose starting tickets" meta="Private choice" density="ceremony" />
       <p className="modal-copy">
-        Tutorial overlays use the same modal family but with stronger ceremony and a wider reading surface.
+        Ceremony overlays use the same modal family but with stronger emphasis and a wider reading surface.
       </p>
       <div className="setup-actions">
-        <Button>Skip</Button>
-        <Button variant="primary">Start tutorial</Button>
+        <Button>Back</Button>
+        <Button variant="primary">Confirm tickets</Button>
       </div>
     </ModalShell>
   )

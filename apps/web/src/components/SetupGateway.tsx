@@ -3,9 +3,10 @@ import { DepartureBoardTile, SetupShell, type SetupStep } from "./setup/SetupPri
 interface SetupGatewayProps {
   onChooseLocal: () => void;
   onChooseOnline: () => void;
+  onOpenGuide: () => void;
 }
 
-export function SetupGateway({ onChooseLocal, onChooseOnline }: SetupGatewayProps): JSX.Element {
+export function SetupGateway({ onChooseLocal, onChooseOnline, onOpenGuide }: SetupGatewayProps): JSX.Element {
   const setupHeroImageUrl = "/setup/landing-bg.png";
   const gatewaySteps: SetupStep[] = [
     { label: "Choose table", meta: "Local or online", status: "current" },
@@ -47,13 +48,13 @@ export function SetupGateway({ onChooseLocal, onChooseOnline }: SetupGatewayProp
 
         <DepartureBoardTile
           className="setup-entry-artifact--rules"
-          disabled
+          onClick={onOpenGuide}
           testId="gateway-onboarding"
-          ariaLabel="Rules tour coming soon"
+          ariaLabel="Open the guide"
           kicker="First ride"
           code="GUIDE_"
-          copy="Learn the routes before the table opens."
-          status="Boarding soon"
+          copy="Learn the table in nine quick cards."
+          status="Rulebook"
         />
       </div>
     </SetupShell>

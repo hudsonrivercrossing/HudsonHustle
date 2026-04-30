@@ -3,7 +3,6 @@ import { decodeReconnectToken } from "../src/reconnect-token";
 
 const SESSION_KEY = "hudson-hustle-multiplayer-session-v2";
 const API_BASE_URL = "http://127.0.0.1:8787";
-const TUTORIAL_SEEN_KEY = "hudson-hustle-onboarding-v1-1";
 
 async function waitForApi(page: Page): Promise<void> {
   await expect
@@ -44,12 +43,9 @@ async function openMultiplayerSetup(page: Page): Promise<void> {
   await expect(page.getByTestId("online-join-room")).toBeVisible();
 }
 
-async function openLocalSetup(page: Page, options?: { resetTutorial?: boolean }): Promise<void> {
+async function openLocalSetup(page: Page): Promise<void> {
   await page.goto("/");
   await waitForApi(page);
-  if (options?.resetTutorial) {
-    await page.evaluate((key) => window.localStorage.removeItem(key), TUTORIAL_SEEN_KEY);
-  }
   await page.getByTestId("gateway-local").click();
   await expect(page.getByRole("heading", { name: "Pass-and-play" })).toBeVisible();
 }
@@ -404,6 +400,10 @@ test("normal setup can create a room with one bot seat and start with the host a
   await clearInitialTicketChoice(page);
 
   await expect(page.getByTestId("turn-status-banner")).toBeVisible();
+  await page.getByRole("button", { name: "Guide" }).click();
+  await expect(page.getByTestId("guidebook-screen")).toBeVisible();
+  await page.getByRole("button", { name: "Back" }).click();
+  await expect(page.getByTestId("turn-status-banner")).toBeVisible();
   await context.close();
 });
 
@@ -491,22 +491,33 @@ test("timed mixed rooms hand off through bot turns and still allow human reconne
   await hostContext.close();
 });
 
-test("local tutorial and shell hierarchy keep ceremony and work roles distinct", async ({ browser }) => {
+test("guidebook opens from gateway and local setup without old tutorial chrome", async ({ browser }) => {
   const context = await browser.newContext();
   const page = await context.newPage();
 
-  await openLocalSetup(page, { resetTutorial: true });
-  await expect(page.getByText("First game guide")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Learn the board in a few minutes" })).toBeVisible();
-  await expect(page.locator(".tutorial-body .surface-card")).toHaveCount(2);
+  await page.goto("/");
+  await waitForApi(page);
+  await page.getByTestId("gateway-onboarding").click();
+  await expect(page.getByTestId("guidebook-screen")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "First ride rulebook" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Win the table" })).toBeVisible();
+  await expect(page.locator(".tutorial-nav")).toHaveCount(0);
+  await page.getByRole("button", { name: "Next guide step" }).click();
+  await expect(page.getByRole("heading", { name: "Take one action" })).toBeVisible();
 
-  const tutorialFontFamily = await page.locator(".tutorial-hero .section-header__title").evaluate((node) => {
+  const guideFontFamily = await page.locator(".guidebook-copy h2").evaluate((node) => {
     return window.getComputedStyle(node).fontFamily;
   });
-  expect(tutorialFontFamily).toContain("Fraunces");
+  expect(guideFontFamily).toContain("Fraunces");
 
-  await page.evaluate((key) => window.localStorage.setItem(key, "seen"), TUTORIAL_SEEN_KEY);
+  await page.getByRole("button", { name: "Back" }).click();
+  await expect(page.getByRole("heading", { name: "Hudson Hustle" })).toBeVisible();
+
   await openLocalSetup(page);
+  await expect(page.getByRole("heading", { name: "Pass-and-play" })).toBeVisible();
+  await page.getByRole("button", { name: "Guide" }).click();
+  await expect(page.getByTestId("guidebook-screen")).toBeVisible();
+  await page.getByRole("button", { name: "Back" }).click();
   await expect(page.getByRole("heading", { name: "Pass-and-play" })).toBeVisible();
 
   const setupHeadingFontFamily = await page.locator("main.setup-board-shell h1").evaluate((node) => {
@@ -518,6 +529,18 @@ test("local tutorial and shell hierarchy keep ceremony and work roles distinct",
     return window.getComputedStyle(node).fontFamily;
   });
   expect(playersSectionFontFamily).not.toContain("Fraunces");
+
+  await page.getByRole("button", { name: "Pick board" }).click();
+  await page.getByRole("button", { name: "Set timer" }).click();
+  await page.getByRole("button", { name: "Start local game" }).click();
+  await clearInitialTicketChoice(page);
+  await page.getByRole("button", { name: "I'm ready" }).click();
+  await clearInitialTicketChoice(page);
+  await page.getByRole("button", { name: "I'm ready" }).click();
+  await page.getByRole("button", { name: "Guide" }).click();
+  await expect(page.getByTestId("guidebook-screen")).toBeVisible();
+  await page.getByRole("button", { name: "Back" }).click();
+  await expect(page.getByText("Claim a route, build a station, or draw tickets on this turn.")).toBeVisible();
 
   await context.close();
 });

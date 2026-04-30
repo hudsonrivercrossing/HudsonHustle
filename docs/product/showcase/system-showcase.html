@@ -572,81 +572,37 @@
             </div>
           </div>
 
-          <div class="modal-shell modal-shell--tutorial">
-            <div class="modal-shell__card modal-shell__card--lg modal-shell__card--left tutorial-card">
-              <div class="tutorial-layout">
-                <aside class="tutorial-nav">
-                  <div class="tutorial-nav__intro">
-                    <p class="eyebrow">First game guide</p>
-                    <h2>Learn the board in a few minutes</h2>
-                    <p class="tutorial-copy">Use this walkthrough to learn where the public board ends and where your private choices begin.</p>
-                  </div>
-                  <p class="tutorial-progress-note">Step 2 of 6</p>
-                  <div class="tutorial-step-list">
-                    <button class="tutorial-step-link"><span class="tutorial-step-link__index">1</span><span class="tutorial-step-link__label">Read the setup table</span></button>
-                    <button class="tutorial-step-link tutorial-step-link--active"><span class="tutorial-step-link__index">2</span><span class="tutorial-step-link__label">Read the public board first</span></button>
-                    <button class="tutorial-step-link"><span class="tutorial-step-link__index">3</span><span class="tutorial-step-link__label">Inspect the action rail</span></button>
-                  </div>
-                </aside>
-
-                <div class="tutorial-main">
-                  <div class="tutorial-header">
-                    <div class="tutorial-header__meta">
-                      <span class="tutorial-header__kicker">Guided tutorial</span>
-                      <span class="tutorial-header__target">Main board</span>
-                    </div>
-                    <button class="system-button secondary-button"><span class="system-button__content">Skip tutorial</span></button>
-                  </div>
-
-                  <div class="tutorial-hero">
-                    <div class="section-header section-header--ceremony">
-                      <div class="section-header__row">
-                        <h2 class="section-header__title">Read the public board first</h2>
-                      </div>
-                    </div>
-                    <p class="tutorial-copy tutorial-copy--hero">Start with the public board so you can separate shared information from private hand management.</p>
-                  </div>
-
-                  <div class="tutorial-progress" aria-hidden="true">
-                    <span class="tutorial-progress__dot"></span>
-                    <span class="tutorial-progress__dot tutorial-progress__dot--active"></span>
-                    <span class="tutorial-progress__dot"></span>
-                  </div>
-
-                  <div class="tutorial-body">
-                    <section class="surface-card surface-card--detail tutorial-lesson">
-                      <div class="surface-card__header">
-                        <span class="surface-card__eyebrow">Lesson sheet</span>
-                        <div class="surface-card__row">
-                          <h3 class="surface-card__title">What to notice</h3>
-                        </div>
-                      </div>
-                      <div class="surface-card__body tutorial-lesson__section">
-                        <span class="tutorial-lesson__label">Focus area</span>
-                        <strong class="tutorial-lesson__focus">Main board</strong>
-                        <ul class="tutorial-point-list">
-                          <li>Routes and stations are the only objects that drive decisions.</li>
-                          <li>Claimed lines and station markers are always public.</li>
-                          <li>The action rail responds once you inspect a route or city.</li>
-                        </ul>
-                      </div>
-                    </section>
-
-                    <section class="surface-card surface-card--detail tutorial-tip">
-                      <div class="surface-card__header">
-                        <span class="surface-card__eyebrow">Try this</span>
-                        <div class="surface-card__row">
-                          <h3 class="surface-card__title">Suggested move</h3>
-                        </div>
-                      </div>
-                      <div class="surface-card__body">
-                        <p>Click a short route first so you can see how the action rail responds.</p>
-                      </div>
-                    </section>
-                  </div>
+          <div class="guidebook-shell" style="min-height: 640px; --setup-gateway-image: url('/setup/landing-bg.png');">
+            <section class="guidebook-card">
+              <header class="guidebook-topbar">
+                <div>
+                  <p class="guidebook-kicker">Hudson Hustle guide</p>
+                  <h1>First ride rulebook</h1>
                 </div>
+                <button class="system-button secondary-button"><span class="system-button__content">Back</span></button>
+              </header>
+              <div class="guidebook-rule-card">
+                <div class="guidebook-progress-row">
+                  <span>Routes</span>
+                  <strong>4 / 9</strong>
+                </div>
+                <div class="guidebook-glyph">
+                  <span>RED</span>
+                  <span>4</span>
+                  <span>PTS</span>
+                </div>
+                <article class="guidebook-copy">
+                  <h2>Turn cards into track</h2>
+                  <p class="guidebook-rule">Spend cards that match the route color and length.</p>
+                  <ul>
+                    <li>A length 4 route needs 4 matching cards and 4 trains left.</li>
+                    <li>Gray routes still need one single color set.</li>
+                    <li>Longer routes spend more trains and score more points.</li>
+                  </ul>
+                  <p class="guidebook-note">Locomotives can help pay routes, but some route types reserve them.</p>
+                </article>
               </div>
-            </div>
+            </section>
           </div>
         </div>
       </section>

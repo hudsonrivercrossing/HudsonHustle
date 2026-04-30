@@ -193,16 +193,18 @@ Avoid:
 - broad new primitives before CSS object reuse is proven
 - copying setup/lobby station-counter composition into active play where table instruments would fit better
 
-### P1 Rulebook / Tutorial / Ticket-Desk Overlay Pass
+### P1 Ticket-Desk Overlay Pass
 Scope:
-- bring rulebook, tutorial, ticket picker, handoff, and draw reveal into the same object system
-- treat tutorial/rulebook as guided lesson sheets or table references
+- bring ticket picker, handoff, and draw reveal into the same object system
 - treat ticket choice/reveal as printed artifacts with stronger station/game affordance
 
 Avoid:
 - a full modal-library rewrite
-- tutorial copy expanding into active action details
-- implementing the disabled guide/onboarding gateway placeholder in this pass
+- guidebook copy expanding into active action details
+
+Completed direction:
+- the old auto-opening tutorial is replaced by a compact `Guide` rulebook
+- `GUIDE_` is reachable from the gateway, and `Guide` is reachable from active board topbars
 
 ### P2 Semantic Color Usage Audit
 Scope:

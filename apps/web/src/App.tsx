@@ -47,6 +47,7 @@ import {
   formatCardLabel,
   type GameplayNotification
 } from "./components/GameplayHud";
+import { GuidebookScreen } from "./components/GuidebookScreen";
 import { LocalPlayScreen } from "./components/LocalPlayScreen";
 import { LobbyScreen } from "./components/LobbyScreen";
 import { MultiplayerSetupScreen } from "./components/MultiplayerSetupScreen";
@@ -63,7 +64,7 @@ const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8787";
 const wsUrl = import.meta.env.VITE_WS_URL ?? apiBaseUrl;
 const sessionKey = "hudson-hustle-multiplayer-session-v2";
 type RealtimeStatus = "idle" | "connecting" | "subscribed" | "failed";
-type SetupMode = "gateway" | "local" | "multiplayer";
+type SetupMode = "gateway" | "local" | "multiplayer" | "guide";
 
 class ApiError extends Error {
   constructor(
@@ -201,6 +202,7 @@ export default function App(): JSX.Element {
   const [focusedTicket, setFocusedTicket] = useState<TicketDef | null>(null);
   const [pinnedTicket, setPinnedTicket] = useState<TicketDef | null>(null);
   const [paymentPreview, setPaymentPreview] = useState<{ color: TrainCardColor; totalCost: number; minimumLocomotives?: number } | null>(null);
+  const [guideOpen, setGuideOpen] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [notifications, setNotifications] = useState<GameplayNotification[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -723,8 +725,13 @@ export default function App(): JSX.Element {
             setSetupMode("multiplayer");
             setMultiplayerError(null);
           }}
+          onOpenGuide={() => setSetupMode("guide")}
         />
       );
+    }
+
+    if (setupMode === "guide") {
+      return <GuidebookScreen onBack={() => setSetupMode("gateway")} />;
     }
 
     if (setupMode === "local") {
@@ -759,6 +766,10 @@ export default function App(): JSX.Element {
         onJoinRoom={(form) => void joinRoom(form)}
       />
     );
+  }
+
+  if (guideOpen) {
+    return <GuidebookScreen onBack={() => setGuideOpen(false)} />;
   }
 
   if (snapshot.room.status === "lobby" || !snapshot.game || !mapConfig || !visuals || !projectedGame || !localPlayer) {
@@ -810,7 +821,7 @@ export default function App(): JSX.Element {
           className="player-roster--top"
         />
         <div className="topbar-actions">
-          <Button disabled>Guide</Button>
+          <Button onClick={() => setGuideOpen(true)}>Guide</Button>
           <ScoreGuide className="score-guide--subtle" label="Score" />
           <Button className="topbar-actions__leave" onClick={() => setShowLeaveConfirm(true)}>
             Leave room
