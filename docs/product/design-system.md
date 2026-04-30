@@ -36,7 +36,8 @@ Locked decisions:
   - setup and lobby should use station-enamel panels, muted ticket fields, token accents, progressive summary rows, and map thumbnails
   - SetupShell identity should stay a compact placard, not a large hero column
   - Local setup should use the same setup/lobby primitives and Seats → Map → Timer rhythm as Online so the first table choice does not split into two visual systems
-  - Gateway can reserve a disabled rules/onboarding stakeholder artifact for the next onboarding branch
+  - Gateway `GUIDE_` opens the active guidebook branch: a compact step-by-step rulebook, not the old auto-opening tutorial
+  - Guidebook access also belongs in active local and online board topbar controls
 - map remains conservative and map-first during this phase
 
 ## Structure
@@ -50,6 +51,7 @@ Stable design-system docs:
 - [Map Language Boundary](/Users/djfan/Workspace/HudsonHustle/docs/product/map-language-boundary.md)
 - [Design Implementation Backlog](/Users/djfan/Workspace/HudsonHustle/docs/product/design-implementation-backlog.md)
 - [Design Showcases](/Users/djfan/Workspace/HudsonHustle/docs/product/showcase/README.md)
+- [System Design Revamp Plan](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/system-design-revamp-plan.md)
 
 Versioned rationale and decision trail:
 - [V2.1 Design Lock](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.1-design-lock.md)
@@ -82,19 +84,30 @@ When design implementation is in progress, code should organize around:
 - `apps/web/src/design/tokens.ts`
 - `apps/web/src/design/theme.css`
 - `apps/web/src/components/system/`
+- `apps/web/src/components/system/game/`
+- `apps/web/src/components/setup/`
 
 Only extract primitives proven necessary by the current slice:
-- `StatusBanner`
+- `Badge`
 - `StateSurface`
 - `Panel`
-- `Chip`
 - `SectionHeader`
 - `Button`
 - `FormField`
 - `SurfaceCard`
 - `ChoiceChipButton`
 - `ModalShell`
-- `UtilityPill`
+- deprecated compatibility primitives:
+  - `Chip`
+  - `StatusBanner`
+  - `UtilityPill`
+- gameplay primitives proven by the board layout revamp:
+  - `CardSlot`
+  - `TicketSlip`
+  - `SeatTile`
+  - `SideTabRail`
+  - `NotificationStack`
+  - `GameOverPanel`
 - setup/lobby primitives proven by the current slice:
   - `SetupShell`
   - `SetupStepper`
@@ -104,7 +117,7 @@ Only extract primitives proven necessary by the current slice:
   - `MapThumbnail`
   - `DepartureBoardTile`
   - `StationPlate`
-  - `TicketSlip`
+  - `SetupTicketSlip`
   - `TokenButton`
 
 Do not build a broad component library ahead of proof.

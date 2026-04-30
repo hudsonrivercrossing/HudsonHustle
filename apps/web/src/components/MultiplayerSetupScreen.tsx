@@ -12,10 +12,10 @@ import {
   SetupShell,
   SetupStepPanel,
   SetupSummaryRow,
-  TicketSlip,
+  SetupTicketSlip,
   TokenButton,
   type SetupStep
-} from "./setup/SetupPrimitives";
+} from "./setup";
 import { Button } from "./system/Button";
 
 interface CreateRoomForm {
@@ -221,7 +221,7 @@ export function MultiplayerSetupScreen({
           version={selectedConfig?.version}
         />
       ) : (
-        <TicketSlip
+        <SetupTicketSlip
           className="setup-room-code-plate--table"
           ariaLabel="Table setup ticket"
           label={createStep === 0 ? "Host" : "Seats"}
@@ -252,7 +252,7 @@ export function MultiplayerSetupScreen({
       {previewConfig ? (
         <MapThumbnail configId={previewConfig.configId} mapName={previewConfig.mapName} version={previewConfig.version} />
       ) : (
-        <TicketSlip ariaLabel="No room preview yet" label="Room" value={joinRoomCode || "------"} />
+        <SetupTicketSlip ariaLabel="No room preview yet" label="Room" value={joinRoomCode || "------"} />
       )}
       {joinStep > 0 || roomPreview ? (
         <div className="setup-summary-stack">

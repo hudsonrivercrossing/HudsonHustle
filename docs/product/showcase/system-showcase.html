@@ -237,7 +237,7 @@
         <div class="section-header">
           <span class="section-header__eyebrow">Shell family</span>
           <div class="section-header__row">
-            <h2 class="section-header__title">Panel + SectionHeader + Chip</h2>
+            <h2 class="section-header__title">Panel + SectionHeader + Badge</h2>
             <span class="section-header__meta">outer shell primitives</span>
           </div>
         </div>
@@ -315,7 +315,7 @@
           <section class="panel panel--neutral">
             <div class="section-header section-header--compact">
               <div class="section-header__row">
-                <h2 class="section-header__title">Chip family</h2>
+                <h2 class="section-header__title">Badge family</h2>
                 <span class="section-header__meta">small metadata</span>
               </div>
             </div>
@@ -326,7 +326,7 @@
               <span class="system-chip system-chip--warning">Pending</span>
               <span class="system-chip system-chip--danger">Error</span>
             </div>
-            <p class="showcase-note">Chips should read like compact state marks attached to rows, seats, tickets, or objects. They are tighter and more status-like than UtilityPill.</p>
+            <p class="showcase-note">Badges should read like compact state marks attached to rows, seats, tickets, or objects. They are tighter and more status-like than feature chrome.</p>
           </section>
 
           <section class="panel panel--alert">
@@ -572,81 +572,37 @@
             </div>
           </div>
 
-          <div class="modal-shell modal-shell--tutorial">
-            <div class="modal-shell__card modal-shell__card--lg modal-shell__card--left tutorial-card">
-              <div class="tutorial-layout">
-                <aside class="tutorial-nav">
-                  <div class="tutorial-nav__intro">
-                    <p class="eyebrow">First game guide</p>
-                    <h2>Learn the board in a few minutes</h2>
-                    <p class="tutorial-copy">Use this walkthrough to learn where the public board ends and where your private choices begin.</p>
-                  </div>
-                  <p class="tutorial-progress-note">Step 2 of 6</p>
-                  <div class="tutorial-step-list">
-                    <button class="tutorial-step-link"><span class="tutorial-step-link__index">1</span><span class="tutorial-step-link__label">Read the setup table</span></button>
-                    <button class="tutorial-step-link tutorial-step-link--active"><span class="tutorial-step-link__index">2</span><span class="tutorial-step-link__label">Read the public board first</span></button>
-                    <button class="tutorial-step-link"><span class="tutorial-step-link__index">3</span><span class="tutorial-step-link__label">Inspect the action rail</span></button>
-                  </div>
-                </aside>
-
-                <div class="tutorial-main">
-                  <div class="tutorial-header">
-                    <div class="tutorial-header__meta">
-                      <span class="tutorial-header__kicker">Guided tutorial</span>
-                      <span class="tutorial-header__target">Main board</span>
-                    </div>
-                    <button class="system-button secondary-button"><span class="system-button__content">Skip tutorial</span></button>
-                  </div>
-
-                  <div class="tutorial-hero">
-                    <div class="section-header section-header--ceremony">
-                      <div class="section-header__row">
-                        <h2 class="section-header__title">Read the public board first</h2>
-                      </div>
-                    </div>
-                    <p class="tutorial-copy tutorial-copy--hero">Start with the public board so you can separate shared information from private hand management.</p>
-                  </div>
-
-                  <div class="tutorial-progress" aria-hidden="true">
-                    <span class="tutorial-progress__dot"></span>
-                    <span class="tutorial-progress__dot tutorial-progress__dot--active"></span>
-                    <span class="tutorial-progress__dot"></span>
-                  </div>
-
-                  <div class="tutorial-body">
-                    <section class="surface-card surface-card--detail tutorial-lesson">
-                      <div class="surface-card__header">
-                        <span class="surface-card__eyebrow">Lesson sheet</span>
-                        <div class="surface-card__row">
-                          <h3 class="surface-card__title">What to notice</h3>
-                        </div>
-                      </div>
-                      <div class="surface-card__body tutorial-lesson__section">
-                        <span class="tutorial-lesson__label">Focus area</span>
-                        <strong class="tutorial-lesson__focus">Main board</strong>
-                        <ul class="tutorial-point-list">
-                          <li>Routes and stations are the only objects that drive decisions.</li>
-                          <li>Claimed lines and station markers are always public.</li>
-                          <li>The action rail responds once you inspect a route or city.</li>
-                        </ul>
-                      </div>
-                    </section>
-
-                    <section class="surface-card surface-card--detail tutorial-tip">
-                      <div class="surface-card__header">
-                        <span class="surface-card__eyebrow">Try this</span>
-                        <div class="surface-card__row">
-                          <h3 class="surface-card__title">Suggested move</h3>
-                        </div>
-                      </div>
-                      <div class="surface-card__body">
-                        <p>Click a short route first so you can see how the action rail responds.</p>
-                      </div>
-                    </section>
-                  </div>
+          <div class="guidebook-shell" style="min-height: 640px; --setup-gateway-image: url('/setup/landing-bg.png');">
+            <section class="guidebook-card">
+              <header class="guidebook-topbar">
+                <div>
+                  <p class="guidebook-kicker">Hudson Hustle guide</p>
+                  <h1>First ride rulebook</h1>
                 </div>
+                <button class="system-button secondary-button"><span class="system-button__content">Back</span></button>
+              </header>
+              <div class="guidebook-rule-card">
+                <div class="guidebook-progress-row">
+                  <span>Routes</span>
+                  <strong>4 / 9</strong>
+                </div>
+                <div class="guidebook-glyph">
+                  <span>RED</span>
+                  <span>4</span>
+                  <span>PTS</span>
+                </div>
+                <article class="guidebook-copy">
+                  <h2>Turn cards into track</h2>
+                  <p class="guidebook-rule">Spend cards that match the route color and length.</p>
+                  <ul>
+                    <li>A length 4 route needs 4 matching cards and 4 trains left.</li>
+                    <li>Gray routes still need one single color set.</li>
+                    <li>Longer routes spend more trains and score more points.</li>
+                  </ul>
+                  <p class="guidebook-note">Locomotives can help pay routes, but some route types reserve them.</p>
+                </article>
               </div>
-            </div>
+            </section>
           </div>
         </div>
       </section>
@@ -699,6 +655,99 @@
                 </select>
               </span>
             </label>
+          </section>
+        </div>
+      </section>
+
+      <section class="showcase-panel-stack app-shell--gameplay-hud" style="min-height: auto; padding: 24px;">
+        <div class="section-header">
+          <span class="section-header__eyebrow">Gameplay system</span>
+          <div class="section-header__row">
+            <h2 class="section-header__title">CardSlot + TicketSlip + SeatTile + SideTabRail</h2>
+            <span class="section-header__meta">system/game primitives</span>
+          </div>
+        </div>
+
+        <div class="showcase-grid">
+          <section class="panel panel--private-info private-hand-rail">
+            <div class="section-header section-header--compact">
+              <div class="section-header__row">
+                <h3 class="section-header__title">Card slots</h3>
+                <span class="section-header__meta">stable hand / market sizes</span>
+              </div>
+            </div>
+            <div class="private-hand-rail__slots">
+              <div class="hand-color-slot hand-color-slot--emerald" style="--hand-slot-color: #5aa79a;">
+                <span class="hand-color-slot__count">2</span>
+                <span class="hand-color-slot__label">Emerald</span>
+                <span class="hand-color-slot__spend hand-color-slot__spend--empty">0</span>
+              </div>
+              <div class="hand-color-slot hand-color-slot--amber hand-color-slot--spending" style="--hand-slot-color: #d9ad4f;">
+                <span class="hand-color-slot__count">2</span>
+                <span class="hand-color-slot__label">Amber</span>
+                <span class="hand-color-slot__spend">-2</span>
+              </div>
+              <button class="market-color-slot market-color-slot--locomotive" style="--hand-slot-color: #91a8bd;">
+                <span class="market-color-slot__count">L</span>
+                <span class="market-color-slot__label">Locomotive</span>
+              </button>
+            </div>
+          </section>
+
+          <section class="panel panel--private-info ticket-dock">
+            <div class="ticket-dock__header">
+              <div class="section-header section-header--compact">
+                <div class="section-header__row">
+                  <h3 class="section-header__title">Ticket slips</h3>
+                  <span class="section-header__meta">1/4 connected</span>
+                </div>
+              </div>
+            </div>
+            <div class="ticket-stack ticket-dock__scroll">
+              <button class="ticket-row ticket-row--button ticket-row--focused">
+                <span class="ticket-status row-object__lead">Open</span>
+                <div class="row-object__main">
+                  <span class="row-object__title ticket-route__cities">Exchange Place <span class="ticket-arrow">to</span> Jamaica</span>
+                </div>
+                <div class="row-object__stats"><strong class="ticket-points row-object__stat row-object__stat--strong">14</strong></div>
+              </button>
+              <button class="ticket-row ticket-row--button ticket-row--done ticket-row--compact">
+                <span class="ticket-status row-object__lead ticket-status--done">Done</span>
+                <div class="row-object__main">
+                  <span class="row-object__title ticket-route__cities">Chelsea <span class="ticket-arrow">to</span> Union Sq.</span>
+                </div>
+                <div class="row-object__stats"><strong class="ticket-points row-object__stat row-object__stat--strong">4</strong></div>
+              </button>
+            </div>
+          </section>
+
+          <section class="panel panel--status player-roster">
+            <div class="scoreboard player-roster__list">
+              <article class="player-strip player-roster__row player-strip--active">
+                <span class="player-swatch row-object__lead" style="background: #4f9aa5;"></span>
+                <span class="player-roster__timer">09</span>
+                <div class="row-object__main">
+                  <strong class="row-object__title">Host</strong>
+                  <span class="row-object__meta">Active</span>
+                </div>
+                <div class="row-object__stats"><span class="row-object__stat">24 trains</span><span class="row-object__stat">3 stations</span></div>
+              </article>
+              <article class="player-strip player-roster__row player-roster__row--placeholder">
+                <span class="player-swatch row-object__lead"></span>
+                <div class="row-object__main"><strong class="row-object__title">Open</strong><span class="row-object__meta">Seat 4</span></div>
+              </article>
+            </div>
+          </section>
+
+          <section class="panel panel--status inspector-dock inspector-dock--market">
+            <div class="inspector-tabs" role="tablist" aria-label="Right rail modules">
+              <button class="inspector-tabs__tab inspector-tabs__tab--active">Market</button>
+              <button class="inspector-tabs__tab">Build</button>
+              <button class="inspector-tabs__tab">Chat</button>
+            </div>
+            <div class="inspector-dock__body">
+              <p class="showcase-note">SideTabRail keeps the physical tab spine consistent while each feature owns its panel content.</p>
+            </div>
           </section>
         </div>
       </section>

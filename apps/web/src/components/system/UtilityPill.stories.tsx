@@ -13,7 +13,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Shell chrome metadata and session artifact. Use this for config/session/topbar information. Do not use it as an inline gameplay state tag; that belongs to `Chip`."
+          "Deprecated shell chrome metadata and session artifact. Prefer `Badge` for compact inline state and feature-owned chrome for session metadata."
       }
     }
   },

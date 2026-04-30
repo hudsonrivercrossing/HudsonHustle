@@ -1,11 +1,12 @@
-import { DepartureBoardTile, SetupShell, type SetupStep } from "./setup/SetupPrimitives";
+import { DepartureBoardTile, SetupShell, type SetupStep } from "./setup";
 
 interface SetupGatewayProps {
   onChooseLocal: () => void;
   onChooseOnline: () => void;
+  onOpenGuide: () => void;
 }
 
-export function SetupGateway({ onChooseLocal, onChooseOnline }: SetupGatewayProps): JSX.Element {
+export function SetupGateway({ onChooseLocal, onChooseOnline, onOpenGuide }: SetupGatewayProps): JSX.Element {
   const setupHeroImageUrl = "/setup/landing-bg.png";
   const gatewaySteps: SetupStep[] = [
     { label: "Choose table", meta: "Local or online", status: "current" },
@@ -28,10 +29,10 @@ export function SetupGateway({ onChooseLocal, onChooseOnline }: SetupGatewayProp
           onClick={onChooseLocal}
           testId="gateway-local"
           ariaLabel="Choose Local mode"
-          kicker="Table mode"
+          kicker="Pass-and-play"
           code="LOCAL_"
-          copy="One screen. Human and bot seats."
-          status="Pass-and-play"
+          copy="One screen. All players welcome."
+          status=""
         />
 
         <DepartureBoardTile
@@ -39,21 +40,21 @@ export function SetupGateway({ onChooseLocal, onChooseOnline }: SetupGatewayProp
           onClick={onChooseOnline}
           testId="gateway-online"
           ariaLabel="Choose Online mode"
-          kicker="Live room"
+          kicker="Start Game"
           code="ONLINE"
-          copy="Create a room, claim a seat, start together."
-          status="Room code"
+          copy="Create a room, claim a seat."
+          status=""
         />
 
         <DepartureBoardTile
           className="setup-entry-artifact--rules"
-          disabled
+          onClick={onOpenGuide}
           testId="gateway-onboarding"
-          ariaLabel="Rules tour coming soon"
-          kicker="First ride"
+          ariaLabel="Open the guide"
+          kicker="Rulebook"
           code="GUIDE_"
-          copy="Learn the routes before the table opens."
-          status="Boarding soon"
+          copy="Learn the table in nine quick cards."
+          status=""
         />
       </div>
     </SetupShell>

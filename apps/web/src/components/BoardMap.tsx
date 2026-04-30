@@ -157,6 +157,7 @@ interface BoardMapProps {
   };
   selectedRouteId: string | null;
   selectedCityId: string | null;
+  highlightedCityIds?: string[];
   onSelectRoute: (routeId: string) => void;
   onSelectCity: (cityId: string) => void;
 }
@@ -172,6 +173,7 @@ export function BoardMap({
   game,
   selectedRouteId,
   selectedCityId,
+  highlightedCityIds = [],
   onSelectRoute,
   onSelectCity
 }: BoardMapProps): JSX.Element {
@@ -198,6 +200,7 @@ export function BoardMap({
         ? backdrop.regionLabels.filter((label) => label.id !== "new-jersey")
         : backdrop.regionLabels;
   const regionLabelClassSuffix = boardLabelMode === "minimal-region-labels" ? " region-label--minimal" : "";
+  const highlightedCitySet = new Set(highlightedCityIds);
 
   return (
     <div className="board-shell">
@@ -207,7 +210,7 @@ export function BoardMap({
         role="img"
         aria-label="Hudson Hustle board map"
       >
-        <rect x="0" y="0" width={boardWidth} height={boardHeight} rx="28" fill="#ebdfc8" />
+        <rect x="0" y="0" width={boardWidth} height={boardHeight} rx="12" fill="#d9c8a6" />
 
         {backdropOpacityScale > 0
           ? backdrop.waterAreas.map((area) => (
@@ -273,7 +276,7 @@ export function BoardMap({
           const markerY = middlePoint.y + direction.ny * 18;
           const fillOpacity = claim ? 0.96 : 0.82;
           const ownerBadge = claimingPlayer?.name.trim().charAt(0).toUpperCase() ?? "";
-          const backplateFill = claim ? (claimedByViewer ? "#f3df9f" : "#4a3a2b") : "#f7f0e3";
+          const backplateFill = claim ? (claimedByViewer ? "#f0d78e" : "#493728") : "#fff2d7";
           const claimStitchStroke = claimedByViewer ? "rgba(255, 251, 236, 0.98)" : "rgba(255, 247, 236, 0.22)";
           const claimStitchWidth = claimedByViewer ? 4.6 : 3;
           const claimStitchDasharray = claimedByViewer ? "3.4 5.6" : "2 8.2";
@@ -343,15 +346,24 @@ export function BoardMap({
         {config.cities.map((city) => {
           const station = game.stations.find((item) => item.cityId === city.id);
           const selected = selectedCityId === city.id;
+          const highlighted = highlightedCitySet.has(city.id);
           const labelDx = city.labelDx ?? 14;
           const labelDy = city.labelDy ?? -14;
           const labelAnchor = city.labelAnchor ?? "start";
           return (
-            <g key={city.id}>
+            <g key={city.id} className={highlighted ? "city-node city-node--highlighted" : "city-node"}>
+              {highlighted ? (
+                <circle
+                  cx={city.x}
+                  cy={city.y}
+                  r="25"
+                  className="city-highlight-ring"
+                />
+              ) : null}
               <circle
                 cx={city.x}
                 cy={city.y}
-                r={selected ? 15 : 12}
+                r={highlighted ? 17 : selected ? 15 : 12}
                 fill="#f8f5ef"
                 stroke="#453221"
                 strokeWidth="3"
@@ -375,7 +387,7 @@ export function BoardMap({
                 x={city.x + labelDx}
                 y={city.y + labelDy}
                 textAnchor={labelAnchor}
-                className="board-label"
+                className={highlighted ? "board-label board-label--highlighted" : "board-label"}
               >
                 {city.label ?? city.name}
               </text>

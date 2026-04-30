@@ -3,7 +3,7 @@
 ## Welcome
 Hudson Hustle is a route-building game about connecting the NYC/NJ metro area before your rivals lock down the best crossings. You will collect transit cards, claim routes on the map, complete destination tickets, and decide when to spend precious stations to rescue a plan.
 
-If you are brand new, the in-app tutorial gives you a short guided teach and points at the exact part of the screen being explained. If you already know the flow, you can skip it immediately.
+If you are brand new, open the in-app `Guide` from the main page or the game board. It teaches the rules as a short step-by-step rulebook without changing the table state.
 
 ## Bot Seat Note
 Local setup and online multiplayer may include one or more built-in `bot` seats.
