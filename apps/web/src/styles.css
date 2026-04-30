@@ -4282,6 +4282,11 @@ h3 {
   background: rgba(255, 247, 231, 0.055);
 }
 
+.chat-panel__messages:has(> :only-child) {
+  align-content: center;
+  place-items: center;
+}
+
 .chat-panel__message {
   margin: 0;
   padding: 8px 10px;
