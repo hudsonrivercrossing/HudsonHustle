@@ -336,7 +336,7 @@ export function SupplyDock({
   className = ""
 }: SupplyDockProps): JSX.Element {
   return (
-    <Panel variant="neutral" className={["supply-dock", className].filter(Boolean).join(" ")}>
+    <div className={["supply-dock", className].filter(Boolean).join(" ")}>
       <SectionHeader title="Market" meta={`${deckCount} deck`} density="compact" />
       <div className="market-grid supply-dock__market">
         {market.map((card, index) => (
@@ -350,7 +350,7 @@ export function SupplyDock({
           />
         ))}
       </div>
-      <Button disabled={disabled} onClick={onDrawFromDeck}>
+      <Button className="supply-dock__draw-deck" disabled={disabled} onClick={onDrawFromDeck}>
         Draw from deck
       </Button>
       {onDrawTickets ? (
@@ -358,7 +358,7 @@ export function SupplyDock({
           Draw tickets
         </Button>
       ) : null}
-    </Panel>
+    </div>
   );
 }
 

@@ -3734,7 +3734,6 @@ h3 {
 .app-shell--gameplay-hud .player-roster,
 .app-shell--gameplay-hud .private-hand-rail,
 .app-shell--gameplay-hud .ticket-dock,
-.app-shell--gameplay-hud .supply-dock,
 .app-shell--gameplay-hud .inspector-dock {
   border-color: rgba(222, 199, 158, 0.2);
   background:
@@ -6464,8 +6463,7 @@ h3 {
     0 5px 0 rgba(0, 0, 0, 0.2);
 }
 
-.app-shell--gameplay-hud .hand-color-slot::before,
-.app-shell--gameplay-hud .market-color-slot::before {
+.app-shell--gameplay-hud .hand-color-slot::before {
   content: "";
   position: absolute;
   inset: 7px 7px 6px 16px;
@@ -6475,6 +6473,12 @@ h3 {
   background:
     linear-gradient(135deg, rgba(232, 220, 194, 0.08), transparent 38%),
     linear-gradient(180deg, rgba(232, 220, 194, 0.045), transparent);
+}
+
+.app-shell--gameplay-hud .market-color-slot::before,
+.app-shell--gameplay-hud .market-color-slot::after {
+  display: none !important;
+  content: none !important;
 }
 
 .app-shell--gameplay-hud .hand-color-slot--empty {
@@ -6705,8 +6709,7 @@ h3 {
   );
 }
 
-.app-shell--gameplay-hud .hand-color-slot::before,
-.app-shell--gameplay-hud .market-color-slot::before {
+.app-shell--gameplay-hud .hand-color-slot::before {
   border-radius: 1px;
   clip-path: polygon(
     5px 0,
