@@ -1555,9 +1555,6 @@ h3 {
 }
 
 .player-roster__timer {
-  position: absolute;
-  top: 6px;
-  right: 7px;
   display: grid;
   place-items: center;
   min-width: 28px;
@@ -1571,6 +1568,15 @@ h3 {
   font-weight: 880;
   line-height: 1;
   letter-spacing: 0.06em;
+}
+
+.player-roster__timer:empty {
+  visibility: hidden;
+  padding: 0;
+  min-width: 0;
+  min-height: 0;
+  border: 0;
+  background: transparent;
 }
 
 .player-roster__row--placeholder {
@@ -1612,8 +1618,8 @@ h3 {
 .player-strip {
   position: relative;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: 12px;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  gap: 10px;
   align-items: center;
   padding: 12px 14px;
   border-radius: var(--radius-md);
