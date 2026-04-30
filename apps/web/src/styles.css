@@ -5957,18 +5957,6 @@ h3 {
   color: rgba(246, 235, 214, 0.58);
 }
 
-.app-shell--gameplay-hud .inspector-dock .supply-dock--board {
-  padding: 0;
-  border: 0;
-  background: transparent;
-  box-shadow: none;
-  backdrop-filter: none;
-}
-
-.app-shell--gameplay-hud .inspector-dock .supply-dock--board::before {
-  display: none;
-}
-
 .app-shell--gameplay-hud .inspector-dock .supply-dock--board .section-header {
   padding-inline: 8px 1px;
   overflow: visible;
