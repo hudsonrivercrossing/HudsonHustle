@@ -3750,14 +3750,14 @@ h3 {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
     0 18px 48px rgba(0, 0, 0, 0.28);
-  color: #f5ecdc;
+  color: var(--hud-paper-bright);
 }
 
 .app-shell--gameplay-hud .board-stage {
   border-color: rgba(222, 199, 158, 0.22);
   background:
     linear-gradient(180deg, rgba(26, 36, 45, 0.86), rgba(11, 17, 22, 0.78));
-  color: #f7eddd;
+  color: var(--hud-paper-bright);
 }
 
 .app-shell--gameplay-hud .section-header__eyebrow,
@@ -3768,7 +3768,7 @@ h3 {
 .app-shell--gameplay-hud .section-header__title,
 .app-shell--gameplay-hud .surface-card__title,
 .app-shell--gameplay-hud .row-object__title {
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
 }
 
 .app-shell--gameplay-hud .section-header__meta,
@@ -4341,7 +4341,7 @@ h3 {
   background:
     radial-gradient(circle at top right, rgba(91, 145, 184, 0.12), transparent 28%),
     linear-gradient(180deg, rgba(255, 247, 231, 0.1), rgba(9, 14, 19, 0.12));
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
 }
 
 .app-shell--gameplay-hud .detail-card__fact,
@@ -4353,7 +4353,7 @@ h3 {
 
 .app-shell--gameplay-hud .detail-card__prompt,
 .app-shell--gameplay-hud .action-empty-prompt__title {
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
 }
 
 .app-shell--gameplay-hud .action-empty-prompt__copy,
@@ -4372,7 +4372,7 @@ h3 {
   background:
     radial-gradient(circle at top left, rgba(92, 145, 184, 0.18), transparent 34%),
     linear-gradient(180deg, rgba(23, 33, 42, 0.94), rgba(10, 16, 22, 0.92));
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
 }
 
 .app-shell--gameplay-hud .ticket-choice-sheet .ticket-picker__tray,
@@ -4380,7 +4380,7 @@ h3 {
 .app-shell--gameplay-hud .ticket-card {
   border-color: rgba(222, 199, 158, 0.18);
   background: rgba(255, 247, 231, 0.08);
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
 }
 
 .setup-board-shell {
@@ -5929,7 +5929,7 @@ h3 {
 }
 
 .app-shell--gameplay-hud .section-header__title {
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
   font-family: var(--font-body);
   font-size: 1rem;
   font-weight: 850;
@@ -6038,7 +6038,7 @@ h3 {
 }
 
 .app-shell--gameplay-hud .ticket-route__cities {
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
   font-family: var(--font-body);
   font-size: 0.76rem;
   font-weight: 820;
@@ -6087,7 +6087,7 @@ h3 {
 }
 
 .app-shell--gameplay-hud .inspector-dock--build .surface-card__title {
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
   font-family: var(--font-body);
   font-size: 1.02rem;
   font-weight: 870;
@@ -6119,7 +6119,7 @@ h3 {
 
 .app-shell--gameplay-hud .detail-card__prompt,
 .app-shell--gameplay-hud .action-empty-prompt__title {
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
   font-size: 0.82rem;
   font-weight: 800;
 }
@@ -6274,7 +6274,7 @@ h3 {
 }
 
 .app-shell--gameplay-hud .game-over-layer {
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
 }
 
 .app-shell--gameplay-hud .game-over-layer__header {
@@ -6310,13 +6310,13 @@ h3 {
     radial-gradient(circle at top right, rgba(142, 169, 188, 0.14), transparent 34%),
     linear-gradient(180deg, rgba(33, 45, 54, 0.92), rgba(11, 17, 23, 0.92));
   border-color: rgba(222, 199, 158, 0.18);
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
 }
 
 .app-shell--gameplay-hud .game-over-layer .endgame-score,
 .app-shell--gameplay-hud .game-over-layer .endgame-breakdown__value,
 .app-shell--gameplay-hud .game-over-layer .endgame-breakdown__list-item {
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
 }
 
 .app-shell--gameplay-hud .game-over-layer .endgame-score__label,
@@ -6329,7 +6329,7 @@ h3 {
     radial-gradient(circle at top left, rgba(142, 169, 188, 0.16), transparent 36%),
     linear-gradient(180deg, rgba(31, 42, 51, 0.96), rgba(9, 15, 20, 0.96));
   border-color: rgba(222, 199, 158, 0.26);
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
 }
 
 .app-shell--gameplay-hud .leave-confirm-card p {
@@ -6341,7 +6341,7 @@ h3 {
 }
 
 .app-shell--gameplay-hud .leave-confirm-card .section-header__title {
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
 }
 
 .notification-pipe {
@@ -6405,6 +6405,7 @@ h3 {
 .app-shell--gameplay-hud {
   --hud-paper: #e8dcc2;
   --hud-paper-deep: #c9b895;
+  --hud-paper-bright: #fff8ea;
   --hud-paper-soft: rgba(246, 235, 214, 0.78);
   --hud-ink: #241d15;
   --hud-ink-soft: #5f5343;
