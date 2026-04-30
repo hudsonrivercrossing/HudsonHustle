@@ -5298,7 +5298,7 @@ h3 {
 }
 
 .setup-board-shell--gateway .setup-entry-artifact--rules {
-  opacity: 0.7;
+  opacity: 1.0;
 }
 
 .setup-board-shell--lobby .state-surface {

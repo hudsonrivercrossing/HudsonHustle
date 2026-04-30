@@ -29,10 +29,10 @@ export function SetupGateway({ onChooseLocal, onChooseOnline, onOpenGuide }: Set
           onClick={onChooseLocal}
           testId="gateway-local"
           ariaLabel="Choose Local mode"
-          kicker="Table mode"
+          kicker="Pass-and-play"
           code="LOCAL_"
-          copy="One screen. Human and bot seats."
-          status="Pass-and-play"
+          copy="One screen. All players welcome."
+          status=""
         />
 
         <DepartureBoardTile
@@ -40,10 +40,10 @@ export function SetupGateway({ onChooseLocal, onChooseOnline, onOpenGuide }: Set
           onClick={onChooseOnline}
           testId="gateway-online"
           ariaLabel="Choose Online mode"
-          kicker="Live room"
+          kicker="Start Game"
           code="ONLINE"
-          copy="Create a room, claim a seat, start together."
-          status="Room code"
+          copy="Create a room, claim a seat."
+          status=""
         />
 
         <DepartureBoardTile
@@ -51,10 +51,10 @@ export function SetupGateway({ onChooseLocal, onChooseOnline, onOpenGuide }: Set
           onClick={onOpenGuide}
           testId="gateway-onboarding"
           ariaLabel="Open the guide"
-          kicker="First ride"
+          kicker="Rulebook"
           code="GUIDE_"
           copy="Learn the table in nine quick cards."
-          status="Rulebook"
+          status=""
         />
       </div>
     </SetupShell>
