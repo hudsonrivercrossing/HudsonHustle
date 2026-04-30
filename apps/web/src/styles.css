@@ -2446,6 +2446,8 @@ h3 {
   gap: 4px;
   padding: 12px 0 4px;
   border-top: 1px solid rgba(92, 70, 46, 0.08);
+  place-items: center;
+  text-align: center;
 }
 
 .action-empty-prompt__title {
