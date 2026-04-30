@@ -7500,7 +7500,7 @@ h3 {
   margin-top: 0;
 }
 
-/* TicketChoiceSheet: fills right panel, paper-style tickets */
+/* TicketChoiceSheet: fills right panel, tickets match HUD left dock */
 .app-shell--gameplay-hud .ticket-choice-sheet__panel {
   border-radius: 0 !important;
   border: 0 !important;
@@ -7546,68 +7546,8 @@ h3 {
 }
 
 .app-shell--gameplay-hud .ticket-choice-sheet .ticket-row--choice {
-  border-radius: 12px;
   margin-bottom: 0;
-  min-height: 64px !important;
-  height: 64px !important;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: 8px;
-  padding: 8px 9px;
-  background:
-    linear-gradient(180deg, rgba(255, 252, 247, 0.92), rgba(244, 236, 220, 0.86)) !important;
-  border: 1px solid rgba(92, 70, 46, 0.16);
-  color: #2b2117;
-}
-
-.app-shell--gameplay-hud .ticket-choice-sheet .ticket-row--choice .ticket-route__cities {
-  color: #2b2117 !important;
-  font-size: 0.76rem !important;
-  font-family: var(--font-body) !important;
-  font-weight: 820 !important;
-  letter-spacing: 0 !important;
-  line-height: 1.12 !important;
-}
-
-.app-shell--gameplay-hud .ticket-choice-sheet .ticket-row--choice .ticket-arrow {
-  color: rgba(139, 110, 74, 0.6);
-  font-size: 0.52rem !important;
-  font-weight: 850 !important;
-  letter-spacing: 0.04em !important;
-}
-
-.app-shell--gameplay-hud .ticket-choice-sheet .ticket-row--choice .ticket-points {
-  color: #3b2a1d !important;
-  font-size: 0.76rem !important;
-  font-weight: 820 !important;
-}
-
-.app-shell--gameplay-hud .ticket-choice-sheet .ticket-row--choice .ticket-status {
-  color: #2b2117 !important;
-  border-color: rgba(92, 70, 46, 0.2);
-  background:
-    linear-gradient(180deg, rgba(232, 220, 194, 0.9), rgba(210, 195, 168, 0.85)) !important;
-  font-size: 0.76rem !important;
-  font-weight: 850 !important;
-  letter-spacing: 0.04em !important;
-  line-height: 1 !important;
-  min-width: 34px !important;
-  padding: 4px 6px !important;
-  border-radius: 999px !important;
-  text-transform: uppercase !important;
-}
-
-.app-shell--gameplay-hud .ticket-choice-sheet .ticket-row--choice.ticket-row--keep {
-  background:
-    linear-gradient(180deg, rgba(248, 240, 220, 0.96), rgba(232, 220, 194, 0.9)) !important;
-  border-color: rgba(160, 144, 80, 0.34);
-  border-left: 4px solid rgba(160, 144, 80, 0.55);
-}
-
-.app-shell--gameplay-hud .ticket-choice-sheet .ticket-row--choice.ticket-row--keep .ticket-status {
-  color: #2e230d !important;
-  border-color: rgba(160, 144, 80, 0.3);
-  background:
-    linear-gradient(180deg, rgba(232, 220, 160, 0.9), rgba(200, 180, 120, 0.85)) !important;
+  min-height: 64px;
 }
 
 .app-shell--gameplay-hud .ticket-choice-sheet .setup-actions {
