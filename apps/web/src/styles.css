@@ -7298,12 +7298,6 @@ h3 {
   color: #241d15;
 }
 
-.app-shell--gameplay-hud .ticket-dock {
-  height: 100%;
-  max-height: none;
-  align-self: stretch;
-}
-
 .app-shell--gameplay-hud .ticket-dock__scroll {
   min-height: 0;
 }
