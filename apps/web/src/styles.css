@@ -6165,7 +6165,7 @@ h3 {
 /* TicketChoiceSheet: exact same size as inspector dock, solid background */
 .app-shell--gameplay-hud .ticket-choice-sheet {
   position: absolute !important;
-  top: 18px !important;
+  top: 86px !important;
   right: 18px !important;
   bottom: 18px !important;
   width: var(--game-right-rail) !important;
@@ -7633,7 +7633,7 @@ h3 {
 
 .app-shell--gameplay-hud .ticket-choice-sheet .ticket-list {
   gap: 6px;
-  padding: 8px 12px;
+  padding: 8px 9px;
 }
 
 .app-shell--gameplay-hud .ticket-choice-sheet .ticket-row--choice {
