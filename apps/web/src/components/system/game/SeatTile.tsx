@@ -31,6 +31,7 @@ export function SeatTile({
           <strong className="row-object__title">Open</strong>
           <span className="row-object__meta">{seatLabel ?? "Seat"}</span>
         </div>
+        <span className="player-roster__timer" />
         <div className="row-object__stats" />
       </article>
     );
@@ -43,11 +44,11 @@ export function SeatTile({
       ) : (
         <span className="player-swatch row-object__lead" style={{ background: color }} />
       )}
-      {timerLabel ? <span className="player-roster__timer">{timerLabel}</span> : null}
       <div className="row-object__main">
         <strong className="row-object__title">{name}</strong>
         <span className="row-object__meta">{active ? "Active" : `${ticketCount} tickets`}</span>
       </div>
+      <span className="player-roster__timer">{timerLabel}</span>
       <div className="row-object__stats">
         {typeof trainsLeft === "number" ? <span className="row-object__stat">{trainsLeft} trains</span> : null}
         {typeof stationsLeft === "number" ? <span className="row-object__stat">{stationsLeft} stations</span> : null}
