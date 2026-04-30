@@ -942,19 +942,19 @@ h3 {
 }
 
 .seat-avatar {
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 0.85rem;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15);
-  color: #fff;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
   flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.seat-avatar--empty {
+  opacity: 0.35;
+  filter: grayscale(1) brightness(1.2);
 }
 
 .seat-row {
@@ -982,15 +982,8 @@ h3 {
 }
 
 .seat-row--self .seat-avatar {
-  border-color: rgba(42, 111, 182, 0.6);
-  box-shadow: 0 0 0 1px rgba(42, 111, 182, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.15);
-}
-
-.seat-host-icon {
-  display: inline-block;
-  margin-left: 6px;
-  font-size: 0.85rem;
-  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
+  border-color: rgba(42, 111, 182, 0.5);
+  box-shadow: 0 0 0 1px rgba(42, 111, 182, 0.25), inset 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
 .row-object__lead {

@@ -32,11 +32,18 @@ function getSeatStatus(seat: SeatSummary): SeatStatus {
   return seat.ready ? { label: "Ready", tone: "success" } : { label: "Waiting", tone: "warning" };
 }
 
-function getInitials(name: string | null): string {
-  if (!name) return "??";
-  const parts = name.trim().split(/\s+/);
-  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-  return name.substring(0, 2).toUpperCase();
+const AVATAR_NAMES = ["Felix", "Aneka", "Zoe", "Max", "Maya", "Leo"];
+
+function hashString(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash);
+}
+
+function getAvatarForSeat(seatIndex: number): string {
+  return AVATAR_NAMES[seatIndex % AVATAR_NAMES.length];
 }
 
 export function LobbyScreen({
@@ -134,23 +141,25 @@ export function LobbyScreen({
         }
       >
         <div className="seat-stack">
-          {room.seats.map((seat) => {
+          {room.seats.map((seat, index) => {
             const isSelf = seat.seatId === localSeatId;
             const status = getSeatStatus(seat);
             const isEmpty = seat.playerName === null;
+            const avatarName = getAvatarForSeat(index);
             return (
               <article
                 key={seat.seatId}
                 className={`seat-row ${isSelf ? "seat-row--self" : ""} ${isEmpty ? "seat-row--open" : ""}`}
                 data-testid={`seat-row-${seat.seatId}`}
               >
-                <div className="seat-avatar" style={{ background: seat.playerColor || "#6b5d4f" }}>
-                  {getInitials(seat.playerName)}
-                </div>
+                <img
+                  className={`seat-avatar ${isEmpty ? "seat-avatar--empty" : ""}`}
+                  src={`/avatars/avatar-${avatarName}.svg`}
+                  alt={`${seat.playerName || "Open seat"} avatar`}
+                />
                 <div className="row-object__main">
                   <strong className="row-object__title">
                     {seat.playerName ?? "Open seat"}
-                    {seat.isHost && <span className="seat-host-icon" title="Host">👑</span>}
                   </strong>
                   <p className="row-object__meta">
                     {isEmpty ? "Waiting for player" : seat.seatId}
