@@ -7223,7 +7223,7 @@ h3 {
   grid-template-columns: minmax(0, 1fr) 36px;
   column-gap: 9px;
   padding: 12px 9px 12px 12px;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .app-shell--gameplay-hud .inspector-tabs {
