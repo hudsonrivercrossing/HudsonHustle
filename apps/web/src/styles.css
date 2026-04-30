@@ -2648,7 +2648,7 @@ h3 {
   align-items: center;
   min-width: 48px;
   color: var(--ink-soft);
-  font-size: 0.98rem;
+  font-size: 5.0rem;
   font-weight: 840;
   text-transform: uppercase;
   letter-spacing: 0.11em;
@@ -7322,17 +7322,7 @@ h3 {
   min-height: 0;
 }
 
-/* Right rail market is loose content on the rail, not one large clickable tray. */
-.app-shell--gameplay-hud .inspector-dock--market {
-  border-color: transparent;
-  background: transparent;
-  box-shadow: none;
-}
-
-.app-shell--gameplay-hud .inspector-dock--market::before,
-.app-shell--gameplay-hud .inspector-dock--market::after {
-  display: none;
-}
+/* Right rail market is an inserted tray, not a nested panel */
 
 .app-shell--gameplay-hud .inspector-dock .supply-dock--board {
   display: grid;
@@ -7346,7 +7336,6 @@ h3 {
   background: transparent;
   box-shadow: none;
   backdrop-filter: none;
-  pointer-events: none;
 }
 
 .app-shell--gameplay-hud .inspector-dock .supply-dock--board::before,
@@ -7361,12 +7350,6 @@ h3 {
   outline: 0;
   background: transparent;
   box-shadow: none;
-}
-
-.app-shell--gameplay-hud .inspector-dock .supply-dock--board .section-header,
-.app-shell--gameplay-hud .inspector-dock .market-color-slot,
-.app-shell--gameplay-hud .inspector-dock .supply-dock--board .system-button {
-  pointer-events: auto;
 }
 
 .app-shell--gameplay-hud .inspector-dock .supply-dock__draw-deck.system-button,
