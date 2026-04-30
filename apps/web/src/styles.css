@@ -3776,7 +3776,7 @@ h3 {
 .app-shell--gameplay-hud .row-object__stat,
 .app-shell--gameplay-hud .muted-copy,
 .app-shell--gameplay-hud .board-stage__placeholder {
-  color: rgba(246, 235, 214, 0.64);
+  color: var(--hud-paper-soft);
 }
 
 .app-shell--gameplay-hud .player-strip,
@@ -3917,7 +3917,7 @@ h3 {
 .inspector-dock__summary {
   margin: 0;
   max-width: calc(100% - 42px);
-  color: rgba(246, 235, 214, 0.64);
+  color: var(--hud-paper-soft);
   font-size: 0.78rem;
   line-height: 1.35;
 }
@@ -5937,7 +5937,7 @@ h3 {
 }
 
 .app-shell--gameplay-hud .section-header__meta {
-  color: rgba(246, 235, 214, 0.64);
+  color: var(--hud-paper-soft);
   font-size: 0.78rem;
   font-weight: 650;
   letter-spacing: 0;
@@ -6125,7 +6125,7 @@ h3 {
 }
 
 .app-shell--gameplay-hud .action-empty-prompt__copy {
-  color: rgba(246, 235, 214, 0.62);
+  color: rgba(246, 235, 214, 0.72);
   font-size: 0.74rem;
 }
 
@@ -6405,10 +6405,12 @@ h3 {
 .app-shell--gameplay-hud {
   --hud-paper: #e8dcc2;
   --hud-paper-deep: #c9b895;
+  --hud-paper-soft: rgba(246, 235, 214, 0.78);
   --hud-ink: #241d15;
   --hud-ink-soft: #5f5343;
   --hud-brass: #b79b61;
   --hud-brass-dark: #6d5830;
+  --hud-brass-light: rgba(222, 199, 158, 0.64);
   --hud-wood: #16100b;
   --hud-wood-light: #2a2117;
   --hud-shadow: rgba(0, 0, 0, 0.42);
