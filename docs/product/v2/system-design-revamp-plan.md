@@ -504,3 +504,77 @@ Updated: April 30, 2026
 | Phase 6: Documentation And Showcase | Done | Added stories for new foundation/game components and updated design-system docs, component docs, and static showcase. |
 | Phase 7: Migration Cleanup | Done | Updated active app imports away from deprecated `Chip`; retained deprecated compatibility files only where useful for stories/showcase comparison. |
 | Phase 8: Verification | Done | `pnpm build`, `pnpm --filter @hudson-hustle/web build-storybook`, and `pnpm --filter @hudson-hustle/web test:e2e` pass. |
+
+## Next System Component Improvement Items
+
+Reviewed from the static System Component Showcase and built Storybook on April 30, 2026.
+
+### P1: Make The Showcase Reviewable In The First Viewport
+
+- The current showcase first viewport is too dark and low-contrast; the title and early sections are nearly unreadable before the page reaches the lighter component bands.
+- Replace the dark intro treatment with a readable table-surface header, or invert the text system so the first viewport has deliberate contrast.
+- Keep the page useful as a review artifact: every visible section title should be readable in screenshots without manual zooming.
+
+### P1: Give Storybook Stories Real Component Frames
+
+- Several stories render tiny components in a huge beige canvas, which makes scale and rhythm impossible to judge.
+- Add Storybook decorators or per-story wrappers for:
+  - `system`: neutral paper workbench.
+  - `system/game`: dark tabletop workbench with constrained tray widths.
+  - overlay components: centered modal/overlay frame.
+- Stories should show the component at the size it uses in production, not stretched or floating in empty space.
+
+### P1: Lock Intrinsic Size Contracts For Game Objects
+
+- `CardSlot` should own or document its stable slot dimensions so isolated Storybook stories cannot stretch into a full-width bar.
+- `TicketSlip` should render inside a realistic fixed-width ticket column in stories so typography, vertical status, and points badge can be reviewed.
+- `SideTabRail` should be shown attached to a rail/tray edge, not floating alone.
+
+### P1: Add Composition Stories For Real Game Surfaces
+
+- Single primitive stories are not enough to judge the system language.
+- Add composition stories for:
+  - `PrivateHandRail` equivalent: 9 `CardSlot`s with empty, filled, and spend preview states.
+  - `TicketDock` equivalent: 4 ticket slips, paging controls, connected count.
+  - `SupplyDock` equivalent: market slots plus draw buttons.
+  - `InspectorDock` equivalent: Market/Build/Chat tab spine with content.
+  - `PlayerRoster` equivalent: 4 seats with active/timer/placeholder states.
+- These can stay story-only compositions if feature components remain in `GameplayHud.tsx`.
+
+### P2: Separate Deprecated Components In Storybook
+
+- `Chip`, `UtilityPill`, and `StatusBanner` still appear beside active primitives in the Storybook sidebar.
+- Move deprecated stories under `System/Deprecated/...` or tag them clearly so future work does not choose them by accident.
+- Keep the compatibility files until imports and docs are fully migrated, then delete in a later cleanup.
+
+### P2: Improve Storybook Docs Controls
+
+- Controls currently show raw prop names without enough usage guidance.
+- Add `argTypes` descriptions for high-risk props:
+  - `CardSlot.mode`, `face`, `count`, `spendDelta`.
+  - `TicketSlip.status`, `focused`.
+  - `SeatTile.active`, `timerLabel`, `placeholder`.
+  - `SideTabRail.tabs`, `activeTab`.
+- Include short docs text: what owns gameplay state, what is visual-only, and what must stay feature-owned.
+
+### P2: Align Showcase Examples With Current Components
+
+- Static showcase still includes some older visual examples and should now mirror the new component names more tightly.
+- Rename all visible “chip” language to “badge” unless referring to the deprecated alias.
+- Add a small “deprecated comparison” row instead of mixing deprecated primitives into the active component narrative.
+
+### P2: Add Accessibility Review Notes To Component Docs
+
+- `TicketSlip`, `CardSlot`, and `SideTabRail` use visually distinctive shapes and vertical labels; document their accessible names and keyboard expectations.
+- Add story examples for focus-visible states, disabled market card slots, and active tabs.
+- Keep visual compactness, but require readable labels and stable focus outlines.
+
+### P3: Add Screenshot QA Targets
+
+- Store a short checklist of canonical screenshots:
+  - System showcase first viewport.
+  - Storybook `CardSlot` hand grid.
+  - Storybook `TicketSlip` stack.
+  - Storybook `SideTabRail` attached to right rail.
+  - Storybook `GameOverPanel`.
+- Use these as lightweight visual drift checks before future large UI passes.
