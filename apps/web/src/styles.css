@@ -3059,14 +3059,14 @@ h3 {
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgba(57, 42, 27, 0.38);
+  background: rgba(57, 42, 27, 0.52);
   animation: shell-fade-in 180ms ease;
 }
 
 .overlay--tutorial,
 .overlay--tutorial-focus,
 .modal-shell--tutorial {
-  background: rgba(34, 24, 14, 0.58);
+  background: rgba(34, 24, 14, 0.68);
 }
 
 .overlay-card,
