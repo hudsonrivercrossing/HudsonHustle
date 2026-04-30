@@ -353,6 +353,9 @@ export function SupplyDock({
       <Button className="supply-dock__draw-deck" disabled={disabled} onClick={onDrawFromDeck}>
         Draw from deck
       </Button>
+      {onDrawTickets && (
+        <div className="supply-dock__divider" />
+      )}
       {onDrawTickets ? (
         <Button className="supply-dock__draw-tickets" disabled={drawTicketsDisabled} onClick={onDrawTickets}>
           Draw tickets
@@ -383,6 +386,10 @@ interface InspectorDockProps {
   activeBuildKey?: string | null;
   chatMessages?: Array<{ id: string; playerName: string; message: string }>;
   onSendChat?: (message: string) => void;
+  turnNumber?: number;
+  currentPlayerName?: string;
+  deckCount?: number;
+  ticketDeckCount?: number;
 }
 
 export function InspectorDock({
@@ -392,7 +399,11 @@ export function InspectorDock({
   buildContent,
   activeBuildKey = null,
   chatMessages = [],
-  onSendChat
+  onSendChat,
+  turnNumber,
+  currentPlayerName,
+  deckCount,
+  ticketDeckCount
 }: InspectorDockProps): JSX.Element {
   const [activeTab, setActiveTab] = useState<InspectorTab>("market");
   const [chatDraft, setChatDraft] = useState("");
@@ -438,7 +449,7 @@ export function InspectorDock({
               setChatDraft("");
             }}
           >
-            <SectionHeader title="Chat" meta="Reserved channel" density="compact" />
+            <SectionHeader title="Chat" density="compact" />
             <div className="chat-panel__messages" aria-label="Chat messages">
               {chatMessages.length > 0 ? (
                 chatMessages.map((message) => (
@@ -449,24 +460,37 @@ export function InspectorDock({
                 ))
               ) : (
                 <p className="chat-panel__message chat-panel__message--system">
-                  {onSendChat ? "No room messages yet." : "Chat is reserved for multiplayer rooms."}
+                  {onSendChat ? "No room messages yet." : "Local play — no chat."}
                 </p>
               )}
             </div>
-            <div className="chat-panel__composer" aria-label="Chat composer">
-              <input
-                type="text"
-                placeholder="Message room"
-                value={chatDraft}
-                maxLength={280}
-                disabled={!onSendChat}
-                onChange={(event) => setChatDraft(event.target.value)}
-              />
-              <Button disabled={!onSendChat || chatDraft.trim().length === 0}>Send</Button>
-            </div>
+            {onSendChat ? (
+              <div className="chat-panel__composer" aria-label="Chat composer">
+                <input
+                  type="text"
+                  placeholder="Message room"
+                  value={chatDraft}
+                  maxLength={280}
+                  onChange={(event) => setChatDraft(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" && chatDraft.trim().length > 0) {
+                      event.preventDefault();
+                      onSendChat(chatDraft.trim());
+                      setChatDraft("");
+                    }
+                  }}
+                />
+              </div>
+            ) : null}
           </form>
         </div>
       )}
+      <div className="inspector-dock__footer">
+        {currentPlayerName ? <span className="inspector-dock__footer-stat">{currentPlayerName}</span> : null}
+        {turnNumber != null ? <span className="inspector-dock__footer-stat">Turn {turnNumber}</span> : null}
+        {deckCount != null ? <span className="inspector-dock__footer-stat">{deckCount} cards</span> : null}
+        {ticketDeckCount != null ? <span className="inspector-dock__footer-stat">{ticketDeckCount} tickets</span> : null}
+      </div>
     </Panel>
   );
 }

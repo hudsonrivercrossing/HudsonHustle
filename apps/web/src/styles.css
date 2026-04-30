@@ -6023,7 +6023,7 @@ h3 {
   border: 1px solid rgba(222, 199, 158, 0.18);
   border-radius: 999px;
   color: rgba(246, 235, 214, 0.72);
-  font-size: 0.52rem;
+  font-size: 0.76rem;
   font-weight: 850;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -6072,7 +6072,7 @@ h3 {
 }
 
 .app-shell--gameplay-hud .inspector-dock--build .detail-card {
-  padding: 2px 0 0;
+  padding: 4px 0 0;
   border: 0;
   background: transparent;
   box-shadow: none;
@@ -6084,6 +6084,7 @@ h3 {
 
 .app-shell--gameplay-hud .inspector-dock--build .surface-card__header {
   gap: 4px;
+  padding-top: 2px;
 }
 
 .app-shell--gameplay-hud .inspector-dock--build .surface-card__title {
@@ -6092,7 +6093,8 @@ h3 {
   font-size: 1.02rem;
   font-weight: 870;
   letter-spacing: -0.015em;
-  line-height: 1.08;
+  line-height: 1.2;
+  padding-top: 2px;
 }
 
 .app-shell--gameplay-hud .inspector-dock--build .surface-card__body {
@@ -6161,10 +6163,14 @@ h3 {
 }
 
 .app-shell--gameplay-hud .ticket-choice-sheet {
-  top: 80px;
+  position: absolute;
+  top: 62px;
   right: 18px;
-  width: min(304px, calc(100vw - 36px));
-  max-height: calc(100vh - 104px);
+  bottom: 18px;
+  width: var(--game-right-rail);
+  max-height: none;
+  pointer-events: auto;
+  z-index: 35;
 }
 
 .app-shell--gameplay-hud .ticket-choice-sheet__panel {
@@ -7401,6 +7407,279 @@ h3 {
     linear-gradient(180deg, color-mix(in srgb, var(--ticket-status-accent) 78%, #fff2cc), var(--ticket-status-accent));
   color: var(--ticket-status-ink);
   text-shadow: 0 1px 0 rgba(255, 248, 232, 0.28);
+}
+
+/* Chat panel: serif font, tighter corners */
+.app-shell--gameplay-hud .chat-panel {
+  font-family: var(--font-serif);
+  gap: 8px;
+}
+
+.app-shell--gameplay-hud .chat-panel__messages {
+  border-radius: 4px;
+  border-color: rgba(183, 155, 97, 0.12);
+  background: rgba(255, 247, 231, 0.03);
+  padding: 10px;
+}
+
+.app-shell--gameplay-hud .chat-panel__message {
+  border-radius: 3px;
+  background: rgba(255, 247, 231, 0.05);
+  color: rgba(255, 248, 232, 0.72);
+  font-family: var(--font-serif);
+  font-size: var(--hud-type-sm);
+  line-height: var(--lh-relaxed);
+  padding: 6px 8px;
+}
+
+.app-shell--gameplay-hud .chat-panel__message strong {
+  font-family: var(--font-sans);
+  font-size: var(--hud-type-label);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: rgba(255, 248, 232, 0.88);
+}
+
+.app-shell--gameplay-hud .chat-panel__composer {
+  grid-template-columns: 1fr;
+}
+
+.app-shell--gameplay-hud .chat-panel__composer input {
+  border-radius: 3px;
+  border-color: rgba(183, 155, 97, 0.18);
+  background: rgba(255, 247, 231, 0.05);
+  color: rgba(255, 248, 232, 0.78);
+  font-family: var(--font-serif);
+  font-size: var(--hud-type-sm);
+  padding: 8px 10px;
+}
+
+.app-shell--gameplay-hud .chat-panel__composer input::placeholder {
+  color: rgba(255, 248, 232, 0.32);
+  font-style: italic;
+}
+
+/* Supply dock: divider + distinct buttons */
+.app-shell--gameplay-hud .inspector-dock .supply-dock--board {
+  gap: 0;
+}
+
+.app-shell--gameplay-hud .inspector-dock .supply-dock__draw-deck.system-button {
+  background:
+    linear-gradient(180deg, rgba(183, 155, 97, 0.2), rgba(12, 10, 8, 0.14)),
+    var(--hud-grain),
+    linear-gradient(180deg, #2d3432, #131815);
+  border-color: rgba(var(--hud-brass-rgb), 0.32);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  font-size: var(--hud-type-sm);
+}
+
+.app-shell--gameplay-hud .inspector-dock .supply-dock__divider {
+  display: block;
+  height: 1px;
+  margin: 2px 8px;
+  background: linear-gradient(90deg, transparent, rgba(183, 155, 97, 0.18), transparent);
+}
+
+.app-shell--gameplay-hud .inspector-dock .supply-dock__draw-tickets.system-button {
+  background:
+    linear-gradient(180deg, rgba(160, 144, 80, 0.12), rgba(12, 10, 8, 0.12)),
+    var(--hud-grain),
+    linear-gradient(180deg, #28302f, #111513);
+  border: 1px solid rgba(160, 144, 80, 0.24);
+  border-radius: 4px;
+  color: rgba(255, 248, 232, 0.62);
+  font-size: var(--hud-type-xs);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  margin-top: 0;
+}
+
+/* TicketChoiceSheet: fills right panel, paper-style tickets */
+.app-shell--gameplay-hud .ticket-choice-sheet__panel {
+  border-radius: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet__panel::before,
+.app-shell--gameplay-hud .ticket-choice-sheet__panel::after {
+  display: none;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-picker {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  gap: 8px;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-picker::before,
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-picker::after {
+  display: none;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-picker__tray {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-picker__tray::before,
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-picker__tray::after {
+  display: none;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-list {
+  gap: 6px;
+  padding: 8px 12px;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-row--choice {
+  border-radius: 12px;
+  margin-bottom: 0;
+  min-height: 64px !important;
+  height: 64px !important;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 8px 9px;
+  background:
+    linear-gradient(180deg, rgba(255, 252, 247, 0.92), rgba(244, 236, 220, 0.86)) !important;
+  border: 1px solid rgba(92, 70, 46, 0.16);
+  color: #2b2117;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-row--choice .ticket-route__cities {
+  color: #2b2117 !important;
+  font-size: 0.76rem !important;
+  font-family: var(--font-body) !important;
+  font-weight: 820 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.12 !important;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-row--choice .ticket-arrow {
+  color: rgba(139, 110, 74, 0.6);
+  font-size: 0.52rem !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.04em !important;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-row--choice .ticket-points {
+  color: #3b2a1d !important;
+  font-size: 0.76rem !important;
+  font-weight: 820 !important;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-row--choice .ticket-status {
+  color: #2b2117 !important;
+  border-color: rgba(92, 70, 46, 0.2);
+  background:
+    linear-gradient(180deg, rgba(232, 220, 194, 0.9), rgba(210, 195, 168, 0.85)) !important;
+  font-size: 0.76rem !important;
+  font-weight: 850 !important;
+  letter-spacing: 0.04em !important;
+  line-height: 1 !important;
+  min-width: 34px !important;
+  padding: 4px 6px !important;
+  border-radius: 999px !important;
+  text-transform: uppercase !important;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-row--choice.ticket-row--keep {
+  background:
+    linear-gradient(180deg, rgba(248, 240, 220, 0.96), rgba(232, 220, 194, 0.9)) !important;
+  border-color: rgba(160, 144, 80, 0.34);
+  border-left: 4px solid rgba(160, 144, 80, 0.55);
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-row--choice.ticket-row--keep .ticket-status {
+  color: #2e230d !important;
+  border-color: rgba(160, 144, 80, 0.3);
+  background:
+    linear-gradient(180deg, rgba(232, 220, 160, 0.9), rgba(200, 180, 120, 0.85)) !important;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .setup-actions {
+  display: flex;
+  gap: 8px;
+  padding: 0 12px 8px;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .primary-button {
+  background:
+    linear-gradient(180deg, #d6c391, #8c713b);
+  color: #1a150e;
+  border-radius: 3px;
+  font-weight: var(--weight-black);
+  letter-spacing: var(--ls-tight);
+  text-shadow: 0 1px 0 rgba(255, 248, 232, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .primary-button:disabled {
+  opacity: 0.4;
+  background: rgba(183, 155, 97, 0.12);
+  color: rgba(255, 248, 232, 0.32);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* Build tab claim buttons: show actual card colors */
+.app-shell--gameplay-hud .inspector-dock--build .choice-chip-button {
+  min-height: 36px;
+  border-radius: 4px;
+  font-size: var(--hud-type-sm);
+  font-weight: var(--weight-bold);
+  border-color: color-mix(in srgb, var(--choice-chip-accent) 42%, rgba(183, 155, 97, 0.22));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--choice-chip-accent) 28%, rgba(43, 49, 47, 0.85)), rgba(17, 23, 21, 0.92));
+  color: var(--hud-paper);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 244, 217, 0.06),
+    0 2px 0 rgba(0, 0, 0, 0.18);
+}
+
+.app-shell--gameplay-hud .inspector-dock--build .choice-chip-button:hover,
+.app-shell--gameplay-hud .inspector-dock--build .choice-chip-button:focus-visible {
+  border-color: color-mix(in srgb, var(--choice-chip-accent) 62%, rgba(183, 155, 97, 0.28));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--choice-chip-accent) 38%, rgba(43, 49, 47, 0.8)), rgba(17, 23, 21, 0.88));
+}
+
+/* Ticket dock: extra bottom padding so last ticket doesn't clip */
+.app-shell--gameplay-hud .ticket-dock {
+  padding-bottom: 16px;
+}
+
+/* Right bar footer */
+.app-shell--gameplay-hud .inspector-dock__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  padding: 8px 12px 10px;
+  border-top: 1px solid rgba(183, 155, 97, 0.12);
+  color: rgba(255, 248, 232, 0.38);
+  font-size: var(--hud-type-xs);
+  font-family: var(--font-sans);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+}
+
+.app-shell--gameplay-hud .inspector-dock__footer-stat {
+  white-space: nowrap;
 }
 
 .visually-hidden {
