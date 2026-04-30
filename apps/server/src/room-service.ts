@@ -767,6 +767,8 @@ export class RoomService {
       playerNames: room.seats.map((seat) => seat.playerName ?? seat.seatId)
     });
 
+    room.snapshotVersion = 0;
+    room.history = { events: [], checkpoints: [] };
     room.game = nextGame;
     room.status = "active";
     room.updatedAt = nowIso();
@@ -785,7 +787,7 @@ export class RoomService {
       eventType: "game_started",
       createdAt: room.updatedAt
     });
-    await this.saveRoom(room, historyUpdate);
+    await this.saveRoom(room, historyUpdate, { replaceHistory: true });
     await this.runServerControlledTurns(room);
     return {
       snapshot: this.buildSnapshot(room, hostSeat.seatId)
@@ -987,12 +989,19 @@ export class RoomService {
     };
   }
 
-  private async saveRoom(room: ServerRoom, historyUpdate?: StoredGameHistoryUpdate): Promise<void> {
+  private async saveRoom(
+    room: ServerRoom,
+    historyUpdate?: StoredGameHistoryUpdate,
+    options?: { replaceHistory?: boolean }
+  ): Promise<void> {
+    if (options?.replaceHistory) {
+      room.history = { events: [], checkpoints: [] };
+    }
     if (historyUpdate) {
       room.history = appendHistoryUpdate(room.history, historyUpdate);
     }
     this.rooms.set(room.roomCode, room);
-    await this.repository.saveRoom(toStoredRecord(room), historyUpdate);
+    await this.repository.saveRoom(toStoredRecord(room), historyUpdate, options);
     this.onRoomChanged?.(room.roomCode);
   }
 

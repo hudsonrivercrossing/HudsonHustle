@@ -7322,6 +7322,75 @@ h3 {
   min-height: 0;
 }
 
+/* Right rail market is an inserted tray, not a nested panel. */
+.app-shell--gameplay-hud .inspector-dock .supply-dock--board {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  width: 100%;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.app-shell--gameplay-hud .inspector-dock .supply-dock--board::before,
+.app-shell--gameplay-hud .inspector-dock .supply-dock--board::after,
+.app-shell--gameplay-hud .inspector-dock .supply-dock__market::before,
+.app-shell--gameplay-hud .inspector-dock .supply-dock__market::after {
+  display: none;
+}
+
+.app-shell--gameplay-hud .inspector-dock .supply-dock__market {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.app-shell--gameplay-hud .inspector-dock .supply-dock__draw-deck.system-button,
+.app-shell--gameplay-hud .inspector-dock .supply-dock__draw-tickets.system-button {
+  position: relative;
+  z-index: 1;
+}
+
+.app-shell--gameplay-hud .ticket-row {
+  --ticket-status-accent: #b79b61;
+  --ticket-status-ink: #2b2217;
+  border-left: 5px solid var(--ticket-status-accent);
+}
+
+.app-shell--gameplay-hud .ticket-row--connected {
+  --ticket-status-accent: #5aa779;
+  --ticket-status-ink: #102418;
+}
+
+.app-shell--gameplay-hud .ticket-row--keep {
+  --ticket-status-accent: #d2aa4d;
+  --ticket-status-ink: #2e230d;
+}
+
+.app-shell--gameplay-hud .ticket-row--review {
+  --ticket-status-accent: #8ea9bc;
+  --ticket-status-ink: #14202a;
+}
+
+.app-shell--gameplay-hud .ticket-row--open {
+  --ticket-status-accent: #b57676;
+  --ticket-status-ink: #2b1717;
+}
+
+.app-shell--gameplay-hud .ticket-status {
+  border-color: color-mix(in srgb, var(--ticket-status-accent) 72%, #1b130d);
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--ticket-status-accent) 78%, #fff2cc), var(--ticket-status-accent));
+  color: var(--ticket-status-ink);
+  text-shadow: 0 1px 0 rgba(255, 248, 232, 0.28);
+}
+
 .visually-hidden {
   position: absolute !important;
   width: 1px !important;

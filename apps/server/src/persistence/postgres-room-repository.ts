@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import { gameEventsTable, gameHistoryCheckpointsTable, gameSnapshotsTable, roomsTable, roomSeatsTable } from "../db/schema.js";
-import type { RoomRepository, StoredGameHistory, StoredGameHistoryUpdate, StoredRoomRecord } from "./types.js";
+import type { RoomRepository, SaveRoomOptions, StoredGameHistory, StoredGameHistoryUpdate, StoredRoomRecord } from "./types.js";
 
 async function ensureSchema(sql: postgres.Sql): Promise<void> {
   await sql`
@@ -94,7 +94,7 @@ export class PostgresRoomRepository implements RoomRepository {
     this.ready = ensureSchema(this.sql);
   }
 
-  async saveRoom(record: StoredRoomRecord, historyUpdate?: StoredGameHistoryUpdate): Promise<void> {
+  async saveRoom(record: StoredRoomRecord, historyUpdate?: StoredGameHistoryUpdate, options?: SaveRoomOptions): Promise<void> {
     await this.ready;
     const updatedAt = new Date(record.updatedAt);
     const createdAt = new Date(record.createdAt);
@@ -170,6 +170,11 @@ export class PostgresRoomRepository implements RoomRepository {
         });
     } else {
       await this.db.delete(gameSnapshotsTable).where(eq(gameSnapshotsTable.roomCode, record.roomCode));
+    }
+
+    if (options?.replaceHistory) {
+      await this.db.delete(gameEventsTable).where(eq(gameEventsTable.roomCode, record.roomCode));
+      await this.db.delete(gameHistoryCheckpointsTable).where(eq(gameHistoryCheckpointsTable.roomCode, record.roomCode));
     }
 
     if (historyUpdate && historyUpdate.events.length > 0) {

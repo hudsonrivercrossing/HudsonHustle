@@ -112,8 +112,12 @@ export interface StoredGameHistoryUpdate {
   checkpoints: StoredGameHistoryCheckpoint[];
 }
 
+export interface SaveRoomOptions {
+  replaceHistory?: boolean;
+}
+
 export interface RoomRepository {
-  saveRoom(record: StoredRoomRecord, historyUpdate?: StoredGameHistoryUpdate): Promise<void>;
+  saveRoom(record: StoredRoomRecord, historyUpdate?: StoredGameHistoryUpdate, options?: SaveRoomOptions): Promise<void>;
   getRoom(roomCode: string): Promise<StoredRoomRecord | null>;
   getGameHistory(roomCode: string): Promise<StoredGameHistory>;
 }

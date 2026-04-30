@@ -1,11 +1,14 @@
-import type { RoomRepository, StoredGameHistory, StoredGameHistoryUpdate, StoredRoomRecord } from "./types.js";
+import type { RoomRepository, SaveRoomOptions, StoredGameHistory, StoredGameHistoryUpdate, StoredRoomRecord } from "./types.js";
 
 export class MemoryRoomRepository implements RoomRepository {
   private readonly rooms = new Map<string, StoredRoomRecord>();
   private readonly histories = new Map<string, StoredGameHistory>();
 
-  async saveRoom(record: StoredRoomRecord, historyUpdate?: StoredGameHistoryUpdate): Promise<void> {
+  async saveRoom(record: StoredRoomRecord, historyUpdate?: StoredGameHistoryUpdate, options?: SaveRoomOptions): Promise<void> {
     this.rooms.set(record.roomCode, structuredClone(record));
+    if (options?.replaceHistory) {
+      this.histories.set(record.roomCode, { events: [], checkpoints: [] });
+    }
     if (!historyUpdate) {
       return;
     }

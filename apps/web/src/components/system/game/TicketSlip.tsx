@@ -13,11 +13,11 @@ interface TicketSlipProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 function formatStatus(status: TicketSlipStatus): string {
   switch (status) {
     case "connected":
-      return "Done";
+      return "Linked";
     case "keep":
-      return "Keep";
+      return "Kept";
     case "review":
-      return "Review";
+      return "Hold";
     case "open":
     default:
       return "Open";
@@ -38,6 +38,7 @@ export function TicketSlip({
   const classes = [
     "ticket-row",
     "ticket-row--button",
+    `ticket-row--${status}`,
     completed ? "ticket-row--done ticket-row--compact" : "",
     selected ? "ticket-row--selected" : "",
     focused ? "ticket-row--focused" : "",
@@ -46,7 +47,7 @@ export function TicketSlip({
 
   return (
     <button type="button" className={classes} {...rest}>
-      <span className={`ticket-status row-object__lead ${completed || selected ? "ticket-status--done" : ""}`}>
+      <span className={`ticket-status ticket-status--${status} row-object__lead ${completed || selected ? "ticket-status--done" : ""}`}>
         {formatStatus(status)}
       </span>
       <div className="row-object__main">
