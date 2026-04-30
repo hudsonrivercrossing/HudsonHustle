@@ -806,9 +806,9 @@ h3 {
 .app-shell--gameplay-hud .inspector-dock {
   grid-column: 2;
   grid-row: 1 / span 2;
-  height: calc(100vh - 112px);
-  min-height: 560px;
-  max-height: calc(100vh - 112px);
+  height: calc(100vh - 92px);
+  min-height: 480px;
+  max-height: calc(100vh - 92px);
 }
 
 .join-preview-button {
@@ -6046,9 +6046,6 @@ h3 {
 }
 
 .app-shell--gameplay-hud .inspector-dock {
-  height: calc(100vh - 58px);
-  max-height: calc(100vh - 58px);
-  min-height: 0;
   padding: 12px;
 }
 
@@ -6230,8 +6227,6 @@ h3 {
 .app-shell--gameplay-hud .inspector-dock {
   grid-column: 2;
   grid-row: 1;
-  height: calc(100vh - 92px);
-  max-height: calc(100vh - 92px);
   grid-template-columns: minmax(0, 1fr) 34px;
   column-gap: 10px;
   overflow: hidden;
