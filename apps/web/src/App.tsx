@@ -195,6 +195,7 @@ export default function App(): JSX.Element {
   const [multiplayerError, setMultiplayerError] = useState<string | null>(null);
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
   const [timer, setTimer] = useState<TimerUpdate | null>(null);
+  const [timerNow, setTimerNow] = useState(() => Date.now());
   const [realtimeStatus, setRealtimeStatus] = useState<RealtimeStatus>("idle");
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
@@ -368,6 +369,21 @@ export default function App(): JSX.Element {
         ? "Realtime connection failed. Seat presence and ready/start controls are disabled until the live room link recovers."
         : null;
 
+  useEffect(() => {
+    if (!timer?.deadlineAt) {
+      return;
+    }
+
+    setTimerNow(Date.now());
+    const interval = window.setInterval(() => {
+      setTimerNow(Date.now());
+    }, 1000);
+
+    return () => {
+      window.clearInterval(interval);
+    };
+  }, [timer?.deadlineAt]);
+
   const mapConfig = useMemo(() => {
     if (!snapshot) {
       return null;
@@ -470,22 +486,27 @@ export default function App(): JSX.Element {
     pushNotification(latestLog, snapshot.game.phase === "gameOver" ? "success" : "neutral");
   }, [snapshot?.game?.log.length, snapshot?.game?.phase]);
 
+  const liveTimerSecondsRemaining =
+    timer?.deadlineAt
+      ? Math.max(0, Math.ceil((timer.deadlineAt - timerNow) / 1000))
+      : timer?.secondsRemaining ?? null;
+
   useEffect(() => {
-    if (!timer || !credentials || timer.activeSeatId !== credentials.seatId || !timer.secondsRemaining) {
+    if (!timer || !credentials || timer.activeSeatId !== credentials.seatId || liveTimerSecondsRemaining === null) {
       timerWarningRef.current = null;
       return;
     }
 
     const deadlineKey = `${timer.deadlineAt ?? "no-deadline"}`;
-    if (timer.secondsRemaining <= 10 && timerWarningRef.current !== deadlineKey) {
+    if (liveTimerSecondsRemaining <= 10 && timerWarningRef.current !== deadlineKey) {
       timerWarningRef.current = deadlineKey;
       pushNotification("10 seconds left.", "warning");
     }
 
-    if (timer.secondsRemaining > 10) {
+    if (liveTimerSecondsRemaining > 10) {
       timerWarningRef.current = null;
     }
-  }, [credentials, timer]);
+  }, [credentials, liveTimerSecondsRemaining, timer]);
 
   const ticketProgress = useMemo(() => {
     if (!projectedGame || !mapConfig || !localPlayer) {
@@ -652,6 +673,9 @@ export default function App(): JSX.Element {
       setFocusedTicket(null);
       setPinnedTicket(null);
       setPaymentPreview(null);
+      lastAnnouncedLogRef.current = null;
+      lastAnnouncedLogLengthRef.current = 0;
+      timerWarningRef.current = null;
       setMultiplayerError(null);
       pushNotification("New game started with the same room settings.", "success");
     } catch (caught) {
@@ -804,22 +828,38 @@ export default function App(): JSX.Element {
   const currentStationCost = mapConfig.settings.stationsPerPlayer - localPlayer.stationsLeft + 1;
   const highlightedTicket = focusedTicket ?? pinnedTicket;
   const highlightedCityIds = highlightedTicket ? [highlightedTicket.from, highlightedTicket.to] : [];
+  const activePlayer = publicGame.players[publicGame.activePlayerIndex];
+  const turnStatusLabel = localIsActive ? "Your turn" : "Waiting";
+  const turnStatusCopy = localIsActive
+    ? "Your turn"
+    : `Waiting for ${activePlayer?.name ?? "the active player"} to finish their move.`;
+  const turnTimerBadge =
+    liveTimerSecondsRemaining === null
+      ? snapshot.room.turnTimeLimitSeconds === 0
+        ? "Untimed room"
+        : `Timer ${snapshot.room.turnTimeLimitSeconds}s`
+      : `${liveTimerSecondsRemaining}s left`;
 
   return (
     <div className="app-shell app-shell--gameplay-hud" data-config-theme={visuals.theme}>
       <header className="topbar topbar--gameplay-actions">
         <div className="topbar-private-spacer" aria-hidden="true" />
-        <PlayerRoster
-          players={snapshot.game.players}
-          activePlayerIndex={snapshot.game.activePlayerIndex}
-          playerPalette={visuals.palettes.players}
-          timer={
-            timer?.secondsRemaining === null || timer?.secondsRemaining === undefined
-              ? null
-              : { activePlayerIndex: snapshot.game.activePlayerIndex, secondsRemaining: timer.secondsRemaining }
-          }
-          className="player-roster--top"
-        />
+        <div data-testid="turn-status-banner">
+          <span className="visually-hidden">{turnStatusLabel}</span>
+          <span className="visually-hidden">{turnStatusCopy}</span>
+          <span className="visually-hidden" data-testid="turn-timer-badge">{turnTimerBadge}</span>
+          <PlayerRoster
+            players={snapshot.game.players}
+            activePlayerIndex={snapshot.game.activePlayerIndex}
+            playerPalette={visuals.palettes.players}
+            timer={
+              liveTimerSecondsRemaining === null
+                ? null
+                : { activePlayerIndex: snapshot.game.activePlayerIndex, secondsRemaining: liveTimerSecondsRemaining }
+            }
+            className="player-roster--top"
+          />
+        </div>
         <div className="topbar-actions">
           <Button onClick={() => setGuideOpen(true)}>Guide</Button>
           <ScoreGuide className="score-guide--subtle" label="Score" />
