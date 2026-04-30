@@ -1583,6 +1583,20 @@ h3 {
   box-shadow: inset 0 0 0 1px rgba(246, 235, 214, 0.38);
 }
 
+.seat-avatar--tiny {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+}
+
+.player-roster__row--placeholder .seat-avatar--tiny {
+  opacity: 0.35;
+  filter: grayscale(1) brightness(1.2);
+}
+
 .player-roster__list {
   gap: 8px;
 }

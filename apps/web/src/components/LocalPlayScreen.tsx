@@ -49,6 +49,32 @@ import { Panel } from "./system/Panel";
 import { SectionHeader } from "./system/SectionHeader";
 import { SurfaceCard } from "./system/SurfaceCard";
 
+const AVATAR_NAMES = [
+  "Conductor", "Milo", "Engineer", "Rosa", "Switchman",
+  "Jack", "Dispatcher", "Lily", "Caboose", "Nellie"
+];
+
+function seededRandom(seed: string): () => number {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = ((h << 5) - h + seed.charCodeAt(i)) | 0;
+  return () => {
+    h = (h ^ (h >>> 16)) * 0x45d9f3b | 0;
+    h = (h ^ (h >>> 16)) * 0x45d9f3b | 0;
+    h ^= h >>> 16;
+    return (h >>> 0) / 4294967296;
+  };
+}
+
+function shuffleAvatars(seed: string, count: number): string[] {
+  const rng = seededRandom(seed);
+  const pool = [...AVATAR_NAMES];
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(0, count);
+}
+
 const saveKey = "hudson-hustle-save-v1";
 
 type VisibilityMode = "visible" | "postTurn" | "handoff";
@@ -463,12 +489,28 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   const highlightedTicket = focusedTicket ?? pinnedTicket;
   const highlightedCityIds = highlightedTicket ? [highlightedTicket.from, highlightedTicket.to] : [];
 
+  const playerAvatars = useMemo(() => {
+    if (!game) return {};
+    const avatars = shuffleAvatars(game.players.map((p) => p.id).join("|"), game.players.length);
+    const map: Record<string, string> = {};
+    game.players.forEach((p, i) => { map[p.id] = avatars[i]; });
+    return map;
+  }, [game?.players.map((p) => p.id).join("|")]);
+
+  const rosterPlayers = useMemo(() => {
+    if (!game) return [];
+    return game.players.map((p) => ({
+      ...p,
+      avatarName: playerAvatars[p.id] ?? null
+    }));
+  }, [game, playerAvatars]);
+
   return (
     <div className="app-shell app-shell--gameplay-hud" data-config-theme={localVisuals.theme}>
       <header className="topbar topbar--gameplay-actions">
         <div className="topbar-private-spacer" aria-hidden="true" />
         <PlayerRoster
-          players={game.players}
+          players={rosterPlayers}
           activePlayerIndex={game.activePlayerIndex}
           playerPalette={playerColorPalette}
           className={`player-roster--top ${tutorialTarget === "scoreboard" ? "panel--tutorial-focus" : ""}`}

@@ -419,6 +419,44 @@ export default function App(): JSX.Element {
     return snapshot.game.players[snapshot.game.activePlayerIndex]?.id === snapshot.privateState.playerId;
   }, [snapshot]);
 
+  const playerAvatars = useMemo(() => {
+    if (!snapshot?.game) return {};
+    const AVATAR_NAMES = [
+      "Conductor", "Milo", "Engineer", "Rosa", "Switchman",
+      "Jack", "Dispatcher", "Lily", "Caboose", "Nellie"
+    ];
+    const seed = snapshot.room.roomCode;
+    let h = 0;
+    for (let i = 0; i < seed.length; i++) h = ((h << 5) - h + seed.charCodeAt(i)) | 0;
+    const rng = () => {
+      h = (h ^ (h >>> 16)) * 0x45d9f3b | 0;
+      h = (h ^ (h >>> 16)) * 0x45d9f3b | 0;
+      h ^= h >>> 16;
+      return (h >>> 0) / 4294967296;
+    };
+    const pool = [...AVATAR_NAMES];
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    const map: Record<string, string> = {};
+    snapshot.game.players.forEach((p, idx) => { map[p.id] = pool[idx % pool.length]; });
+    return map;
+  }, [snapshot?.game.players.map((p) => p.id).join("|"), snapshot?.room.roomCode]);
+
+  const rosterPlayers = useMemo(() => {
+    if (!snapshot?.game) return [];
+    return snapshot.game.players.map((p) => ({
+      id: p.id,
+      name: p.name,
+      color: p.color,
+      trainsLeft: p.trainsLeft,
+      stationsLeft: p.stationsLeft,
+      tickets: p.tickets ?? [],
+      avatarName: playerAvatars[p.id] ?? null
+    }));
+  }, [snapshot?.game, playerAvatars]);
+
   useEffect(() => {
     const pending = snapshot?.privateState?.pendingTickets ?? [];
     const pendingKey = pending.map((ticket) => ticket.id).join("|");
@@ -849,7 +887,7 @@ export default function App(): JSX.Element {
           <span className="visually-hidden">{turnStatusCopy}</span>
           <span className="visually-hidden" data-testid="turn-timer-badge">{turnTimerBadge}</span>
           <PlayerRoster
-            players={snapshot.game.players}
+            players={rosterPlayers}
             activePlayerIndex={snapshot.game.activePlayerIndex}
             playerPalette={visuals.palettes.players}
             timer={

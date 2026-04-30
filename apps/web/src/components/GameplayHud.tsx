@@ -35,6 +35,7 @@ type PlayerRosterEntry = {
   stationsLeft: number;
   tickets?: unknown[];
   ticketCount?: number;
+  avatarName?: string | null;
 };
 
 type PlayerRosterTimer = {
@@ -77,6 +78,7 @@ export function PlayerRoster({ players, activePlayerIndex, playerPalette, timer 
               stationsLeft={player.stationsLeft}
               active={isActive}
               timerLabel={slotTimer}
+              avatarName={player.avatarName}
             />
           ) : (
             <SeatTile key={`empty-seat-${index}`} placeholder seatLabel={`Seat ${index + 1}`} />
