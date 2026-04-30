@@ -1097,13 +1097,13 @@ export default function App(): JSX.Element {
 
       {showLeaveConfirm ? (
         <ModalShell width="md" align="center" cardClassName="leave-confirm-card">
-          <SectionHeader eyebrow="Leave room" title="Leave this game?" density="ceremony" />
+          <SectionHeader title="Leave this game?" density="ceremony" />
           <p>You will return to setup and clear this room from the current browser.</p>
           <div className="setup-actions">
             <Button onClick={() => setShowLeaveConfirm(false)}>
               Cancel
             </Button>
-            <Button variant="primary" onClick={leaveRoom}>
+            <Button variant="primary" className="leave-button" onClick={leaveRoom}>
               Leave
             </Button>
           </div>

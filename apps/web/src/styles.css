@@ -6457,6 +6457,18 @@ h3 {
   color: var(--hud-paper-bright);
 }
 
+.app-shell--gameplay-hud .leave-confirm-card .leave-button {
+  background: linear-gradient(180deg, #c44a2f, #8b2518) !important;
+  color: #fff !important;
+  border-color: #c44a2f !important;
+  font-weight: 700;
+}
+
+.app-shell--gameplay-hud .leave-confirm-card .leave-button:hover {
+  background: linear-gradient(180deg, #d45a3f, #9b3528) !important;
+  border-color: #d45a3f !important;
+}
+
 .notification-pipe {
   z-index: 160;
 }
