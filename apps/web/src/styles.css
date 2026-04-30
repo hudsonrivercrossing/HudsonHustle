@@ -7397,8 +7397,8 @@ h3 {
 }
 
 .app-shell--gameplay-hud .ticket-row--open {
-  --ticket-status-accent: #b57676;
-  --ticket-status-ink: #2b1717;
+  --ticket-status-accent: #9a7060;
+  --ticket-status-ink: #241a16;
 }
 
 .app-shell--gameplay-hud .ticket-status {
@@ -7407,6 +7407,11 @@ h3 {
     linear-gradient(180deg, color-mix(in srgb, var(--ticket-status-accent) 78%, #fff2cc), var(--ticket-status-accent));
   color: var(--ticket-status-ink);
   text-shadow: 0 1px 0 rgba(255, 248, 232, 0.28);
+}
+
+/* Force ticket status font size across all HUD contexts */
+.app-shell--gameplay-hud .ticket-status {
+  font-size: 0.76rem !important;
 }
 
 /* Chat panel: serif font, tighter corners */
