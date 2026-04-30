@@ -6304,6 +6304,11 @@ h3 {
   align-self: stretch;
 }
 
+.app-shell--gameplay-hud .topbar {
+  position: relative;
+  z-index: 100;
+}
+
 .app-shell--gameplay-hud .topbar-actions {
   grid-column: 3;
   display: grid;
@@ -6315,6 +6320,13 @@ h3 {
 
 .app-shell--gameplay-hud .topbar-actions .score-guide {
   min-width: 0;
+}
+
+.app-shell--gameplay-hud .score-guide__panel {
+  position: fixed !important;
+  top: 72px !important;
+  right: 18px !important;
+  z-index: 9999 !important;
 }
 
 .app-shell--gameplay-hud .topbar-actions .system-button,
@@ -7279,10 +7291,11 @@ h3 {
 
 .app-shell--gameplay-hud .score-guide {
   z-index: 600;
+  position: relative;
 }
 
 .app-shell--gameplay-hud .score-guide__panel {
-  z-index: 700;
+  z-index: 7000;
   position: absolute;
   width: min(340px, calc(100vw - 28px));
   border-radius: 8px;
