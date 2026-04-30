@@ -1,4 +1,4 @@
-import type { RoomSummary, TimerUpdate } from "@hudson-hustle/game-core";
+import type { RoomSummary, TimerUpdate, SeatSummary } from "@hudson-hustle/game-core";
 import {
   MapThumbnail,
   SetupActions,
@@ -21,6 +21,22 @@ interface LobbyScreenProps {
   timer: TimerUpdate | null;
   realtimeReady: boolean;
   realtimeMessage: string | null;
+}
+
+type SeatStatus = { label: string; tone: "neutral" | "info" | "danger" | "success" | "warning" };
+
+function getSeatStatus(seat: SeatSummary): SeatStatus {
+  if (!seat.playerName) return { label: "Open", tone: "neutral" };
+  if (seat.controllerType === "bot") return { label: "Bot", tone: "info" };
+  if (!seat.connected) return { label: "Offline", tone: "danger" };
+  return seat.ready ? { label: "Ready", tone: "success" } : { label: "Waiting", tone: "warning" };
+}
+
+function getInitials(name: string | null): string {
+  if (!name) return "??";
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  return name.substring(0, 2).toUpperCase();
 }
 
 export function LobbyScreen({
@@ -118,47 +134,34 @@ export function LobbyScreen({
         }
       >
         <div className="seat-stack">
-          {room.seats.map((seat) => (
-            <article
-              key={seat.seatId}
-              className={`seat-row ${seat.seatId === localSeatId ? "seat-row--self" : ""}`}
-              data-testid={`seat-row-${seat.seatId}`}
-            >
-              <div className="row-object__main">
-                <strong className="row-object__title">{seat.playerName ?? "Open seat"}</strong>
-                <p className="row-object__meta">
-                  {seat.seatId}
-                  {seat.isHost ? " · host" : ""}
-                  {seat.controllerType === "bot" ? " · server-owned bot" : seat.playerName ? seat.connected ? " · connected" : " · offline" : ""}
-                </p>
-              </div>
-              <div className="row-object__stats seat-status-stack">
-                {seat.playerName === null ? (
-                  <Badge tone="neutral" className="seat-ready">
-                    Open
-                  </Badge>
-                ) : seat.controllerType === "bot" ? (
-                  <>
-                    <Badge tone="info" className="seat-ready">
-                      Bot
-                    </Badge>
-                    <Badge tone="success" className="seat-ready" data-testid={`seat-connected-${seat.seatId}`}>
-                      Server
-                    </Badge>
-                  </>
-                ) : (
-                  <>
-                    <Badge tone={seat.ready ? "success" : "warning"} className="seat-ready">
-                      {seat.ready ? "Ready" : "Waiting"}
-                    </Badge>
-                    <Badge tone={seat.connected ? "info" : "danger"} className="seat-ready" data-testid={`seat-connected-${seat.seatId}`}>
-                      {seat.connected ? "Connected" : "Offline"}
-                    </Badge>
-                  </>
-                )}
-              </div>
-            </article>
-          ))}
+          {room.seats.map((seat) => {
+            const isSelf = seat.seatId === localSeatId;
+            const status = getSeatStatus(seat);
+            const isEmpty = seat.playerName === null;
+            return (
+              <article
+                key={seat.seatId}
+                className={`seat-row ${isSelf ? "seat-row--self" : ""} ${isEmpty ? "seat-row--open" : ""}`}
+                data-testid={`seat-row-${seat.seatId}`}
+              >
+                <div className="seat-avatar" style={{ background: seat.playerColor || "#6b5d4f" }}>
+                  {getInitials(seat.playerName)}
+                </div>
+                <div className="row-object__main">
+                  <strong className="row-object__title">
+                    {seat.playerName ?? "Open seat"}
+                    {seat.isHost && <span className="seat-host-icon" title="Host">👑</span>}
+                  </strong>
+                  <p className="row-object__meta">
+                    {isEmpty ? "Waiting for player" : seat.seatId}
+                  </p>
+                </div>
+                <div className="row-object__stats seat-status-stack">
+                  <Badge tone={status.tone} className="seat-ready">{status.label}</Badge>
+                </div>
+              </article>
+            );
+          })}
         </div>
         {timer?.deadlineAt ? <p className="muted-copy">Timer will activate when the next live turn begins.</p> : null}
       </SetupStepPanel>
