@@ -951,6 +951,7 @@ export default function App(): JSX.Element {
               players={rosterPlayers}
               activePlayerIndex={snapshot.game.activePlayerIndex}
               playerPalette={visuals.palettes.players}
+              viewerPlayerId={snapshot.privateState?.playerId ?? null}
             />
           </BoardStage>
 

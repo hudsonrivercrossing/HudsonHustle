@@ -591,6 +591,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
               players={rosterPlayers}
               activePlayerIndex={game.activePlayerIndex}
               playerPalette={playerColorPalette}
+              viewerPlayerId={game.players[game.activePlayerIndex]?.id ?? null}
             />
           </BoardStage>
 

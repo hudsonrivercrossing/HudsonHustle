@@ -90,19 +90,19 @@ export function PlayerRoster({ players, activePlayerIndex, playerPalette, timer 
   );
 }
 
-const CORNER_POSITIONS = ["top-left", "top-right", "bottom-left", "bottom-right"] as const;
+const CORNER_POSITIONS = ["top-left", "top-right", "bottom-right", "bottom-left"] as const;
 
 interface FloatingPlayerPanelProps {
   player: PlayerRosterEntry;
-  index: number;
+  cornerIndex: number;
   isActive: boolean;
   color: string;
 }
 
-function FloatingPlayerPanel({ player, index, isActive, color }: FloatingPlayerPanelProps): JSX.Element {
+function FloatingPlayerPanel({ player, cornerIndex, isActive, color }: FloatingPlayerPanelProps): JSX.Element {
   return (
     <div
-      className={`floating-player-panel floating-player-panel--${CORNER_POSITIONS[index]} ${isActive ? "floating-player-panel--active" : ""}`}
+      className={`floating-player-panel floating-player-panel--${CORNER_POSITIONS[cornerIndex]} ${isActive ? "floating-player-panel--active" : ""}`}
       style={{ "--player-color": color } as React.CSSProperties}
     >
       {player.avatarName ? (
@@ -111,7 +111,7 @@ function FloatingPlayerPanel({ player, index, isActive, color }: FloatingPlayerP
       <div className="floating-player-panel__info">
         <span className="floating-player-panel__name">{player.name}</span>
         <span className="floating-player-panel__stats">
-          {player.tickets?.length ?? player.ticketCount ?? 0} tickets · {player.trainsLeft} trains · {player.stationsLeft} stations
+          {player.tickets?.length ?? player.ticketCount ?? 0} tkt · {player.trainsLeft} tr · {player.stationsLeft} st
         </span>
       </div>
     </div>
@@ -122,25 +122,31 @@ interface FloatingPlayerRosterProps {
   players: PlayerRosterEntry[];
   activePlayerIndex: number;
   playerPalette: Record<string, string>;
+  viewerPlayerId?: string | null;
 }
 
-export function FloatingPlayerRoster({ players, activePlayerIndex, playerPalette }: FloatingPlayerRosterProps): JSX.Element {
-  const slots = Array.from({ length: 4 }, (_, index) => players[index] ?? null);
+export function FloatingPlayerRoster({ players, activePlayerIndex, playerPalette, viewerPlayerId }: FloatingPlayerRosterProps): JSX.Element {
+  const viewerIndex = viewerPlayerId ? players.findIndex((p) => p.id === viewerPlayerId) : -1;
+  const effectiveViewer = viewerIndex >= 0 ? viewerIndex : 0;
+
+  const ordered: Array<{ player: PlayerRosterEntry; cornerIndex: number }> = [];
+  const n = players.length;
+  for (let i = 0; i < n; i++) {
+    const playerIdx = (effectiveViewer + i) % n;
+    ordered.push({ player: players[playerIdx], cornerIndex: i });
+  }
 
   return (
     <div className="floating-player-roster">
-      {slots.map((player, index) => {
-        if (!player) return null;
-        return (
-          <FloatingPlayerPanel
-            key={player.id}
-            player={player}
-            index={index}
-            isActive={index === activePlayerIndex}
-            color={playerPalette[player.color]}
-          />
-        );
-      })}
+      {ordered.map(({ player, cornerIndex }) => (
+        <FloatingPlayerPanel
+          key={player.id}
+          player={player}
+          cornerIndex={cornerIndex}
+          isActive={players.indexOf(player) === activePlayerIndex}
+          color={playerPalette[player.color]}
+        />
+      ))}
     </div>
   );
 }
