@@ -295,6 +295,9 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
     if (!game || !selectedRouteId) {
       return [];
     }
+    if (!localMap.routes.find((route) => route.id === selectedRouteId)) {
+      return [];
+    }
     return getAffordableRouteColors(game, localMap, selectedRouteId);
   }, [game, localMap, selectedRouteId]);
 
