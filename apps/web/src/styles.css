@@ -3055,20 +3055,17 @@ h3 {
   stroke-width: 2;
 }
 
-.claim-badge--self {
-  fill: #d2a545;
-}
-
-.claim-badge--opponent {
-  fill: #433227;
-}
-
 .claim-badge__label {
   font-size: 10px;
   font-weight: 800;
   fill: #fff9ec;
   letter-spacing: 0.04em;
   pointer-events: none;
+  paint-order: stroke;
+  stroke: rgba(0, 0, 0, 0.35);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .shoreline {

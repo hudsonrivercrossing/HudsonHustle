@@ -211,12 +211,16 @@ export function BoardMap({
         aria-label="Hudson Hustle board map"
       >
         <defs>
-          <pattern id="transit-grid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
-            <circle cx="12" cy="12" r="1.5" fill="rgba(74, 55, 36, 0.18)" />
+          <pattern id="transit-grid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+            <circle cx="10" cy="10" r="1.8" fill="rgba(74, 55, 36, 0.30)" />
           </pattern>
         </defs>
 
         <rect x="0" y="0" width={boardWidth} height={boardHeight} rx="12" fill="#d9c8a6" />
+
+        {backdropOpacityScale > 0 ? (
+          <rect x="0" y="0" width={boardWidth} height={boardHeight} fill="url(#transit-grid)" rx="12" style={{ pointerEvents: "none" }} />
+        ) : null}
 
         {backdropOpacityScale > 0
           ? backdrop.waterAreas.map((area) => (
@@ -372,7 +376,11 @@ export function BoardMap({
 
               {claim ? (
                 <g transform={`translate(${markerX} ${markerY - 18})`} data-testid={`route-claim-${route.id}`}>
-                  <circle r="11" className={claimedByViewer ? "claim-badge claim-badge--self" : "claim-badge claim-badge--opponent"} />
+                  <circle
+                    r="11"
+                    className="claim-badge"
+                    fill={claimingPlayer ? playerPalette[claimingPlayer.color] : "#f0d78e"}
+                  />
                   <text textAnchor="middle" dy="4" className="claim-badge__label">
                     {ownerBadge}
                   </text>
@@ -445,7 +453,15 @@ export function BoardMap({
         })}
 
         {backdropOpacityScale > 0 ? (
-          <rect x="0" y="0" width={boardWidth} height={boardHeight} fill="url(#transit-grid)" rx="12" style={{ pointerEvents: "none" }} />
+          <rect
+            x="0"
+            y="0"
+            width={boardWidth}
+            height={boardHeight}
+            fill="url(#transit-grid)"
+            rx="12"
+            style={{ pointerEvents: "none", mixBlendMode: "multiply" }}
+          />
         ) : null}
       </svg>
     </div>
