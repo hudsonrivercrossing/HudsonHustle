@@ -33,8 +33,8 @@ type PlayerRosterEntry = {
   color: string;
   trainsLeft: number;
   stationsLeft: number;
-  tickets?: unknown[];
-  ticketCount?: number;
+  ticketCount: number;
+  avatarName?: string | null;
 };
 
 type PlayerRosterTimer = {
@@ -72,11 +72,12 @@ export function PlayerRoster({ players, activePlayerIndex, playerPalette, timer 
               key={player.id}
               name={player.name}
               color={playerPalette[player.color]}
-              ticketCount={player.tickets?.length ?? player.ticketCount ?? 0}
+              ticketCount={player.ticketCount ?? 0}
               trainsLeft={player.trainsLeft}
               stationsLeft={player.stationsLeft}
               active={isActive}
               timerLabel={slotTimer}
+              avatarName={player.avatarName}
             />
           ) : (
             <SeatTile key={`empty-seat-${index}`} placeholder seatLabel={`Seat ${index + 1}`} />
@@ -85,6 +86,67 @@ export function PlayerRoster({ players, activePlayerIndex, playerPalette, timer 
       </div>
       <span className="player-roster__active-label">{players[activePlayerIndex]?.name ?? "Player"} active{timerLabel ? ` · ${timerLabel}` : ""}</span>
     </Panel>
+  );
+}
+
+const CORNER_POSITIONS = ["top-left", "top-right", "bottom-right", "bottom-left"] as const;
+
+interface FloatingPlayerPanelProps {
+  player: PlayerRosterEntry;
+  cornerIndex: number;
+  isActive: boolean;
+  color: string;
+}
+
+function FloatingPlayerPanel({ player, cornerIndex, isActive, color }: FloatingPlayerPanelProps): JSX.Element {
+  return (
+    <div
+      className={`floating-player-panel floating-player-panel--${CORNER_POSITIONS[cornerIndex]} ${isActive ? "floating-player-panel--active" : ""}`}
+      style={{ "--player-color": color } as React.CSSProperties}
+    >
+      {player.avatarName ? (
+        <img className="floating-player-panel__avatar" src={`/avatars/avatar-${player.avatarName}.svg`} alt="" />
+      ) : null}
+      <div className="floating-player-panel__info">
+        <span className="floating-player-panel__name">{player.name}</span>
+        <span className="floating-player-panel__stats">
+          {player.ticketCount ?? 0} tickets · {player.trainsLeft} trains · {player.stationsLeft} stations
+        </span>
+      </div>
+    </div>
+  );
+}
+
+interface FloatingPlayerRosterProps {
+  players: PlayerRosterEntry[];
+  activePlayerIndex: number;
+  playerPalette: Record<string, string>;
+  viewerPlayerId?: string | null;
+}
+
+export function FloatingPlayerRoster({ players, activePlayerIndex, playerPalette, viewerPlayerId }: FloatingPlayerRosterProps): JSX.Element {
+  const viewerIndex = viewerPlayerId ? players.findIndex((p) => p.id === viewerPlayerId) : -1;
+  const effectiveViewer = viewerIndex >= 0 ? viewerIndex : 0;
+
+  const ordered: Array<{ player: PlayerRosterEntry; cornerIndex: number }> = [];
+  const n = players.length;
+  for (let i = 0; i < n; i++) {
+    const playerIdx = (effectiveViewer + i) % n;
+    ordered.push({ player: players[playerIdx], cornerIndex: i });
+  }
+
+  return (
+    <div className="floating-player-roster">
+      {ordered.map(({ player, cornerIndex }) => (
+        <FloatingPlayerPanel
+          key={player.id}
+          player={player}
+          cornerIndex={cornerIndex}
+          isActive={players.indexOf(player) === activePlayerIndex}
+          color={playerPalette[player.color]}
+        />
+      ))}
+    </div>
   );
 }
 
@@ -264,10 +326,10 @@ export function TicketChoiceSheet({
       <div className="ticket-choice-sheet__panel">
         <div className="ticket-picker ticket-picker--rail">
           <SectionHeader
-            eyebrow="Private choice"
+            eyebrow=" "
             title={title}
             meta={`Keep ${minimumKeep}+ · ${selectedCount}/${tickets.length}`}
-            density="compact"
+            // density="compact"
           />
 
           <div className="ticket-picker__tray">
@@ -353,6 +415,9 @@ export function SupplyDock({
       <Button className="supply-dock__draw-deck" disabled={disabled} onClick={onDrawFromDeck}>
         Draw from deck
       </Button>
+      {onDrawTickets && (
+        <div className="supply-dock__divider" />
+      )}
       {onDrawTickets ? (
         <Button className="supply-dock__draw-tickets" disabled={drawTicketsDisabled} onClick={onDrawTickets}>
           Draw tickets
@@ -383,6 +448,10 @@ interface InspectorDockProps {
   activeBuildKey?: string | null;
   chatMessages?: Array<{ id: string; playerName: string; message: string }>;
   onSendChat?: (message: string) => void;
+  turnNumber?: number;
+  currentPlayerName?: string;
+  deckCount?: number;
+  ticketDeckCount?: number;
 }
 
 export function InspectorDock({
@@ -392,7 +461,11 @@ export function InspectorDock({
   buildContent,
   activeBuildKey = null,
   chatMessages = [],
-  onSendChat
+  onSendChat,
+  turnNumber,
+  currentPlayerName,
+  deckCount,
+  ticketDeckCount
 }: InspectorDockProps): JSX.Element {
   const [activeTab, setActiveTab] = useState<InspectorTab>("market");
   const [chatDraft, setChatDraft] = useState("");
@@ -438,7 +511,7 @@ export function InspectorDock({
               setChatDraft("");
             }}
           >
-            <SectionHeader title="Chat" meta="Reserved channel" density="compact" />
+            <SectionHeader title="Chat" density="compact" />
             <div className="chat-panel__messages" aria-label="Chat messages">
               {chatMessages.length > 0 ? (
                 chatMessages.map((message) => (
@@ -449,24 +522,37 @@ export function InspectorDock({
                 ))
               ) : (
                 <p className="chat-panel__message chat-panel__message--system">
-                  {onSendChat ? "No room messages yet." : "Chat is reserved for multiplayer rooms."}
+                  {onSendChat ? "No room messages yet." : "Local play — no chat."}
                 </p>
               )}
             </div>
-            <div className="chat-panel__composer" aria-label="Chat composer">
-              <input
-                type="text"
-                placeholder="Message room"
-                value={chatDraft}
-                maxLength={280}
-                disabled={!onSendChat}
-                onChange={(event) => setChatDraft(event.target.value)}
-              />
-              <Button disabled={!onSendChat || chatDraft.trim().length === 0}>Send</Button>
-            </div>
+            {onSendChat ? (
+              <div className="chat-panel__composer" aria-label="Chat composer">
+                <input
+                  type="text"
+                  placeholder="Message room"
+                  value={chatDraft}
+                  maxLength={280}
+                  onChange={(event) => setChatDraft(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" && chatDraft.trim().length > 0) {
+                      event.preventDefault();
+                      onSendChat(chatDraft.trim());
+                      setChatDraft("");
+                    }
+                  }}
+                />
+              </div>
+            ) : null}
           </form>
         </div>
       )}
+      <div className="inspector-dock__footer">
+        {currentPlayerName ? <span className="inspector-dock__footer-stat">{currentPlayerName}</span> : null}
+        {turnNumber != null ? <span className="inspector-dock__footer-stat">Turn {turnNumber}</span> : null}
+        {deckCount != null ? <span className="inspector-dock__footer-stat">{deckCount} cards</span> : null}
+        {ticketDeckCount != null ? <span className="inspector-dock__footer-stat">{ticketDeckCount} tickets</span> : null}
+      </div>
     </Panel>
   );
 }

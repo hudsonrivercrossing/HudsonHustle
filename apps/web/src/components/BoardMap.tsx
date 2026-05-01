@@ -210,7 +210,17 @@ export function BoardMap({
         role="img"
         aria-label="Hudson Hustle board map"
       >
+        <defs>
+          <pattern id="transit-grid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+            <circle cx="10" cy="10" r="1.8" fill="rgba(74, 55, 36, 0.30)" />
+          </pattern>
+        </defs>
+
         <rect x="0" y="0" width={boardWidth} height={boardHeight} rx="12" fill="#d9c8a6" />
+
+        {backdropOpacityScale > 0 ? (
+          <rect x="0" y="0" width={boardWidth} height={boardHeight} fill="url(#transit-grid)" rx="12" style={{ pointerEvents: "none" }} />
+        ) : null}
 
         {backdropOpacityScale > 0
           ? backdrop.waterAreas.map((area) => (
@@ -250,7 +260,7 @@ export function BoardMap({
             key={label.id}
             x={label.point.x}
             y={label.point.y}
-            className={`region-label${regionLabelClassSuffix} ${label.vertical ? "region-label--vertical" : ""}`.trim()}
+            className={`region-label${backdropMode === "muted" ? " region-label--muted" : regionLabelClassSuffix}${label.vertical ? " region-label--vertical" : ""}`.trim()}
           >
             {label.text}
           </text>
@@ -281,12 +291,22 @@ export function BoardMap({
           const claimStitchWidth = claimedByViewer ? 4.6 : 3;
           const claimStitchDasharray = claimedByViewer ? "3.4 5.6" : "2 8.2";
           const claimStitchDashoffset = claimedByViewer ? 0 : 1.4;
+          const tieCount = claim ? Math.floor(totalLength / 10) : 0;
 
           return (
             <g key={route.id}>
               {selected ? (
                 <path d={pathD} className="route-selection" fill="none" />
               ) : null}
+
+              <path
+                d={pathD}
+                fill="none"
+                className="route-railbed"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+
               {segments.map((segment, index) => (
                 <g key={`${route.id}-${index}`}>
                   <path
@@ -307,7 +327,7 @@ export function BoardMap({
                     strokeLinejoin="round"
                     opacity={fillOpacity}
                   />
-                    {claim ? (
+                  {claim ? (
                     <path
                       d={segment.pathD}
                       fill="none"
@@ -321,9 +341,46 @@ export function BoardMap({
                   ) : null}
                 </g>
               ))}
+
+              {claim ? (
+                Array.from({ length: tieCount }, (_, i) => {
+                  const dist = 6 + i * 10;
+                  if (dist > totalLength - 6) return null;
+                  const pt = getPointAlongPath(pathPoints, dist);
+                  const dir = getPathDirection(pathPoints, dist);
+                  const tieLen = 14;
+                  return (
+                    <line
+                      key={`tie-${route.id}-${i}`}
+                      x1={pt.x + dir.nx * tieLen / 2}
+                      y1={pt.y + dir.ny * tieLen / 2}
+                      x2={pt.x - dir.nx * tieLen / 2}
+                      y2={pt.y - dir.ny * tieLen / 2}
+                      className="route-cross-tie"
+                    />
+                  );
+                })
+              ) : null}
+
+              {route.type === "tunnel" && !claim ? (
+                <g className="route-tunnel-marker" transform={`translate(${middlePoint.x} ${middlePoint.y})`}>
+                  <rect x="-6" y="-3" width="12" height="6" rx="3" fill="none" stroke="rgba(100, 80, 60, 0.25)" strokeWidth="1.5" strokeDasharray="2 2" />
+                </g>
+              ) : null}
+
+              {route.type === "ferry" && !claim ? (
+                <g className="route-ferry-marker" transform={`translate(${middlePoint.x} ${middlePoint.y})`}>
+                  <path d="M -5 0 Q 0 -4, 5 0 Q 0 4, -5 0 Z" fill="none" stroke="rgba(80, 130, 160, 0.35)" strokeWidth="1.5" />
+                </g>
+              ) : null}
+
               {claim ? (
                 <g transform={`translate(${markerX} ${markerY - 18})`} data-testid={`route-claim-${route.id}`}>
-                  <circle r="11" className={claimedByViewer ? "claim-badge claim-badge--self" : "claim-badge claim-badge--opponent"} />
+                  <circle
+                    r="11"
+                    className="claim-badge"
+                    fill={claimingPlayer ? playerPalette[claimingPlayer.color] : "#f0d78e"}
+                  />
                   <text textAnchor="middle" dy="4" className="claim-badge__label">
                     {ownerBadge}
                   </text>
@@ -394,6 +451,18 @@ export function BoardMap({
             </g>
           );
         })}
+
+        {backdropOpacityScale > 0 ? (
+          <rect
+            x="0"
+            y="0"
+            width={boardWidth}
+            height={boardHeight}
+            fill="url(#transit-grid)"
+            rx="12"
+            style={{ pointerEvents: "none", mixBlendMode: "multiply" }}
+          />
+        ) : null}
       </svg>
     </div>
   );

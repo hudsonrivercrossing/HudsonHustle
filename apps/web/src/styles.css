@@ -678,8 +678,10 @@ h3 {
 .secondary-button:disabled,
 .primary-button:disabled {
   cursor: not-allowed;
-  opacity: 0.62;
+  opacity: 0.55;
   transform: none;
+  filter: saturate(0.4);
+  user-select: none;
   box-shadow:
     inset 0 1px 0 rgba(255, 249, 239, 0.05),
     0 2px 0 rgba(5, 12, 17, 0.12);
@@ -806,9 +808,9 @@ h3 {
 .app-shell--gameplay-hud .inspector-dock {
   grid-column: 2;
   grid-row: 1 / span 2;
-  height: calc(100vh - 112px);
-  min-height: 560px;
-  max-height: calc(100vh - 112px);
+  height: calc(100vh - 92px);
+  min-height: 480px;
+  max-height: calc(100vh - 92px);
 }
 
 .join-preview-button {
@@ -939,12 +941,28 @@ h3 {
   gap: 12px;
 }
 
+.seat-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.seat-avatar--empty {
+  opacity: 0.35;
+  filter: grayscale(1) brightness(1.2);
+}
+
 .seat-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 12px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 14px;
   align-items: center;
-  padding: 14px 16px;
+  padding: 12px 16px;
   border-radius: var(--radius-md);
   background:
     linear-gradient(180deg, rgba(255, 252, 247, 0.96), rgba(244, 236, 220, 0.88));
@@ -954,8 +972,18 @@ h3 {
     0 8px 18px rgba(62, 41, 20, 0.05);
 }
 
+.seat-row--open {
+  border-style: dashed;
+  background: linear-gradient(180deg, rgba(250, 246, 240, 0.94), rgba(238, 228, 212, 0.8));
+}
+
 .seat-row--self {
-  box-shadow: inset 0 0 0 2px rgba(42, 111, 182, 0.18);
+  box-shadow: inset 0 0 0 2px rgba(42, 111, 182, 0.22);
+}
+
+.seat-row--self .seat-avatar {
+  border-color: rgba(42, 111, 182, 0.5);
+  box-shadow: 0 0 0 1px rgba(42, 111, 182, 0.25), inset 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
 .row-object__lead {
@@ -1526,25 +1554,6 @@ h3 {
   display: none;
 }
 
-.player-roster__timer {
-  position: absolute;
-  top: 6px;
-  right: 7px;
-  display: grid;
-  place-items: center;
-  min-width: 28px;
-  min-height: 22px;
-  padding: 3px 6px;
-  border: 1px solid rgba(232, 187, 97, 0.48);
-  border-radius: 999px;
-  background: rgba(7, 12, 17, 0.78);
-  color: #ffedbd;
-  font-size: 0.7rem;
-  font-weight: 880;
-  line-height: 1;
-  letter-spacing: 0.06em;
-}
-
 .player-roster__row--placeholder {
   opacity: 0.46;
   border-style: dashed;
@@ -1553,6 +1562,20 @@ h3 {
 .player-roster__row--placeholder .player-swatch {
   background: transparent;
   box-shadow: inset 0 0 0 1px rgba(246, 235, 214, 0.38);
+}
+
+.seat-avatar--tiny {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+}
+
+.player-roster__row--placeholder .seat-avatar--tiny {
+  opacity: 0.35;
+  filter: grayscale(1) brightness(1.2);
 }
 
 .player-roster__list {
@@ -1570,15 +1593,134 @@ h3 {
 .player-strip {
   position: relative;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: 12px;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  gap: 8px 10px;
   align-items: center;
-  padding: 12px 14px;
+  padding: 10px 14px;
   border-radius: var(--radius-md);
   background:
     linear-gradient(180deg, rgba(255, 252, 247, 0.96), rgba(244, 236, 220, 0.88));
   border: 1px solid rgba(92, 70, 46, 0.14);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.42);
+}
+
+.player-roster__timer {
+  display: grid;
+  place-items: center;
+  min-width: 32px;
+  min-height: 24px;
+  padding: 3px 8px;
+  border: 1px solid rgba(232, 187, 97, 0.56);
+  border-radius: 999px;
+  background: rgba(7, 12, 17, 0.88);
+  color: #ffedbd;
+  font-size: 0.7rem;
+  font-weight: 880;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  justify-self: end;
+}
+
+.player-roster__timer:empty {
+  visibility: hidden;
+  padding: 0;
+  min-width: 0;
+  min-height: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.player-roster__timer:empty {
+  visibility: hidden;
+  padding: 0;
+  min-width: 0;
+  min-height: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* FloatingPlayerRoster: compact panels at map corners */
+.floating-player-roster {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.floating-player-panel {
+  position: absolute;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(183, 155, 97, 0.25);
+  background: linear-gradient(180deg, rgba(31, 25, 18, 0.92), rgba(10, 8, 6, 0.92));
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.floating-player-panel--active {
+  border-color: var(--player-color, rgba(212, 79, 76, 0.76));
+  box-shadow:
+    0 0 0 1px var(--player-color, rgba(212, 79, 76, 0.3)),
+    0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.floating-player-panel__avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.floating-player-panel__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.floating-player-panel__name {
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #fff8ea;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.floating-player-panel__stats {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  color: rgba(246, 235, 214, 0.7);
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
+.floating-player-panel--top-left {
+  top: 10px;
+  left: 10px;
+}
+
+.floating-player-panel--top-right {
+  top: 10px;
+  right: 10px;
+}
+
+.floating-player-panel--bottom-left {
+  bottom: 10px;
+  left: 10px;
+}
+
+.floating-player-panel--bottom-right {
+  bottom: 10px;
+  right: 10px;
 }
 
 .player-swatch {
@@ -2444,6 +2586,8 @@ h3 {
   gap: 4px;
   padding: 12px 0 4px;
   border-top: 1px solid rgba(92, 70, 46, 0.08);
+  place-items: center;
+  text-align: center;
 }
 
 .action-empty-prompt__title {
@@ -2761,13 +2905,17 @@ h3 {
 }
 
 .landform {
-  fill: rgba(247, 239, 223, 0.18);
-  stroke: rgba(122, 95, 60, 0.05);
-  stroke-width: 1;
+  fill: rgba(247, 239, 223, 0.35);
+  stroke: rgba(122, 95, 60, 0.12);
+  stroke-width: 1.5;
 }
 
 .board-map--full .landform {
-  fill: rgba(247, 239, 223, 0.32);
+  fill: rgba(247, 239, 223, 0.45);
+}
+
+.board-map--muted .landform {
+  fill: rgba(247, 239, 223, 0.35);
 }
 
 .board-map--minimal .landform {
@@ -2775,16 +2923,26 @@ h3 {
 }
 
 .water-body {
-  stroke: rgba(255, 246, 230, 0.08);
+  fill: rgba(130, 170, 195, 0.18);
+  stroke: rgba(130, 170, 195, 0.28);
   stroke-width: 1;
-  opacity: 0.16;
+  opacity: 1;
 }
 
 .board-map--full .water-body {
+  fill: rgba(130, 170, 195, 0.28);
+  stroke: rgba(130, 170, 195, 0.38);
   stroke-width: 1.4;
 }
 
+.board-map--muted .water-body {
+  fill: rgba(130, 170, 195, 0.18);
+  stroke: rgba(130, 170, 195, 0.28);
+  stroke-width: 1.2;
+}
+
 .board-map--minimal .water-body {
+  fill: rgba(130, 170, 195, 0.12);
   stroke-width: 0.8;
 }
 
@@ -2843,6 +3001,27 @@ h3 {
   opacity: 0.18;
 }
 
+.route-railbed {
+  stroke: rgba(74, 55, 36, 0.12);
+  stroke-width: 26;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.route-cross-tie {
+  stroke: rgba(255, 255, 255, 0.45);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.route-tunnel-marker rect {
+  stroke: rgba(100, 80, 60, 0.25);
+}
+
+.route-ferry-marker path {
+  stroke: rgba(80, 130, 160, 0.35);
+}
+
 .route-selection {
   stroke: rgba(42, 111, 182, 0.28);
   stroke-width: 28;
@@ -2876,37 +3055,42 @@ h3 {
   stroke-width: 2;
 }
 
-.claim-badge--self {
-  fill: #d2a545;
-}
-
-.claim-badge--opponent {
-  fill: #433227;
-}
-
 .claim-badge__label {
   font-size: 10px;
   font-weight: 800;
   fill: #fff9ec;
   letter-spacing: 0.04em;
   pointer-events: none;
+  paint-order: stroke;
+  stroke: rgba(0, 0, 0, 0.35);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .shoreline {
   fill: none;
-  stroke: rgba(72, 54, 34, 0.08);
+  stroke: rgba(72, 54, 34, 0.15);
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  opacity: 0.18;
+  stroke-dasharray: 6 4;
 }
 
 .board-map--full .shoreline {
+  stroke: rgba(72, 54, 34, 0.22);
   stroke-width: 2.4;
+}
+
+.board-map--muted .shoreline {
+  stroke: rgba(72, 54, 34, 0.15);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
 }
 
 .board-map--minimal .shoreline {
   stroke-width: 1.4;
+  stroke-dasharray: none;
 }
 
 .region-label {
@@ -2917,6 +3101,11 @@ h3 {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   pointer-events: none;
+}
+
+.region-label--muted {
+  fill: rgba(88, 64, 38, 0.10);
+  font-size: 20px;
 }
 
 .region-label--minimal {
@@ -3055,14 +3244,14 @@ h3 {
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgba(57, 42, 27, 0.38);
+  background: rgba(57, 42, 27, 0.52);
   animation: shell-fade-in 180ms ease;
 }
 
 .overlay--tutorial,
 .overlay--tutorial-focus,
 .modal-shell--tutorial {
-  background: rgba(34, 24, 14, 0.58);
+  background: rgba(34, 24, 14, 0.68);
 }
 
 .overlay-card,
@@ -3641,6 +3830,11 @@ h3 {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.42);
   animation: notification-drift 4.2s ease forwards;
   backdrop-filter: blur(16px);
+  pointer-events: auto;
+}
+
+.notification-pipe__item:hover {
+  animation-play-state: paused;
 }
 
 .notification-pipe__item--success {
@@ -3741,14 +3935,14 @@ h3 {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
     0 18px 48px rgba(0, 0, 0, 0.28);
-  color: #f5ecdc;
+  color: var(--hud-paper-bright);
 }
 
 .app-shell--gameplay-hud .board-stage {
   border-color: rgba(222, 199, 158, 0.22);
   background:
     linear-gradient(180deg, rgba(26, 36, 45, 0.86), rgba(11, 17, 22, 0.78));
-  color: #f7eddd;
+  color: var(--hud-paper-bright);
 }
 
 .app-shell--gameplay-hud .section-header__eyebrow,
@@ -3759,7 +3953,7 @@ h3 {
 .app-shell--gameplay-hud .section-header__title,
 .app-shell--gameplay-hud .surface-card__title,
 .app-shell--gameplay-hud .row-object__title {
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
 }
 
 .app-shell--gameplay-hud .section-header__meta,
@@ -3767,7 +3961,7 @@ h3 {
 .app-shell--gameplay-hud .row-object__stat,
 .app-shell--gameplay-hud .muted-copy,
 .app-shell--gameplay-hud .board-stage__placeholder {
-  color: rgba(246, 235, 214, 0.64);
+  color: var(--hud-paper-soft);
 }
 
 .app-shell--gameplay-hud .player-strip,
@@ -3831,17 +4025,27 @@ h3 {
 }
 
 .app-shell--gameplay-hud .board-map > rect:first-child {
-  fill: rgba(255, 255, 255, 0.42) !important;
+  fill: #d9c8a6 !important;
+}
+
+.app-shell--gameplay-hud .board-map > rect:nth-of-type(2) {
+  opacity: 0.8;
 }
 
 .app-shell--gameplay-hud .board-map--full .landform,
 .app-shell--gameplay-hud .board-map--muted .landform,
 .app-shell--gameplay-hud .landform {
-  fill: rgba(255, 255, 255, 0.2);
+  fill: rgba(255, 255, 255, 0.22);
 }
 
 .app-shell--gameplay-hud .water-body {
-  fill: rgba(160, 184, 197, 0.16);
+  fill: rgba(130, 170, 195, 0.22);
+  stroke: rgba(130, 170, 195, 0.32);
+}
+
+.app-shell--gameplay-hud .shoreline {
+  stroke: rgba(72, 54, 34, 0.18);
+  stroke-dasharray: 6 4;
 }
 
 .app-shell--gameplay-hud .board-map {
@@ -3908,7 +4112,7 @@ h3 {
 .inspector-dock__summary {
   margin: 0;
   max-width: calc(100% - 42px);
-  color: rgba(246, 235, 214, 0.64);
+  color: var(--hud-paper-soft);
   font-size: 0.78rem;
   line-height: 1.35;
 }
@@ -4174,6 +4378,10 @@ h3 {
   min-height: 0;
 }
 
+.app-shell--gameplay-hud .board-stage__map {
+  position: relative;
+}
+
 .app-shell--gameplay-hud .board-map {
   width: 100%;
   max-width: none;
@@ -4282,6 +4490,11 @@ h3 {
   background: rgba(255, 247, 231, 0.055);
 }
 
+.chat-panel__messages:has(> :only-child) {
+  align-content: center;
+  place-items: center;
+}
+
 .chat-panel__message {
   margin: 0;
   padding: 8px 10px;
@@ -4327,7 +4540,7 @@ h3 {
   background:
     radial-gradient(circle at top right, rgba(91, 145, 184, 0.12), transparent 28%),
     linear-gradient(180deg, rgba(255, 247, 231, 0.1), rgba(9, 14, 19, 0.12));
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
 }
 
 .app-shell--gameplay-hud .detail-card__fact,
@@ -4339,7 +4552,7 @@ h3 {
 
 .app-shell--gameplay-hud .detail-card__prompt,
 .app-shell--gameplay-hud .action-empty-prompt__title {
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
 }
 
 .app-shell--gameplay-hud .action-empty-prompt__copy,
@@ -4358,7 +4571,7 @@ h3 {
   background:
     radial-gradient(circle at top left, rgba(92, 145, 184, 0.18), transparent 34%),
     linear-gradient(180deg, rgba(23, 33, 42, 0.94), rgba(10, 16, 22, 0.92));
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
 }
 
 .app-shell--gameplay-hud .ticket-choice-sheet .ticket-picker__tray,
@@ -4366,7 +4579,7 @@ h3 {
 .app-shell--gameplay-hud .ticket-card {
   border-color: rgba(222, 199, 158, 0.18);
   background: rgba(255, 247, 231, 0.08);
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
 }
 
 .setup-board-shell {
@@ -5564,6 +5777,20 @@ h3 {
   gap: 10px;
 }
 
+@media (max-width: 1200px) {
+  .app-shell--gameplay-hud .game-layout {
+    grid-template-columns: minmax(240px, 260px) minmax(0, 1fr);
+  }
+
+  .app-shell--gameplay-hud {
+    --game-right-rail: clamp(300px, 22vw, 340px);
+  }
+
+  .app-shell--gameplay-hud .board-column {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 280px);
+  }
+}
+
 @media (max-width: 1120px) {
   .setup-board,
   .setup-board-shell--gateway .setup-board {
@@ -5901,7 +6128,7 @@ h3 {
 }
 
 .app-shell--gameplay-hud .section-header__title {
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
   font-family: var(--font-body);
   font-size: 1rem;
   font-weight: 850;
@@ -5909,7 +6136,7 @@ h3 {
 }
 
 .app-shell--gameplay-hud .section-header__meta {
-  color: rgba(246, 235, 214, 0.64);
+  color: var(--hud-paper-soft);
   font-size: 0.78rem;
   font-weight: 650;
   letter-spacing: 0;
@@ -5957,18 +6184,6 @@ h3 {
   color: rgba(246, 235, 214, 0.58);
 }
 
-.app-shell--gameplay-hud .inspector-dock .supply-dock--board {
-  padding: 0;
-  border: 0;
-  background: transparent;
-  box-shadow: none;
-  backdrop-filter: none;
-}
-
-.app-shell--gameplay-hud .inspector-dock .supply-dock--board::before {
-  display: none;
-}
-
 .app-shell--gameplay-hud .inspector-dock .supply-dock--board .section-header {
   padding-inline: 8px 1px;
   overflow: visible;
@@ -6007,7 +6222,7 @@ h3 {
   border: 1px solid rgba(222, 199, 158, 0.18);
   border-radius: 999px;
   color: rgba(246, 235, 214, 0.72);
-  font-size: 0.52rem;
+  font-size: 0.76rem;
   font-weight: 850;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -6022,7 +6237,7 @@ h3 {
 }
 
 .app-shell--gameplay-hud .ticket-route__cities {
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
   font-family: var(--font-body);
   font-size: 0.76rem;
   font-weight: 820;
@@ -6046,9 +6261,6 @@ h3 {
 }
 
 .app-shell--gameplay-hud .inspector-dock {
-  height: calc(100vh - 58px);
-  max-height: calc(100vh - 58px);
-  min-height: 0;
   padding: 12px;
 }
 
@@ -6059,7 +6271,7 @@ h3 {
 }
 
 .app-shell--gameplay-hud .inspector-dock--build .detail-card {
-  padding: 2px 0 0;
+  padding: 4px 0 0;
   border: 0;
   background: transparent;
   box-shadow: none;
@@ -6071,15 +6283,17 @@ h3 {
 
 .app-shell--gameplay-hud .inspector-dock--build .surface-card__header {
   gap: 4px;
+  padding-top: 2px;
 }
 
 .app-shell--gameplay-hud .inspector-dock--build .surface-card__title {
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
   font-family: var(--font-body);
   font-size: 1.02rem;
   font-weight: 870;
   letter-spacing: -0.015em;
-  line-height: 1.08;
+  line-height: 1.2;
+  padding-top: 2px;
 }
 
 .app-shell--gameplay-hud .inspector-dock--build .surface-card__body {
@@ -6106,13 +6320,13 @@ h3 {
 
 .app-shell--gameplay-hud .detail-card__prompt,
 .app-shell--gameplay-hud .action-empty-prompt__title {
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
   font-size: 0.82rem;
   font-weight: 800;
 }
 
 .app-shell--gameplay-hud .action-empty-prompt__copy {
-  color: rgba(246, 235, 214, 0.62);
+  color: rgba(246, 235, 214, 0.72);
   font-size: 0.74rem;
 }
 
@@ -6147,11 +6361,110 @@ h3 {
   white-space: normal;
 }
 
+/* TicketChoiceSheet: exact same size as inspector dock, solid background */
 .app-shell--gameplay-hud .ticket-choice-sheet {
-  top: 80px;
-  right: 18px;
-  width: min(304px, calc(100vw - 36px));
-  max-height: calc(100vh - 104px);
+  position: absolute !important;
+  top: 86px !important;
+  right: 18px !important;
+  bottom: 18px !important;
+  width: var(--game-right-rail) !important;
+  max-height: none !important;
+  pointer-events: auto !important;
+  z-index: 35;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet__panel {
+  border-radius: 7px !important;
+  border: 1px solid rgba(183, 155, 97, 0.34) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 244, 217, 0.08),
+    0 18px 36px rgba(0, 0, 0, 0.4) !important;
+  background:
+    var(--hud-grain),
+    linear-gradient(180deg, rgba(35, 28, 20, 0.96), rgba(10, 8, 6, 0.96)) !important;
+  padding: 0 !important;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 12px) 0,
+    100% 12px,
+    100% 100%,
+    0 100%
+  );
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet__panel::before,
+.app-shell--gameplay-hud .ticket-choice-sheet__panel::after {
+  display: none;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-picker {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  gap: 8px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-picker::before,
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-picker::after {
+  display: none;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-picker__tray {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-picker__tray::before,
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-picker__tray::after {
+  display: none;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-list {
+  gap: 6px;
+  padding: 12px;
+  overflow-y: auto;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-row--choice {
+  margin-bottom: 0;
+  min-height: 64px;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .setup-actions {
+  display: flex;
+  gap: 8px;
+  padding: 0 12px 8px;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .primary-button {
+  background:
+    linear-gradient(180deg, #d6c391, #8c713b);
+  color: #1a150e;
+  border-radius: 3px;
+  font-weight: var(--weight-black);
+  letter-spacing: var(--ls-tight);
+  text-shadow: 0 1px 0 rgba(255, 248, 232, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .primary-button:disabled {
+  opacity: 0.4;
+  background: rgba(183, 155, 97, 0.12);
+  color: rgba(255, 248, 232, 0.32);
+  box-shadow: none;
+  cursor: not-allowed;
 }
 
 .app-shell--gameplay-hud .ticket-choice-sheet__panel {
@@ -6190,6 +6503,46 @@ h3 {
   align-self: stretch;
 }
 
+.app-shell--gameplay-hud .turn-indicator {
+  grid-column: 2;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  justify-content: center;
+}
+
+.app-shell--gameplay-hud .turn-indicator__name {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff8ea;
+  letter-spacing: 0.02em;
+}
+
+.app-shell--gameplay-hud .turn-indicator__label {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  color: rgba(246, 235, 214, 0.6);
+  text-transform: lowercase;
+  letter-spacing: 0.04em;
+}
+
+.app-shell--gameplay-hud .turn-indicator__timer {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(246, 235, 214, 0.85);
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(212, 79, 76, 0.15);
+  border: 1px solid rgba(212, 79, 76, 0.3);
+}
+
+.app-shell--gameplay-hud .topbar {
+  position: relative;
+  z-index: 100;
+}
+
 .app-shell--gameplay-hud .topbar-actions {
   grid-column: 3;
   display: grid;
@@ -6201,6 +6554,13 @@ h3 {
 
 .app-shell--gameplay-hud .topbar-actions .score-guide {
   min-width: 0;
+}
+
+.app-shell--gameplay-hud .score-guide__panel {
+  position: fixed !important;
+  top: 72px !important;
+  right: 18px !important;
+  z-index: 9999 !important;
 }
 
 .app-shell--gameplay-hud .topbar-actions .system-button,
@@ -6230,8 +6590,6 @@ h3 {
 .app-shell--gameplay-hud .inspector-dock {
   grid-column: 2;
   grid-row: 1;
-  height: calc(100vh - 92px);
-  max-height: calc(100vh - 92px);
   grid-template-columns: minmax(0, 1fr) 34px;
   column-gap: 10px;
   overflow: hidden;
@@ -6263,7 +6621,7 @@ h3 {
 }
 
 .app-shell--gameplay-hud .game-over-layer {
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
 }
 
 .app-shell--gameplay-hud .game-over-layer__header {
@@ -6299,13 +6657,13 @@ h3 {
     radial-gradient(circle at top right, rgba(142, 169, 188, 0.14), transparent 34%),
     linear-gradient(180deg, rgba(33, 45, 54, 0.92), rgba(11, 17, 23, 0.92));
   border-color: rgba(222, 199, 158, 0.18);
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
 }
 
 .app-shell--gameplay-hud .game-over-layer .endgame-score,
 .app-shell--gameplay-hud .game-over-layer .endgame-breakdown__value,
 .app-shell--gameplay-hud .game-over-layer .endgame-breakdown__list-item {
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
 }
 
 .app-shell--gameplay-hud .game-over-layer .endgame-score__label,
@@ -6318,7 +6676,7 @@ h3 {
     radial-gradient(circle at top left, rgba(142, 169, 188, 0.16), transparent 36%),
     linear-gradient(180deg, rgba(31, 42, 51, 0.96), rgba(9, 15, 20, 0.96));
   border-color: rgba(222, 199, 158, 0.26);
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
 }
 
 .app-shell--gameplay-hud .leave-confirm-card p {
@@ -6330,7 +6688,19 @@ h3 {
 }
 
 .app-shell--gameplay-hud .leave-confirm-card .section-header__title {
-  color: #fff8ea;
+  color: var(--hud-paper-bright);
+}
+
+.app-shell--gameplay-hud .leave-confirm-card .leave-button {
+  background: linear-gradient(180deg, #c44a2f, #8b2518) !important;
+  color: #fff !important;
+  border-color: #c44a2f !important;
+  font-weight: 700;
+}
+
+.app-shell--gameplay-hud .leave-confirm-card .leave-button:hover {
+  background: linear-gradient(180deg, #d45a3f, #9b3528) !important;
+  border-color: #d45a3f !important;
 }
 
 .notification-pipe {
@@ -6394,10 +6764,13 @@ h3 {
 .app-shell--gameplay-hud {
   --hud-paper: #e8dcc2;
   --hud-paper-deep: #c9b895;
+  --hud-paper-bright: #fff8ea;
+  --hud-paper-soft: rgba(246, 235, 214, 0.78);
   --hud-ink: #241d15;
   --hud-ink-soft: #5f5343;
   --hud-brass: #b79b61;
   --hud-brass-dark: #6d5830;
+  --hud-brass-light: rgba(222, 199, 158, 0.64);
   --hud-wood: #16100b;
   --hud-wood-light: #2a2117;
   --hud-shadow: rgba(0, 0, 0, 0.42);
@@ -7060,22 +7433,23 @@ h3 {
 .app-shell--gameplay-hud .board-map--full .landform,
 .app-shell--gameplay-hud .board-map--muted .landform,
 .app-shell--gameplay-hud .landform {
-  fill: rgba(238, 222, 190, 0.28);
-  stroke: rgba(75, 54, 32, 0.1);
+  fill: rgba(238, 222, 190, 0.32);
+  stroke: rgba(75, 54, 32, 0.14);
 }
 
 .app-shell--gameplay-hud .water-body {
-  fill: rgba(97, 127, 125, 0.24);
-  stroke: rgba(232, 220, 194, 0.16);
+  fill: rgba(100, 145, 175, 0.22);
+  stroke: rgba(100, 145, 175, 0.34);
 }
 
 .app-shell--gameplay-hud .shoreline {
-  stroke: rgba(74, 55, 36, 0.18);
-  opacity: 0.42;
+  stroke: rgba(74, 55, 36, 0.22);
+  stroke-dasharray: 6 4;
+  opacity: 1;
 }
 
 .app-shell--gameplay-hud .region-label {
-  fill: rgba(62, 45, 28, 0.16);
+  fill: rgba(62, 45, 28, 0.18);
 }
 
 .app-shell--gameplay-hud .board-label {
@@ -7103,6 +7477,14 @@ h3 {
 .app-shell--gameplay-hud .city-highlight-ring {
   fill: rgba(23, 79, 115, 0.14);
   stroke: rgba(23, 79, 115, 0.76);
+}
+
+.app-shell--gameplay-hud .route-railbed {
+  stroke: rgba(74, 55, 36, 0.10);
+}
+
+.app-shell--gameplay-hud .route-cross-tie {
+  stroke: rgba(255, 255, 255, 0.50);
 }
 
 .app-shell--gameplay-hud .route-selection {
@@ -7164,10 +7546,11 @@ h3 {
 
 .app-shell--gameplay-hud .score-guide {
   z-index: 600;
+  position: relative;
 }
 
 .app-shell--gameplay-hud .score-guide__panel {
-  z-index: 700;
+  z-index: 7000;
   position: absolute;
   width: min(340px, calc(100vw - 28px));
   border-radius: 8px;
@@ -7175,10 +7558,26 @@ h3 {
   background:
     var(--hud-grain),
     linear-gradient(180deg, rgba(31, 25, 18, 0.985), rgba(10, 8, 6, 0.985));
-  color: var(--hud-paper);
+  color: var(--hud-paper-bright);
   box-shadow:
     inset 0 0 0 1px rgba(255, 244, 217, 0.08),
     0 24px 54px rgba(0, 0, 0, 0.54);
+}
+
+.app-shell--gameplay-hud .score-guide__eyebrow {
+  color: var(--hud-brass-light);
+  font-weight: 700;
+}
+
+.app-shell--gameplay-hud .score-guide__heading {
+  color: var(--hud-paper-bright);
+  font-weight: 800;
+}
+
+.app-shell--gameplay-hud .score-guide__list {
+  color: var(--hud-paper-bright);
+  font-size: 0.86rem;
+  line-height: 1.45;
 }
 
 .app-shell--gameplay-hud .board-stage {
@@ -7205,24 +7604,29 @@ h3 {
 }
 
 .app-shell--gameplay-hud .board-map > rect:first-child {
-  fill: rgba(217, 200, 166, 0.54) !important;
+  fill: #d9c8a6 !important;
+}
+
+.app-shell--gameplay-hud .board-map > rect:nth-of-type(2) {
+  opacity: 0.8;
 }
 
 .app-shell--gameplay-hud .board-map--full .landform,
 .app-shell--gameplay-hud .board-map--muted .landform,
 .app-shell--gameplay-hud .landform {
-  fill: rgba(238, 222, 190, 0.2);
-  stroke: rgba(75, 54, 32, 0.08);
+  fill: rgba(238, 222, 190, 0.24);
+  stroke: rgba(75, 54, 32, 0.1);
 }
 
 .app-shell--gameplay-hud .water-body {
-  fill: rgba(91, 126, 128, 0.18);
-  stroke: rgba(232, 220, 194, 0.11);
+  fill: rgba(100, 145, 175, 0.2);
+  stroke: rgba(100, 145, 175, 0.32);
 }
 
 .app-shell--gameplay-hud .shoreline {
-  stroke: rgba(74, 55, 36, 0.13);
-  opacity: 0.34;
+  stroke: rgba(74, 55, 36, 0.2);
+  stroke-dasharray: 6 4;
+  opacity: 1;
 }
 
 .app-shell--gameplay-hud .board-label {
@@ -7236,11 +7640,19 @@ h3 {
   stroke: #332317;
 }
 
+.app-shell--gameplay-hud .route-railbed {
+  stroke: rgba(74, 55, 36, 0.10);
+}
+
+.app-shell--gameplay-hud .route-cross-tie {
+  stroke: rgba(255, 255, 255, 0.40);
+}
+
 .app-shell--gameplay-hud .inspector-dock {
   grid-template-columns: minmax(0, 1fr) 36px;
   column-gap: 9px;
   padding: 12px 9px 12px 12px;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .app-shell--gameplay-hud .inspector-tabs {
@@ -7293,7 +7705,7 @@ h3 {
   border-color: rgba(232, 220, 194, 0.72);
   background:
     linear-gradient(
-      90deg,
+      180deg,
       #c65f6e 0 12.5%,
       #d9ad4f 12.5% 25%,
       #5aa79a 25% 37.5%,
@@ -7310,17 +7722,11 @@ h3 {
 
 .app-shell--gameplay-hud .hand-color-slot--locomotive .hand-color-slot__count,
 .app-shell--gameplay-hud .market-color-slot--locomotive .market-color-slot__count {
+border-color: rgba(232, 220, 194, 0.72);
   background:
     linear-gradient(180deg, #f0e6cb, #b7a875);
   color: #241d15;
 }
-
-.app-shell--gameplay-hud .ticket-dock {
-  height: 100%;
-  max-height: none;
-  align-self: stretch;
-}
-
 .app-shell--gameplay-hud .ticket-dock__scroll {
   min-height: 0;
 }
@@ -7383,8 +7789,8 @@ h3 {
 }
 
 .app-shell--gameplay-hud .ticket-row--open {
-  --ticket-status-accent: #b57676;
-  --ticket-status-ink: #2b1717;
+  --ticket-status-accent: #9a7060;
+  --ticket-status-ink: #241a16;
 }
 
 .app-shell--gameplay-hud .ticket-status {
@@ -7393,6 +7799,236 @@ h3 {
     linear-gradient(180deg, color-mix(in srgb, var(--ticket-status-accent) 78%, #fff2cc), var(--ticket-status-accent));
   color: var(--ticket-status-ink);
   text-shadow: 0 1px 0 rgba(255, 248, 232, 0.28);
+}
+
+/* Force ticket status font size across all HUD contexts */
+.app-shell--gameplay-hud .ticket-status {
+  font-size: 0.76rem !important;
+}
+
+/* Chat panel: serif font, tighter corners */
+.app-shell--gameplay-hud .chat-panel {
+  font-family: var(--font-serif);
+  gap: 8px;
+}
+
+.app-shell--gameplay-hud .chat-panel__messages {
+  border-radius: 4px;
+  border-color: rgba(183, 155, 97, 0.12);
+  background: rgba(255, 247, 231, 0.03);
+  padding: 10px;
+}
+
+.app-shell--gameplay-hud .chat-panel__message {
+  border-radius: 3px;
+  background: rgba(255, 247, 231, 0.05);
+  color: rgba(255, 248, 232, 0.72);
+  font-family: var(--font-serif);
+  font-size: var(--hud-type-sm);
+  line-height: var(--lh-relaxed);
+  padding: 6px 8px;
+}
+
+.app-shell--gameplay-hud .chat-panel__message strong {
+  font-family: var(--font-sans);
+  font-size: var(--hud-type-label);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: rgba(255, 248, 232, 0.88);
+}
+
+.app-shell--gameplay-hud .chat-panel__composer {
+  grid-template-columns: 1fr;
+}
+
+.app-shell--gameplay-hud .chat-panel__composer input {
+  border-radius: 3px;
+  border-color: rgba(183, 155, 97, 0.18);
+  background: rgba(255, 247, 231, 0.05);
+  color: rgba(255, 248, 232, 0.78);
+  font-family: var(--font-serif);
+  font-size: var(--hud-type-sm);
+  padding: 8px 10px;
+}
+
+.app-shell--gameplay-hud .chat-panel__composer input::placeholder {
+  color: rgba(255, 248, 232, 0.32);
+  font-style: italic;
+}
+
+/* Supply dock: divider + distinct buttons */
+.app-shell--gameplay-hud .inspector-dock .supply-dock--board {
+  gap: 0;
+}
+
+.app-shell--gameplay-hud .inspector-dock .supply-dock__draw-deck.system-button {
+  background:
+    linear-gradient(180deg, rgba(183, 155, 97, 0.2), rgba(12, 10, 8, 0.14)),
+    var(--hud-grain),
+    linear-gradient(180deg, #2d3432, #131815);
+  border-color: rgba(var(--hud-brass-rgb), 0.32);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  font-size: var(--hud-type-sm);
+}
+
+.app-shell--gameplay-hud .inspector-dock .supply-dock__divider {
+  display: block;
+  height: 1px;
+  margin: 2px 8px;
+  background: linear-gradient(90deg, transparent, rgba(183, 155, 97, 0.18), transparent);
+}
+
+.app-shell--gameplay-hud .inspector-dock .supply-dock__draw-tickets.system-button {
+  background:
+    linear-gradient(180deg, rgba(160, 144, 80, 0.12), rgba(12, 10, 8, 0.12)),
+    var(--hud-grain),
+    linear-gradient(180deg, #28302f, #111513);
+  border: 1px solid rgba(160, 144, 80, 0.24);
+  border-radius: 4px;
+  color: rgba(255, 248, 232, 0.62);
+  font-size: var(--hud-type-xs);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  margin-top: 0;
+}
+
+/* TicketChoiceSheet: fills right panel, tickets match HUD left dock */
+.app-shell--gameplay-hud .ticket-choice-sheet__panel {
+  border-radius: 7px !important;
+  border: 1px solid rgba(183, 155, 97, 0.34) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 244, 217, 0.08),
+    0 18px 36px rgba(0, 0, 0, 0.4) !important;
+  background:
+    var(--hud-grain),
+    linear-gradient(180deg, rgba(35, 28, 20, 0.96), rgba(10, 8, 6, 0.96)) !important;
+  padding: 0 !important;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 12px) 0,
+    100% 12px,
+    100% 100%,
+    0 100%
+  );
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet__panel::before,
+.app-shell--gameplay-hud .ticket-choice-sheet__panel::after {
+  display: none;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-picker {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  gap: 8px;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-picker::before,
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-picker::after {
+  display: none;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-picker__tray {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-picker__tray::before,
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-picker__tray::after {
+  display: none;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-list {
+  gap: 1px;
+  padding: 8px 9px;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .ticket-row--choice {
+  margin-bottom: 0;
+  min-height: 74px;
+  max-width: 100%;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .setup-actions {
+  display: flex;
+  gap: 8px;
+  padding: 0 12px 8px;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .primary-button {
+  background:
+    linear-gradient(180deg, #d6c391, #8c713b);
+  color: #1a150e;
+  border-radius: 3px;
+  font-weight: var(--weight-black);
+  letter-spacing: var(--ls-tight);
+  text-shadow: 0 1px 0 rgba(255, 248, 232, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet .primary-button:disabled {
+  opacity: 0.4;
+  background: rgba(183, 155, 97, 0.12);
+  color: rgba(255, 248, 232, 0.32);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* Build tab claim buttons: show actual card colors */
+.app-shell--gameplay-hud .inspector-dock--build .choice-chip-button {
+  min-height: 36px;
+  border-radius: 4px;
+  font-size: var(--hud-type-sm);
+  font-weight: var(--weight-bold);
+  border-color: color-mix(in srgb, var(--choice-chip-accent) 42%, rgba(183, 155, 97, 0.22));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--choice-chip-accent) 28%, rgba(43, 49, 47, 0.85)), rgba(17, 23, 21, 0.92));
+  color: var(--hud-paper);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 244, 217, 0.06),
+    0 2px 0 rgba(0, 0, 0, 0.18);
+}
+
+.app-shell--gameplay-hud .inspector-dock--build .choice-chip-button:hover,
+.app-shell--gameplay-hud .inspector-dock--build .choice-chip-button:focus-visible {
+  border-color: color-mix(in srgb, var(--choice-chip-accent) 62%, rgba(183, 155, 97, 0.28));
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--choice-chip-accent) 38%, rgba(43, 49, 47, 0.8)), rgba(17, 23, 21, 0.88));
+}
+
+/* Ticket dock: extra bottom padding so last ticket doesn't clip */
+.app-shell--gameplay-hud .ticket-dock {
+  padding-bottom: 10px;
+}
+
+/* Right bar footer */
+.app-shell--gameplay-hud .inspector-dock__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  padding: 8px 12px 10px;
+  border-top: 1px solid rgba(183, 155, 97, 0.12);
+  color: rgba(255, 248, 232, 0.38);
+  font-size: var(--hud-type-xs);
+  font-family: var(--font-sans);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+}
+
+.app-shell--gameplay-hud .inspector-dock__footer-stat {
+  white-space: nowrap;
 }
 
 .visually-hidden {

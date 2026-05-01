@@ -36,10 +36,10 @@ import { BoardMap } from "./components/BoardMap";
 import { EndgameBreakdown } from "./components/EndgameBreakdown";
 import {
   BoardStage,
+  FloatingPlayerRoster,
   GameOverLayer,
   InspectorDock,
   NotificationPipe,
-  PlayerRoster,
   PrivateHandRail,
   SupplyDock,
   TicketChoiceSheet,
@@ -418,6 +418,44 @@ export default function App(): JSX.Element {
     }
     return snapshot.game.players[snapshot.game.activePlayerIndex]?.id === snapshot.privateState.playerId;
   }, [snapshot]);
+
+  const playerAvatars = useMemo(() => {
+    if (!snapshot?.game) return {};
+    const AVATAR_NAMES = [
+      "Conductor", "Milo", "Engineer", "Rosa", "Switchman",
+      "Jack", "Dispatcher", "Lily", "Caboose", "Nellie"
+    ];
+    const seed = snapshot.room.roomCode;
+    let h = 0;
+    for (let i = 0; i < seed.length; i++) h = ((h << 5) - h + seed.charCodeAt(i)) | 0;
+    const rng = () => {
+      h = (h ^ (h >>> 16)) * 0x45d9f3b | 0;
+      h = (h ^ (h >>> 16)) * 0x45d9f3b | 0;
+      h ^= h >>> 16;
+      return (h >>> 0) / 4294967296;
+    };
+    const pool = [...AVATAR_NAMES];
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    const map: Record<string, string> = {};
+    snapshot.game.players.forEach((p, idx) => { map[p.id] = pool[idx % pool.length]; });
+    return map;
+  }, [snapshot?.game?.players.map((p) => p.id).join("|"), snapshot?.room.roomCode]);
+
+  const rosterPlayers = useMemo(() => {
+    if (!snapshot?.game) return [];
+    return snapshot.game.players.map((p) => ({
+      id: p.id,
+      name: p.name,
+      color: p.color,
+      trainsLeft: p.trainsLeft,
+      stationsLeft: p.stationsLeft,
+      ticketCount: p.ticketCount,
+      avatarName: playerAvatars[p.id] ?? null
+    }));
+  }, [snapshot?.game, playerAvatars]);
 
   useEffect(() => {
     const pending = snapshot?.privateState?.pendingTickets ?? [];
@@ -844,21 +882,12 @@ export default function App(): JSX.Element {
     <div className="app-shell app-shell--gameplay-hud" data-config-theme={visuals.theme}>
       <header className="topbar topbar--gameplay-actions">
         <div className="topbar-private-spacer" aria-hidden="true" />
-        <div data-testid="turn-status-banner">
-          <span className="visually-hidden">{turnStatusLabel}</span>
-          <span className="visually-hidden">{turnStatusCopy}</span>
-          <span className="visually-hidden" data-testid="turn-timer-badge">{turnTimerBadge}</span>
-          <PlayerRoster
-            players={snapshot.game.players}
-            activePlayerIndex={snapshot.game.activePlayerIndex}
-            playerPalette={visuals.palettes.players}
-            timer={
-              liveTimerSecondsRemaining === null
-                ? null
-                : { activePlayerIndex: snapshot.game.activePlayerIndex, secondsRemaining: liveTimerSecondsRemaining }
-            }
-            className="player-roster--top"
-          />
+        <div className="turn-indicator">
+          <span className="turn-indicator__name">{projectedGame.players[snapshot.game.activePlayerIndex]?.name}</span>
+          <span className="turn-indicator__label">active</span>
+          {liveTimerSecondsRemaining !== null && (
+            <span className="turn-indicator__timer">{liveTimerSecondsRemaining}s</span>
+          )}
         </div>
         <div className="topbar-actions">
           <Button onClick={() => setGuideOpen(true)}>Guide</Button>
@@ -917,6 +946,12 @@ export default function App(): JSX.Element {
                 setSelectedRouteId(null);
                 setPaymentPreview(null);
               }}
+            />
+            <FloatingPlayerRoster
+              players={rosterPlayers}
+              activePlayerIndex={snapshot.game.activePlayerIndex}
+              playerPalette={visuals.palettes.players}
+              viewerPlayerId={snapshot.privateState?.playerId ?? null}
             />
           </BoardStage>
 
@@ -1097,13 +1132,13 @@ export default function App(): JSX.Element {
 
       {showLeaveConfirm ? (
         <ModalShell width="md" align="center" cardClassName="leave-confirm-card">
-          <SectionHeader eyebrow="Leave room" title="Leave this game?" density="ceremony" />
+          <SectionHeader title="Leave this game?" density="ceremony" />
           <p>You will return to setup and clear this room from the current browser.</p>
           <div className="setup-actions">
             <Button onClick={() => setShowLeaveConfirm(false)}>
               Cancel
             </Button>
-            <Button variant="primary" onClick={leaveRoom}>
+            <Button variant="primary" className="leave-button" onClick={leaveRoom}>
               Leave
             </Button>
           </div>

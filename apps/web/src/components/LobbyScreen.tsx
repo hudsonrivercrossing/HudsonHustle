@@ -1,4 +1,4 @@
-import type { RoomSummary, TimerUpdate } from "@hudson-hustle/game-core";
+import type { RoomSummary, RoomSeatSummary, TimerUpdate } from "@hudson-hustle/game-core";
 import {
   MapThumbnail,
   SetupActions,
@@ -23,6 +23,41 @@ interface LobbyScreenProps {
   realtimeMessage: string | null;
 }
 
+type SeatStatus = { label: string; tone: "neutral" | "info" | "danger" | "success" | "warning" };
+
+function getSeatStatus(seat: RoomSeatSummary): SeatStatus {
+  if (!seat.playerName) return { label: "Open", tone: "neutral" };
+  if (seat.controllerType === "bot") return { label: "Bot", tone: "info" };
+  if (!seat.connected) return { label: "Offline", tone: "danger" };
+  return seat.ready ? { label: "Ready", tone: "success" } : { label: "Waiting", tone: "warning" };
+}
+
+const AVATAR_NAMES = [
+  "Conductor", "Milo", "Engineer", "Rosa", "Switchman",
+  "Jack", "Dispatcher", "Lily", "Caboose", "Nellie"
+];
+
+function seededRandom(seed: string): () => number {
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = ((h << 5) - h + seed.charCodeAt(i)) | 0;
+  return () => {
+    h = (h ^ (h >>> 16)) * 0x45d9f3b | 0;
+    h = (h ^ (h >>> 16)) * 0x45d9f3b | 0;
+    h ^= h >>> 16;
+    return (h >>> 0) / 4294967296;
+  };
+}
+
+function shuffleAvatars(seed: string, count: number): string[] {
+  const rng = seededRandom(seed);
+  const pool = [...AVATAR_NAMES];
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  return pool.slice(0, count);
+}
+
 export function LobbyScreen({
   room,
   localSeatId,
@@ -35,6 +70,7 @@ export function LobbyScreen({
 }: LobbyScreenProps): JSX.Element {
   const setupHeroImageUrl = "/setup/landing-bg.png";
   const localSeat = room.seats.find((seat) => seat.seatId === localSeatId);
+  const seatAvatars = shuffleAvatars(room.roomCode, room.seats.length);
   const canStart = realtimeReady && localSeat?.isHost && room.seats.every((seat) => seat.playerName) && room.seats.every((seat) => seat.ready);
   const occupiedCount = room.seats.filter((seat) => seat.playerName).length;
   const readyCount = room.seats.filter((seat) => seat.ready).length;
@@ -118,47 +154,36 @@ export function LobbyScreen({
         }
       >
         <div className="seat-stack">
-          {room.seats.map((seat) => (
-            <article
-              key={seat.seatId}
-              className={`seat-row ${seat.seatId === localSeatId ? "seat-row--self" : ""}`}
-              data-testid={`seat-row-${seat.seatId}`}
-            >
-              <div className="row-object__main">
-                <strong className="row-object__title">{seat.playerName ?? "Open seat"}</strong>
-                <p className="row-object__meta">
-                  {seat.seatId}
-                  {seat.isHost ? " · host" : ""}
-                  {seat.controllerType === "bot" ? " · server-owned bot" : seat.playerName ? seat.connected ? " · connected" : " · offline" : ""}
-                </p>
-              </div>
-              <div className="row-object__stats seat-status-stack">
-                {seat.playerName === null ? (
-                  <Badge tone="neutral" className="seat-ready">
-                    Open
-                  </Badge>
-                ) : seat.controllerType === "bot" ? (
-                  <>
-                    <Badge tone="info" className="seat-ready">
-                      Bot
-                    </Badge>
-                    <Badge tone="success" className="seat-ready" data-testid={`seat-connected-${seat.seatId}`}>
-                      Server
-                    </Badge>
-                  </>
-                ) : (
-                  <>
-                    <Badge tone={seat.ready ? "success" : "warning"} className="seat-ready">
-                      {seat.ready ? "Ready" : "Waiting"}
-                    </Badge>
-                    <Badge tone={seat.connected ? "info" : "danger"} className="seat-ready" data-testid={`seat-connected-${seat.seatId}`}>
-                      {seat.connected ? "Connected" : "Offline"}
-                    </Badge>
-                  </>
-                )}
-              </div>
-            </article>
-          ))}
+          {room.seats.map((seat, index) => {
+            const isSelf = seat.seatId === localSeatId;
+            const status = getSeatStatus(seat);
+            const isEmpty = seat.playerName === null;
+            const avatarName = seatAvatars[index];
+            return (
+              <article
+                key={seat.seatId}
+                className={`seat-row ${isSelf ? "seat-row--self" : ""} ${isEmpty ? "seat-row--open" : ""}`}
+                data-testid={`seat-row-${seat.seatId}`}
+              >
+                <img
+                  className={`seat-avatar ${isEmpty ? "seat-avatar--empty" : ""}`}
+                  src={`/avatars/avatar-${avatarName}.svg`}
+                  alt={`${seat.playerName || "Open seat"} avatar`}
+                />
+                <div className="row-object__main">
+                  <strong className="row-object__title">
+                    {seat.playerName ?? "Open seat"}
+                  </strong>
+                  <p className="row-object__meta">
+                    {isEmpty ? "Waiting for player" : seat.seatId}
+                  </p>
+                </div>
+                <div className="row-object__stats seat-status-stack">
+                  <Badge tone={status.tone} className="seat-ready">{status.label}</Badge>
+                </div>
+              </article>
+            );
+          })}
         </div>
         {timer?.deadlineAt ? <p className="muted-copy">Timer will activate when the next live turn begins.</p> : null}
       </SetupStepPanel>
