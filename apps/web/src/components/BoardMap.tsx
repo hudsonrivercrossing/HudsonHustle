@@ -211,18 +211,15 @@ export function BoardMap({
         aria-label="Hudson Hustle board map"
       >
         <defs>
-          <pattern id="transit-grid" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
-            <circle cx="16" cy="16" r="1.2" fill="rgba(74, 55, 36, 0.06)" />
-          </pattern>
-          <pattern id="cross-ties" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(0)">
-            <line x1="4" y1="-2" x2="4" y2="10" stroke="rgba(255, 255, 255, 0.35)" strokeWidth="1.5" />
+          <pattern id="transit-grid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+            <circle cx="12" cy="12" r="1.5" fill="rgba(74, 55, 36, 0.14)" />
           </pattern>
         </defs>
 
         <rect x="0" y="0" width={boardWidth} height={boardHeight} rx="12" fill="#d9c8a6" />
 
         {backdropOpacityScale > 0 ? (
-          <rect x="0" y="0" width={boardWidth} height={boardHeight} fill="url(#transit-grid)" rx="12" opacity={0.8} />
+          <rect x="0" y="0" width={boardWidth} height={boardHeight} fill="url(#transit-grid)" rx="12" opacity={1} />
         ) : null}
 
         {backdropOpacityScale > 0
@@ -316,7 +313,7 @@ export function BoardMap({
                   if (dist > totalLength - 6) return null;
                   const pt = getPointAlongPath(pathPoints, dist);
                   const dir = getPathDirection(pathPoints, dist);
-                  const tieLen = 10;
+                  const tieLen = 14;
                   return (
                     <line
                       key={`tie-${route.id}-${i}`}
