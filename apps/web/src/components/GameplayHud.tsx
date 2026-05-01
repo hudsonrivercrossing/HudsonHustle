@@ -90,6 +90,61 @@ export function PlayerRoster({ players, activePlayerIndex, playerPalette, timer 
   );
 }
 
+const CORNER_POSITIONS = ["top-left", "top-right", "bottom-left", "bottom-right"] as const;
+
+interface FloatingPlayerPanelProps {
+  player: PlayerRosterEntry;
+  index: number;
+  isActive: boolean;
+  color: string;
+}
+
+function FloatingPlayerPanel({ player, index, isActive, color }: FloatingPlayerPanelProps): JSX.Element {
+  return (
+    <div
+      className={`floating-player-panel floating-player-panel--${CORNER_POSITIONS[index]} ${isActive ? "floating-player-panel--active" : ""}`}
+      style={{ "--player-color": color } as React.CSSProperties}
+    >
+      {player.avatarName ? (
+        <img className="floating-player-panel__avatar" src={`/avatars/avatar-${player.avatarName}.svg`} alt="" />
+      ) : null}
+      <div className="floating-player-panel__info">
+        <span className="floating-player-panel__name">{player.name}</span>
+        <span className="floating-player-panel__stats">
+          {player.tickets?.length ?? player.ticketCount ?? 0} tickets · {player.trainsLeft} trains · {player.stationsLeft} stations
+        </span>
+      </div>
+    </div>
+  );
+}
+
+interface FloatingPlayerRosterProps {
+  players: PlayerRosterEntry[];
+  activePlayerIndex: number;
+  playerPalette: Record<string, string>;
+}
+
+export function FloatingPlayerRoster({ players, activePlayerIndex, playerPalette }: FloatingPlayerRosterProps): JSX.Element {
+  const slots = Array.from({ length: 4 }, (_, index) => players[index] ?? null);
+
+  return (
+    <div className="floating-player-roster">
+      {slots.map((player, index) => {
+        if (!player) return null;
+        return (
+          <FloatingPlayerPanel
+            key={player.id}
+            player={player}
+            index={index}
+            isActive={index === activePlayerIndex}
+            color={playerPalette[player.color]}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
 function countHandByFace(hand: TrainCard[]): Record<TrainCardFace, number> {
   const counts = Object.fromEntries([...trainCardColors, "locomotive"].map((color) => [color, 0])) as Record<TrainCardFace, number>;
   for (const card of hand) {

@@ -27,10 +27,10 @@ import { BoardMap } from "./BoardMap";
 import { EndgameBreakdown } from "./EndgameBreakdown";
 import {
   BoardStage,
+  FloatingPlayerRoster,
   GameOverLayer,
   InspectorDock,
   NotificationPipe,
-  PlayerRoster,
   PrivateHandRail,
   SupplyDock,
   TicketChoiceSheet,
@@ -509,12 +509,10 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
     <div className="app-shell app-shell--gameplay-hud" data-config-theme={localVisuals.theme}>
       <header className="topbar topbar--gameplay-actions">
         <div className="topbar-private-spacer" aria-hidden="true" />
-        <PlayerRoster
-          players={rosterPlayers}
-          activePlayerIndex={game.activePlayerIndex}
-          playerPalette={playerColorPalette}
-          className={`player-roster--top ${tutorialTarget === "scoreboard" ? "panel--tutorial-focus" : ""}`}
-        />
+        <div className="turn-indicator">
+          <span className="turn-indicator__name">{game.players[game.activePlayerIndex]?.name}</span>
+          <span className="turn-indicator__label">active</span>
+        </div>
         <div className="topbar-actions">
           <Button onClick={openTutorial}>
             Guide
@@ -588,6 +586,11 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
                 setSelectedRouteId(null);
                 setPaymentPreview(null);
               }}
+            />
+            <FloatingPlayerRoster
+              players={rosterPlayers}
+              activePlayerIndex={game.activePlayerIndex}
+              playerPalette={playerColorPalette}
             />
           </BoardStage>
 

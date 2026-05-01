@@ -1642,6 +1642,88 @@ h3 {
   box-shadow: none;
 }
 
+/* FloatingPlayerRoster: compact panels at map corners */
+.floating-player-roster {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.floating-player-panel {
+  position: absolute;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(183, 155, 97, 0.3);
+  background: linear-gradient(180deg, rgba(31, 25, 18, 0.94), rgba(10, 8, 6, 0.94));
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  backdrop-filter: none;
+  max-width: 220px;
+}
+
+.floating-player-panel--active {
+  border-color: var(--player-color, rgba(212, 79, 76, 0.76));
+  box-shadow:
+    0 0 0 1px var(--player-color, rgba(212, 79, 76, 0.3)),
+    0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.floating-player-panel__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.floating-player-panel__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.floating-player-panel__name {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff8ea;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.floating-player-panel__stats {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  color: rgba(246, 235, 214, 0.7);
+  white-space: nowrap;
+}
+
+.floating-player-panel--top-left {
+  top: 8px;
+  left: 8px;
+}
+
+.floating-player-panel--top-right {
+  top: 8px;
+  right: 44px;
+}
+
+.floating-player-panel--bottom-left {
+  bottom: 8px;
+  left: 8px;
+}
+
+.floating-player-panel--bottom-right {
+  bottom: 8px;
+  right: 44px;
+}
+
 .player-swatch {
   width: 14px;
   height: 14px;
@@ -4242,6 +4324,10 @@ h3 {
   min-height: 0;
 }
 
+.app-shell--gameplay-hud .board-stage__map {
+  position: relative;
+}
+
 .app-shell--gameplay-hud .board-map {
   width: 100%;
   max-width: none;
@@ -6361,6 +6447,41 @@ h3 {
   min-height: 52px;
   padding: 7px;
   align-self: stretch;
+}
+
+.app-shell--gameplay-hud .turn-indicator {
+  grid-column: 2;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  justify-content: center;
+}
+
+.app-shell--gameplay-hud .turn-indicator__name {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff8ea;
+  letter-spacing: 0.02em;
+}
+
+.app-shell--gameplay-hud .turn-indicator__label {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  color: rgba(246, 235, 214, 0.6);
+  text-transform: lowercase;
+  letter-spacing: 0.04em;
+}
+
+.app-shell--gameplay-hud .turn-indicator__timer {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: rgba(246, 235, 214, 0.85);
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(212, 79, 76, 0.15);
+  border: 1px solid rgba(212, 79, 76, 0.3);
 }
 
 .app-shell--gameplay-hud .topbar {

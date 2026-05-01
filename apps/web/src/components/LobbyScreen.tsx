@@ -1,4 +1,4 @@
-import type { RoomSummary, TimerUpdate, SeatSummary } from "@hudson-hustle/game-core";
+import type { RoomSummary, RoomSeatSummary, TimerUpdate } from "@hudson-hustle/game-core";
 import {
   MapThumbnail,
   SetupActions,
@@ -25,7 +25,7 @@ interface LobbyScreenProps {
 
 type SeatStatus = { label: string; tone: "neutral" | "info" | "danger" | "success" | "warning" };
 
-function getSeatStatus(seat: SeatSummary): SeatStatus {
+function getSeatStatus(seat: RoomSeatSummary): SeatStatus {
   if (!seat.playerName) return { label: "Open", tone: "neutral" };
   if (seat.controllerType === "bot") return { label: "Bot", tone: "info" };
   if (!seat.connected) return { label: "Offline", tone: "danger" };

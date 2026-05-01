@@ -36,10 +36,10 @@ import { BoardMap } from "./components/BoardMap";
 import { EndgameBreakdown } from "./components/EndgameBreakdown";
 import {
   BoardStage,
+  FloatingPlayerRoster,
   GameOverLayer,
   InspectorDock,
   NotificationPipe,
-  PlayerRoster,
   PrivateHandRail,
   SupplyDock,
   TicketChoiceSheet,
@@ -442,7 +442,7 @@ export default function App(): JSX.Element {
     const map: Record<string, string> = {};
     snapshot.game.players.forEach((p, idx) => { map[p.id] = pool[idx % pool.length]; });
     return map;
-  }, [snapshot?.game.players.map((p) => p.id).join("|"), snapshot?.room.roomCode]);
+  }, [snapshot?.game?.players.map((p) => p.id).join("|"), snapshot?.room.roomCode]);
 
   const rosterPlayers = useMemo(() => {
     if (!snapshot?.game) return [];
@@ -882,21 +882,12 @@ export default function App(): JSX.Element {
     <div className="app-shell app-shell--gameplay-hud" data-config-theme={visuals.theme}>
       <header className="topbar topbar--gameplay-actions">
         <div className="topbar-private-spacer" aria-hidden="true" />
-        <div data-testid="turn-status-banner">
-          <span className="visually-hidden">{turnStatusLabel}</span>
-          <span className="visually-hidden">{turnStatusCopy}</span>
-          <span className="visually-hidden" data-testid="turn-timer-badge">{turnTimerBadge}</span>
-          <PlayerRoster
-            players={rosterPlayers}
-            activePlayerIndex={snapshot.game.activePlayerIndex}
-            playerPalette={visuals.palettes.players}
-            timer={
-              liveTimerSecondsRemaining === null
-                ? null
-                : { activePlayerIndex: snapshot.game.activePlayerIndex, secondsRemaining: liveTimerSecondsRemaining }
-            }
-            className="player-roster--top"
-          />
+        <div className="turn-indicator">
+          <span className="turn-indicator__name">{projectedGame.players[snapshot.game.activePlayerIndex]?.name}</span>
+          <span className="turn-indicator__label">active</span>
+          {liveTimerSecondsRemaining !== null && (
+            <span className="turn-indicator__timer">{liveTimerSecondsRemaining}s</span>
+          )}
         </div>
         <div className="topbar-actions">
           <Button onClick={() => setGuideOpen(true)}>Guide</Button>
@@ -955,6 +946,11 @@ export default function App(): JSX.Element {
                 setSelectedRouteId(null);
                 setPaymentPreview(null);
               }}
+            />
+            <FloatingPlayerRoster
+              players={rosterPlayers}
+              activePlayerIndex={snapshot.game.activePlayerIndex}
+              playerPalette={visuals.palettes.players}
             />
           </BoardStage>
 
