@@ -212,15 +212,11 @@ export function BoardMap({
       >
         <defs>
           <pattern id="transit-grid" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
-            <circle cx="12" cy="12" r="1.5" fill="rgba(74, 55, 36, 0.14)" />
+            <circle cx="12" cy="12" r="1.5" fill="rgba(74, 55, 36, 0.18)" />
           </pattern>
         </defs>
 
         <rect x="0" y="0" width={boardWidth} height={boardHeight} rx="12" fill="#d9c8a6" />
-
-        {backdropOpacityScale > 0 ? (
-          <rect x="0" y="0" width={boardWidth} height={boardHeight} fill="url(#transit-grid)" rx="12" opacity={1} />
-        ) : null}
 
         {backdropOpacityScale > 0
           ? backdrop.waterAreas.map((area) => (
@@ -307,26 +303,6 @@ export function BoardMap({
                 strokeLinejoin="round"
               />
 
-              {claim ? (
-                Array.from({ length: tieCount }, (_, i) => {
-                  const dist = 6 + i * 10;
-                  if (dist > totalLength - 6) return null;
-                  const pt = getPointAlongPath(pathPoints, dist);
-                  const dir = getPathDirection(pathPoints, dist);
-                  const tieLen = 14;
-                  return (
-                    <line
-                      key={`tie-${route.id}-${i}`}
-                      x1={pt.x + dir.nx * tieLen / 2}
-                      y1={pt.y + dir.ny * tieLen / 2}
-                      x2={pt.x - dir.nx * tieLen / 2}
-                      y2={pt.y - dir.ny * tieLen / 2}
-                      className="route-cross-tie"
-                    />
-                  );
-                })
-              ) : null}
-
               {segments.map((segment, index) => (
                 <g key={`${route.id}-${index}`}>
                   <path
@@ -361,6 +337,26 @@ export function BoardMap({
                   ) : null}
                 </g>
               ))}
+
+              {claim ? (
+                Array.from({ length: tieCount }, (_, i) => {
+                  const dist = 6 + i * 10;
+                  if (dist > totalLength - 6) return null;
+                  const pt = getPointAlongPath(pathPoints, dist);
+                  const dir = getPathDirection(pathPoints, dist);
+                  const tieLen = 14;
+                  return (
+                    <line
+                      key={`tie-${route.id}-${i}`}
+                      x1={pt.x + dir.nx * tieLen / 2}
+                      y1={pt.y + dir.ny * tieLen / 2}
+                      x2={pt.x - dir.nx * tieLen / 2}
+                      y2={pt.y - dir.ny * tieLen / 2}
+                      className="route-cross-tie"
+                    />
+                  );
+                })
+              ) : null}
 
               {route.type === "tunnel" && !claim ? (
                 <g className="route-tunnel-marker" transform={`translate(${middlePoint.x} ${middlePoint.y})`}>
@@ -447,6 +443,10 @@ export function BoardMap({
             </g>
           );
         })}
+
+        {backdropOpacityScale > 0 ? (
+          <rect x="0" y="0" width={boardWidth} height={boardHeight} fill="url(#transit-grid)" rx="12" style={{ pointerEvents: "none" }} />
+        ) : null}
       </svg>
     </div>
   );

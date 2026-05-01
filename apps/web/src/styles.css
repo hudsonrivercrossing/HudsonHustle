@@ -3003,7 +3003,7 @@ h3 {
 
 .route-railbed {
   stroke: rgba(74, 55, 36, 0.12);
-  stroke-width: 18;
+  stroke-width: 26;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -7487,7 +7487,7 @@ h3 {
 }
 
 .app-shell--gameplay-hud .route-cross-tie {
-  stroke: rgba(255, 255, 255, 0.38);
+  stroke: rgba(255, 255, 255, 0.50);
 }
 
 .app-shell--gameplay-hud .route-selection {
@@ -7644,11 +7644,11 @@ h3 {
 }
 
 .app-shell--gameplay-hud .route-railbed {
-  stroke: rgba(74, 55, 36, 0.08);
+  stroke: rgba(74, 55, 36, 0.10);
 }
 
 .app-shell--gameplay-hud .route-cross-tie {
-  stroke: rgba(255, 255, 255, 0.30);
+  stroke: rgba(255, 255, 255, 0.40);
 }
 
 .app-shell--gameplay-hud .inspector-dock {
