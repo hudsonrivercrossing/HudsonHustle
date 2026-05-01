@@ -2905,13 +2905,17 @@ h3 {
 }
 
 .landform {
-  fill: rgba(247, 239, 223, 0.18);
-  stroke: rgba(122, 95, 60, 0.05);
-  stroke-width: 1;
+  fill: rgba(247, 239, 223, 0.35);
+  stroke: rgba(122, 95, 60, 0.12);
+  stroke-width: 1.5;
 }
 
 .board-map--full .landform {
-  fill: rgba(247, 239, 223, 0.32);
+  fill: rgba(247, 239, 223, 0.45);
+}
+
+.board-map--muted .landform {
+  fill: rgba(247, 239, 223, 0.35);
 }
 
 .board-map--minimal .landform {
@@ -2919,16 +2923,26 @@ h3 {
 }
 
 .water-body {
-  stroke: rgba(255, 246, 230, 0.08);
+  fill: rgba(130, 170, 195, 0.18);
+  stroke: rgba(130, 170, 195, 0.28);
   stroke-width: 1;
-  opacity: 0.16;
+  opacity: 1;
 }
 
 .board-map--full .water-body {
+  fill: rgba(130, 170, 195, 0.28);
+  stroke: rgba(130, 170, 195, 0.38);
   stroke-width: 1.4;
 }
 
+.board-map--muted .water-body {
+  fill: rgba(130, 170, 195, 0.18);
+  stroke: rgba(130, 170, 195, 0.28);
+  stroke-width: 1.2;
+}
+
 .board-map--minimal .water-body {
+  fill: rgba(130, 170, 195, 0.12);
   stroke-width: 0.8;
 }
 
@@ -2949,6 +2963,11 @@ h3 {
   font-weight: 800;
 }
 
+.board-label--anchor {
+  font-weight: 800;
+  fill: #2a1e10;
+}
+
 .city-highlight-ring {
   fill: rgba(42, 111, 182, 0.12);
   stroke: rgba(42, 111, 182, 0.58);
@@ -2957,9 +2976,27 @@ h3 {
   pointer-events: none;
 }
 
+.city-junction-ring {
+  fill: none;
+  stroke: rgba(122, 95, 60, 0.25);
+  stroke-width: 1.5;
+  stroke-dasharray: 3 3;
+  pointer-events: none;
+}
+
 .city-node--highlighted .city-hitbox {
   stroke: rgba(42, 111, 182, 0.82);
   stroke-width: 4;
+}
+
+.city-node--anchor .city-hitbox {
+  fill: #f0e8d8;
+  stroke: #5a4330;
+  stroke-width: 3.5;
+}
+
+.city-node--junction .city-junction-ring {
+  stroke: rgba(122, 95, 60, 0.3);
 }
 
 .route-hitbox,
@@ -3038,19 +3075,27 @@ h3 {
 
 .shoreline {
   fill: none;
-  stroke: rgba(72, 54, 34, 0.08);
+  stroke: rgba(72, 54, 34, 0.15);
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  opacity: 0.18;
+  stroke-dasharray: 6 4;
 }
 
 .board-map--full .shoreline {
+  stroke: rgba(72, 54, 34, 0.22);
   stroke-width: 2.4;
+}
+
+.board-map--muted .shoreline {
+  stroke: rgba(72, 54, 34, 0.15);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
 }
 
 .board-map--minimal .shoreline {
   stroke-width: 1.4;
+  stroke-dasharray: none;
 }
 
 .region-label {
@@ -3061,6 +3106,11 @@ h3 {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   pointer-events: none;
+}
+
+.region-label--muted {
+  fill: rgba(88, 64, 38, 0.10);
+  font-size: 20px;
 }
 
 .region-label--minimal {
@@ -3986,11 +4036,17 @@ h3 {
 .app-shell--gameplay-hud .board-map--full .landform,
 .app-shell--gameplay-hud .board-map--muted .landform,
 .app-shell--gameplay-hud .landform {
-  fill: rgba(255, 255, 255, 0.2);
+  fill: rgba(255, 255, 255, 0.22);
 }
 
 .app-shell--gameplay-hud .water-body {
-  fill: rgba(160, 184, 197, 0.16);
+  fill: rgba(130, 170, 195, 0.22);
+  stroke: rgba(130, 170, 195, 0.32);
+}
+
+.app-shell--gameplay-hud .shoreline {
+  stroke: rgba(72, 54, 34, 0.18);
+  stroke-dasharray: 6 4;
 }
 
 .app-shell--gameplay-hud .board-map {
@@ -7378,28 +7434,34 @@ h3 {
 .app-shell--gameplay-hud .board-map--full .landform,
 .app-shell--gameplay-hud .board-map--muted .landform,
 .app-shell--gameplay-hud .landform {
-  fill: rgba(238, 222, 190, 0.28);
-  stroke: rgba(75, 54, 32, 0.1);
+  fill: rgba(238, 222, 190, 0.32);
+  stroke: rgba(75, 54, 32, 0.14);
 }
 
 .app-shell--gameplay-hud .water-body {
-  fill: rgba(97, 127, 125, 0.24);
-  stroke: rgba(232, 220, 194, 0.16);
+  fill: rgba(100, 145, 175, 0.22);
+  stroke: rgba(100, 145, 175, 0.34);
 }
 
 .app-shell--gameplay-hud .shoreline {
-  stroke: rgba(74, 55, 36, 0.18);
-  opacity: 0.42;
+  stroke: rgba(74, 55, 36, 0.22);
+  stroke-dasharray: 6 4;
+  opacity: 1;
 }
 
 .app-shell--gameplay-hud .region-label {
-  fill: rgba(62, 45, 28, 0.16);
+  fill: rgba(62, 45, 28, 0.18);
 }
 
 .app-shell--gameplay-hud .board-label {
   fill: #2b2117;
   stroke: rgba(247, 238, 214, 0.94);
   stroke-width: 4.8px;
+}
+
+.app-shell--gameplay-hud .board-label--anchor {
+  font-weight: 800;
+  fill: #2a1e10;
 }
 
 .app-shell--gameplay-hud .board-label--highlighted {
@@ -7411,6 +7473,12 @@ h3 {
   fill: #f6eddb;
   stroke: #3b2a1d;
   stroke-width: 3.2px;
+}
+
+.app-shell--gameplay-hud .city-node--anchor .city-hitbox {
+  fill: #ede2cc;
+  stroke: #5a4330;
+  stroke-width: 3.5px;
 }
 
 .app-shell--gameplay-hud .city-node > circle:nth-of-type(2) {
@@ -7546,18 +7614,19 @@ h3 {
 .app-shell--gameplay-hud .board-map--full .landform,
 .app-shell--gameplay-hud .board-map--muted .landform,
 .app-shell--gameplay-hud .landform {
-  fill: rgba(238, 222, 190, 0.2);
-  stroke: rgba(75, 54, 32, 0.08);
+  fill: rgba(238, 222, 190, 0.24);
+  stroke: rgba(75, 54, 32, 0.1);
 }
 
 .app-shell--gameplay-hud .water-body {
-  fill: rgba(91, 126, 128, 0.18);
-  stroke: rgba(232, 220, 194, 0.11);
+  fill: rgba(100, 145, 175, 0.2);
+  stroke: rgba(100, 145, 175, 0.32);
 }
 
 .app-shell--gameplay-hud .shoreline {
-  stroke: rgba(74, 55, 36, 0.13);
-  opacity: 0.34;
+  stroke: rgba(74, 55, 36, 0.2);
+  stroke-dasharray: 6 4;
+  opacity: 1;
 }
 
 .app-shell--gameplay-hud .board-label {
