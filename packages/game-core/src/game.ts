@@ -202,7 +202,10 @@ function buildAdjacency(routeClaims: RouteClaim[], config: MapConfig): Map<strin
   };
 
   for (const claim of routeClaims) {
-    const route = getRoute(config, claim.routeId);
+    const route = config.routes.find((item) => item.id === claim.routeId);
+    if (!route) {
+      continue;
+    }
     push(route.from, route.to, route.id, route.length);
     push(route.to, route.from, route.id, route.length);
   }
@@ -242,8 +245,8 @@ function enumerateStationOptions(playerId: string, stations: StationPlacement[],
       if (claim.playerId === playerId) {
         return false;
       }
-      const route = getRoute(config, claim.routeId);
-      return route.from === station.cityId || route.to === station.cityId;
+      const route = config.routes.find((item) => item.id === claim.routeId);
+      return route && (route.from === station.cityId || route.to === station.cityId);
     });
     return [null, ...edges];
   });
@@ -321,7 +324,10 @@ function longestRouteLength(playerId: string, state: GameState, config: MapConfi
   const adjacency = buildAdjacency(claims, config);
   const routeLengths = new Map<string, number>();
   for (const claim of claims) {
-    const route = getRoute(config, claim.routeId);
+    const route = config.routes.find((item) => item.id === claim.routeId);
+    if (!route) {
+      continue;
+    }
     routeLengths.set(route.id, route.length);
   }
 
