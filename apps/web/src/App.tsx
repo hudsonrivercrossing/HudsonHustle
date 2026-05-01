@@ -557,6 +557,9 @@ export default function App(): JSX.Element {
     if (!localIsActive || !projectedGame || !mapConfig || !selectedRouteId) {
       return [];
     }
+    if (!mapConfig.routes.find((route) => route.id === selectedRouteId)) {
+      return [];
+    }
     return getAffordableRouteColors(projectedGame, mapConfig, selectedRouteId);
   }, [localIsActive, mapConfig, projectedGame, selectedRouteId]);
 

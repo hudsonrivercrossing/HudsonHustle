@@ -291,65 +291,6 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
     return () => window.clearTimeout(timeout);
   }, [game, localBotPlayerIds, localMap]);
 
-  const routeOptions = useMemo(() => {
-    if (!game || !selectedRouteId) {
-      return [];
-    }
-    return getAffordableRouteColors(game, localMap, selectedRouteId);
-  }, [game, localMap, selectedRouteId]);
-
-  const stationOptions = useMemo(() => {
-    if (!game || !selectedCityId) {
-      return [];
-    }
-    return getAffordableStationColors(game, localMap);
-  }, [game, localMap, selectedCityId]);
-
-  const ticketProgress = useMemo(() => {
-    if (!game || !currentPlayer) {
-      return [];
-    }
-
-    return getTicketProgress(game, localMap, currentPlayer.id).sort(
-      (left, right) => Number(left.completed) - Number(right.completed)
-    );
-  }, [currentPlayer, game, localMap]);
-
-  const currentRouteUnavailableReason = useMemo(() => {
-    if (!game || !selectedRouteId) {
-      return null;
-    }
-
-    const currentRoute = localMap.routes.find((route) => route.id === selectedRouteId);
-    if (!currentRoute) {
-      return null;
-    }
-
-    const currentRouteClaim = game.routeClaims.find((claim) => claim.routeId === currentRoute.id);
-    const currentRouteOwner = currentRouteClaim ? game.players.find((player) => player.id === currentRouteClaim.playerId) : null;
-
-    if (game.turn.stage !== "idle") {
-      return "Finish the current draw before claiming a route.";
-    }
-
-    if (currentRouteClaim && currentRouteOwner) {
-      return `This route is already claimed by ${currentRouteOwner.name}.`;
-    }
-
-    if (currentRoute.twinGroup && game.players.length <= 3) {
-      const twinIds = localMap.routes
-        .filter((route) => route.twinGroup === currentRoute.twinGroup && route.id !== currentRoute.id)
-        .map((route) => route.id);
-      const twinClaim = game.routeClaims.find((claim) => twinIds.includes(claim.routeId));
-      if (twinClaim) {
-        const twinOwner = game.players.find((player) => player.id === twinClaim.playerId);
-        return `This parallel route is unavailable in a ${game.players.length}-player game because its twin is already claimed${twinOwner ? ` by ${twinOwner.name}` : ""}.`;
-      }
-    }
-
-    return "No affordable claim options right now.";
-  }, [game, localMap, selectedRouteId]);
-
   function startNewGame(setup: LocalStartSetup) {
     const nextMap = getHudsonHustleMapByConfigId(setup.configId);
     const nextGame = startGame(nextMap, { playerNames: setup.playerNames });
@@ -458,6 +399,87 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
     }
   }
 
+  const playerAvatars = useMemo(() => {
+    if (!game) return {};
+    const avatars = shuffleAvatars(game.players.map((p) => p.id).join("|"), game.players.length);
+    const map: Record<string, string> = {};
+    game.players.forEach((p, i) => { map[p.id] = avatars[i]; });
+    return map;
+  }, [game?.players.map((p) => p.id).join("|")]);
+
+  const rosterPlayers = useMemo(() => {
+    if (!game) return [];
+    return game.players.map((p) => ({
+      id: p.id,
+      name: p.name,
+      color: p.color,
+      trainsLeft: p.trainsLeft,
+      stationsLeft: p.stationsLeft,
+      ticketCount: p.tickets.length + p.pendingTickets.length,
+      avatarName: playerAvatars[p.id] ?? null
+    })) as Array<{ id: string; name: string; color: string; trainsLeft: number; stationsLeft: number; ticketCount: number; avatarName?: string | null }>;
+  }, [game, playerAvatars]);
+
+  const routeOptions = useMemo(() => {
+    if (!game || !selectedRouteId) {
+      return [];
+    }
+    if (!localMap.routes.find((route) => route.id === selectedRouteId)) {
+      return [];
+    }
+    return getAffordableRouteColors(game, localMap, selectedRouteId);
+  }, [game, localMap, selectedRouteId]);
+
+  const stationOptions = useMemo(() => {
+    if (!game || !selectedCityId) {
+      return [];
+    }
+    return getAffordableStationColors(game, localMap);
+  }, [game, localMap, selectedCityId]);
+
+  const ticketProgress = useMemo(() => {
+    if (!game || !currentPlayer) {
+      return [];
+    }
+
+    return getTicketProgress(game, localMap, currentPlayer.id).sort(
+      (left, right) => Number(left.completed) - Number(right.completed)
+    );
+  }, [currentPlayer, game, localMap]);
+
+  const currentRouteUnavailableReason = useMemo(() => {
+    if (!game || !selectedRouteId) {
+      return null;
+    }
+
+    const currentRoute = localMap.routes.find((route) => route.id === selectedRouteId);
+    if (!currentRoute) {
+      return null;
+    }
+
+    const currentRouteClaim = game.routeClaims.find((claim) => claim.routeId === currentRoute.id);
+    const currentRouteOwner = currentRouteClaim ? game.players.find((player) => player.id === currentRouteClaim.playerId) : null;
+
+    if (currentRoute.twinGroup && game.players.length <= 3) {
+      const twinIds = localMap.routes.filter((item) => item.twinGroup === currentRoute.twinGroup).map((item) => item.id);
+      const twinClaim = game.routeClaims.find((claim) => twinIds.includes(claim.routeId) && claim.routeId !== currentRoute.id);
+      if (twinClaim) {
+        const twinOwner = game.players.find((player) => player.id === twinClaim.playerId);
+        return `This parallel route is unavailable in a ${game.players.length}-player game because its twin is already claimed${twinOwner ? ` by ${twinOwner.name}` : ""}.`;
+      }
+    }
+
+    if (!currentRouteOwner) {
+      return null;
+    }
+
+    if (currentPlayer && currentRouteOwner.id !== currentPlayer.id) {
+      return `Already claimed by ${currentRouteOwner.name}.`;
+    }
+
+    return "No affordable claim options right now.";
+  }, [game, localMap, selectedRouteId]);
+
   if (guideOpen) {
     return <GuidebookScreen onBack={() => setGuideOpen(false)} />;
   }
@@ -488,27 +510,6 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   const currentStationCost = localMap.settings.stationsPerPlayer - activePlayer.stationsLeft + 1;
   const highlightedTicket = focusedTicket ?? pinnedTicket;
   const highlightedCityIds = highlightedTicket ? [highlightedTicket.from, highlightedTicket.to] : [];
-
-  const playerAvatars = useMemo(() => {
-    if (!game) return {};
-    const avatars = shuffleAvatars(game.players.map((p) => p.id).join("|"), game.players.length);
-    const map: Record<string, string> = {};
-    game.players.forEach((p, i) => { map[p.id] = avatars[i]; });
-    return map;
-  }, [game?.players.map((p) => p.id).join("|")]);
-
-  const rosterPlayers = useMemo(() => {
-    if (!game) return [];
-    return game.players.map((p) => ({
-      id: p.id,
-      name: p.name,
-      color: p.color,
-      trainsLeft: p.trainsLeft,
-      stationsLeft: p.stationsLeft,
-      ticketCount: p.tickets.length + p.pendingTickets.length,
-      avatarName: playerAvatars[p.id] ?? null
-    })) as Array<{ id: string; name: string; color: string; trainsLeft: number; stationsLeft: number; ticketCount: number; avatarName?: string | null }>;
-  }, [game, playerAvatars]);
 
   return (
     <div className="app-shell app-shell--gameplay-hud" data-config-theme={localVisuals.theme}>
