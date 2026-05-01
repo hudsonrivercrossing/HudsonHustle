@@ -1655,26 +1655,25 @@ h3 {
   pointer-events: auto;
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border-radius: 10px;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
   border: 1px solid rgba(183, 155, 97, 0.25);
   background: linear-gradient(180deg, rgba(31, 25, 18, 0.92), rgba(10, 8, 6, 0.92));
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-  max-width: 180px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
 .floating-player-panel--active {
   border-color: var(--player-color, rgba(212, 79, 76, 0.76));
   box-shadow:
     0 0 0 1px var(--player-color, rgba(212, 79, 76, 0.3)),
-    0 4px 16px rgba(0, 0, 0, 0.35);
+    0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
 .floating-player-panel__avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
   object-fit: cover;
   flex-shrink: 0;
 }
@@ -1682,13 +1681,13 @@ h3 {
 .floating-player-panel__info {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
   min-width: 0;
 }
 
 .floating-player-panel__name {
   font-family: var(--font-sans);
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   font-weight: 700;
   color: #fff8ea;
   white-space: nowrap;
@@ -1698,8 +1697,8 @@ h3 {
 
 .floating-player-panel__stats {
   font-family: var(--font-body);
-  font-size: 0.65rem;
-  color: rgba(246, 235, 214, 0.65);
+  font-size: 0.72rem;
+  color: rgba(246, 235, 214, 0.7);
   white-space: nowrap;
   letter-spacing: 0.02em;
 }

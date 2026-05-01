@@ -111,7 +111,7 @@ function FloatingPlayerPanel({ player, cornerIndex, isActive, color }: FloatingP
       <div className="floating-player-panel__info">
         <span className="floating-player-panel__name">{player.name}</span>
         <span className="floating-player-panel__stats">
-          {player.tickets?.length ?? player.ticketCount ?? 0} tkt · {player.trainsLeft} tr · {player.stationsLeft} st
+          {player.tickets?.length ?? player.ticketCount ?? 0} tickets · {player.trainsLeft} trains · {player.stationsLeft} stations
         </span>
       </div>
     </div>
