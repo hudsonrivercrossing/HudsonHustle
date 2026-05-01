@@ -604,10 +604,9 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
             summary={game.turn.summary}
             className={`action-panel ${tutorialTarget === "action" ? "panel--tutorial-focus" : ""}`}
             activeBuildKey={selectedRouteId ?? selectedCityId}
-            turnNumber={game.turn.number}
-            currentPlayerName={game.players[game.turn.currentPlayer]?.name}
+            currentPlayerName={game.players[game.activePlayerIndex]?.name}
             deckCount={game.trainDeck.length}
-            ticketDeckCount={game.ticketDeck.length}
+            ticketDeckCount={game.regularTickets.length + game.longTickets.length}
             marketContent={
               <SupplyDock
                 market={game.market}
