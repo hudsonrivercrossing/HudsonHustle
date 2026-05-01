@@ -473,7 +473,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
       return null;
     }
 
-    if (currentRouteOwner.id !== currentPlayer.id) {
+    if (currentPlayer && currentRouteOwner.id !== currentPlayer.id) {
       return `Already claimed by ${currentRouteOwner.name}.`;
     }
 
