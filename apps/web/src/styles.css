@@ -1658,16 +1658,16 @@ h3 {
   gap: 10px;
   padding: 10px 14px;
   border-radius: 12px;
-  border: 1px solid var(--player-color, rgba(183, 155, 97, 0.25));
-  background: var(--player-color, rgba(73, 55, 40, 0.88));
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(183, 155, 97, 0.25);
+  background: linear-gradient(180deg, rgba(31, 25, 18, 0.92), rgba(10, 8, 6, 0.92));
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
 .floating-player-panel--active {
-  border-color: var(--player-color);
+  border-color: var(--player-color, rgba(212, 79, 76, 0.76));
   box-shadow:
-    0 0 0 2px var(--player-color, rgba(212, 79, 76, 0.5)),
-    0 8px 24px rgba(0, 0, 0, 0.35);
+    0 0 0 1px var(--player-color, rgba(212, 79, 76, 0.3)),
+    0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
 .floating-player-panel__avatar {

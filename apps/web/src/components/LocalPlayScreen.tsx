@@ -511,6 +511,27 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   const highlightedTicket = focusedTicket ?? pinnedTicket;
   const highlightedCityIds = highlightedTicket ? [highlightedTicket.from, highlightedTicket.to] : [];
 
+  const playerAvatars = useMemo(() => {
+    if (!game) return {};
+    const avatars = shuffleAvatars(game.players.map((p) => p.id).join("|"), game.players.length);
+    const map: Record<string, string> = {};
+    game.players.forEach((p, i) => { map[p.id] = avatars[i]; });
+    return map;
+  }, [game?.players.map((p) => p.id).join("|")]);
+
+  const rosterPlayers = useMemo(() => {
+    if (!game) return [];
+    return game.players.map((p) => ({
+      id: p.id,
+      name: p.name,
+      color: p.color,
+      trainsLeft: p.trainsLeft,
+      stationsLeft: p.stationsLeft,
+      ticketCount: p.tickets.length + p.pendingTickets.length,
+      avatarName: playerAvatars[p.id] ?? null
+    })) as Array<{ id: string; name: string; color: string; trainsLeft: number; stationsLeft: number; ticketCount: number; avatarName?: string | null }>;
+  }, [game, playerAvatars]);
+
   return (
     <div className="app-shell app-shell--gameplay-hud" data-config-theme={localVisuals.theme}>
       <header className="topbar topbar--gameplay-actions">
