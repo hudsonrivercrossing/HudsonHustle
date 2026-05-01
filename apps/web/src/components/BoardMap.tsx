@@ -202,12 +202,6 @@ export function BoardMap({
   const regionLabelClassSuffix = boardLabelMode === "minimal-region-labels" ? " region-label--minimal" : "";
   const highlightedCitySet = new Set(highlightedCityIds);
 
-  const cityRouteCount = new Map<string, number>();
-  for (const route of config.routes) {
-    cityRouteCount.set(route.from, (cityRouteCount.get(route.from) ?? 0) + 1);
-    cityRouteCount.set(route.to, (cityRouteCount.get(route.to) ?? 0) + 1);
-  }
-
   return (
     <div className="board-shell">
       <svg
@@ -216,7 +210,20 @@ export function BoardMap({
         role="img"
         aria-label="Hudson Hustle board map"
       >
+        <defs>
+          <pattern id="transit-grid" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
+            <circle cx="16" cy="16" r="1.2" fill="rgba(74, 55, 36, 0.06)" />
+          </pattern>
+          <pattern id="cross-ties" x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(0)">
+            <line x1="4" y1="-2" x2="4" y2="10" stroke="rgba(255, 255, 255, 0.35)" strokeWidth="1.5" />
+          </pattern>
+        </defs>
+
         <rect x="0" y="0" width={boardWidth} height={boardHeight} rx="12" fill="#d9c8a6" />
+
+        {backdropOpacityScale > 0 ? (
+          <rect x="0" y="0" width={boardWidth} height={boardHeight} fill="url(#transit-grid)" rx="12" opacity={0.8} />
+        ) : null}
 
         {backdropOpacityScale > 0
           ? backdrop.waterAreas.map((area) => (
@@ -287,12 +294,42 @@ export function BoardMap({
           const claimStitchWidth = claimedByViewer ? 4.6 : 3;
           const claimStitchDasharray = claimedByViewer ? "3.4 5.6" : "2 8.2";
           const claimStitchDashoffset = claimedByViewer ? 0 : 1.4;
+          const tieCount = claim ? Math.floor(totalLength / 10) : 0;
 
           return (
             <g key={route.id}>
               {selected ? (
                 <path d={pathD} className="route-selection" fill="none" />
               ) : null}
+
+              <path
+                d={pathD}
+                fill="none"
+                className="route-railbed"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+
+              {claim ? (
+                Array.from({ length: tieCount }, (_, i) => {
+                  const dist = 6 + i * 10;
+                  if (dist > totalLength - 6) return null;
+                  const pt = getPointAlongPath(pathPoints, dist);
+                  const dir = getPathDirection(pathPoints, dist);
+                  const tieLen = 10;
+                  return (
+                    <line
+                      key={`tie-${route.id}-${i}`}
+                      x1={pt.x + dir.nx * tieLen / 2}
+                      y1={pt.y + dir.ny * tieLen / 2}
+                      x2={pt.x - dir.nx * tieLen / 2}
+                      y2={pt.y - dir.ny * tieLen / 2}
+                      className="route-cross-tie"
+                    />
+                  );
+                })
+              ) : null}
+
               {segments.map((segment, index) => (
                 <g key={`${route.id}-${index}`}>
                   <path
@@ -313,7 +350,7 @@ export function BoardMap({
                     strokeLinejoin="round"
                     opacity={fillOpacity}
                   />
-                    {claim ? (
+                  {claim ? (
                     <path
                       d={segment.pathD}
                       fill="none"
@@ -327,6 +364,19 @@ export function BoardMap({
                   ) : null}
                 </g>
               ))}
+
+              {route.type === "tunnel" && !claim ? (
+                <g className="route-tunnel-marker" transform={`translate(${middlePoint.x} ${middlePoint.y})`}>
+                  <rect x="-6" y="-3" width="12" height="6" rx="3" fill="none" stroke="rgba(100, 80, 60, 0.25)" strokeWidth="1.5" strokeDasharray="2 2" />
+                </g>
+              ) : null}
+
+              {route.type === "ferry" && !claim ? (
+                <g className="route-ferry-marker" transform={`translate(${middlePoint.x} ${middlePoint.y})`}>
+                  <path d="M -5 0 Q 0 -4, 5 0 Q 0 4, -5 0 Z" fill="none" stroke="rgba(80, 130, 160, 0.35)" strokeWidth="1.5" />
+                </g>
+              ) : null}
+
               {claim ? (
                 <g transform={`translate(${markerX} ${markerY - 18})`} data-testid={`route-claim-${route.id}`}>
                   <circle r="11" className={claimedByViewer ? "claim-badge claim-badge--self" : "claim-badge claim-badge--opponent"} />
@@ -353,57 +403,37 @@ export function BoardMap({
           const station = game.stations.find((item) => item.cityId === city.id);
           const selected = selectedCityId === city.id;
           const highlighted = highlightedCitySet.has(city.id);
-          const junctionCount = cityRouteCount.get(city.id) ?? 0;
-          const isAnchor = junctionCount >= 4;
-          const isJunction = junctionCount >= 3;
           const labelDx = city.labelDx ?? 14;
           const labelDy = city.labelDy ?? -14;
           const labelAnchor = city.labelAnchor ?? "start";
-          const outerR = highlighted ? 22 : isAnchor ? 18 : selected ? 15 : 13;
-          const innerR = selected ? 6 : isAnchor ? 5 : 4;
-          const strokeW = isAnchor ? 3.5 : 3;
-          const stationSize = isAnchor ? 20 : 16;
-          const stationRx = isAnchor ? 5 : 4;
-          const stationX = city.x - stationSize / 2;
-          const stationY = city.y - stationSize / 2;
           return (
-            <g key={city.id} className={`city-node ${isAnchor ? "city-node--anchor" : ""} ${isJunction ? "city-node--junction" : ""} ${highlighted ? "city-node--highlighted" : ""}`}>
+            <g key={city.id} className={highlighted ? "city-node city-node--highlighted" : "city-node"}>
               {highlighted ? (
-                <circle cx={city.x} cy={city.y} r="25" className="city-highlight-ring" />
-              ) : null}
-              {isJunction && !station ? (
-                <circle cx={city.x} cy={city.y} r={outerR + 4} className="city-junction-ring" />
+                <circle
+                  cx={city.x}
+                  cy={city.y}
+                  r="25"
+                  className="city-highlight-ring"
+                />
               ) : null}
               <circle
                 cx={city.x}
                 cy={city.y}
-                r={outerR}
-                fill={isAnchor ? "#f0e8d8" : "#f8f5ef"}
-                stroke={isAnchor ? "#5a4330" : "#453221"}
-                strokeWidth={strokeW}
+                r={highlighted ? 17 : selected ? 15 : 12}
+                fill="#f8f5ef"
+                stroke="#453221"
+                strokeWidth="3"
                 onClick={() => onSelectCity(city.id)}
                 className="city-hitbox"
               />
-              {isAnchor ? (
-                <rect
-                  x={city.x - 4}
-                  y={city.y - 4}
-                  width="8"
-                  height="8"
-                  rx="2"
-                  fill="#5b4633"
-                  opacity="0.65"
-                />
-              ) : (
-                <circle cx={city.x} cy={city.y} r={innerR} fill="#5b4633" opacity="0.85" />
-              )}
+              <circle cx={city.x} cy={city.y} r={selected ? 7 : 5} fill="#5b4633" opacity="0.85" />
               {station ? (
                 <rect
-                  x={stationX}
-                  y={stationY}
-                  width={stationSize}
-                  height={stationSize}
-                  rx={stationRx}
+                  x={city.x - 8}
+                  y={city.y - 8}
+                  width="16"
+                  height="16"
+                  rx="4"
                   fill={playerPalette[game.players.find((player) => player.id === station.playerId)?.color ?? "harbor-blue"]}
                   stroke="#fff8ec"
                   strokeWidth="2"
@@ -413,7 +443,7 @@ export function BoardMap({
                 x={city.x + labelDx}
                 y={city.y + labelDy}
                 textAnchor={labelAnchor}
-                className={`board-label ${isAnchor ? "board-label--anchor" : ""} ${highlighted ? "board-label--highlighted" : ""}`.trim()}
+                className={highlighted ? "board-label board-label--highlighted" : "board-label"}
               >
                 {city.label ?? city.name}
               </text>

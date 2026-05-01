@@ -2963,11 +2963,6 @@ h3 {
   font-weight: 800;
 }
 
-.board-label--anchor {
-  font-weight: 800;
-  fill: #2a1e10;
-}
-
 .city-highlight-ring {
   fill: rgba(42, 111, 182, 0.12);
   stroke: rgba(42, 111, 182, 0.58);
@@ -2976,27 +2971,9 @@ h3 {
   pointer-events: none;
 }
 
-.city-junction-ring {
-  fill: none;
-  stroke: rgba(122, 95, 60, 0.25);
-  stroke-width: 1.5;
-  stroke-dasharray: 3 3;
-  pointer-events: none;
-}
-
 .city-node--highlighted .city-hitbox {
   stroke: rgba(42, 111, 182, 0.82);
   stroke-width: 4;
-}
-
-.city-node--anchor .city-hitbox {
-  fill: #f0e8d8;
-  stroke: #5a4330;
-  stroke-width: 3.5;
-}
-
-.city-node--junction .city-junction-ring {
-  stroke: rgba(122, 95, 60, 0.3);
 }
 
 .route-hitbox,
@@ -3022,6 +2999,27 @@ h3 {
 
 .route-track--opponent {
   opacity: 0.18;
+}
+
+.route-railbed {
+  stroke: rgba(94, 73, 47, 0.1);
+  stroke-width: 16;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.route-cross-tie {
+  stroke: rgba(255, 255, 255, 0.3);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+
+.route-tunnel-marker rect {
+  stroke: rgba(100, 80, 60, 0.25);
+}
+
+.route-ferry-marker path {
+  stroke: rgba(80, 130, 160, 0.35);
 }
 
 .route-selection {
@@ -7459,11 +7457,6 @@ h3 {
   stroke-width: 4.8px;
 }
 
-.app-shell--gameplay-hud .board-label--anchor {
-  font-weight: 800;
-  fill: #2a1e10;
-}
-
 .app-shell--gameplay-hud .board-label--highlighted {
   fill: #174f73;
   stroke: rgba(245, 236, 209, 0.98);
@@ -7475,12 +7468,6 @@ h3 {
   stroke-width: 3.2px;
 }
 
-.app-shell--gameplay-hud .city-node--anchor .city-hitbox {
-  fill: #ede2cc;
-  stroke: #5a4330;
-  stroke-width: 3.5px;
-}
-
 .app-shell--gameplay-hud .city-node > circle:nth-of-type(2) {
   fill: #493626;
   opacity: 0.92;
@@ -7489,6 +7476,14 @@ h3 {
 .app-shell--gameplay-hud .city-highlight-ring {
   fill: rgba(23, 79, 115, 0.14);
   stroke: rgba(23, 79, 115, 0.76);
+}
+
+.app-shell--gameplay-hud .route-railbed {
+  stroke: rgba(94, 73, 47, 0.08);
+}
+
+.app-shell--gameplay-hud .route-cross-tie {
+  stroke: rgba(255, 255, 255, 0.25);
 }
 
 .app-shell--gameplay-hud .route-selection {
@@ -7611,6 +7606,10 @@ h3 {
   fill: rgba(217, 200, 166, 0.54) !important;
 }
 
+.app-shell--gameplay-hud .board-map > rect:nth-of-type(2) {
+  opacity: 0.6;
+}
+
 .app-shell--gameplay-hud .board-map--full .landform,
 .app-shell--gameplay-hud .board-map--muted .landform,
 .app-shell--gameplay-hud .landform {
@@ -7638,6 +7637,14 @@ h3 {
 .app-shell--gameplay-hud .city-hitbox {
   fill: #fbf1dc;
   stroke: #332317;
+}
+
+.app-shell--gameplay-hud .route-railbed {
+  stroke: rgba(94, 73, 47, 0.06);
+}
+
+.app-shell--gameplay-hud .route-cross-tie {
+  stroke: rgba(255, 255, 255, 0.22);
 }
 
 .app-shell--gameplay-hud .inspector-dock {
