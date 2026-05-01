@@ -452,7 +452,7 @@ export default function App(): JSX.Element {
       color: p.color,
       trainsLeft: p.trainsLeft,
       stationsLeft: p.stationsLeft,
-      tickets: p.tickets ?? [],
+      ticketCount: p.ticketCount,
       avatarName: playerAvatars[p.id] ?? null
     }));
   }, [snapshot?.game, playerAvatars]);

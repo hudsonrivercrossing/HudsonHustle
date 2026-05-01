@@ -500,9 +500,14 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   const rosterPlayers = useMemo(() => {
     if (!game) return [];
     return game.players.map((p) => ({
-      ...p,
+      id: p.id,
+      name: p.name,
+      color: p.color,
+      trainsLeft: p.trainsLeft,
+      stationsLeft: p.stationsLeft,
+      ticketCount: p.tickets.length + p.pendingTickets.length,
       avatarName: playerAvatars[p.id] ?? null
-    }));
+    })) as Array<{ id: string; name: string; color: string; trainsLeft: number; stationsLeft: number; ticketCount: number; avatarName?: string | null }>;
   }, [game, playerAvatars]);
 
   return (

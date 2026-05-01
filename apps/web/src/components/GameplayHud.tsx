@@ -33,8 +33,7 @@ type PlayerRosterEntry = {
   color: string;
   trainsLeft: number;
   stationsLeft: number;
-  tickets?: unknown[];
-  ticketCount?: number;
+  ticketCount: number;
   avatarName?: string | null;
 };
 
@@ -73,7 +72,7 @@ export function PlayerRoster({ players, activePlayerIndex, playerPalette, timer 
               key={player.id}
               name={player.name}
               color={playerPalette[player.color]}
-              ticketCount={player.tickets?.length ?? player.ticketCount ?? 0}
+              ticketCount={player.ticketCount ?? 0}
               trainsLeft={player.trainsLeft}
               stationsLeft={player.stationsLeft}
               active={isActive}
@@ -111,7 +110,7 @@ function FloatingPlayerPanel({ player, cornerIndex, isActive, color }: FloatingP
       <div className="floating-player-panel__info">
         <span className="floating-player-panel__name">{player.name}</span>
         <span className="floating-player-panel__stats">
-          {player.tickets?.length ?? player.ticketCount ?? 0} tickets · {player.trainsLeft} trains · {player.stationsLeft} stations
+          {player.ticketCount ?? 0} tickets · {player.trainsLeft} trains · {player.stationsLeft} stations
         </span>
       </div>
     </div>
