@@ -1,0 +1,1 @@
+../../.codex/skills/hudson-hustle-ubiquitous-language/SKILL.md

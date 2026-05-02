@@ -1,0 +1,1 @@
+../../.codex/skills/hudson-hustle-write-a-prd/SKILL.md

@@ -139,7 +139,7 @@ button {
   position: absolute;
   right: 0;
   top: calc(100% + 10px);
-  z-index: 120;
+  z-index: var(--z-toast);
   width: min(320px, 72vw);
   display: grid;
   gap: 10px;
@@ -3240,7 +3240,7 @@ h3 {
 .modal-shell {
   position: fixed;
   inset: 0;
-  z-index: 100;
+  z-index: var(--z-modal);
   display: grid;
   place-items: center;
   padding: 24px;
@@ -6540,7 +6540,7 @@ h3 {
 
 .app-shell--gameplay-hud .topbar {
   position: relative;
-  z-index: 100;
+  z-index: var(--z-modal);
 }
 
 .app-shell--gameplay-hud .topbar-actions {
