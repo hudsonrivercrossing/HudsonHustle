@@ -221,6 +221,12 @@ export function SetupScreen({
                     ))}
                   </select>
                 </FormField>
+                {selectedConfig ? (
+                  <p className="map-picker-meta">
+                    {/* ~0.6 min per route + 20 min base from playtesting */}
+                    {selectedConfig.cityCount} stations · {selectedConfig.routeCount} routes · ~{Math.round(selectedConfig.routeCount * 0.6 + 20)} min
+                  </p>
+                ) : null}
               </div>
             </div>
           </SetupStepPanel>
@@ -251,7 +257,7 @@ export function SetupScreen({
             }
           >
             <div className="setup-timer-preflight">
-              <FormField as="div" label="Timer" className="form-field--timer">
+              <FormField as="div" label="Timer" className="form-field--timer" helper="Enter seconds. 0 = untimed · 30 = 30 s · 60 = 1 min.">
                 <div className="timer-picker">
                   <Button onClick={() => setTurnTimeLimitSeconds((current) => Math.max(0, current - 15))}>-15</Button>
                   <output className="timer-picker__value" aria-live="polite">

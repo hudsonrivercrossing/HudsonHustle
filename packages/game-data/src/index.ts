@@ -9,6 +9,8 @@ export interface HudsonHustleReleasedConfigSummary {
   version: string;
   summary: string;
   mapName: string;
+  cityCount: number;
+  routeCount: number;
 }
 
 function buildHudsonHustleMap(bundle: typeof activeHudsonHustleConfig): MapConfig {
@@ -91,7 +93,9 @@ export const hudsonHustleReleasedConfigs: HudsonHustleReleasedConfigSummary[] = 
     configId: bundle.configId,
     version: bundle.meta.version,
     summary: bundle.meta.summary,
-    mapName: bundle.map.name
+    mapName: bundle.map.name,
+    cityCount: bundle.map.stations.filter((s) => s.active).length,
+    routeCount: bundle.map.routes.length
   }));
 
 export function getHudsonHustleMapByConfigId(configId: string): MapConfig {
@@ -171,6 +175,20 @@ export const hudsonHustleMap: MapConfig = buildHudsonHustleMap(activeHudsonHustl
 export const cardColorPalette: Record<string, string> = activeHudsonHustleConfig.visuals.palettes.cards;
 
 export const playerColorPalette: Record<string, string> = activeHudsonHustleConfig.visuals.palettes.players;
+
+// ghost and blocked are reserved for future use (tutorial highlights, double-route locks)
+export type RouteDisplayState = "unclaimed" | "mine" | "opponent" | "ghost" | "blocked";
+
+export function resolveRouteDisplayState(
+  routeId: string,
+  viewerPlayerId: string | null,
+  routeClaims: ReadonlyArray<{ routeId: string; playerId: string }>
+): RouteDisplayState {
+  const claim = routeClaims.find((c) => c.routeId === routeId);
+  if (!claim) return "unclaimed";
+  if (!viewerPlayerId) return "opponent";
+  return claim.playerId === viewerPlayerId ? "mine" : "opponent";
+}
 
 export { createGeoProjector, projectGeoDiagramCities } from "./cartography.js";
 export { activeHudsonHustleConfig, hudsonHustleConfigRegistry, hudsonHustleCurrentPointer } from "./config-registry.js";

@@ -45,18 +45,16 @@ export function SetupGateway({ onChooseLocal, onChooseOnline, onOpenGuide }: Set
           copy="Create a room, claim a seat."
           status=""
         />
-
-        <DepartureBoardTile
-          className="setup-entry-artifact--rules"
-          onClick={onOpenGuide}
-          testId="gateway-onboarding"
-          ariaLabel="Open the guide"
-          kicker="Rulebook"
-          code="GUIDE_"
-          copy="Learn the table in nine quick cards."
-          status=""
-        />
       </div>
+      <button
+        type="button"
+        className="setup-guide-link"
+        onClick={onOpenGuide}
+        data-testid="gateway-onboarding"
+        aria-label="Open the guide"
+      >
+        First time? Open the rulebook →
+      </button>
     </SetupShell>
   );
 }

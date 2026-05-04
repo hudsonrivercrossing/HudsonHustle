@@ -419,6 +419,11 @@ export default function App(): JSX.Element {
     return snapshot.game.players[snapshot.game.activePlayerIndex]?.id === snapshot.privateState.playerId;
   }, [snapshot]);
 
+  const endgameWinnerScore = useMemo(() => {
+    if (!projectedGame) return 0;
+    return Math.max(...projectedGame.players.map((p) => p.score));
+  }, [projectedGame]);
+
   const playerAvatars = useMemo(() => {
     if (!snapshot?.game) return {};
     const AVATAR_NAMES = [
@@ -917,7 +922,7 @@ export default function App(): JSX.Element {
         </aside>
 
         <main className="board-column">
-          <BoardStage className="board-panel">
+          <BoardStage className="board-panel" isMyTurn={localIsActive && publicGame.phase === "main"}>
             <BoardMap
               config={mapConfig}
               backdrop={visuals.backdrop}
@@ -1091,15 +1096,25 @@ export default function App(): JSX.Element {
           }
         >
           <div className="endgame-grid">
-            {projectedGame.players.map((player) => (
-              <SurfaceCard key={player.id} as="article" variant="summary" title={player.name} className="endgame-card">
-                <div className="endgame-card__hero">
-                  <p className="endgame-score">{player.score}</p>
-                  <span className="endgame-score__label">points</span>
-                </div>
-                <EndgameBreakdown player={player} config={mapConfig} />
-              </SurfaceCard>
-            ))}
+            {projectedGame.players.map((player) => {
+              const isWinner = player.score === endgameWinnerScore;
+              return (
+                <SurfaceCard
+                  key={player.id}
+                  as="article"
+                  variant="summary"
+                  eyebrow={isWinner ? "Winner" : "Final score"}
+                  title={player.name}
+                  className={`endgame-card ${isWinner ? "endgame-card--winner" : ""}`}
+                >
+                  <div className="endgame-card__hero">
+                    <p className="endgame-score">{player.score}</p>
+                    <span className="endgame-score__label">points</span>
+                  </div>
+                  <EndgameBreakdown player={player} config={mapConfig} />
+                </SurfaceCard>
+              );
+            })}
           </div>
         </GameOverLayer>
       ) : null}
