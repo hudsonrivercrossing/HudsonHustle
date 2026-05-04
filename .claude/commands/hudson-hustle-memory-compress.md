@@ -1,0 +1,1 @@
+../../.codex/skills/hudson-hustle-memory-compress/SKILL.md

@@ -1,0 +1,9 @@
+/* Layout module — pending extraction from system.css
+ *
+ * Rules to migrate here during the design system phase:
+ *   .app-shell and variants
+ *   .game-layout and variants
+ *   .board-column, .side-panel
+ *   .setup-flow-grid, .setup-entry-grid, .setup-field-grid, .field-grid
+ *   .setup-actions, .action-rail, .chip-row, .topbar-actions
+ */

@@ -499,6 +499,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   }
 
   const activePlayer = getCurrentPlayer(game);
+  const endgameWinnerScore = Math.max(...game.players.map((p) => p.score));
   const tutorialTarget = null;
   const canTakeTurnAction = visibility === "visible" && game.phase === "main" && game.turn.stage === "idle";
   const marketDisabled = visibility !== "visible" || game.phase !== "main" || game.turn.stage === "awaitingHandoff";
@@ -560,7 +561,10 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
         </aside>
 
         <main className="board-column">
-          <BoardStage className={`board-panel ${tutorialTarget === "board" ? "panel--tutorial-focus" : ""}`}>
+          <BoardStage
+            className={`board-panel ${tutorialTarget === "board" ? "panel--tutorial-focus" : ""}`}
+            isMyTurn={visibility === "visible" && game.phase === "main"}
+          >
             <BoardMap
               config={localMap}
               backdrop={localVisuals.backdrop}
@@ -737,15 +741,25 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
           }
         >
           <div className="endgame-grid">
-            {game.players.map((player) => (
-              <SurfaceCard key={player.id} as="article" variant="summary" eyebrow="Final score" title={player.name} className="endgame-card">
-                <div className="endgame-card__hero">
-                  <p className="endgame-score">{player.score}</p>
-                  <span className="endgame-score__label">points</span>
-                </div>
-                <EndgameBreakdown player={player} config={localMap} />
-              </SurfaceCard>
-            ))}
+            {game.players.map((player) => {
+              const isWinner = player.score === endgameWinnerScore;
+              return (
+                <SurfaceCard
+                  key={player.id}
+                  as="article"
+                  variant="summary"
+                  eyebrow={isWinner ? "Winner" : "Final score"}
+                  title={player.name}
+                  className={`endgame-card ${isWinner ? "endgame-card--winner" : ""}`}
+                >
+                  <div className="endgame-card__hero">
+                    <p className="endgame-score">{player.score}</p>
+                    <span className="endgame-score__label">points</span>
+                  </div>
+                  <EndgameBreakdown player={player} config={localMap} />
+                </SurfaceCard>
+              );
+            })}
           </div>
         </GameOverLayer>
       ) : null}

@@ -56,6 +56,7 @@ export function MultiplayerSetupScreen({
   onCreateRoom,
   onJoinRoom
 }: MultiplayerSetupScreenProps): JSX.Element {
+  const ROOM_CODE_LENGTH = 6;
   const setupHeroImageUrl = "/setup/landing-bg.png";
   const latestConfigId = releasedConfigs.at(-1)?.configId ?? "v0.4-flushing-newark-airport";
   const [hostName, setHostName] = useState("Host");
@@ -435,6 +436,12 @@ export function MultiplayerSetupScreen({
                       ))}
                     </select>
                   </FormField>
+                  {selectedConfig ? (
+                    <p className="map-picker-meta">
+                      {/* ~0.6 min per route + 20 min base from playtesting */}
+                      {selectedConfig.cityCount} stations · {selectedConfig.routeCount} routes · ~{Math.round(selectedConfig.routeCount * 0.6 + 20)} min
+                    </p>
+                  ) : null}
                 </div>
               </div>
             </SetupStepPanel>
@@ -467,7 +474,7 @@ export function MultiplayerSetupScreen({
               }
             >
               <div className="setup-timer-preflight">
-                <FormField as="div" label="Timer" className="form-field--timer">
+                <FormField as="div" label="Timer" className="form-field--timer" helper="Enter seconds. 0 = untimed · 30 = 30 s · 60 = 1 min.">
                   <div className="timer-picker">
                     <Button onClick={() => setTurnTimeLimitSeconds((current) => Math.max(0, current - 15))}>-15</Button>
                     <output className="timer-picker__value" aria-live="polite">
@@ -487,7 +494,7 @@ export function MultiplayerSetupScreen({
           {joinStep === 0 ? (
             <SetupStepPanel eyebrow="Now" title="Room code" meta="Check the table before choosing a seat">
               <div className="setup-field-grid setup-field-grid--launch">
-                <FormField label="Room code">
+                <FormField label="Room code" helper={`${ROOM_CODE_LENGTH}-character code`}>
                   <input
                     value={joinRoomCode}
                     onChange={(event) => {
@@ -495,10 +502,15 @@ export function MultiplayerSetupScreen({
                       setPreferredSeatId(undefined);
                       onClearRoomPreview?.();
                     }}
-                    maxLength={6}
+                    maxLength={ROOM_CODE_LENGTH}
+                    placeholder="------"
                   />
                 </FormField>
-                <Button className="join-preview-button" onClick={() => onPreviewRoom(joinRoomCode)}>
+                <Button
+                  className="join-preview-button"
+                  disabled={joinRoomCode.length < ROOM_CODE_LENGTH}
+                  onClick={() => onPreviewRoom(joinRoomCode)}
+                >
                   Preview
                 </Button>
               </div>

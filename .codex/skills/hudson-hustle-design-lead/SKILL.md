@@ -17,7 +17,7 @@ Use smaller workflow skills for adjacent jobs:
 - `hudson-hustle-ubiquitous-language` when the real problem is naming drift
 - `hudson-hustle-qa-session` when the task is a structured UI/browser findings pass
 
-This skill is for `v2.1`-style shell work, not broad map redesign.
+This skill is for shell-first design work. Keep map redesign out of scope unless the task explicitly expands it. Check `DESIGN.md` for the current phase.
 
 ## Product Stance
 - Keep the game map first.
@@ -26,7 +26,7 @@ This skill is for `v2.1`-style shell work, not broad map redesign.
 - `coding is not expensive`; design judgment is expensive. Use agents to widen critique, not to replace judgment.
 
 ## Default Aesthetic Contracts
-- `Inter = work`
+- `IBM Plex Sans = work`
   - controls
   - labels
   - row metadata

@@ -1,0 +1,1 @@
+../../.codex/skills/how-to-win-hudson-hustle/SKILL.md

@@ -429,12 +429,13 @@ export function SupplyDock({
 
 interface BoardStageProps {
   className?: string;
+  isMyTurn?: boolean;
   children: ReactNode;
 }
 
-export function BoardStage({ className = "", children }: BoardStageProps): JSX.Element {
+export function BoardStage({ className = "", isMyTurn = false, children }: BoardStageProps): JSX.Element {
   return (
-    <Panel variant="neutral" className={["board-stage", className].filter(Boolean).join(" ")}>
+    <Panel variant="neutral" className={["board-stage", isMyTurn ? "board-stage--my-turn" : "", className].filter(Boolean).join(" ")}>
       <div className="board-stage__map">{children}</div>
     </Panel>
   );
