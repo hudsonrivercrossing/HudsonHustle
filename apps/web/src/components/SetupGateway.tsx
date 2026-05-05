@@ -48,6 +48,7 @@ export function SetupGateway({ onChooseLocal, onChooseOnline, onOpenGuide }: Set
         />
       </div>
       <Button
+        variant="link"
         className="setup-guide-link"
         onClick={onOpenGuide}
         data-testid="gateway-onboarding"

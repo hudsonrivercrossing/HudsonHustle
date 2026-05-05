@@ -851,24 +851,8 @@
 }
 
 .setup-guide-link {
-  appearance: none;
-  background: transparent;
-  border: none;
-  cursor: pointer;
   margin-top: 16px;
-  padding: 6px 0;
-  color: rgba(244, 235, 219, 0.56);
-  font-family: var(--font-body);
-  font-size: 0.78rem;
-  letter-spacing: 0.04em;
   text-align: left;
-  transition: color var(--duration-fast) var(--easing-standard);
-}
-
-.setup-guide-link:hover,
-.setup-guide-link:focus-visible {
-  color: rgba(244, 235, 219, 0.9);
-  outline: none;
 }
 
 .setup-entry-artifact {

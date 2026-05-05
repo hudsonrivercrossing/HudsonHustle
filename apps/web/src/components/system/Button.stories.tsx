@@ -47,3 +47,33 @@ export const LongLabel: Story = {
     children: "Create room and keep this table moving"
   }
 };
+
+export const Ghost: Story = {
+  args: {
+    variant: "ghost",
+    children: "‹"
+  }
+};
+
+export const GhostDisabled: Story = {
+  args: {
+    variant: "ghost",
+    children: "›",
+    disabled: true
+  }
+};
+
+export const Link: Story = {
+  args: {
+    variant: "link",
+    children: "First time? Open the rulebook →"
+  }
+};
+
+export const LinkDisabled: Story = {
+  args: {
+    variant: "link",
+    children: "Open the rulebook →",
+    disabled: true
+  }
+};

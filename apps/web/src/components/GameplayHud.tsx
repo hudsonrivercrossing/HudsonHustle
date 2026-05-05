@@ -255,6 +255,7 @@ export function TicketDock({
         <SectionHeader title="Tickets" meta={`${connectedCount}/${sortedTickets.length} connected`} variant="compact" />
         <div className="ticket-dock__pager" aria-label="Ticket pages">
           <Button
+            variant="ghost"
             className="ticket-dock__pager-button"
             disabled={safePageIndex === 0}
             onClick={() => setPageIndex((current) => Math.max(0, current - 1))}
@@ -265,6 +266,7 @@ export function TicketDock({
             {safePageIndex + 1}/{pageCount}
           </span>
           <Button
+            variant="ghost"
             className="ticket-dock__pager-button"
             disabled={safePageIndex >= pageCount - 1}
             onClick={() => setPageIndex((current) => Math.min(pageCount - 1, current + 1))}
