@@ -48,6 +48,21 @@ export const LongLabel: Story = {
   }
 };
 
+export const LoadingPrimary: Story = {
+  args: {
+    variant: "primary",
+    loading: true,
+    children: "Creating room…"
+  }
+};
+
+export const LoadingSecondary: Story = {
+  args: {
+    loading: true,
+    children: "Saving…"
+  }
+};
+
 export const Ghost: Story = {
   args: {
     variant: "ghost",
