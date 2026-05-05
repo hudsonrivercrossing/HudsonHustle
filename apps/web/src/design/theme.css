@@ -215,3 +215,93 @@
     --space-panel-xl: 28px;
   }
 }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    /* Canvas */
+    --color-canvas-base: #1c1710;
+    --color-canvas-deep: #131009;
+    --color-canvas-glow-warm: rgba(255, 220, 140, 0.12);
+    --color-canvas-glow-cool: rgba(80, 130, 160, 0.10);
+
+    /* Ink */
+    --color-ink-strong: #f0e6d0;
+    --color-ink-muted: #b09880;
+
+    /* Surfaces */
+    --color-surface-panel: rgba(36, 29, 20, 0.92);
+    --color-surface-panel-strong: #2c2318;
+    --color-surface-paper: rgba(42, 34, 24, 0.9);
+    --color-surface-paper-strong: rgba(46, 37, 26, 0.98);
+    --color-surface-private: rgba(38, 32, 24, 0.96);
+    --color-surface-alert: rgba(60, 25, 18, 0.96);
+
+    /* Border */
+    --color-border-subtle: rgba(220, 190, 150, 0.13);
+
+    /* Accent */
+    --color-accent-base: #5b9ad0;
+    --color-accent-strong: #4480be;
+    --color-accent-soft: #96bbdc;
+
+    /* Status */
+    --color-danger: #c85f4e;
+    --color-warning: #c07d3a;
+
+    /* Shadows */
+    --shadow: 0 18px 38px rgba(0, 0, 0, 0.36);
+    --shadow-strong: 0 24px 56px rgba(0, 0, 0, 0.52);
+
+    /* Alias updates */
+    --bg: var(--color-canvas-base);
+    --bg-deep: var(--color-canvas-deep);
+    --panel: var(--color-surface-panel);
+    --panel-strong: var(--color-surface-panel-strong);
+    --ink: var(--color-ink-strong);
+    --ink-soft: var(--color-ink-muted);
+    --line: var(--color-border-subtle);
+    --accent: var(--color-accent-base);
+    --accent-strong: var(--color-accent-strong);
+    --accent-soft: var(--color-accent-soft);
+    --danger: var(--color-danger);
+    --warning: var(--color-warning);
+    --surface-paper: var(--color-surface-paper);
+    --surface-paper-strong: var(--color-surface-paper-strong);
+    --surface-private: var(--color-surface-private);
+    --surface-alert: var(--color-surface-alert);
+
+    /* Panel variants */
+    --panel-alert-bg: linear-gradient(180deg, rgba(60, 25, 18, 0.98), rgba(50, 18, 12, 0.92));
+    --panel-alert-border: rgba(200, 95, 78, 0.28);
+
+    /* Status surfaces */
+    --status-neutral-bg: linear-gradient(180deg, rgba(42, 34, 24, 0.94), rgba(36, 28, 18, 0.9));
+    --status-neutral-border: rgba(180, 150, 110, 0.16);
+    --status-neutral-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
+
+    --status-active-bg: linear-gradient(135deg, rgba(60, 110, 180, 0.22), rgba(42, 34, 24, 0.96));
+    --status-active-border: rgba(90, 150, 208, 0.32);
+    --status-active-shadow: 0 18px 38px rgba(0, 0, 0, 0.32);
+
+    --status-warning-bg: linear-gradient(135deg, rgba(180, 120, 40, 0.20), rgba(42, 34, 24, 0.96));
+    --status-warning-border: rgba(192, 125, 58, 0.30);
+    --status-warning-shadow: 0 16px 34px rgba(0, 0, 0, 0.30);
+
+    --status-failure-bg: linear-gradient(135deg, rgba(200, 95, 78, 0.20), rgba(46, 28, 22, 0.98));
+    --status-failure-border: rgba(200, 95, 78, 0.32);
+    --status-failure-shadow: 0 18px 38px rgba(0, 0, 0, 0.34);
+
+    /* Material overrides */
+    --material-paper-grain: repeating-linear-gradient(135deg, rgba(255, 220, 160, 0.02) 0 1px, transparent 1px 8px);
+    --material-ink-border: rgba(80, 60, 40, 0.32);
+    --material-shadow-soft: 0 14px 34px rgba(0, 0, 0, 0.38);
+
+    /* Surface overlays */
+    --surface-overlay: rgba(0, 0, 0, 0.82);
+    --surface-table: rgba(12, 9, 5, 0.82);
+    --surface-rail: rgba(10, 8, 4, 0.90);
+    --surface-ink: rgba(6, 4, 2, 0.94);
+  }
+}
