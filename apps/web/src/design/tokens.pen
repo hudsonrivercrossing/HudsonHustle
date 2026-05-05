@@ -53,7 +53,8 @@
           "content": "canvas-base",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -80,7 +81,8 @@
           "content": "canvas-deep",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -107,7 +109,8 @@
           "content": "panel-strong",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -134,7 +137,8 @@
           "content": "paper",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -175,7 +179,8 @@
           "content": "ink-strong",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -202,7 +207,8 @@
           "content": "ink-muted",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -229,7 +235,8 @@
           "content": "border",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -270,7 +277,8 @@
           "content": "accent",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -297,7 +305,8 @@
           "content": "accent-strong",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -324,7 +333,8 @@
           "content": "accent-soft",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -351,7 +361,8 @@
           "content": "map-water",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -392,7 +403,8 @@
           "content": "danger",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -419,7 +431,8 @@
           "content": "warning",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         }
       ]
     },
@@ -475,7 +488,8 @@
           "content": "enamel",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -502,7 +516,8 @@
           "content": "ticket-field",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -529,7 +544,8 @@
           "content": "departure",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -556,7 +572,8 @@
           "content": "dep-letter",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -583,7 +600,8 @@
           "content": "brass",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -610,7 +628,8 @@
           "content": "blue",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -651,7 +670,8 @@
           "content": "face",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -678,7 +698,8 @@
           "content": "face-strong",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -705,7 +726,8 @@
           "content": "accent",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -732,7 +754,8 @@
           "content": "enamel",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         }
       ]
     },
@@ -788,7 +811,8 @@
           "content": "paper",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -815,7 +839,8 @@
           "content": "paper-shadow",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -842,7 +867,8 @@
           "content": "brass",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -869,7 +895,8 @@
           "content": "border",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         }
       ]
     },
@@ -891,9 +918,9 @@
           "id": "665QX",
           "x": 24,
           "y": 24,
-          "name": "label-TYPE SCALE \u2014 Fraunces (display) / IBM Plex Sans (body)",
+          "name": "label-TYPE SCALE — Fraunces (display) / IBM Plex Sans (body)",
           "fill": "#2a6fb6",
-          "content": "TYPE SCALE \u2014 Fraunces (display) / IBM Plex Sans (body)",
+          "content": "TYPE SCALE — Fraunces (display) / IBM Plex Sans (body)",
           "lineHeight": 1.3,
           "fontFamily": "IBM Plex Sans, sans-serif",
           "fontSize": 11,
@@ -907,10 +934,11 @@
           "y": 60,
           "name": "--type-xs",
           "fill": "#2e2317",
-          "content": "Aa \u2014 0.75rem / 12px  XS \u2014 Caps, badges",
+          "content": "Aa — 0.75rem / 12px  XS — Caps, badges",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -919,10 +947,11 @@
           "y": 82,
           "name": "--type-sm",
           "fill": "#2e2317",
-          "content": "Aa \u2014 0.875rem / 14px  SM \u2014 Labels, metadata",
+          "content": "Aa — 0.875rem / 14px  SM — Labels, metadata",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 12
+          "fontSize": 12,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -931,10 +960,11 @@
           "y": 106,
           "name": "--type-body",
           "fill": "#2e2317",
-          "content": "Aa \u2014 0.9375rem / 15px  Body \u2014 Default UI",
+          "content": "Aa — 0.9375rem / 15px  Body — Default UI",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 14
+          "fontSize": 14,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -943,10 +973,11 @@
           "y": 132,
           "name": "--type-md",
           "fill": "#2e2317",
-          "content": "Aa \u2014 1.0625rem / 17px  MD \u2014 Emphasized, buttons",
+          "content": "Aa — 1.0625rem / 17px  MD — Emphasized, buttons",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 16
+          "fontSize": 16,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -955,10 +986,11 @@
           "y": 160,
           "name": "--type-lg",
           "fill": "#2e2317",
-          "content": "Aa \u2014 1.1875rem / 19px  LG \u2014 Card titles",
+          "content": "Aa — 1.1875rem / 19px  LG — Card titles",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 18
+          "fontSize": 18,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -967,10 +999,11 @@
           "y": 190,
           "name": "--type-xl",
           "fill": "#2e2317",
-          "content": "Aa \u2014 1.375rem / 22px  XL \u2014 Panel titles",
+          "content": "Aa — 1.375rem / 22px  XL — Panel titles",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 21
+          "fontSize": 21,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -979,10 +1012,11 @@
           "y": 223,
           "name": "--type-display",
           "fill": "#2e2317",
-          "content": "Aa \u2014 1.75rem / 28px  Display \u2014 Ceremony",
+          "content": "Aa — 1.75rem / 28px  Display — Ceremony",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 26
+          "fontSize": 26,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -1005,10 +1039,11 @@
           "y": 301,
           "name": "weight-regular",
           "fill": "#2e2317",
-          "content": "Regular \u2014 Body, secondary",
+          "content": "Regular — Body, secondary",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 15
+          "fontSize": 15,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -1017,7 +1052,7 @@
           "y": 325,
           "name": "weight-medium",
           "fill": "#2e2317",
-          "content": "Medium \u2014 Labels, emphasized",
+          "content": "Medium — Labels, emphasized",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
           "fontSize": 15,
@@ -1030,7 +1065,7 @@
           "y": 349,
           "name": "weight-semibold",
           "fill": "#2e2317",
-          "content": "Semibold \u2014 Buttons, titles",
+          "content": "Semibold — Buttons, titles",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
           "fontSize": 15,
@@ -1043,7 +1078,7 @@
           "y": 373,
           "name": "weight-bold",
           "fill": "#2e2317",
-          "content": "Bold \u2014 Important headings",
+          "content": "Bold — Important headings",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
           "fontSize": 15,
@@ -1056,7 +1091,7 @@
           "y": 397,
           "name": "weight-black",
           "fill": "#2e2317",
-          "content": "Black \u2014 Ceremony, numerics",
+          "content": "Black — Ceremony, numerics",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
           "fontSize": 15,
@@ -1112,7 +1147,8 @@
           "content": "xs\n6px",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -1135,7 +1171,8 @@
           "content": "sm\n12px",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -1158,7 +1195,8 @@
           "content": "md\n18px",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -1181,7 +1219,8 @@
           "content": "lg\n24px",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -1204,7 +1243,8 @@
           "content": "xl\n32px",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -1245,7 +1285,8 @@
           "content": "control\n6px",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -1272,7 +1313,8 @@
           "content": "ticket\n8px",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -1299,7 +1341,8 @@
           "content": "sm\n12px",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -1326,7 +1369,8 @@
           "content": "panel\n14px",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -1353,7 +1397,8 @@
           "content": "md\n18px",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -1380,7 +1425,8 @@
           "content": "lg\n24px",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         }
       ]
     },
@@ -1402,9 +1448,9 @@
           "id": "kedbj",
           "x": 24,
           "y": 24,
-          "name": "BUTTON  \u00b7  variant: ",
+          "name": "BUTTON  ·  variant: ",
           "fill": "#976125",
-          "content": "BUTTON  \u00b7  variant: primary | secondary  \u00b7  states: default | hover | active | disabled",
+          "content": "BUTTON  ·  variant: primary | secondary  ·  states: default | hover | active | disabled",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
           "fontSize": 10,
@@ -1460,7 +1506,8 @@
           "content": "variant=\"primary\"",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 9
+          "fontSize": 9,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -1511,7 +1558,8 @@
           "content": "hover",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 9
+          "fontSize": 9,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -1519,7 +1567,7 @@
           "id": "G0qoe",
           "x": 320,
           "y": 49,
-          "name": "Active \u2193-shadow",
+          "name": "Active ↓-shadow",
           "fill": "rgba(5,12,17,0.12)",
           "width": 132,
           "height": 42
@@ -1530,7 +1578,7 @@
           "id": "upngH",
           "x": 320,
           "y": 46,
-          "name": "Active \u2193",
+          "name": "Active ↓",
           "fill": "#23313a",
           "width": 132,
           "height": 42,
@@ -1544,9 +1592,9 @@
           "id": "lOO7m",
           "x": 356,
           "y": 60,
-          "name": "Active \u2193",
+          "name": "Active ↓",
           "fill": "#f8f3eb",
-          "content": "Active \u2193",
+          "content": "Active ↓",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
           "fontSize": 13,
@@ -1557,12 +1605,13 @@
           "id": "KjNaq",
           "x": 320,
           "y": 98,
-          "name": "active \u2193",
+          "name": "active ↓",
           "fill": "#9e8a79",
-          "content": "active \u2193",
+          "content": "active ↓",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 9
+          "fontSize": 9,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -1613,7 +1662,8 @@
           "content": "disabled",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 9
+          "fontSize": 9,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -1664,7 +1714,8 @@
           "content": "variant=\"secondary\"",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 9
+          "fontSize": 9,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -1713,7 +1764,8 @@
           "fill": "#9e8a79",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 9
+          "fontSize": 9,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -1721,7 +1773,7 @@
           "id": "Cq0UT",
           "x": 320,
           "y": 129,
-          "name": "Active \u2193-shadow",
+          "name": "Active ↓-shadow",
           "fill": "rgba(5,12,17,0.12)",
           "width": 132,
           "height": 42
@@ -1732,7 +1784,7 @@
           "id": "uqCmh",
           "x": 320,
           "y": 126,
-          "name": "Active \u2193",
+          "name": "Active ↓",
           "fill": "rgba(46,52,55,0.78)",
           "width": 132,
           "height": 42,
@@ -1746,9 +1798,9 @@
           "id": "6cfXj",
           "x": 356,
           "y": 140,
-          "name": "Active \u2193",
+          "name": "Active ↓",
           "fill": "rgba(255,249,239,0.9)",
-          "content": "Active \u2193",
+          "content": "Active ↓",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
           "fontSize": 13,
@@ -1762,7 +1814,8 @@
           "fill": "#9e8a79",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 9
+          "fontSize": 9,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -1811,7 +1864,8 @@
           "fill": "#9e8a79",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 9
+          "fontSize": 9,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -1823,28 +1877,30 @@
           "content": "Props: variant=\"primary\"|\"secondary\"  children: ReactNode  + all ButtonHTMLAttributes",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
           "id": "iwBhJ",
           "x": 24,
           "y": 226,
-          "name": "\u21b3 TODO P1#7: add gho",
+          "name": "↳ TODO P1#7: add gho",
           "fill": "#b78846",
-          "content": "\u21b3 TODO P1#7: add ghost + link variants",
+          "content": "↳ TODO P1#7: add ghost + link variants",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
           "id": "RqVZ8",
           "x": 24,
           "y": 262,
-          "name": "GHOST  \u00b7  transparen",
+          "name": "GHOST  ·  transparen",
           "fill": "#976125",
-          "content": "GHOST  \u00b7  transparent, border, muted \u2014 for icon/pager buttons",
+          "content": "GHOST  ·  transparent, border, muted — for icon/pager buttons",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
           "fontSize": 10,
@@ -1967,9 +2023,9 @@
           "id": "UZ3nb",
           "x": 24,
           "y": 340,
-          "name": "LINK  \u00b7  text-only, ",
+          "name": "LINK  ·  text-only, ",
           "fill": "#976125",
-          "content": "LINK  \u00b7  text-only, no bg/border \u2014 for secondary text actions",
+          "content": "LINK  ·  text-only, no bg/border — for secondary text actions",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
           "fontSize": 10,
@@ -1980,9 +2036,9 @@
           "id": "kxAKn",
           "x": 24,
           "y": 366,
-          "name": "Open the rulebook \u2192",
+          "name": "Open the rulebook →",
           "fill": "rgba(244,235,219,0.52)",
-          "content": "Open the rulebook \u2192",
+          "content": "Open the rulebook →",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
           "fontSize": 13,
@@ -1998,16 +2054,17 @@
           "content": "Default",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 9
+          "fontSize": 9,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
           "id": "pg9Hi",
           "x": 224,
           "y": 366,
-          "name": "Open the rulebook \u2192",
+          "name": "Open the rulebook →",
           "fill": "rgba(244,235,219,0.88)",
-          "content": "Open the rulebook \u2192",
+          "content": "Open the rulebook →",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
           "fontSize": 13,
@@ -2023,16 +2080,17 @@
           "content": "Hover",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 9
+          "fontSize": 9,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
           "id": "ljF69",
           "x": 424,
           "y": 366,
-          "name": "Open the rulebook \u2192",
+          "name": "Open the rulebook →",
           "fill": "rgba(244,235,219,0.2)",
-          "content": "Open the rulebook \u2192",
+          "content": "Open the rulebook →",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
           "fontSize": 13,
@@ -2048,7 +2106,8 @@
           "content": "Disabled",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 9
+          "fontSize": 9,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -2060,7 +2119,8 @@
           "content": "Props: variant=\"primary\"|\"secondary\"|\"ghost\"|\"link\"  + all ButtonHTMLAttributes",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         }
       ]
     },
@@ -2082,9 +2142,9 @@
           "id": "zuyo1",
           "x": 24,
           "y": 24,
-          "name": "BADGE  \u00b7  tone: neut",
+          "name": "BADGE  ·  tone: neut",
           "fill": "#976125",
-          "content": "BADGE  \u00b7  tone: neutral | info | success | warning | danger",
+          "content": "BADGE  ·  tone: neutral | info | success | warning | danger",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
           "fontSize": 10,
@@ -2129,7 +2189,8 @@
           "content": "tone=\"neutral\"",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 9
+          "fontSize": 9,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -2169,7 +2230,8 @@
           "content": "tone=\"info\"",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 9
+          "fontSize": 9,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -2209,7 +2271,8 @@
           "content": "tone=\"success\"",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 9
+          "fontSize": 9,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -2249,7 +2312,8 @@
           "content": "tone=\"warning\"",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 9
+          "fontSize": 9,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -2289,7 +2353,8 @@
           "content": "tone=\"danger\"",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 9
+          "fontSize": 9,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -2301,7 +2366,8 @@
           "content": "Props: tone=\"neutral\"|\"info\"|\"success\"|\"warning\"|\"danger\"  children: ReactNode  + HTMLAttributes<span>",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         }
       ]
     },
@@ -2323,9 +2389,9 @@
           "id": "kwZgI",
           "x": 24,
           "y": 24,
-          "name": "SECTION HEADER  \u00b7  v",
+          "name": "SECTION HEADER  ·  v",
           "fill": "#976125",
-          "content": "SECTION HEADER  \u00b7  variant: compact | standard | ceremony",
+          "content": "SECTION HEADER  ·  variant: compact | standard | ceremony",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
           "fontSize": 10,
@@ -2369,7 +2435,8 @@
           "content": "2 seated",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -2381,7 +2448,8 @@
           "content": "variant=\"compact\"",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 9
+          "fontSize": 9,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -2420,7 +2488,8 @@
           "content": "Optional",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -2432,7 +2501,8 @@
           "content": "variant=\"standard\"",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 9
+          "fontSize": 9,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -2471,7 +2541,8 @@
           "content": "Private",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -2483,7 +2554,8 @@
           "content": "variant=\"ceremony\"",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 9
+          "fontSize": 9,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -2495,7 +2567,8 @@
           "content": "Props: eyebrow? title  meta?  variant=\"compact\"|\"standard\"|\"ceremony\"  level? className?",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         }
       ]
     },
@@ -2517,9 +2590,9 @@
           "id": "ciumB",
           "x": 24,
           "y": 24,
-          "name": "FORM FIELD  \u00b7  as: l",
+          "name": "FORM FIELD  ·  as: l",
           "fill": "#976125",
-          "content": "FORM FIELD  \u00b7  as: label | div  \u00b7  label + control + helper?",
+          "content": "FORM FIELD  ·  as: label | div  ·  label + control + helper?",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
           "fontSize": 10,
@@ -2559,12 +2632,13 @@
           "id": "plX0z",
           "x": 34,
           "y": 76,
-          "name": "Enter name\u2026",
+          "name": "Enter name…",
           "fill": "#b0a090",
-          "content": "Enter name\u2026",
+          "content": "Enter name…",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 13
+          "fontSize": 13,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -2604,7 +2678,8 @@
           "content": "90s",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 13
+          "fontSize": 13,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -2616,7 +2691,8 @@
           "content": "0 = Untimed",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -2656,7 +2732,8 @@
           "content": "A1B2C3",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 13
+          "fontSize": 13,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -2668,7 +2745,8 @@
           "content": "6 characters",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -2680,7 +2758,8 @@
           "content": "Props: as=\"label\"|\"div\"  label: string  children: ReactNode  helper?: ReactNode  + HTMLAttributes",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         }
       ]
     },
@@ -2702,9 +2781,9 @@
           "id": "3ToFr",
           "x": 24,
           "y": 24,
-          "name": "PANEL  \u00b7  variant: n",
+          "name": "PANEL  ·  variant: n",
           "fill": "#976125",
-          "content": "PANEL  \u00b7  variant: neutral | info | private | danger",
+          "content": "PANEL  ·  variant: neutral | info | private | danger",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
           "fontSize": 10,
@@ -2745,12 +2824,13 @@
           "id": "QB7f7",
           "x": 36,
           "y": 74,
-          "name": "Neutral panel \u2014 defa",
+          "name": "Neutral panel — defa",
           "fill": "#5d4d3e",
-          "content": "Neutral panel \u2014 default surface",
+          "content": "Neutral panel — default surface",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -2762,7 +2842,8 @@
           "content": "variant=\"neutral\"",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 9
+          "fontSize": 9,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -2798,12 +2879,13 @@
           "id": "EClIk",
           "x": 268,
           "y": 74,
-          "name": "Info \u2014 player status",
+          "name": "Info — player status",
           "fill": "#2a5280",
-          "content": "Info \u2014 player status, active state",
+          "content": "Info — player status, active state",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -2815,7 +2897,8 @@
           "content": "variant=\"info\"",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 9
+          "fontSize": 9,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -2851,12 +2934,13 @@
           "id": "GL7qA",
           "x": 500,
           "y": 74,
-          "name": "Private \u2014 hand cards",
+          "name": "Private — hand cards",
           "fill": "#5d4d3e",
-          "content": "Private \u2014 hand cards, personal info",
+          "content": "Private — hand cards, personal info",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -2868,7 +2952,8 @@
           "content": "variant=\"private\"",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 9
+          "fontSize": 9,
+          "fontWeight": "normal"
         },
         {
           "type": "rectangle",
@@ -2904,12 +2989,13 @@
           "id": "wjvEE",
           "x": 732,
           "y": 74,
-          "name": "Danger \u2014 errors, dis",
+          "name": "Danger — errors, dis",
           "fill": "#a13d2f",
-          "content": "Danger \u2014 errors, disconnections",
+          "content": "Danger — errors, disconnections",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -2921,7 +3007,8 @@
           "content": "variant=\"danger\"",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 9
+          "fontSize": 9,
+          "fontWeight": "normal"
         },
         {
           "type": "text",
@@ -2933,19 +3020,225 @@
           "content": "Props: variant=\"neutral\"|\"info\"|\"private\"|\"danger\"  + all HTMLAttributes<div>",
           "lineHeight": 1.4,
           "fontFamily": "IBM Plex Sans, sans-serif",
-          "fontSize": 10
+          "fontSize": 10,
+          "fontWeight": "normal"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "h4zKTn",
+      "x": 0,
+      "y": 3085,
+      "name": "Tablet Layout (768–1024px)",
+      "clip": true,
+      "width": 960,
+      "height": 580,
+      "fill": "#e4d7bf",
+      "cornerRadius": 12,
+      "children": [
+        {
+          "type": "text",
+          "id": "M8Fai",
+          "name": "title",
+          "fill": "#5d4d3e",
+          "content": "Tablet Layout — max-width: 1024px breakpoint",
+          "fontFamily": "Inter",
+          "fontSize": 12,
+          "fontWeight": "600"
+        },
+        {
+          "type": "text",
+          "id": "O9iLBL",
+          "name": "sub",
+          "fill": "#9e8a79",
+          "content": "Side panel: 200px  ·  Board fills  ·  Inspector: full-width row below board at ≤820px",
+          "fontFamily": "Inter",
+          "fontSize": 10,
+          "fontWeight": "normal"
+        },
+        {
+          "type": "frame",
+          "id": "ee217",
+          "name": "app-shell (900px)",
+          "clip": true,
+          "width": 900,
+          "height": 490,
+          "fill": "#d8caad",
+          "cornerRadius": 8,
+          "children": [
+            {
+              "type": "frame",
+              "id": "eSlXl",
+              "name": "topbar",
+              "clip": true,
+              "width": 900,
+              "height": 34,
+              "fill": "#faf4e9e6",
+              "cornerRadius": 4,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "rq5fJ",
+                  "name": "topbarTxt",
+                  "fill": "#5d4d3e",
+                  "content": "topbar — score / actions",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "MtYcA",
+              "name": "side-panel (200px)",
+              "clip": true,
+              "width": 200,
+              "height": 440,
+              "fill": "#faf4e9e6",
+              "cornerRadius": 8,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "HG1z9",
+                  "name": "sideLbl",
+                  "fill": "#5d4d3e",
+                  "content": "side-panel\n─────\nplayer roster\n\nprivate hand\n(ticket dock)",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "GNtIO",
+                  "name": "sideLbl2",
+                  "fill": "#9e8a79",
+                  "content": "200px fixed",
+                  "fontFamily": "Inter",
+                  "fontSize": 9,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "AAuQs",
+              "name": "board-column (690px)",
+              "clip": true,
+              "width": 690,
+              "height": 440,
+              "fill": "#00000000",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "d1ZQl",
+                  "name": "board-stage",
+                  "clip": true,
+                  "width": 690,
+                  "height": 330,
+                  "fill": "#fffaf2e6",
+                  "cornerRadius": 8,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "LwJq1",
+                      "name": "boardLbl",
+                      "fill": "#5d4d3e",
+                      "content": "board-stage\nfills flexible height\n\n690 × ~330px at 900px viewport",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "rectangle",
+                  "id": "O5MhF",
+                  "name": "divider",
+                  "fill": "#4433222e",
+                  "width": 690,
+                  "height": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "Zy1py",
+                  "name": "inspector-dock (full width, stacked below board)",
+                  "clip": true,
+                  "width": 690,
+                  "height": 86,
+                  "fill": "#faf4e9e6",
+                  "cornerRadius": 8,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "LYgsO",
+                      "name": "inspLbl",
+                      "fill": "#5d4d3e",
+                      "content": "inspector-dock — full width, stacked below board, max-height: 120px, overflow-y: auto",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "text",
+                      "id": "E9Z6C",
+                      "name": "inspLbl2",
+                      "fill": "#9e8a79",
+                      "content": "@media (max-width: 820px): grid-template-columns→1fr, board-column layout→vertical",
+                      "fontFamily": "Inter",
+                      "fontSize": 9,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }
       ]
     }
   ],
+  "themes": {
+    "mode": [
+      "light",
+      "dark"
+    ]
+  },
   "variables": {
     "--color-canvas-base": {
       "type": "color",
-      "value": "#e4d7bf"
+      "value": [
+        {
+          "value": "#e4d7bf",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#1c1710",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
     },
     "--color-canvas-deep": {
       "type": "color",
-      "value": "#c5b18f"
+      "value": [
+        {
+          "value": "#c5b18f",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#131009",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
     },
     "--color-canvas-glow-warm": {
       "type": "string",
@@ -2957,59 +3250,241 @@
     },
     "--color-surface-panel": {
       "type": "string",
-      "value": "rgba(250, 244, 233, 0.9)"
+      "value": [
+        {
+          "value": "rgba(250, 244, 233, 0.9)",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "rgba(36, 29, 20, 0.92)",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
     },
     "--color-surface-panel-strong": {
       "type": "color",
-      "value": "#fff8eb"
+      "value": [
+        {
+          "value": "#fff8eb",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#2c2318",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
     },
     "--color-surface-paper": {
       "type": "string",
-      "value": "rgba(255, 250, 242, 0.9)"
+      "value": [
+        {
+          "value": "rgba(255, 250, 242, 0.9)",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "rgba(42, 34, 24, 0.9)",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
     },
     "--color-surface-paper-strong": {
       "type": "string",
-      "value": "rgba(255, 248, 235, 0.98)"
+      "value": [
+        {
+          "value": "rgba(255, 248, 235, 0.98)",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "rgba(46, 37, 26, 0.98)",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
     },
     "--color-surface-private": {
       "type": "string",
-      "value": "rgba(250, 246, 238, 0.96)"
+      "value": [
+        {
+          "value": "rgba(250, 246, 238, 0.96)",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "rgba(38, 32, 24, 0.96)",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
     },
     "--color-surface-alert": {
       "type": "string",
-      "value": "rgba(255, 241, 236, 0.96)"
+      "value": [
+        {
+          "value": "rgba(255, 241, 236, 0.96)",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "rgba(60, 25, 18, 0.96)",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
     },
     "--color-ink-strong": {
       "type": "color",
-      "value": "#2e2317"
+      "value": [
+        {
+          "value": "#2e2317",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#f0e6d0",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
     },
     "--color-ink-muted": {
       "type": "color",
-      "value": "#5d4d3e"
+      "value": [
+        {
+          "value": "#5d4d3e",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#b09880",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
     },
     "--color-border-subtle": {
       "type": "string",
-      "value": "rgba(68, 51, 34, 0.18)"
+      "value": [
+        {
+          "value": "rgba(68, 51, 34, 0.18)",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "rgba(220, 190, 150, 0.13)",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
     },
     "--color-accent-base": {
       "type": "color",
-      "value": "#2a6fb6"
+      "value": [
+        {
+          "value": "#2a6fb6",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#5b9ad0",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
     },
     "--color-accent-strong": {
       "type": "color",
-      "value": "#1f5285"
+      "value": [
+        {
+          "value": "#1f5285",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#4480be",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
     },
     "--color-accent-soft": {
       "type": "color",
-      "value": "#7ea7cf"
+      "value": [
+        {
+          "value": "#7ea7cf",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#96bbdc",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
     },
     "--color-danger": {
       "type": "color",
-      "value": "#a13d2f"
+      "value": [
+        {
+          "value": "#a13d2f",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#c85f4e",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
     },
     "--color-warning": {
       "type": "color",
-      "value": "#976125"
+      "value": [
+        {
+          "value": "#976125",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#c07d3a",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
     },
     "--map-water": {
       "type": "color",
@@ -3193,11 +3668,37 @@
     },
     "--shadow": {
       "type": "string",
-      "value": "0 18px 38px rgba(67, 46, 24, 0.15)"
+      "value": [
+        {
+          "value": "0 18px 38px rgba(67, 46, 24, 0.15)",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "0 18px 38px rgba(0, 0, 0, 0.36)",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
     },
     "--shadow-strong": {
       "type": "string",
-      "value": "0 24px 56px rgba(62, 41, 20, 0.22)"
+      "value": [
+        {
+          "value": "0 24px 56px rgba(62, 41, 20, 0.22)",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "0 24px 56px rgba(0, 0, 0, 0.52)",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
     },
     "--z-overlay": {
       "type": "string",
@@ -3249,19 +3750,11 @@
     },
     "--border-thin": {
       "type": "string",
-      "value": [
-        {
-          "value": "1px"
-        }
-      ]
+      "value": "1px"
     },
     "--border-medium": {
       "type": "string",
-      "value": [
-        {
-          "value": "2px"
-        }
-      ]
+      "value": "2px"
     }
   }
 }

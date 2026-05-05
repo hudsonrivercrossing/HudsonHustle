@@ -1992,6 +1992,33 @@ border-color: rgba(232, 220, 194, 0.72);
   border: 0 !important;
 }
 
+/* ── Tablet: 768–1024px ────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .app-shell--gameplay-hud .game-layout {
+    grid-template-columns: minmax(200px, 220px) minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .app-shell--gameplay-hud .board-column {
+    grid-template-columns: minmax(0, 1fr) minmax(200px, 220px);
+    gap: 10px;
+  }
+}
+
+/* ── Narrow tablet: ≤820px — inspector stacks below board ─────── */
+@media (max-width: 820px) {
+  .app-shell--gameplay-hud .board-column {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .app-shell--gameplay-hud .inspector-dock {
+    max-height: 180px;
+    overflow-y: auto;
+    min-height: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -2002,7 +2029,6 @@ border-color: rgba(232, 220, 194, 0.72);
     scroll-behavior: auto !important;
   }
 }
-
 
 /* ── Gameplay HUD context overrides ───────────────────────────────────────
    Scoped to .app-shell--gameplay-hud. Moved from system.css — system.css
@@ -2727,11 +2753,6 @@ border-color: rgba(232, 220, 194, 0.72);
 }
 
 .app-shell--gameplay-hud .detail-card__fact,
-.app-shell--gameplay-hud .action-rail__timer {
-  border-color: rgba(222, 199, 158, 0.16);
-  background: rgba(255, 247, 231, 0.08);
-  color: rgba(246, 235, 214, 0.76);
-}
 
 .app-shell--gameplay-hud .detail-card__prompt,
 .app-shell--gameplay-hud .action-empty-prompt__title {

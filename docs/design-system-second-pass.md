@@ -88,7 +88,7 @@ These block the design system from being trustworthy. Do before opening Pencil f
 | # | [ ] | What | Tool | Notes |
 |---|-----|------|------|-------|
 | 16 | [x] | **Design dark/dim mode token layer in Pencil** — Dark theme as a Pencil variable set override. Lower canvas brightness, reduce light emission. Not a brand change — a comfort layer. | `[Pencil → Code]` | Pencil supports multiple themes/variable sets. Design the dark overrides in Pencil, sync to a `@media (prefers-color-scheme: dark)` block in theme.css via MCP. Do not start until P0+P1 light mode tokens are locked. |
-| 17 | [ ] | **Tablet viewport layout (768–1024px)** — Game layout breaks between 720px and 1024px. Design the intermediate board + inspector layout in Pencil at 900px width. | `[Pencil → Code]` | Design first in Pencil (I can generate a 900px frame via `batch_design`). Then add a breakpoint in game.css matching the design. |
+| 17 | [x] | **Tablet viewport layout (768–1024px)** — Game layout breaks between 720px and 1024px. Design the intermediate board + inspector layout in Pencil at 900px width. | `[Pencil → Code]` | Design first in Pencil (I can generate a 900px frame via `batch_design`). Then add a breakpoint in game.css matching the design. |
 | 18 | [x] | **Audit and remove dead CSS** — `.artifact-card`, `.detail-card`, `.ticket-card`, `.market-card` in system.css have no React components. Verify and remove. | `[Code]` | Grep each class in TSX. If unused, delete CSS block. Reduces system.css from ~4,600 lines. |
 | 19 | [x] | **FormField: validation + error states** — No story for error helper, disabled input, checkbox/radio child. | `[Pencil → Storybook]` | Design error state in Pencil. May need `error` prop added to FormField.tsx. Then add Storybook stories. |
 
