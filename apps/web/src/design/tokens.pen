@@ -3036,10 +3036,13 @@
       "height": 580,
       "fill": "#e4d7bf",
       "cornerRadius": 12,
+      "layout": "none",
       "children": [
         {
           "type": "text",
           "id": "M8Fai",
+          "x": 24,
+          "y": 20,
           "name": "title",
           "fill": "#5d4d3e",
           "content": "Tablet Layout — max-width: 1024px breakpoint",
@@ -3050,6 +3053,8 @@
         {
           "type": "text",
           "id": "O9iLBL",
+          "x": 24,
+          "y": 38,
           "name": "sub",
           "fill": "#9e8a79",
           "content": "Side panel: 200px  ·  Board fills  ·  Inspector: full-width row below board at ≤820px",
@@ -3060,16 +3065,21 @@
         {
           "type": "frame",
           "id": "ee217",
+          "x": 24,
+          "y": 64,
           "name": "app-shell (900px)",
           "clip": true,
           "width": 900,
           "height": 490,
           "fill": "#d8caad",
           "cornerRadius": 8,
+          "layout": "none",
           "children": [
             {
               "type": "frame",
               "id": "eSlXl",
+              "x": 0,
+              "y": 0,
               "name": "topbar",
               "clip": true,
               "width": 900,
@@ -3092,6 +3102,8 @@
             {
               "type": "frame",
               "id": "MtYcA",
+              "x": 0,
+              "y": 42,
               "name": "side-panel (200px)",
               "clip": true,
               "width": 200,
@@ -3124,15 +3136,20 @@
             {
               "type": "frame",
               "id": "AAuQs",
+              "x": 210,
+              "y": 42,
               "name": "board-column (690px)",
               "clip": true,
               "width": 690,
               "height": 440,
               "fill": "#00000000",
+              "layout": "none",
               "children": [
                 {
                   "type": "frame",
                   "id": "d1ZQl",
+                  "x": 0,
+                  "y": 0,
                   "name": "board-stage",
                   "clip": true,
                   "width": 690,
@@ -3155,6 +3172,8 @@
                 {
                   "type": "rectangle",
                   "id": "O5MhF",
+                  "x": 0,
+                  "y": 338,
                   "name": "divider",
                   "fill": "#4433222e",
                   "width": 690,
@@ -3163,6 +3182,8 @@
                 {
                   "type": "frame",
                   "id": "Zy1py",
+                  "x": 0,
+                  "y": 347,
                   "name": "inspector-dock (full width, stacked below board)",
                   "clip": true,
                   "width": 690,
