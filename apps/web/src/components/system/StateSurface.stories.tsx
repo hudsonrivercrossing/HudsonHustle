@@ -31,6 +31,35 @@ export const Neutral: Story = {
   }
 };
 
+export const NeutralNoCopy: Story = {
+  args: {
+    eyebrow: "Session",
+    headline: "Waiting for players.",
+    copy: undefined,
+    rightSlot: undefined
+  }
+};
+
+export const Active: Story = {
+  args: {
+    tone: "active",
+    eyebrow: "Your turn",
+    headline: "Make your move.",
+    copy: "Claim a route or draw cards. Your opponents are watching.",
+    rightSlot: "42s"
+  }
+};
+
+export const Warning: Story = {
+  args: {
+    tone: "warning",
+    eyebrow: "Low time",
+    headline: "You have 10 seconds.",
+    copy: "Claim quickly or your turn will pass automatically.",
+    rightSlot: "10s"
+  }
+};
+
 export const Recovery: Story = {
   args: {
     tone: "danger",
@@ -52,5 +81,14 @@ export const EmptyDetail: Story = {
     eyebrow: "Empty detail",
     headline: "Select a route or city.",
     copy: "Use this when the action rail should explain what to do next instead of showing a blank panel."
+  }
+};
+
+export const EmptyDetailNoCopy: Story = {
+  args: {
+    tone: "waiting",
+    eyebrow: "Empty detail",
+    headline: "Select a route or city.",
+    copy: undefined
   }
 };

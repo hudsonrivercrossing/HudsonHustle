@@ -39,17 +39,55 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-export const Ceremony: Story = {
-  args: {
-    variant: "tutorial",
-    width: "lg",
-    align: "left"
-  },
+export const MdLeft: Story = {
+  args: { width: "md", align: "left" },
+  render: ({ variant, width, align }) => (
+    <ModalShell variant={variant} width={width} align={align}>
+      <SectionHeader eyebrow="Modal shell" title="Choose starting tickets" meta="Keep at least 2" variant="ceremony" />
+      <p className="modal-copy">Left-aligned text works better for longer instructional copy that needs a natural reading axis.</p>
+      <div className="setup-actions">
+        <Button>Back</Button>
+        <Button variant="primary">Continue</Button>
+      </div>
+    </ModalShell>
+  )
+};
+
+export const LgCenter: Story = {
+  args: { width: "lg", align: "center" },
+  render: ({ variant, width, align }) => (
+    <ModalShell variant={variant} width={width} align={align}>
+      <SectionHeader eyebrow="Modal shell" title="Choose starting tickets" meta="Keep at least 2" variant="ceremony" />
+      <p className="modal-copy">Wide centered layout — for choice moments with multiple options displayed side by side.</p>
+      <div className="setup-actions" style={{ justifyContent: "center" }}>
+        <Button>Back</Button>
+        <Button variant="primary">Continue</Button>
+      </div>
+    </ModalShell>
+  )
+};
+
+export const LgLeft: Story = {
+  args: { width: "lg", align: "left" },
+  render: ({ variant, width, align }) => (
+    <ModalShell variant={variant} width={width} align={align}>
+      <SectionHeader eyebrow="Modal shell" title="Choose starting tickets" meta="Keep at least 2" variant="ceremony" />
+      <p className="modal-copy">Wide left-aligned — maximum reading surface for complex instructional overlays.</p>
+      <div className="setup-actions">
+        <Button>Back</Button>
+        <Button variant="primary">Continue</Button>
+      </div>
+    </ModalShell>
+  )
+};
+
+export const Tutorial: Story = {
+  args: { variant: "tutorial", width: "lg", align: "left" },
   render: ({ variant, width, align }) => (
     <ModalShell variant={variant} width={width} align={align}>
       <SectionHeader eyebrow="Table moment" title="Choose starting tickets" meta="Private choice" variant="ceremony" />
       <p className="modal-copy">
-        Ceremony overlays use the same modal family but with stronger emphasis and a wider reading surface.
+        Tutorial overlays use the same modal family but with stronger emphasis and a wider reading surface.
       </p>
       <div className="setup-actions">
         <Button>Back</Button>
