@@ -78,7 +78,7 @@ These block the design system from being trustworthy. Do before opening Pencil f
 | 11 | [ ] | **Complete StateSurface Storybook coverage** — 3 of 5 tones shown. Add `active` and `warning`. Add with/without `rightSlot` and `copy`. | `[Storybook]` | After vocabulary is unified in P0, tone names may change — update stories to match. |
 | 12 | [ ] | **Add Button Storybook: loading + icon states** | `[Storybook]` | Requires Button.tsx to support `loading` prop first. Design the loading state in Pencil before implementing. |
 | 13 | [ ] | **Extract `SeatPlan` as a system component** — `<div className="seat-plan">` duplicated in SetupScreen and MultiplayerSetupScreen. Extract to shared component. | `[Pencil → Code]` | Design the seat plan component frame in Pencil first (it has meaningful visual structure). Then implement and unify both setup screens. |
-| 14 | [ ] | **Remove deprecated components** — `UtilityPill` and `Chip` marked `@deprecated`. Remove TSX, stories, CSS, exports. Replace usages: `Chip` → `Badge`, `UtilityPill` case-by-case. | `[Code]` | Grep for usages first. Pure cleanup — no design tool needed. |
+| 14 | [x] | **Remove deprecated components** — `UtilityPill` and `Chip` marked `@deprecated`. Remove TSX, stories, CSS, exports. Replace usages: `Chip` → `Badge`, `UtilityPill` case-by-case. | `[Code]` | Grep for usages first. Pure cleanup — no design tool needed. |
 | 15 | [ ] | **Add border-width tokens** — `--border-thin: 1px`, `--border-medium: 2px` missing. `border: 1px solid` hardcoded everywhere. | `[Pencil → Code]` | Add to Pencil variables, sync to theme.css, replace hardcoded values. |
 
 ---
