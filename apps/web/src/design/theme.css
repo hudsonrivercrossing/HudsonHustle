@@ -42,6 +42,10 @@
   --radius-sm: 12px;
   --radius-control: 6px;
 
+  /* --- Border Width --- */
+  --border-thin: 1px;
+  --border-medium: 2px;
+
   /* --- Control Sizing --- */
   --control-height-compact: 36px;  /* compact HUD controls, icon slots */
   --control-height-row: 38px;      /* compact button/row variant */

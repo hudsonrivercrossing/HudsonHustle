@@ -1533,7 +1533,7 @@
 }
 
 .app-shell--gameplay-hud .board-stage.board-stage--my-turn {
-  box-shadow: inset 0 0 0 2px var(--hud-brass);
+  box-shadow: inset 0 0 0 var(--border-medium) var(--hud-brass);
 }
 
 .app-shell--gameplay-hud .board-stage::before,
