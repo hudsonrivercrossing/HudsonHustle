@@ -8,7 +8,7 @@ const meta = {
     eyebrow: "Shell family",
     title: "Section title",
     meta: "Optional metadata",
-    density: "standard"
+    variant: "standard"
   },
   parameters: {
     docs: {
@@ -35,7 +35,7 @@ export const Compact: Story = {
     eyebrow: "Table setup",
     title: "Players",
     meta: "2 seated",
-    density: "compact"
+    variant: "compact"
   }
 };
 
@@ -44,7 +44,7 @@ export const Ceremony: Story = {
     eyebrow: "Table status",
     title: "Round table",
     meta: "Mina active",
-    density: "ceremony"
+    variant: "ceremony"
   }
 };
 

@@ -196,7 +196,7 @@ export function PrivateHandRail({ hand, cardPalette, paymentPreview = null, clas
 
   return (
     <Panel variant="private-info" className={["private-hand-rail", className].filter(Boolean).join(" ")}>
-      <SectionHeader title="Hand" meta="Color counts" density="compact" />
+      <SectionHeader title="Hand" meta="Color counts" variant="compact" />
       <div className="private-hand-rail__slots">
         {faces.map((face) => {
           const count = counts[face];
@@ -252,7 +252,7 @@ export function TicketDock({
   return (
     <Panel variant="private-info" className={["ticket-dock", className].filter(Boolean).join(" ")}>
       <div className="ticket-dock__header">
-        <SectionHeader title="Tickets" meta={`${connectedCount}/${sortedTickets.length} connected`} density="compact" />
+        <SectionHeader title="Tickets" meta={`${connectedCount}/${sortedTickets.length} connected`} variant="compact" />
         <div className="ticket-dock__pager" aria-label="Ticket pages">
           <Button
             className="ticket-dock__pager-button"
@@ -331,7 +331,7 @@ export function TicketChoiceSheet({
             eyebrow=" "
             title={title}
             meta={`Keep ${minimumKeep}+ · ${selectedCount}/${tickets.length}`}
-            // density="compact"
+            // variant="compact"
           />
 
           <div className="ticket-picker__tray">
@@ -401,7 +401,7 @@ export function SupplyDock({
 }: SupplyDockProps): JSX.Element {
   return (
     <div className={["supply-dock", className].filter(Boolean).join(" ")}>
-      <SectionHeader title="Market" meta={`${deckCount} deck`} density="compact" />
+      <SectionHeader title="Market" meta={`${deckCount} deck`} variant="compact" />
       <div className="market-grid supply-dock__market">
         {market.map((card, index) => (
           <CardSlot
@@ -514,7 +514,7 @@ export function InspectorDock({
               setChatDraft("");
             }}
           >
-            <SectionHeader title="Chat" density="compact" />
+            <SectionHeader title="Chat" variant="compact" />
             <div className="chat-panel__messages" aria-label="Chat messages">
               {chatMessages.length > 0 ? (
                 chatMessages.map((message) => (

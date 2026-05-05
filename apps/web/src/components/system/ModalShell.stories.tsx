@@ -7,7 +7,7 @@ const meta = {
   title: "System/ModalShell",
   component: ModalShell,
   args: {
-    tone: "default",
+    variant: "default",
     width: "md",
     align: "center",
     children: null
@@ -20,9 +20,9 @@ const meta = {
       }
     }
   },
-  render: ({ tone, width, align }) => (
-    <ModalShell tone={tone} width={width} align={align}>
-      <SectionHeader eyebrow="Modal shell" title="Choose starting tickets" meta="Keep at least 2" density="ceremony" />
+  render: ({ variant, width, align }) => (
+    <ModalShell variant={variant} width={width} align={align}>
+      <SectionHeader eyebrow="Modal shell" title="Choose starting tickets" meta="Keep at least 2" variant="ceremony" />
       <p className="modal-copy">
         This is the default modal treatment used for overlays that need to feel like a distinct moment rather than another panel.
       </p>
@@ -41,13 +41,13 @@ export const Default: Story = {};
 
 export const Ceremony: Story = {
   args: {
-    tone: "tutorial",
+    variant: "tutorial",
     width: "lg",
     align: "left"
   },
-  render: ({ tone, width, align }) => (
-    <ModalShell tone={tone} width={width} align={align}>
-      <SectionHeader eyebrow="Table moment" title="Choose starting tickets" meta="Private choice" density="ceremony" />
+  render: ({ variant, width, align }) => (
+    <ModalShell variant={variant} width={width} align={align}>
+      <SectionHeader eyebrow="Table moment" title="Choose starting tickets" meta="Private choice" variant="ceremony" />
       <p className="modal-copy">
         Ceremony overlays use the same modal family but with stronger emphasis and a wider reading surface.
       </p>

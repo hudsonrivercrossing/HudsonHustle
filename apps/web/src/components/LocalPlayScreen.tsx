@@ -551,7 +551,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
             </div>
           ) : (
             <Panel variant="alert" className="hidden-panel">
-              <SectionHeader eyebrow="Privacy shield" title="Private info hidden" density="standard" />
+              <SectionHeader eyebrow="Privacy shield" title="Private info hidden" variant="standard" />
               <p>The next player should only see the public board until they click `I'm ready`.</p>
             </Panel>
           )}
@@ -763,8 +763,8 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
       ) : null}
 
       {visibility === "postTurn" && game.phase !== "gameOver" ? (
-        <ModalShell tone={tutorialTarget === "handoff" ? "tutorial" : "default"} width="md" align="center">
-            <SectionHeader eyebrow="Turn complete" title={`${activePlayer.name}, pass the laptop.`} density="ceremony" />
+        <ModalShell variant={tutorialTarget === "handoff" ? "tutorial" : "default"} width="md" align="center">
+            <SectionHeader eyebrow="Turn complete" title={`${activePlayer.name}, pass the laptop.`} variant="ceremony" />
             <p>{game.turn.summary ?? "Your action is locked in."}</p>
             <Button variant="primary" onClick={() => applyAction({ type: "advance_turn" })}>
               I&apos;m done
@@ -773,8 +773,8 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
       ) : null}
 
       {visibility === "handoff" && game.phase !== "gameOver" ? (
-        <ModalShell tone={tutorialTarget === "handoff" ? "tutorial" : "default"} width="md" align="center">
-            <SectionHeader eyebrow="Next player" title={`${activePlayer.name}, take over.`} density="ceremony" />
+        <ModalShell variant={tutorialTarget === "handoff" ? "tutorial" : "default"} width="md" align="center">
+            <SectionHeader eyebrow="Next player" title={`${activePlayer.name}, take over.`} variant="ceremony" />
             <p>The board is safe to look at. Private cards and tickets stay hidden until you are ready.</p>
             <Button variant="primary" onClick={() => setVisibility("visible")}>
               I&apos;m ready
@@ -813,7 +813,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
 
       {revealedDeckCard ? (
         <ModalShell width="md" align="center" cardClassName="draw-reveal-card">
-            <SectionHeader eyebrow="Deck draw" title={`You drew ${formatFaceLabel(revealedDeckCard)}`} density="ceremony" />
+            <SectionHeader eyebrow="Deck draw" title={`You drew ${formatFaceLabel(revealedDeckCard)}`} variant="ceremony" />
             <TransitCard className="draw-reveal-preview" color={revealedDeckCard} context="hand" />
             <Button variant="primary" onClick={() => setRevealedDeckCard(null)}>
               Continue
@@ -823,7 +823,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
 
       {showLeaveConfirm ? (
         <ModalShell width="md" align="center" cardClassName="leave-confirm-card">
-          <SectionHeader eyebrow="Leave game" title="Leave this game?" density="ceremony" />
+          <SectionHeader eyebrow="Leave game" title="Leave this game?" variant="ceremony" />
           <p>Your local match will return to setup.</p>
           <div className="setup-actions">
             <Button onClick={() => setShowLeaveConfirm(false)}>

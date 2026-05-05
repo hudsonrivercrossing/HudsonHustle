@@ -2,7 +2,7 @@ interface SectionHeaderProps {
   eyebrow?: string;
   title: string;
   meta?: string;
-  density?: "compact" | "standard" | "ceremony";
+  variant?: "compact" | "standard" | "ceremony";
   level?: 2 | 3;
   className?: string;
 }
@@ -11,13 +11,13 @@ export function SectionHeader({
   eyebrow,
   title,
   meta,
-  density = "standard",
+  variant = "standard",
   level,
   className
 }: SectionHeaderProps): JSX.Element {
-  const headingLevel = level ?? (density === "compact" ? 3 : 2);
+  const headingLevel = level ?? (variant === "compact" ? 3 : 2);
   const TitleTag = headingLevel === 3 ? "h3" : "h2";
-  const classes = ["section-header", `section-header--${density}`, className].filter(Boolean).join(" ");
+  const classes = ["section-header", `section-header--${variant}`, className].filter(Boolean).join(" ");
   return (
     <div className={classes}>
       {eyebrow ? <span className="section-header__eyebrow">{eyebrow}</span> : null}

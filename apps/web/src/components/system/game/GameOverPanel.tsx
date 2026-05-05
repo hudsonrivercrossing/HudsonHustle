@@ -12,7 +12,7 @@ export function GameOverPanel({ title, subtitle, actions, children }: GameOverPa
   return (
     <section className="game-over-layer" aria-label="Final scoreboard">
       <div className="game-over-layer__header">
-        <SectionHeader eyebrow="Game over" title={title} density="ceremony" />
+        <SectionHeader eyebrow="Game over" title={title} variant="ceremony" />
         <p>{subtitle}</p>
         <div className="game-over-layer__actions">{actions}</div>
       </div>

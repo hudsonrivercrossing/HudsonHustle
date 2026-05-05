@@ -30,7 +30,7 @@ export function TicketPicker({
     <ModalShell width="lg" align="center" cardClassName="ticket-picker-modal">
       <div className="ticket-picker">
         <div className="ticket-picker__header">
-          <SectionHeader eyebrow="Private choice" title={title} density="ceremony" />
+          <SectionHeader eyebrow="Private choice" title={title} variant="ceremony" />
           <div className="ticket-picker__rule state-surface state-surface--waiting">
             <span className="ticket-picker__rule-label">Selection rule</span>
             <strong className="ticket-picker__rule-value">Keep at least {minimumKeep}</strong>
