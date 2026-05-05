@@ -1,25 +1,59 @@
 # Hudson Hustle — Design System Second Pass
 **Branch:** `feat/design-system-audit` | **Date:** 2026-05-05
 
-**Goal:** Harden the design system so changes are controllable, components are predictable, and claude.ai/design can be used as the primary design source of truth.
+**Goal:** Harden the design system so changes are controllable, components are predictable, and Pencil is the primary design source of truth — with MCP integration keeping design and code in sync automatically.
 
-**Tool key:**
-- `[claude.ai/design]` — Do this in claude.ai/design first, bring output back to code
-- `[Storybook]` — Document/validate in Storybook
+---
+
+## Tool stack & roles
+
+| Tool | Role | Why |
+|------|------|-----|
+| **Pencil** | Design source of truth — tokens, component specs, screen designs | MCP integration means I (Claude Code) can read/write designs directly. Variables sync to `theme.css` via `get_variables` / `set_variables`. No manual copy-paste between design and code. |
+| **Storybook** | Interactive component validation — states, props, edge cases | Renders actual React components. Catches regressions. Documents component API for developers. Pencil shows what it *should* look like; Storybook proves the code *actually* does it. |
+| **Code** | Implementation layer | Implements what Pencil specifies. Tokens come from `theme.css` which stays in sync with Pencil variables. |
+
+**Tool key used in todos below:**
+- `[Pencil]` — Do in Pencil first (I can drive this via MCP when Pencil is open in VS Code)
+- `[Pencil → Code]` — Design in Pencil, MCP syncs variables to `theme.css`, implement components
+- `[Storybook]` — Interactive states / regression guard / developer API docs
 - `[Code]` — Pure code change, no design tool needed
-- `[claude.ai/design → Code]` — Design in claude.ai/design, implement in code
+
+---
+
+## Workflow
+
+```
+Pencil (design + token variables)
+  ↕  MCP: get_variables / set_variables  (I drive this — no manual handoff)
+theme.css (CSS custom properties)
+  ↓
+React components (implementation)
+  ↓
+Storybook (validate: does running code match Pencil design?)
+```
+
+**Rule: never implement without a Pencil spec. Never spec without tokens locked.**
+Sequence: token decisions in Pencil → sync to theme.css → implement → Storybook story validates.
+
+**Storybook's narrowed scope with Pencil in the stack:**
+- ✅ Keep: interactive states (hover, focus, disabled, loading) — Pencil is static
+- ✅ Keep: visual regression guard in CI (screenshot testing)
+- ✅ Keep: developer prop/API reference
+- ❌ Drop: design documentation — Pencil owns this now
+- ❌ Drop: token reference page — Pencil variables ARE the reference
 
 ---
 
 ## P0 — Blocking: Fix before anything else
 
-These block the design system from being trustworthy. Do them before adding new components or going to claude.ai/design.
+These block the design system from being trustworthy. Do before opening Pencil for component work.
 
 | # | [ ] | What | Tool | Notes |
 |---|-----|------|------|-------|
-| 1 | [ ] | **Standardize `variant` vs `tone` vocabulary** — Pick one prop name per purpose across all components. Rule: `variant` = visual structure (layout/shape), `tone` = semantic color (status/meaning). Update Button, Panel, SurfaceCard, StateSurface, StatusBanner, Badge, SectionHeader to follow the rule consistently. | `[Code]` | This is a pure rename. Most impactful single change — every future component will follow this contract. StatusBanner uses `tone` correctly; SectionHeader's `density` should become `variant`. |
-| 2 | [ ] | **Unify status color vocabulary** — `StatusBanner` uses `failure`, `Badge` uses `danger`, `Panel` uses `alert`. Pick one word per semantic state and apply everywhere. Proposed: `neutral · info · success · warning · danger`. | `[claude.ai/design]` | Design the unified status palette visually first. One swatch per tone, show in context. Then rename in code to match. |
-| 3 | [ ] | **Move gameplay overrides out of `system.css`** — 80+ `.app-shell--gameplay-hud` rules live in system.css. Move them to game.css. system.css should contain zero game-context selectors. | `[Code]` | Grep for `.app-shell--gameplay-hud` in system.css and relocate. system.css becomes a clean, trustworthy layer. |
+| 1 | [ ] | **Standardize `variant` vs `tone` vocabulary** — Rule: `variant` = visual structure (layout/shape), `tone` = semantic color (status/meaning). Update Button, Panel, SurfaceCard, StateSurface, StatusBanner, Badge, SectionHeader consistently. SectionHeader's `density` → `variant`. | `[Code]` | Pure rename. Most impactful single change — every future Pencil component design and code component follows this contract. Do this before Pencil component specs are created. |
+| 2 | [ ] | **Unify status color vocabulary** — `StatusBanner` uses `failure`, `Badge` uses `danger`, `Panel` uses `alert`. Pick one set. Proposed: `neutral · info · success · warning · danger`. | `[Pencil → Code]` | Design the unified status palette as Pencil variables (5 swatches in context). Sync to theme.css. Then rename in code. Pencil becomes the reference for status color decisions. |
+| 3 | [ ] | **Move gameplay overrides out of `system.css`** — 80+ `.app-shell--gameplay-hud` rules in system.css. Move all to game.css. system.css should contain zero game-context selectors. | `[Code]` | Grep for `.app-shell--gameplay-hud` in system.css, relocate to game.css. Makes system.css a clean layer Pencil components map to without game noise. |
 
 ---
 
@@ -27,12 +61,11 @@ These block the design system from being trustworthy. Do them before adding new 
 
 | # | [ ] | What | Tool | Notes |
 |---|-----|------|------|-------|
-| 4 | [ ] | **Add motion tokens to theme.css** — Add `--duration-fast: 120ms`, `--duration-base: 160ms`, `--duration-slow: 240ms`, `--easing-standard: ease`, `--easing-expressive: cubic-bezier(0.34, 1.56, 0.64, 1)`. Replace all hardcoded `140ms`, `160ms`, `ease` in system.css, game.css, setup.css. | `[claude.ai/design → Code]` | Design the motion scale in claude.ai/design (fast/base/slow feel). Implement tokens in theme.css. Then do a global find-replace of magic transition values. |
-| 5 | [ ] | **Complete ModalShell Storybook coverage** — Currently 2 stories. Need all width × align combinations: md+center, md+left, lg+center, lg+left. Add tone=tutorial variant. | `[Storybook]` | No code changes needed — just stories. claude.ai/design can generate the story variations layout spec if helpful. |
-| 6 | [ ] | **Complete SurfaceCard Storybook coverage** — Currently 2 stories (detail, summary). Add: title-only, eyebrow+title+meta, with/without children, winner variant (endgame-card--winner). | `[Storybook]` | The `endgame-card--winner` modifier from the last PR has no story. Add it here. |
-| 7 | [ ] | **Complete StateSurface Storybook coverage** — 3 of 5 tones shown. Add `active` and `warning` stories. Add with/without `rightSlot` and `copy` combinations. | `[Storybook]` | |
-| 8 | [ ] | **Add Button variants: ghost + link** — The UI needs a text-style button (e.g. SetupGateway guide link, in-game secondary actions). Currently these are either raw `<button>` elements or styled with className hacks. | `[claude.ai/design → Code]` | Design ghost and link variants in claude.ai/design against the existing primary/secondary. Then implement in Button.tsx and add stories. |
-| 9 | [ ] | **Tokenize hardcoded sizing in game.css** — `min-height: 38px`, `min-width: 112px`, `padding: 8px 14px 12px` are magic numbers. Add `--input-height-compact`, `--button-min-width-sm` tokens. | `[Code]` | Audit game.css for non-standard padding values (8px, 9px, 13px, 14px). Map to nearest spacing token or create explicit compact-context tokens. |
+| 4 | [ ] | **Build token palette in Pencil** — Full visual token map: color palette, type scale (Fraunces + IBM Plex Sans), spacing scale, radius, shadow levels. Set as Pencil variables. Sync to theme.css via MCP. | `[Pencil → Code]` | This is the foundation everything else builds on. I can drive `set_variables` to push existing theme.css values into Pencil, then you refine from there. Output: Pencil file IS the token reference. |
+| 5 | [ ] | **Add motion tokens** — Add `--duration-fast: 120ms`, `--duration-base: 160ms`, `--duration-slow: 240ms`, `--easing-standard: ease`, `--easing-expressive: cubic-bezier(0.34, 1.56, 0.64, 1)` to theme.css. Replace all hardcoded `140ms`, `160ms`, `ease` in system.css, game.css, setup.css. | `[Pencil → Code]` | Define motion scale as Pencil variables alongside color/spacing. Then implement in theme.css and do a global find-replace of magic transition values. Needed before dark mode or animation work. |
+| 6 | [ ] | **Design core component specs in Pencil** — Button (all variants+states), Panel (all variants), SurfaceCard, FormField, Badge, SectionHeader. Each component as a Pencil frame using token variables. | `[Pencil]` | Do after token palette (#4) is locked. Component designs reference Pencil variables, not raw values. These frames become the spec Storybook stories are measured against. I can generate these via `batch_design`. |
+| 7 | [ ] | **Add Button variants: ghost + link** — The UI needs a text-style button (SetupGateway guide link, in-game secondary actions). Currently raw `<button>` elements or className hacks. | `[Pencil → Code]` | Design ghost and link in Pencil alongside primary/secondary. Implement in Button.tsx. Add Storybook stories. |
+| 8 | [ ] | **Tokenize hardcoded sizing in game.css** — `min-height: 38px`, `min-width: 112px`, `padding: 8px 14px 12px` are magic numbers. Add `--input-height-compact`, `--button-min-width-sm` as Pencil variables → theme.css. | `[Pencil → Code]` | Add sizing tokens to Pencil variable set. Sync to theme.css. Replace hardcoded values in game.css. |
 
 ---
 
@@ -40,37 +73,24 @@ These block the design system from being trustworthy. Do them before adding new 
 
 | # | [ ] | What | Tool | Notes |
 |---|-----|------|------|-------|
-| 10 | [ ] | **Build token palette in claude.ai/design** — Create the full visual token map: color palette, type scale (Fraunces + IBM Plex Sans sizes), spacing scale, radius, shadow levels, motion scale. This becomes the source of truth reference doc. | `[claude.ai/design]` | Start here for the "structural design system" the user wants. Output: a shareable design file that maps 1:1 to theme.css tokens. Use for all future design decisions. |
-| 11 | [ ] | **Design core component specs in claude.ai/design** — Button (all variants+states), Panel (all variants), SurfaceCard, FormField, Badge, SectionHeader. | `[claude.ai/design]` | Do this after token palette is locked (#10). Component designs reference tokens, not raw values. Output becomes the spec Storybook stories are measured against. |
-| 12 | [ ] | **Extract `SeatPlan` as a system component** — `<div className="seat-plan">` pattern duplicated in SetupScreen and MultiplayerSetupScreen. Extract to a shared component accepting seats array + bot toggle callback. | `[Code]` | Medium refactor. Unifies the seat configuration UI across local and multiplayer setup. |
-| 13 | [ ] | **Add Button Storybook: loading + icon states** — No story for a loading/spinner state or a button with an icon. Add both. | `[Storybook]` | Requires Button.tsx to support an `icon` slot or `loading` prop first if not already there. |
-| 14 | [ ] | **Remove deprecated components** — `UtilityPill` and `Chip` are marked `@deprecated`. Remove their story files, TSX files, CSS rules, and exports. Replace any remaining usages. | `[Code]` | Grep for usages first. `Chip` is an alias for `Badge` — replace all with `Badge`. `UtilityPill` usages need case-by-case review. |
-| 15 | [ ] | **Add border-width tokens** — No `--border-thin`, `--border-medium` tokens. `border: 1px solid` and `border: 0` hardcoded throughout. | `[Code]` | Small addition to theme.css. Then replace hardcoded border widths in system.css. |
+| 9 | [ ] | **Complete ModalShell Storybook coverage** — 2 of 8 width × align × tone combinations shown. Add md+center, md+left, lg+center, lg+left, tutorial tone. | `[Storybook]` | No code changes — just stories. Pencil frame for each combination provides the visual spec to validate against. |
+| 10 | [ ] | **Complete SurfaceCard Storybook coverage** — 2 of 4 variants shown. Add title-only, eyebrow+title+meta, winner variant (`endgame-card--winner`). | `[Storybook]` | `endgame-card--winner` from last PR has no story. Pencil should have a design frame for the winner state before adding the story. |
+| 11 | [ ] | **Complete StateSurface Storybook coverage** — 3 of 5 tones shown. Add `active` and `warning`. Add with/without `rightSlot` and `copy`. | `[Storybook]` | After vocabulary is unified in P0, tone names may change — update stories to match. |
+| 12 | [ ] | **Add Button Storybook: loading + icon states** | `[Storybook]` | Requires Button.tsx to support `loading` prop first. Design the loading state in Pencil before implementing. |
+| 13 | [ ] | **Extract `SeatPlan` as a system component** — `<div className="seat-plan">` duplicated in SetupScreen and MultiplayerSetupScreen. Extract to shared component. | `[Pencil → Code]` | Design the seat plan component frame in Pencil first (it has meaningful visual structure). Then implement and unify both setup screens. |
+| 14 | [ ] | **Remove deprecated components** — `UtilityPill` and `Chip` marked `@deprecated`. Remove TSX, stories, CSS, exports. Replace usages: `Chip` → `Badge`, `UtilityPill` case-by-case. | `[Code]` | Grep for usages first. Pure cleanup — no design tool needed. |
+| 15 | [ ] | **Add border-width tokens** — `--border-thin: 1px`, `--border-medium: 2px` missing. `border: 1px solid` hardcoded everywhere. | `[Pencil → Code]` | Add to Pencil variables, sync to theme.css, replace hardcoded values. |
 
 ---
 
-## P3 — Polish: When the system is stable
+## P3 — Polish: When system is stable
 
 | # | [ ] | What | Tool | Notes |
 |---|-----|------|------|-------|
-| 16 | [ ] | **Add a token reference page to Storybook** — A page that visually shows all color tokens (swatches), type scale, spacing scale, radius values, and shadow levels. Not a component — a design system documentation page. | `[Storybook]` | Use Storybook MDX format. This is the internal "design system doc" that replaces needing Figma for token reference. |
-| 17 | [ ] | **Design dark/dim mode token layer in claude.ai/design** — Define a `@media (prefers-color-scheme: dark)` overrides block for theme.css. Lower canvas brightness, reduce light emission. Not a brand change — a comfort layer. | `[claude.ai/design → Code]` | Do not implement until the light mode token layer is fully locked (P0+P1 complete). Design first, then add overrides to theme.css as a new block. |
-| 18 | [ ] | **Tablet viewport design (768–1024px)** — The game layout breaks between 720px and 1024px. Design the intermediate layout in claude.ai/design first, then add a breakpoint. | `[claude.ai/design → Code]` | claude.ai/design is the right tool — design what the board + inspector layout looks like at 900px before writing a single media query. |
-| 19 | [ ] | **Audit and remove dead CSS rules** — `.artifact-card`, `.detail-card`, `.ticket-card`, `.market-card` class selectors exist in system.css with no corresponding React components. Verify and remove. | `[Code]` | Grep for each class in TSX files. If unused, delete the CSS block. Reduces system.css from ~4,600 lines. |
-| 20 | [ ] | **FormField Storybook: validation + error states** — No story for an input with an error helper, disabled input, or checkbox/radio child. Add these. | `[Storybook]` | May require FormField.tsx to support an `error` prop variant. |
-
----
-
-## Tool usage philosophy
-
-```
-claude.ai/design  →  design decisions (what it looks like, what the spec is)
-Storybook         →  component documentation and validation (does the code match the spec?)
-Code              →  implementation (make the code match the design)
-```
-
-**Never implement without a spec. Never spec without tokens.**
-The sequence is always: token decisions → component design → code → Storybook story.
+| 16 | [ ] | **Design dark/dim mode token layer in Pencil** — Dark theme as a Pencil variable set override. Lower canvas brightness, reduce light emission. Not a brand change — a comfort layer. | `[Pencil → Code]` | Pencil supports multiple themes/variable sets. Design the dark overrides in Pencil, sync to a `@media (prefers-color-scheme: dark)` block in theme.css via MCP. Do not start until P0+P1 light mode tokens are locked. |
+| 17 | [ ] | **Tablet viewport layout (768–1024px)** — Game layout breaks between 720px and 1024px. Design the intermediate board + inspector layout in Pencil at 900px width. | `[Pencil → Code]` | Design first in Pencil (I can generate a 900px frame via `batch_design`). Then add a breakpoint in game.css matching the design. |
+| 18 | [ ] | **Audit and remove dead CSS** — `.artifact-card`, `.detail-card`, `.ticket-card`, `.market-card` in system.css have no React components. Verify and remove. | `[Code]` | Grep each class in TSX. If unused, delete CSS block. Reduces system.css from ~4,600 lines. |
+| 19 | [ ] | **FormField: validation + error states** — No story for error helper, disabled input, checkbox/radio child. | `[Pencil → Storybook]` | Design error state in Pencil. May need `error` prop added to FormField.tsx. Then add Storybook stories. |
 
 ---
 
