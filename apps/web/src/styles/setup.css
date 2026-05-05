@@ -1404,7 +1404,6 @@
   }
 
   .panel,
-  .overlay-card,
   .modal-card,
   .modal-shell__card {
     padding: var(--space-panel-md);
@@ -1471,8 +1470,5 @@
 
   .modal-shell,
   .overlay,
-  .modal-backdrop {
-    padding: 16px;
-  }
 }
 
