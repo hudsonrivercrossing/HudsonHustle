@@ -862,7 +862,7 @@
   font-size: 0.78rem;
   letter-spacing: 0.04em;
   text-align: left;
-  transition: color 0.15s ease;
+  transition: color var(--duration-fast) var(--easing-standard);
 }
 
 .setup-guide-link:hover,

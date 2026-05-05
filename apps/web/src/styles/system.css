@@ -38,10 +38,10 @@ button {
   box-shadow: var(--shadow-strong);
   backdrop-filter: blur(10px);
   transition:
-    transform 160ms ease,
-    box-shadow 160ms ease,
-    border-color 160ms ease,
-    background-color 160ms ease;
+    transform var(--duration-base) var(--easing-standard),
+    box-shadow var(--duration-base) var(--easing-standard),
+    border-color var(--duration-base) var(--easing-standard),
+    background-color var(--duration-base) var(--easing-standard);
 }
 
 .panel::before,
@@ -114,7 +114,7 @@ button {
   opacity: 0;
   pointer-events: none;
   transform: translateY(-4px);
-  transition: opacity 140ms ease, transform 140ms ease;
+  transition: opacity var(--duration-fast) var(--easing-standard), transform var(--duration-fast) var(--easing-standard);
 }
 
 .score-guide:hover .score-guide__panel,
@@ -206,10 +206,10 @@ button {
 .utility-pill--interactive {
   cursor: default;
   transition:
-    transform 160ms ease,
-    box-shadow 160ms ease,
-    border-color 160ms ease,
-    background-color 160ms ease;
+    transform var(--duration-base) var(--easing-standard),
+    box-shadow var(--duration-base) var(--easing-standard),
+    border-color var(--duration-base) var(--easing-standard),
+    background-color var(--duration-base) var(--easing-standard);
 }
 
 .utility-pill--interactive:hover,
@@ -341,7 +341,7 @@ button {
   opacity: 0;
   pointer-events: none;
   transform: translateY(-4px);
-  transition: opacity 140ms ease, transform 140ms ease;
+  transition: opacity var(--duration-fast) var(--easing-standard), transform var(--duration-fast) var(--easing-standard);
 }
 
 .config-hover-card:hover .config-summary-tooltip,
@@ -471,10 +471,10 @@ h3 {
     inset 0 -1px 0 rgba(168, 145, 116, 0.08),
     0 5px 12px rgba(62, 41, 20, 0.04);
   transition:
-    border-color 140ms ease,
-    box-shadow 140ms ease,
-    background-color 140ms ease,
-    transform 140ms ease;
+    border-color var(--duration-fast) var(--easing-standard),
+    box-shadow var(--duration-fast) var(--easing-standard),
+    background-color var(--duration-fast) var(--easing-standard),
+    transform var(--duration-fast) var(--easing-standard);
 }
 
 .form-field input:hover,
@@ -513,11 +513,11 @@ h3 {
   border: 0;
   border-radius: var(--radius-sm);
   transition:
-    transform 140ms ease,
-    box-shadow 140ms ease,
-    opacity 140ms ease,
-    border-color 140ms ease,
-    background-color 140ms ease;
+    transform var(--duration-fast) var(--easing-standard),
+    box-shadow var(--duration-fast) var(--easing-standard),
+    opacity var(--duration-fast) var(--easing-standard),
+    border-color var(--duration-fast) var(--easing-standard),
+    background-color var(--duration-fast) var(--easing-standard);
   font: inherit;
 }
 
@@ -1080,10 +1080,10 @@ h3 {
   padding: 18px 20px;
   border-radius: calc(var(--radius-md) + 2px);
   transition:
-    transform 160ms ease,
-    box-shadow 160ms ease,
-    border-color 160ms ease,
-    background-color 160ms ease;
+    transform var(--duration-base) var(--easing-standard),
+    box-shadow var(--duration-base) var(--easing-standard),
+    border-color var(--duration-base) var(--easing-standard),
+    background-color var(--duration-base) var(--easing-standard);
 }
 
 .status-banner {
@@ -1988,9 +1988,9 @@ h3 {
   text-align: left;
   color: var(--transit-card-ink);
   transition:
-    transform 140ms ease,
-    box-shadow 140ms ease,
-    border-color 140ms ease;
+    transform var(--duration-fast) var(--easing-standard),
+    box-shadow var(--duration-fast) var(--easing-standard),
+    border-color var(--duration-fast) var(--easing-standard);
 }
 
 .transit-card::before {
@@ -2307,10 +2307,10 @@ h3 {
 
 .artifact-card {
   transition:
-    transform 140ms ease,
-    box-shadow 140ms ease,
-    border-color 140ms ease,
-    background-color 140ms ease;
+    transform var(--duration-fast) var(--easing-standard),
+    box-shadow var(--duration-fast) var(--easing-standard),
+    border-color var(--duration-fast) var(--easing-standard),
+    background-color var(--duration-fast) var(--easing-standard);
 }
 
 .artifact-card--selected {
@@ -3098,10 +3098,10 @@ h3 {
     inset 0 1px 0 rgba(255, 249, 239, 0.08),
     0 3px 0 rgba(5, 12, 17, 0.2);
   transition:
-    transform 140ms ease,
-    box-shadow 140ms ease,
-    border-color 140ms ease,
-    background-color 140ms ease;
+    transform var(--duration-fast) var(--easing-standard),
+    box-shadow var(--duration-fast) var(--easing-standard),
+    border-color var(--duration-fast) var(--easing-standard),
+    background-color var(--duration-fast) var(--easing-standard);
   position: relative;
   overflow: hidden;
 }
@@ -3203,7 +3203,7 @@ h3 {
   place-items: center;
   padding: 24px;
   background: rgba(57, 42, 27, 0.52);
-  animation: shell-fade-in 180ms ease;
+  animation: shell-fade-in var(--duration-slow) var(--easing-standard);
 }
 
 .overlay--tutorial,
@@ -3220,7 +3220,7 @@ h3 {
   text-align: center;
   position: relative;
   overflow: hidden;
-  animation: shell-rise-in 200ms ease;
+  animation: shell-rise-in var(--duration-slow) var(--easing-standard);
 }
 
 .modal-shell__card--md {
@@ -3622,10 +3622,10 @@ h3 {
   overflow: hidden;
   isolation: isolate;
   transition:
-    transform 140ms ease,
-    box-shadow 140ms ease,
-    border-color 140ms ease,
-    background-color 140ms ease;
+    transform var(--duration-fast) var(--easing-standard),
+    box-shadow var(--duration-fast) var(--easing-standard),
+    border-color var(--duration-fast) var(--easing-standard),
+    background-color var(--duration-fast) var(--easing-standard);
 }
 
 .ticket-card::before {
