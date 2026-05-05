@@ -1,3 +1,5 @@
+export { SeatPlan } from "./SeatPlan";
+export type { SeatRow } from "./SeatPlan";
 export {
   DepartureBoardTile,
   MapThumbnail,

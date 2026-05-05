@@ -7,6 +7,7 @@ import {
   DepartureBoardTile,
   MapThumbnail,
   ModeSwitch,
+  SeatPlan,
   SetupActions,
   SetupBackButton,
   SetupShell,
@@ -14,6 +15,7 @@ import {
   SetupSummaryRow,
   SetupTicketSlip,
   TokenButton,
+  type SeatRow,
   type SetupStep
 } from "./setup";
 import { Button } from "./system/Button";
@@ -371,38 +373,35 @@ export function MultiplayerSetupScreen({
                 </FormField>
               </div>
 
-              <div className="seat-plan">
-                {setupSeatIds.map((seatId, index) => {
+              <SeatPlan
+                seats={setupSeatIds.map((seatId, index): SeatRow => {
                   const isHostSeat = seatId === "seat-1";
                   const isBotSeat = botSeatIds.includes(seatId);
-                  return (
-                    <div key={seatId} className={`seat-plan__row ${isBotSeat ? "seat-plan__row--bot" : ""}`} data-testid={`seat-plan-${seatId}`}>
-                      <div className="seat-plan__copy">
-                        <strong className="seat-plan__title">{seatId}</strong>
-                        <span className="seat-plan__meta">
-                          {isHostSeat ? "Host seat" : isBotSeat ? `Bot ${index}` : "Open human seat"}
-                        </span>
-                      </div>
-                      {isHostSeat ? (
-                        <TokenButton label="Host" tone="host" className="seat-plan__toggle seat-plan__toggle--fixed" />
-                      ) : (
-                        <TokenButton
-                          label={isBotSeat ? "Bot" : "Open"}
-                          tone={isBotSeat ? "bot" : "open"}
-                          selected={isBotSeat}
-                          className="seat-plan__toggle"
-                          testId={`seat-plan-toggle-${seatId}`}
-                          onClick={() =>
-                            setBotSeatIds((current) =>
-                              current.includes(seatId) ? current.filter((entry) => entry !== seatId) : [...current, seatId]
-                            )
-                          }
-                        />
-                      )}
-                    </div>
-                  );
+                  return {
+                    id: seatId,
+                    title: seatId,
+                    meta: isHostSeat ? "Host seat" : isBotSeat ? `Bot ${index}` : "Open human seat",
+                    isBot: isBotSeat,
+                    testId: `seat-plan-${seatId}`,
+                    action: isHostSeat ? (
+                      <TokenButton label="Host" tone="host" className="seat-plan__toggle seat-plan__toggle--fixed" />
+                    ) : (
+                      <TokenButton
+                        label={isBotSeat ? "Bot" : "Open"}
+                        tone={isBotSeat ? "bot" : "open"}
+                        selected={isBotSeat}
+                        className="seat-plan__toggle"
+                        testId={`seat-plan-toggle-${seatId}`}
+                        onClick={() =>
+                          setBotSeatIds((current) =>
+                            current.includes(seatId) ? current.filter((entry) => entry !== seatId) : [...current, seatId]
+                          )
+                        }
+                      />
+                    )
+                  };
                 })}
-              </div>
+              />
 
             </SetupStepPanel>
           ) : null}

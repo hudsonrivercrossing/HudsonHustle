@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import {
   MapThumbnail,
+  SeatPlan,
   SetupActions,
   SetupBackButton,
   SetupShell,
@@ -8,6 +9,7 @@ import {
   SetupSummaryRow,
   SetupTicketSlip,
   TokenButton,
+  type SeatRow,
   type SetupStep
 } from "./setup";
 import { Button } from "./system/Button";
@@ -138,61 +140,55 @@ export function SetupScreen({
               </FormField>
             </div>
 
-            <div className="seat-plan">
-              {setupSeatIds.map((seatId, index) => {
+            <SeatPlan
+              seats={setupSeatIds.map((seatId, index): SeatRow => {
                 const isFirstSeat = seatId === "seat-1";
                 const isBotSeat = botSeatIds.includes(seatId);
-                return (
-                  <div
-                    key={seatId}
-                    className={`seat-plan__row setup-local-seat-row ${isBotSeat ? "seat-plan__row--bot" : ""}`}
-                    data-testid={`local-seat-plan-${seatId}`}
-                  >
-                    <div className="seat-plan__copy">
-                      <strong className="seat-plan__title">{isBotSeat ? `Bot ${index}` : `Player ${index + 1}`}</strong>
-                      <span className="seat-plan__meta">{isBotSeat ? "Bot seat" : "Human seat"}</span>
-                    </div>
-                    {!isBotSeat ? (
-                      <input
-                        className="setup-seat-name-input"
-                        aria-label={`Player ${index + 1} name`}
-                        value={names[index]}
-                        maxLength={24}
-                        onChange={(event) =>
-                          setNames((current) => {
-                            const next = [...current];
-                            next[index] = event.target.value;
-                            return next;
-                          })
-                        }
-                      />
-                    ) : (
-                      <span className="setup-seat-name-input setup-seat-name-input--bot" aria-label={`Bot ${index} seat`}>
-                        Automated rival
-                      </span>
-                    )}
-                    <div className="seat-choice-row">
-                      {isFirstSeat ? (
-                        <TokenButton label="Human" tone="human" className="seat-plan__toggle seat-plan__toggle--fixed setup-seat-token" />
-                      ) : (
-                        <TokenButton
-                          label={isBotSeat ? "Bot" : "Human"}
-                          tone={isBotSeat ? "bot" : "human"}
-                          selected={isBotSeat}
-                          className="seat-plan__toggle"
-                          testId={`local-seat-plan-toggle-${seatId}`}
-                          onClick={() =>
-                            setBotSeatIds((current) =>
-                              current.includes(seatId) ? current.filter((entry) => entry !== seatId) : [...current, seatId]
-                            )
-                          }
-                        />
-                      )}
-                    </div>
-                  </div>
-                );
+                return {
+                  id: seatId,
+                  title: isBotSeat ? `Bot ${index}` : `Player ${index + 1}`,
+                  meta: isBotSeat ? "Bot seat" : "Human seat",
+                  isBot: isBotSeat,
+                  testId: `local-seat-plan-${seatId}`,
+                  rowClassName: "setup-local-seat-row",
+                  input: !isBotSeat ? (
+                    <input
+                      className="setup-seat-name-input"
+                      aria-label={`Player ${index + 1} name`}
+                      value={names[index]}
+                      maxLength={24}
+                      onChange={(event) =>
+                        setNames((current) => {
+                          const next = [...current];
+                          next[index] = event.target.value;
+                          return next;
+                        })
+                      }
+                    />
+                  ) : (
+                    <span className="setup-seat-name-input setup-seat-name-input--bot" aria-label={`Bot ${index} seat`}>
+                      Automated rival
+                    </span>
+                  ),
+                  action: isFirstSeat ? (
+                    <TokenButton label="Human" tone="human" className="seat-plan__toggle seat-plan__toggle--fixed setup-seat-token" />
+                  ) : (
+                    <TokenButton
+                      label={isBotSeat ? "Bot" : "Human"}
+                      tone={isBotSeat ? "bot" : "human"}
+                      selected={isBotSeat}
+                      className="seat-plan__toggle"
+                      testId={`local-seat-plan-toggle-${seatId}`}
+                      onClick={() =>
+                        setBotSeatIds((current) =>
+                          current.includes(seatId) ? current.filter((entry) => entry !== seatId) : [...current, seatId]
+                        )
+                      }
+                    />
+                  )
+                };
               })}
-            </div>
+            />
           </SetupStepPanel>
         ) : null}
 
