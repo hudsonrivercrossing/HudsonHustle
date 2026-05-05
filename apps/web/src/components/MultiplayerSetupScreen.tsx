@@ -17,6 +17,7 @@ import {
   type SetupStep
 } from "./setup";
 import { Button } from "./system/Button";
+import { TimerPicker } from "./system/TimerPicker";
 
 interface CreateRoomForm {
   hostName: string;
@@ -475,13 +476,7 @@ export function MultiplayerSetupScreen({
             >
               <div className="setup-timer-preflight">
                 <FormField as="div" label="Timer" className="form-field--timer" helper="Enter seconds. 0 = untimed · 30 = 30 s · 60 = 1 min.">
-                  <div className="timer-picker">
-                    <Button onClick={() => setTurnTimeLimitSeconds((current) => Math.max(0, current - 15))}>-15</Button>
-                    <output className="timer-picker__value" aria-live="polite">
-                      {turnTimeLimitSeconds === 0 ? "Untimed" : `${turnTimeLimitSeconds}s`}
-                    </output>
-                    <Button onClick={() => setTurnTimeLimitSeconds((current) => current + 15)}>+15</Button>
-                  </div>
+                  <TimerPicker value={turnTimeLimitSeconds} onChange={setTurnTimeLimitSeconds} />
                 </FormField>
               </div>
             </SetupStepPanel>

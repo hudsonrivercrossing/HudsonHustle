@@ -1,3 +1,4 @@
+import { Button } from "./system";
 import { DepartureBoardTile, SetupShell, type SetupStep } from "./setup";
 
 interface SetupGatewayProps {
@@ -46,15 +47,14 @@ export function SetupGateway({ onChooseLocal, onChooseOnline, onOpenGuide }: Set
           status=""
         />
       </div>
-      <button
-        type="button"
+      <Button
         className="setup-guide-link"
         onClick={onOpenGuide}
         data-testid="gateway-onboarding"
         aria-label="Open the guide"
       >
         First time? Open the rulebook →
-      </button>
+      </Button>
     </SetupShell>
   );
 }

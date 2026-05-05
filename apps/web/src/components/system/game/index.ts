@@ -9,3 +9,4 @@ export { SideTabRail } from "./SideTabRail";
 export type { SideTab } from "./SideTabRail";
 export { TicketSlip } from "./TicketSlip";
 export type { TicketSlipStatus } from "./TicketSlip";
+export { TurnIndicator } from "./TurnIndicator";
