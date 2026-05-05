@@ -1469,6 +1469,8 @@
   }
 
   .modal-shell,
-  .overlay,
+  .overlay {
+    padding: 16px;
+  }
 }
 
