@@ -1,0 +1,1 @@
+../../.codex/skills/polish/SKILL.md

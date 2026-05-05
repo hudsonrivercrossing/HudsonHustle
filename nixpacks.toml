@@ -1,0 +1,5 @@
+# Disable Corepack so pnpm is installed via npm rather than fetched from the
+# npm registry at build time. Corepack network failures are transient but
+# frequent on Railway; this makes the build resilient to registry downtime.
+[phases.setup]
+cmds = ["corepack disable", "npm install -g pnpm@9.12.0"]

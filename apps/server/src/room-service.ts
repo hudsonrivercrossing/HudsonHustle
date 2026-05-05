@@ -1,5 +1,6 @@
 import { randomBytes, randomUUID } from "node:crypto";
 import {
+  chooseBotAction,
   getCurrentPlayer,
   type ControllerType,
   type GameAction,
@@ -15,6 +16,8 @@ import {
   type PublicPlayerState,
   type RejoinRoomRequest,
   type RejoinRoomResponse,
+  type RestartRoomRequest,
+  type RestartRoomResponse,
   type RoomSeatSummary,
   type RoomSnapshot,
   type RoomStatus,
@@ -43,7 +46,6 @@ import type {
   StoredRoomRecord,
   StoredSeatRecord
 } from "./persistence/types.js";
-import { chooseBotAction } from "./bot-policy.js";
 
 type RoomTimerCallback = (roomCode: string, deadlineAt: number | null) => void;
 
@@ -751,6 +753,47 @@ export class RoomService {
     };
   }
 
+  async restartRoom(roomCode: string, request: RestartRoomRequest): Promise<RestartRoomResponse> {
+    const room = await this.getRoomOrThrow(roomCode);
+    const hostSeat = this.getAuthorizedSeat(room, { seatId: room.hostSeatId, playerSecret: request.playerSecret });
+    invariant(hostSeat.isHost, "Only the host can restart the room.");
+    invariant(room.status === "finished" || room.game?.phase === "gameOver", "The game is not finished yet.");
+    invariant(
+      room.seats.every((seat) => seat.playerName && (!seatRequiresPlayerSecret(seat.controllerType) || seat.playerSecret)),
+      "All seats must be filled before restarting."
+    );
+
+    const nextGame = startGame(getHudsonHustleMapByConfigId(room.configId), {
+      playerNames: room.seats.map((seat) => seat.playerName ?? seat.seatId)
+    });
+
+    room.snapshotVersion = 0;
+    room.history = { events: [], checkpoints: [] };
+    room.game = nextGame;
+    room.status = "active";
+    room.updatedAt = nowIso();
+    room.seats.forEach((seat, index) => {
+      seat.playerId = nextGame.players[index]?.id ?? null;
+      seat.ready = true;
+      seat.updatedAt = room.updatedAt;
+    });
+
+    this.scheduleTimer(room);
+    const historyUpdate = this.buildHistoryUpdate(room, {
+      beforeGame: null,
+      seat: hostSeat,
+      source: "human_request",
+      action: null,
+      eventType: "game_started",
+      createdAt: room.updatedAt
+    });
+    await this.saveRoom(room, historyUpdate, { replaceHistory: true });
+    await this.runServerControlledTurns(room);
+    return {
+      snapshot: this.buildSnapshot(room, hostSeat.seatId)
+    };
+  }
+
   async setReady(roomCode: string, auth: RoomAuth, ready: boolean): Promise<RoomSnapshot> {
     const room = await this.getRoomOrThrow(roomCode);
     invariant(room.status === "lobby", "You can only change ready state in the lobby.");
@@ -946,12 +989,19 @@ export class RoomService {
     };
   }
 
-  private async saveRoom(room: ServerRoom, historyUpdate?: StoredGameHistoryUpdate): Promise<void> {
+  private async saveRoom(
+    room: ServerRoom,
+    historyUpdate?: StoredGameHistoryUpdate,
+    options?: { replaceHistory?: boolean }
+  ): Promise<void> {
+    if (options?.replaceHistory) {
+      room.history = { events: [], checkpoints: [] };
+    }
     if (historyUpdate) {
       room.history = appendHistoryUpdate(room.history, historyUpdate);
     }
     this.rooms.set(room.roomCode, room);
-    await this.repository.saveRoom(toStoredRecord(room), historyUpdate);
+    await this.repository.saveRoom(toStoredRecord(room), historyUpdate, options);
     this.onRoomChanged?.(room.roomCode);
   }
 

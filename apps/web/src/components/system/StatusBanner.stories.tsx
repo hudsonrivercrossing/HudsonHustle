@@ -58,7 +58,7 @@ export const Warning: Story = {
 
 export const Failure: Story = {
   args: {
-    tone: "failure",
+    tone: "danger",
     eyebrow: "Connection issue",
     headline: "Multiplayer setup needs attention.",
     copy: "Use failure banners for concise error states that do not need large recovery blocks."

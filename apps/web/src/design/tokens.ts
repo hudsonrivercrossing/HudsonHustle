@@ -1,6 +1,7 @@
 export const fontPair = {
   display: "Fraunces",
-  body: "Inter"
+  body: "IBM Plex Sans",
+  setup: "IBM Plex Sans"
 } as const;
 
 export const colorSystem = {
@@ -21,6 +22,26 @@ export const colorSystem = {
     base: "#2a6fb6",
     strong: "#1f5285",
     soft: "#7ea7cf"
+  },
+  setup: {
+    stationEnamel: "rgba(14, 21, 27, 0.94)",
+    stationEnamelSoft: "rgba(25, 34, 41, 0.9)",
+    ticketField: "#283239",
+    ticketFieldInk: "rgba(255, 249, 239, 0.94)",
+    departureCell: "#050a0d",
+    departureLetter: "#efbf4e",
+    tokenBrass: "#b78846",
+    tokenBlue: "#203d4c",
+    printedRule: "rgba(244, 235, 219, 0.16)",
+    metadataMuted: "rgba(244, 235, 219, 0.68)"
+  },
+  controls: {
+    face: "#23313a",
+    faceStrong: "#17232c",
+    metal: "rgba(244, 235, 219, 0.1)",
+    border: "rgba(244, 235, 219, 0.2)",
+    accent: "#b78846",
+    radius: 6
   },
   status: {
     danger: "#a13d2f",
@@ -56,8 +77,36 @@ export const layoutRhythm = {
   }
 } as const;
 
-export const statusBannerTones = ["neutral", "active", "waiting", "warning", "failure"] as const;
+export const materialTokens = {
+  surface: {
+    ink: "rgba(11, 18, 23, 0.92)",
+    rail: "rgba(21, 31, 38, 0.88)",
+    table: "rgba(28, 24, 18, 0.72)",
+    overlay: "rgba(5, 10, 13, 0.78)"
+  },
+  material: {
+    brass: "#b78846",
+    inkBorder: "rgba(241, 226, 197, 0.22)",
+    enamel: "#1b2a33"
+  },
+  radius: {
+    ticket: 8,
+    slot: 10,
+    panel: 14,
+    modal: 18
+  },
+  zIndex: {
+    dropdown: 20,
+    sticky: 40,
+    overlay: 80,
+    modal: 100,
+    toast: 120,
+    tooltip: 140
+  }
+} as const;
+
+export const statusBannerTones = ["neutral", "active", "waiting", "warning", "danger"] as const;
 export type StatusBannerTone = (typeof statusBannerTones)[number];
 
-export const panelVariants = ["neutral", "status", "private-info", "alert"] as const;
+export const panelVariants = ["neutral", "info", "private", "danger"] as const;
 export type PanelVariant = (typeof panelVariants)[number];

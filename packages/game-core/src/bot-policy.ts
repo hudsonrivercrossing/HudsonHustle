@@ -2,12 +2,11 @@ import {
   trainCardColors,
   type GameAction,
   type MapConfig,
-  type PublicGameState,
   type RouteDef,
-  type SeatPrivateState,
   type TrainCard,
   type TrainCardColor
-} from "@hudson-hustle/game-core";
+} from "./types.js";
+import type { PublicGameState, SeatPrivateState } from "./multiplayer.js";
 
 export interface BotDecisionContext {
   config: MapConfig;

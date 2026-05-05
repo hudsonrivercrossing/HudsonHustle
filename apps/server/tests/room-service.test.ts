@@ -789,6 +789,90 @@ describe("RoomService", () => {
     });
   });
 
+  it("starts restarted rooms with a fresh history boundary", async () => {
+    const repository = new MemoryRoomRepository();
+    const service = new RoomService(repository, hudsonHustleReleasedConfigs);
+    const created = await service.createRoom({
+      hostName: "Ava",
+      playerCount: 2,
+      configId: "v0.4-flushing-newark-airport",
+      turnTimeLimitSeconds: 0
+    });
+    const joined = await service.joinRoom(created.roomCode, {
+      playerName: "Beau"
+    });
+
+    await service.setReady(created.roomCode, { seatId: created.seatId, playerSecret: created.playerSecret }, true);
+    await service.setReady(created.roomCode, { seatId: joined.seatId, playerSecret: joined.playerSecret }, true);
+    const started = await service.startRoom(created.roomCode, { playerSecret: created.playerSecret });
+
+    await service.applyAction(
+      created.roomCode,
+      { seatId: created.seatId, playerSecret: created.playerSecret },
+      {
+        roomCode: created.roomCode,
+        seatId: created.seatId,
+        playerSecret: created.playerSecret,
+        action: {
+          type: "select_initial_tickets",
+          keptTicketIds: started.snapshot.privateState?.pendingTickets.slice(0, 2).map((ticket) => ticket.id) ?? []
+        }
+      }
+    );
+
+    const guestSnapshot = await service.getSnapshot(created.roomCode, {
+      seatId: joined.seatId,
+      playerSecret: joined.playerSecret
+    });
+    await service.applyAction(
+      created.roomCode,
+      { seatId: joined.seatId, playerSecret: joined.playerSecret },
+      {
+        roomCode: created.roomCode,
+        seatId: joined.seatId,
+        playerSecret: joined.playerSecret,
+        action: {
+          type: "select_initial_tickets",
+          keptTicketIds: guestSnapshot.privateState?.pendingTickets.slice(0, 2).map((ticket) => ticket.id) ?? []
+        }
+      }
+    );
+
+    const room = (service as any).rooms.get(created.roomCode);
+    room.game.finalRoundRemaining = 0;
+    room.game.turn.stage = "awaitingHandoff";
+
+    await service.applyAction(
+      created.roomCode,
+      { seatId: created.seatId, playerSecret: created.playerSecret },
+      {
+        roomCode: created.roomCode,
+        seatId: created.seatId,
+        playerSecret: created.playerSecret,
+        action: {
+          type: "advance_turn"
+        }
+      }
+    );
+    expect((await service.getGameHistory(created.roomCode)).events.some((event) => event.eventType === "game_finished")).toBe(
+      true
+    );
+
+    await service.restartRoom(created.roomCode, { playerSecret: created.playerSecret });
+    const restartedHistory = await service.getGameHistory(created.roomCode);
+
+    expect(restartedHistory.events).toHaveLength(1);
+    expect(restartedHistory.events[0]).toMatchObject({
+      sequence: 0,
+      eventType: "game_started"
+    });
+    expect(restartedHistory.checkpoints).toHaveLength(1);
+    expect(restartedHistory.checkpoints[0]).toMatchObject({
+      snapshotVersion: 0,
+      checkpointType: "game_started"
+    });
+  });
+
   it("only exposes review history after the match finishes", async () => {
     const repository = new MemoryRoomRepository();
     const service = new RoomService(repository, hudsonHustleReleasedConfigs);

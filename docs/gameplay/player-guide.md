@@ -3,14 +3,15 @@
 ## Welcome
 Hudson Hustle is a route-building game about connecting the NYC/NJ metro area before your rivals lock down the best crossings. You will collect transit cards, claim routes on the map, complete destination tickets, and decide when to spend precious stations to rescue a plan.
 
-If you are brand new, the in-app tutorial gives you a short guided teach and points at the exact part of the screen being explained. If you already know the flow, you can skip it immediately.
+If you are brand new, open the in-app `Guide` from the main page or the game board. It teaches the rules as a short step-by-step rulebook without changing the table state.
 
-## Online Room Note
-In online multiplayer, a room may include one or more built-in `bot` seats.
+## Bot Seat Note
+Local setup and online multiplayer may include one or more built-in `bot` seats.
 
 What stays true:
 - `bot` seats still play by the same route, ticket, and scoring rules
-- `bot` seats are server-owned and do not use reconnect tokens
+- local `bot` seats advance automatically on the shared laptop
+- online `bot` seats are server-owned and do not use reconnect tokens
 - human seats keep the normal reconnect flow if they refresh or briefly disconnect
 
 ## Goal
@@ -27,11 +28,11 @@ You lose points for unfinished destination tickets.
 If you need a quick reminder during play, use the in-app `Scoring` button in the top bar. It summarizes route points and endgame bonuses without leaving the table.
 
 ## First Game Setup
-1. Choose `2-4` players.
-2. Enter player names.
-3. Each player receives four transit cards.
-4. Each player privately reviews one long ticket and three regular tickets.
-5. Keep at least two of those tickets, then hand the laptop to the next player when the screen tells you to.
+1. Choose `2-4` seats.
+2. Mark any non-first local seats as human or bot.
+3. Choose the map and optional table pace label.
+4. Each human player privately reviews one long ticket and three regular tickets.
+5. Keep at least two of those tickets, then hand the laptop to the next human player when the screen tells you to.
 
 ## What You Do On Your Turn
 Choose exactly one action:

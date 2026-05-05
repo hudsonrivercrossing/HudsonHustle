@@ -46,14 +46,28 @@ Use medium padding for operational panels and secondary shell surfaces.
 ## Screen-Level Rules
 
 ### Setup
-- setup should feel editorial and centered
-- setup shells use narrower width and larger internal padding
+- setup should feel like a compact station counter console, not a landing page
+- main gateway is the exception: it may use a cinematic masthead composition with a wide Fraunces title top-left, open atmospheric center, and equal-size departure-board choices anchored low-left on the screen
+- gateway departure-board choices should sit as one table cluster, equal-sized, with the six-cell code doing the identity work; avoid spreading them into a generic three-column website grid
+- setup shells use narrower width and tighter counter/preflight clustering
 - status should appear early, near the title block
+- setup/lobby refresh uses three desktop zones:
+  - guide zone: about `160px` to `200px`, compact placard identity only unless orientation becomes a tested problem
+  - step panel: primary interactive object, maxing around a compact counter width rather than sprawling full-screen
+  - preflight tray: about `220px` to `250px`, sticky on desktop and visually close to the step panel
+- gateway can widen beyond the setup console width when showing three entry artifacts, but the cards should remain table choices rather than marketing tiles
+- setup console surfaces use station plates plus a close preflight tray; the tray should feel attached to the active counter, not like a separate third column
+- mobile setup stacks as title/context, current step panel, then preflight tray
+- do not keep a large persistent step rail if it reads as a separate component competing with the setup panel
+- preflight is progressive: show established table facts only, not a repeated pending checklist
+- board setup separates map selection from timer selection so the launch action has a clean final check
+- local setup follows the same Seats → Map → Timer rhythm, with local-only copy avoiding server-room language
 
 ### Lobby
 - lobby should read as a staged table, not a raw form stack
 - section headers and panel groupings should establish rhythm before color does
 - repeated seat and metadata surfaces should align to one card family
+- lobby should reuse the setup shell, summary rows, and map thumbnail so room readiness feels like the continuation of setup
 
 ### Active Game Shell
 - board stays visually dominant

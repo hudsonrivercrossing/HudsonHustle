@@ -7,7 +7,7 @@ const meta = {
   title: "System/ModalShell",
   component: ModalShell,
   args: {
-    tone: "default",
+    variant: "default",
     width: "md",
     align: "center",
     children: null
@@ -16,13 +16,13 @@ const meta = {
     docs: {
       description: {
         component:
-          "Overlay shell for ticket choice, handoff, reveal, and tutorial moments. The shell is the full-screen layer; the inner card is the modal surface."
+          "Overlay shell for ticket choice, handoff, and reveal moments. The shell is the full-screen layer; the inner card is the modal surface."
       }
     }
   },
-  render: ({ tone, width, align }) => (
-    <ModalShell tone={tone} width={width} align={align}>
-      <SectionHeader eyebrow="Modal shell" title="Choose starting tickets" meta="Keep at least 2" density="ceremony" />
+  render: ({ variant, width, align }) => (
+    <ModalShell variant={variant} width={width} align={align}>
+      <SectionHeader eyebrow="Modal shell" title="Choose starting tickets" meta="Keep at least 2" variant="ceremony" />
       <p className="modal-copy">
         This is the default modal treatment used for overlays that need to feel like a distinct moment rather than another panel.
       </p>
@@ -39,21 +39,59 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
+export const MdLeft: Story = {
+  args: { width: "md", align: "left" },
+  render: ({ variant, width, align }) => (
+    <ModalShell variant={variant} width={width} align={align}>
+      <SectionHeader eyebrow="Modal shell" title="Choose starting tickets" meta="Keep at least 2" variant="ceremony" />
+      <p className="modal-copy">Left-aligned text works better for longer instructional copy that needs a natural reading axis.</p>
+      <div className="setup-actions">
+        <Button>Back</Button>
+        <Button variant="primary">Continue</Button>
+      </div>
+    </ModalShell>
+  )
+};
+
+export const LgCenter: Story = {
+  args: { width: "lg", align: "center" },
+  render: ({ variant, width, align }) => (
+    <ModalShell variant={variant} width={width} align={align}>
+      <SectionHeader eyebrow="Modal shell" title="Choose starting tickets" meta="Keep at least 2" variant="ceremony" />
+      <p className="modal-copy">Wide centered layout — for choice moments with multiple options displayed side by side.</p>
+      <div className="setup-actions" style={{ justifyContent: "center" }}>
+        <Button>Back</Button>
+        <Button variant="primary">Continue</Button>
+      </div>
+    </ModalShell>
+  )
+};
+
+export const LgLeft: Story = {
+  args: { width: "lg", align: "left" },
+  render: ({ variant, width, align }) => (
+    <ModalShell variant={variant} width={width} align={align}>
+      <SectionHeader eyebrow="Modal shell" title="Choose starting tickets" meta="Keep at least 2" variant="ceremony" />
+      <p className="modal-copy">Wide left-aligned — maximum reading surface for complex instructional overlays.</p>
+      <div className="setup-actions">
+        <Button>Back</Button>
+        <Button variant="primary">Continue</Button>
+      </div>
+    </ModalShell>
+  )
+};
+
 export const Tutorial: Story = {
-  args: {
-    tone: "tutorial",
-    width: "lg",
-    align: "left"
-  },
-  render: ({ tone, width, align }) => (
-    <ModalShell tone={tone} width={width} align={align}>
-      <SectionHeader eyebrow="First game guide" title="Learn the board in a few minutes" meta="Guided tutorial" density="ceremony" />
+  args: { variant: "tutorial", width: "lg", align: "left" },
+  render: ({ variant, width, align }) => (
+    <ModalShell variant={variant} width={width} align={align}>
+      <SectionHeader eyebrow="Table moment" title="Choose starting tickets" meta="Private choice" variant="ceremony" />
       <p className="modal-copy">
-        Tutorial overlays use the same modal family but with stronger ceremony and a wider reading surface.
+        Tutorial overlays use the same modal family but with stronger emphasis and a wider reading surface.
       </p>
       <div className="setup-actions">
-        <Button>Skip</Button>
-        <Button variant="primary">Start tutorial</Button>
+        <Button>Back</Button>
+        <Button variant="primary">Confirm tickets</Button>
       </div>
     </ModalShell>
   )

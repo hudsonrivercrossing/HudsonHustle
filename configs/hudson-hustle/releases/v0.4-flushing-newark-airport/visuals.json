@@ -3,7 +3,7 @@
   "visualSetId": "hudson-hustle-graph-prototype-visuals",
   "boardStyle": "graph-first-transit-nostalgia",
   "theme": "warm-transit-nostalgia",
-  "backdropMode": "none",
+  "backdropMode": "muted",
   "boardLabelMode": "station-only",
   "backdrop": {
     "landAreas": [

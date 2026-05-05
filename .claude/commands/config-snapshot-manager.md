@@ -1,0 +1,1 @@
+../../.codex/skills/config-snapshot-manager/SKILL.md

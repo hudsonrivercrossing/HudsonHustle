@@ -1,11 +1,11 @@
 import type { HTMLAttributes, ReactNode } from "react";
 
-type ModalTone = "default" | "tutorial";
+type ModalVariant = "default" | "tutorial";
 type ModalWidth = "md" | "lg";
 type ModalAlign = "center" | "left";
 
 interface ModalShellProps extends HTMLAttributes<HTMLDivElement> {
-  tone?: ModalTone;
+  variant?: ModalVariant;
   width?: ModalWidth;
   align?: ModalAlign;
   cardClassName?: string;
@@ -13,7 +13,7 @@ interface ModalShellProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export function ModalShell({
-  tone = "default",
+  variant = "default",
   width = "md",
   align = "center",
   className,
@@ -21,7 +21,7 @@ export function ModalShell({
   children,
   ...rest
 }: ModalShellProps): JSX.Element {
-  const overlayClasses = ["modal-shell", `modal-shell--${tone}`, className].filter(Boolean).join(" ");
+  const overlayClasses = ["modal-shell", `modal-shell--${variant}`, className].filter(Boolean).join(" ");
   const cardClasses = ["modal-shell__card", `modal-shell__card--${width}`, `modal-shell__card--${align}`, cardClassName]
     .filter(Boolean)
     .join(" ");

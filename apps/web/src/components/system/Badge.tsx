@@ -1,13 +1,13 @@
 import type { HTMLAttributes, ReactNode } from "react";
 
-type ChipTone = "neutral" | "info" | "success" | "warning" | "danger";
+export type BadgeTone = "neutral" | "info" | "success" | "warning" | "danger";
 
-interface ChipProps extends HTMLAttributes<HTMLSpanElement> {
-  tone?: ChipTone;
+export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
+  tone?: BadgeTone;
   children: ReactNode;
 }
 
-export function Chip({ tone = "neutral", className, children, ...rest }: ChipProps): JSX.Element {
+export function Badge({ tone = "neutral", className, children, ...rest }: BadgeProps): JSX.Element {
   const classes = ["system-chip", `system-chip--${tone}`, className].filter(Boolean).join(" ");
   return (
     <span className={classes} data-tone={tone} {...rest}>

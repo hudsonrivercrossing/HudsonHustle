@@ -4,10 +4,11 @@
 
 Current `v2.1` working choice:
 - display: `Fraunces`
-- body / operational UI: `Inter`
+- body / operational UI: `IBM Plex Sans`
+- setup/lobby operational UI: `IBM Plex Sans`
 
 Fallbacks:
-- primary sans fallback: `Space Grotesk + IBM Plex Sans`
+- primary sans fallback: `IBM Plex Sans + Segoe UI`
 - high-intensity experiment: `Archivo Black + DM Sans`
 
 ## Typography Roles
@@ -23,6 +24,7 @@ Use `Fraunces` for:
 
 Do not use `Fraunces` for:
 - ordinary panel titles
+- setup step titles
 - section headers
 - timers
 - buttons
@@ -31,7 +33,7 @@ Do not use `Fraunces` for:
 - detailed gameplay facts
 
 ### Body / Operational UI
-Use `Inter` for:
+Use `IBM Plex Sans` for:
 - controls
 - labels
 - timers
@@ -42,8 +44,16 @@ Use `Inter` for:
 - detailed gameplay information
 
 Rule of thumb:
-- `Inter` handles work
+- `IBM Plex Sans` handles work
 - `Fraunces` handles ceremony
+
+Setup hierarchy:
+- `SetupShell` uses compact `IBM Plex Sans` placards so the active panel stays primary.
+- `StationPlate` / `SetupStepPanel` titles, controls, labels, summary rows, seat rows, room codes, timers, and mode switches use `IBM Plex Sans` to avoid a generic AI-product feel and lean into transit manual / station hardware language.
+- Reserve `Fraunces` for true ceremony outside the setup console, not routine setup page identity.
+- Gateway and setup copy should use game-table verbs such as seat, board, pass, claim, launch, and guide. Avoid generic app verbs like configure, submit, or continue when a more table-native command is clear.
+- Active gameplay now uses the same operational sans as setup so controls, buttons, and roster objects feel like one product instead of two UI systems.
+- Departure-board tile text is uppercase, short, and mechanical. The six-cell code is the title; do not repeat the same word as a second heading below it.
 
 ## Hierarchy
 
@@ -76,7 +86,7 @@ Stable layout rhythm now lives in:
 - do not duplicate the same status message in multiple regions
 
 ### State Surfaces
-- larger state surfaces may pair a Fraunces headline with Inter body text
+- larger state surfaces may pair a Fraunces headline with IBM Plex Sans body text
 - keep the headline declarative and short
 - reserve this treatment for setup, lobby, reconnect, empty-detail, and failure moments
 

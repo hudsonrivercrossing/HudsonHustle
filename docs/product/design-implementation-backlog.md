@@ -180,6 +180,54 @@ Scope:
 Extraction allowed during this slice:
 - no new major primitives
 
+## Remaining P1/P2 Follow-ups
+
+### P1 Active Game Shell Object Pass
+Scope:
+- make active-game side panels feel like table instruments and transit/game objects, not generic app panels
+- strengthen scoreboard, hand, market, ticket, board/action headers, and action rail using the existing panel, row, artifact, and control families
+- keep board dominance and local/multiplayer active play aligned
+
+Avoid:
+- gameplay rules changes
+- broad new primitives before CSS object reuse is proven
+- copying setup/lobby station-counter composition into active play where table instruments would fit better
+
+### P1 Ticket-Desk Overlay Pass
+Scope:
+- bring ticket picker, handoff, and draw reveal into the same object system
+- treat ticket choice/reveal as printed artifacts with stronger station/game affordance
+
+Avoid:
+- a full modal-library rewrite
+- guidebook copy expanding into active action details
+
+Completed direction:
+- the old auto-opening tutorial is replaced by a compact `Guide` rulebook
+- `GUIDE_` is reachable from the gateway, and `Guide` is reachable from active board topbars
+
+### P2 Semantic Color Usage Audit
+Scope:
+- audit hardcoded shell colors and migrate stable values to semantic tokens where reuse is clear
+- keep setup/lobby-only roles bounded to setup/lobby objects
+- map state colors, warning/success/danger, and ownership colors to existing semantic roles instead of adding decorative one-offs
+
+Avoid:
+- redefining the palette
+- introducing new decorative status colors
+- changing map or player ownership colors without a gameplay readability reason
+
+### P2 Type Role Enforcement Pass
+Scope:
+- verify `Fraunces` is reserved for signage, ceremony, reveal, and major state moments
+- verify `IBM Plex Sans` carries operational UI: setup step titles, controls, timers, chips, seat rows, summary rows, and dense game facts
+- tighten copy toward board-game verbs: seat, claim, board, launch, pass, guide
+
+Avoid:
+- reopening the font-pair decision
+- using `Fraunces` for ordinary buttons, chips, timers, dense facts, or small panel labels
+- repeating completed setup identity changes
+
 ## Deferred
 
 Not for `v2.1`:
@@ -192,7 +240,7 @@ Not for `v2.1`:
 ## Review Gates
 
 Freeze checks:
-- `Fraunces + Inter` still feels right in dense play states
+- `Fraunces + IBM Plex Sans` still feels right in dense play states
 - utility chrome remains distinct from chips and gameplay controls
 - `StatusBanner` and `StateSurface` do not drift into the same job
 - row/object and artifact families feel governed without becoming generic cards

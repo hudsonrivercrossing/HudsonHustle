@@ -3,7 +3,6 @@ import { decodeReconnectToken } from "../src/reconnect-token";
 
 const SESSION_KEY = "hudson-hustle-multiplayer-session-v2";
 const API_BASE_URL = "http://127.0.0.1:8787";
-const TUTORIAL_SEEN_KEY = "hudson-hustle-onboarding-v1-1";
 
 async function waitForApi(page: Page): Promise<void> {
   await expect
@@ -44,14 +43,11 @@ async function openMultiplayerSetup(page: Page): Promise<void> {
   await expect(page.getByTestId("online-join-room")).toBeVisible();
 }
 
-async function openLocalSetup(page: Page, options?: { resetTutorial?: boolean }): Promise<void> {
+async function openLocalSetup(page: Page): Promise<void> {
   await page.goto("/");
   await waitForApi(page);
-  if (options?.resetTutorial) {
-    await page.evaluate((key) => window.localStorage.removeItem(key), TUTORIAL_SEEN_KEY);
-  }
   await page.getByTestId("gateway-local").click();
-  await expect(page.getByRole("heading", { name: "Local pass-and-play" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pass-and-play" })).toBeVisible();
 }
 
 async function openJoinRoomPanel(page: Page) {
@@ -72,12 +68,13 @@ async function createRoom(
   const botSeats = new Set(options?.botSeats ?? []);
   const playerCount = options?.playerCount ?? 2;
   await createPanel.getByLabel("Your name").fill("Host");
-  await createPanel.getByRole("button", { name: "Continue to seats" }).click();
+  await createPanel.getByRole("button", { name: "Seat table" }).click();
   await createPanel.getByLabel("Players").selectOption(String(playerCount));
   for (const seatId of botSeats) {
     await createPanel.getByTestId(`seat-plan-toggle-${seatId}`).click();
   }
-  await createPanel.getByRole("button", { name: "Continue to board" }).click();
+  await createPanel.getByRole("button", { name: "Pick board" }).click();
+  await createPanel.getByRole("button", { name: "Set timer" }).click();
   for (let index = 0; index < timerAdjustments; index += 1) {
     await createPanel.getByRole("button", { name: "+15" }).click();
   }
@@ -103,7 +100,7 @@ async function joinRoom(
   await joinPanel.getByRole("button", { name: "Preview" }).click();
   await expect(page.getByRole("button", { name: seatId })).toBeVisible();
   await page.getByRole("button", { name: seatId }).click();
-  await joinPanel.getByRole("button", { name: "Continue to enter" }).click();
+  await joinPanel.getByRole("button", { name: "Enter table" }).click();
   await joinPanel.getByLabel("Your name").fill(playerName);
   await joinPanel.getByRole("button", { name: "Join room" }).click();
   await expect(page.getByTestId("lobby-status-banner")).toBeVisible({ timeout: 10000 });
@@ -137,13 +134,10 @@ test("multiplayer room lifecycle covers connected badges, private state, reconne
   await clearInitialTicketChoice(guestPage);
 
   await expect(hostPage.getByTestId("turn-status-banner")).toContainText("Your turn");
-  await expect(hostPage.getByTestId("config-utility-pill")).toBeVisible();
-  await expect(hostPage.getByRole("button", { name: "Scoring" })).toBeVisible();
-
-  const roundTableFontFamily = await hostPage.locator(".round-table-panel .section-header__title").evaluate((node) => {
-    return window.getComputedStyle(node).fontFamily;
-  });
-  expect(roundTableFontFamily).toContain("Fraunces");
+  await expect(hostPage.locator(".player-roster--top")).toBeVisible();
+  await expect(hostPage.getByRole("button", { name: "Guide" })).toBeVisible();
+  await expect(hostPage.getByRole("button", { name: "Score" })).toBeVisible();
+  await expect(hostPage.getByRole("button", { name: "Leave room" })).toBeVisible();
 
   const hostTimerBadge = hostPage.getByTestId("turn-timer-badge");
   await expect(hostTimerBadge).toHaveText(/^(Timer 30s|\d+s left)$/);
@@ -235,7 +229,7 @@ test("join flow clears stale seat selections when previewing a different room", 
   await seatThreeButton.click();
   await expect(seatThreeButton).toHaveClass(/chip-button--selected/);
 
-  await guestPage.locator(".setup-mode-back").click();
+  await guestPage.locator(".setup-back-button").click();
   await expect(guestPage.getByTestId("online-mode-gateway")).toBeVisible();
   await guestPage.getByTestId("online-join-room").click();
   const roomCodeField = guestPage.getByTestId("join-room-panel").getByLabel("Room code");
@@ -243,8 +237,8 @@ test("join flow clears stale seat selections when previewing a different room", 
   await roomCodeField.fill(secondRoom.roomCode);
   await guestPage.getByTestId("join-room-panel").getByRole("button", { name: "Preview" }).click();
 
-  await expect(joinPanel.getByText("Pick one")).toBeVisible();
-  await expect(joinPanel.getByRole("button", { name: "Continue to enter" })).toBeDisabled();
+  await expect(guestPage.getByText("1 open").first()).toBeVisible();
+  await expect(guestPage.getByTestId("join-room-panel").getByRole("button", { name: "Enter table" })).toBeDisabled();
   await expect(guestPage.getByRole("button", { name: "seat-2" })).toBeVisible();
 
   await hostOneContext.close();
@@ -267,19 +261,19 @@ test("initial multiplayer ticket choices can be confirmed independently without 
   await guestPage.getByRole("button", { name: "Mark ready" }).click();
   await hostPage.getByRole("button", { name: "Start game" }).click();
 
-  const guestTickets = guestPage.locator(".ticket-card");
+  const guestTickets = guestPage.locator(".ticket-row--choice");
   await expect(guestTickets).toHaveCount(4);
   await guestTickets.nth(2).click();
   await guestTickets.nth(1).click();
-  await expect(guestTickets.nth(0)).toHaveClass(/ticket-card--selected/);
-  await expect(guestTickets.nth(1)).not.toHaveClass(/ticket-card--selected/);
-  await expect(guestTickets.nth(2)).toHaveClass(/ticket-card--selected/);
+  await expect(guestTickets.nth(0)).toHaveClass(/ticket-row--selected/);
+  await expect(guestTickets.nth(1)).not.toHaveClass(/ticket-row--selected/);
+  await expect(guestTickets.nth(2)).toHaveClass(/ticket-row--selected/);
 
   await hostPage.getByRole("button", { name: /Keep 2 tickets/ }).click();
   await expect(hostPage.getByRole("button", { name: /Keep 2 tickets/ })).toHaveCount(0);
-  await expect(guestTickets.nth(0)).toHaveClass(/ticket-card--selected/);
-  await expect(guestTickets.nth(1)).not.toHaveClass(/ticket-card--selected/);
-  await expect(guestTickets.nth(2)).toHaveClass(/ticket-card--selected/);
+  await expect(guestTickets.nth(0)).toHaveClass(/ticket-row--selected/);
+  await expect(guestTickets.nth(1)).not.toHaveClass(/ticket-row--selected/);
+  await expect(guestTickets.nth(2)).toHaveClass(/ticket-row--selected/);
 
   await guestPage.getByRole("button", { name: /Keep 2 tickets/ }).click();
   await expect(hostPage.getByTestId("turn-status-banner")).toContainText("Your turn");
@@ -340,7 +334,7 @@ test("drawing tickets in multiplayer offers no cancel path and still requires a 
   await expect(hostPage.getByRole("button", { name: "Back" })).toHaveCount(0);
   await expect(hostPage.getByRole("button", { name: /Keep 1 ticket/ })).toBeVisible();
 
-  const pickerCards = hostPage.locator(".ticket-card");
+  const pickerCards = hostPage.locator(".ticket-row--choice");
   await expect(pickerCards).toHaveCount(3);
   await pickerCards.nth(0).click();
   await expect(hostPage.getByRole("button", { name: /Keep 0 tickets/ })).toBeDisabled();
@@ -403,6 +397,10 @@ test("normal setup can create a room with one bot seat and start with the host a
   await clearInitialTicketChoice(page);
 
   await expect(page.getByTestId("turn-status-banner")).toBeVisible();
+  await page.getByRole("button", { name: "Guide" }).click();
+  await expect(page.getByTestId("guidebook-screen")).toBeVisible();
+  await page.getByRole("button", { name: "Back" }).click();
+  await expect(page.getByTestId("turn-status-banner")).toBeVisible();
   await context.close();
 });
 
@@ -430,7 +428,7 @@ test("normal setup can create a mixed room with multiple bot seats and only leav
   await expect(guestPage.getByRole("button", { name: "seat-2" })).toHaveCount(0);
   await expect(guestPage.getByRole("button", { name: "seat-3" })).toHaveCount(0);
   await guestPage.getByRole("button", { name: "seat-4" }).click();
-  await joinPanel.getByRole("button", { name: "Continue to enter" }).click();
+  await joinPanel.getByRole("button", { name: "Enter table" }).click();
   await joinPanel.getByLabel("Your name").fill("Guest");
   await joinPanel.getByRole("button", { name: "Join room" }).click();
 
@@ -490,33 +488,55 @@ test("timed mixed rooms hand off through bot turns and still allow human reconne
   await hostContext.close();
 });
 
-test("local tutorial and shell hierarchy keep ceremony and work roles distinct", async ({ browser }) => {
+test("guidebook opens from gateway and local setup without old tutorial chrome", async ({ browser }) => {
   const context = await browser.newContext();
   const page = await context.newPage();
 
-  await openLocalSetup(page, { resetTutorial: true });
-  await expect(page.getByText("First game guide")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Learn the board in a few minutes" })).toBeVisible();
-  await expect(page.locator(".tutorial-body .surface-card")).toHaveCount(2);
+  await page.goto("/");
+  await waitForApi(page);
+  await page.getByTestId("gateway-onboarding").click();
+  await expect(page.getByTestId("guidebook-screen")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Win the table" })).toBeVisible();
+  await expect(page.locator(".tutorial-nav")).toHaveCount(0);
+  await page.getByRole("button", { name: "Next guide step" }).click();
+  await expect(page.getByRole("heading", { name: "Take one action" })).toBeVisible();
 
-  const tutorialFontFamily = await page.locator(".tutorial-hero .section-header__title").evaluate((node) => {
+  const guideFontFamily = await page.locator(".guidebook-copy h1").evaluate((node) => {
     return window.getComputedStyle(node).fontFamily;
   });
-  expect(tutorialFontFamily).toContain("Fraunces");
+  expect(guideFontFamily).toContain("Fraunces");
 
-  await page.evaluate((key) => window.localStorage.setItem(key, "seen"), TUTORIAL_SEEN_KEY);
+  await page.getByRole("button", { name: "Back" }).click();
+  await expect(page.getByRole("heading", { name: "Hudson Hustle" })).toBeVisible();
+
   await openLocalSetup(page);
-  await expect(page.getByRole("heading", { name: "Local pass-and-play" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pass-and-play" })).toBeVisible();
+  await page.getByRole("button", { name: "Guide" }).click();
+  await expect(page.getByTestId("guidebook-screen")).toBeVisible();
+  await page.getByRole("button", { name: "Back" }).click();
+  await expect(page.getByRole("heading", { name: "Pass-and-play" })).toBeVisible();
 
-  const setupHeadingFontFamily = await page.locator("main.setup-shell h1").evaluate((node) => {
+  const setupHeadingFontFamily = await page.locator("main.setup-board-shell h1").evaluate((node) => {
     return window.getComputedStyle(node).fontFamily;
   });
-  expect(setupHeadingFontFamily).toContain("Fraunces");
+  expect(setupHeadingFontFamily).toContain("IBM Plex Sans");
 
-  const playersSectionFontFamily = await page.getByRole("heading", { name: "Players" }).evaluate((node) => {
+  const playersSectionFontFamily = await page.getByRole("heading", { name: "Seats" }).evaluate((node) => {
     return window.getComputedStyle(node).fontFamily;
   });
   expect(playersSectionFontFamily).not.toContain("Fraunces");
+
+  await page.getByRole("button", { name: "Pick board" }).click();
+  await page.getByRole("button", { name: "Set timer" }).click();
+  await page.getByRole("button", { name: "Start local game" }).click();
+  await clearInitialTicketChoice(page);
+  await page.getByRole("button", { name: "I'm ready" }).click();
+  await clearInitialTicketChoice(page);
+  await page.getByRole("button", { name: "I'm ready" }).click();
+  await page.getByRole("button", { name: "Guide" }).click();
+  await expect(page.getByTestId("guidebook-screen")).toBeVisible();
+  await page.getByRole("button", { name: "Back" }).click();
+  await expect(page.locator(".player-roster--top")).toBeVisible();
 
   await context.close();
 });

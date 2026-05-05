@@ -12,10 +12,10 @@ This file is an orientation contract, not the full design system. The canonical 
 
 ## Typography Contract
 
-- `Inter = work`
+- `IBM Plex Sans = work`
 - `Fraunces = ceremony`
 
-Use `Inter` for:
+Use `IBM Plex Sans` for:
 - controls
 - labels
 - row metadata

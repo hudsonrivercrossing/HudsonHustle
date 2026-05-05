@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Chip } from "./Chip";
+import { Badge } from "./Badge";
 import { Panel } from "./Panel";
 import { SectionHeader } from "./SectionHeader";
 
@@ -25,8 +25,8 @@ const meta = {
         Panels should feel structural and map-supporting. They are the outer shell layer, not the authored nested object layer.
       </p>
       <div className="chip-row">
-        <Chip tone="info">Seat 2</Chip>
-        <Chip tone="success">Connected</Chip>
+        <Badge tone="info">Seat 2</Badge>
+        <Badge tone="success">Connected</Badge>
       </div>
     </Panel>
   )
@@ -37,20 +37,20 @@ type Story = StoryObj<typeof meta>;
 
 export const Neutral: Story = {};
 
-export const Status: Story = {
+export const Info: Story = {
   args: {
-    variant: "status"
+    variant: "info"
   }
 };
 
 export const PrivateInfo: Story = {
   args: {
-    variant: "private-info"
+    variant: "private"
   }
 };
 
 export const Alert: Story = {
   args: {
-    variant: "alert"
+    variant: "danger"
   }
 };

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { Badge } from "./Badge";
 import { Button } from "./Button";
-import { Chip } from "./Chip";
 import { ChoiceChipButton } from "./ChoiceChipButton";
 import { Panel } from "./Panel";
 import { SectionHeader } from "./SectionHeader";
@@ -32,9 +32,9 @@ const meta = {
           Use this for route detail, city detail, tunnel reveal, and endgame summary moments.
         </p>
         <div className="chip-row">
-          <Chip tone="info">Rail</Chip>
-          <Chip tone="success">Claimable</Chip>
-          <Chip tone="warning">10 points</Chip>
+          <Badge tone="info">Rail</Badge>
+          <Badge tone="success">Claimable</Badge>
+          <Badge tone="warning">10 points</Badge>
         </div>
         <div className="chip-row">
           <ChoiceChipButton style={{ ["--choice-chip-accent" as string]: "#3d7e52" }}>Claim with green</ChoiceChipButton>
@@ -51,6 +51,35 @@ type Story = StoryObj<typeof meta>;
 
 export const Detail: Story = {};
 
+export const TitleOnly: Story = {
+  args: {
+    eyebrow: undefined,
+    title: "Hoboken to Jamaica",
+    meta: undefined
+  },
+  render: ({ variant, title }) => (
+    <Panel variant="neutral" style={{ maxWidth: 480 }}>
+      <SurfaceCard variant={variant} title={title}>
+        <p className="muted-copy">Minimal card — title only, no eyebrow or meta. Use for simple action confirmations.</p>
+        <Button variant="primary">Confirm</Button>
+      </SurfaceCard>
+    </Panel>
+  )
+};
+
+export const EyebrowTitleMeta: Story = {
+  args: {
+    eyebrow: "Route detail",
+    title: "Penn Station → Grand Central",
+    meta: "8 points"
+  },
+  render: ({ variant, eyebrow, title, meta: cardMeta }) => (
+    <Panel variant="neutral" style={{ maxWidth: 560 }}>
+      <SurfaceCard variant={variant} eyebrow={eyebrow} title={title} meta={cardMeta}>{null}</SurfaceCard>
+    </Panel>
+  )
+};
+
 export const Summary: Story = {
   args: {
     variant: "summary",
@@ -58,4 +87,26 @@ export const Summary: Story = {
     title: "Mina",
     meta: "Winner"
   }
+};
+
+export const Winner: Story = {
+  args: {
+    variant: "summary",
+    eyebrow: "Final score",
+    title: "Mina",
+    meta: "142 pts"
+  },
+  render: ({ eyebrow, title, meta: cardMeta }) => (
+    <Panel variant="neutral" style={{ maxWidth: 480 }}>
+      <SurfaceCard
+        variant="summary"
+        eyebrow={eyebrow}
+        title={title}
+        meta={cardMeta}
+        className="endgame-card endgame-card--winner"
+      >
+        <p className="muted-copy">Winner highlight state — golden border and elevated treatment.</p>
+      </SurfaceCard>
+    </Panel>
+  )
 };
