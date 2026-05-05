@@ -10,6 +10,7 @@ import {
   type TrainCardFace
 } from "@hudson-hustle/game-core";
 import { Button } from "./system/Button";
+import { FormField } from "./system/FormField";
 import { Panel } from "./system/Panel";
 import { SectionHeader } from "./system/SectionHeader";
 import {
@@ -19,11 +20,12 @@ import {
   SeatTile,
   SideTabRail,
   TicketSlip,
+  TurnIndicator,
   formatCardLabel,
   type GameplayNotification
 } from "./system/game";
 
-export { formatCardLabel, type GameplayNotification } from "./system/game";
+export { TurnIndicator, formatCardLabel, type GameplayNotification } from "./system/game";
 
 type InspectorTab = "market" | "build" | "chat";
 
@@ -528,7 +530,7 @@ export function InspectorDock({
               )}
             </div>
             {onSendChat ? (
-              <div className="chat-panel__composer" aria-label="Chat composer">
+              <FormField as="div" label="Message" className="chat-panel__composer">
                 <input
                   type="text"
                   placeholder="Message room"
@@ -543,7 +545,7 @@ export function InspectorDock({
                     }
                   }}
                 />
-              </div>
+              </FormField>
             ) : null}
           </form>
         </div>

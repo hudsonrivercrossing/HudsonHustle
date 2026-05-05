@@ -44,6 +44,7 @@ import {
   SupplyDock,
   TicketChoiceSheet,
   TicketDock,
+  TurnIndicator,
   formatCardLabel,
   type GameplayNotification
 } from "./components/GameplayHud";
@@ -890,13 +891,10 @@ export default function App(): JSX.Element {
     <div className="app-shell app-shell--gameplay-hud" data-config-theme={visuals.theme}>
       <header className="topbar topbar--gameplay-actions">
         <div className="topbar-private-spacer" aria-hidden="true" />
-        <div className="turn-indicator">
-          <span className="turn-indicator__name">{projectedGame.players[snapshot.game.activePlayerIndex]?.name}</span>
-          <span className="turn-indicator__label">active</span>
-          {liveTimerSecondsRemaining !== null && (
-            <span className="turn-indicator__timer">{liveTimerSecondsRemaining}s</span>
-          )}
-        </div>
+        <TurnIndicator
+          playerName={projectedGame.players[snapshot.game.activePlayerIndex]?.name ?? ""}
+          secondsRemaining={liveTimerSecondsRemaining}
+        />
         <div className="topbar-actions">
           <Button onClick={() => setGuideOpen(true)}>Guide</Button>
           <ScoreGuide className="score-guide--subtle" label="Score" />

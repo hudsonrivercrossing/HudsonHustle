@@ -35,6 +35,7 @@ import {
   SupplyDock,
   TicketChoiceSheet,
   TicketDock,
+  TurnIndicator,
   formatCardLabel,
   type GameplayNotification
 } from "./GameplayHud";
@@ -516,10 +517,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
     <div className="app-shell app-shell--gameplay-hud" data-config-theme={localVisuals.theme}>
       <header className="topbar topbar--gameplay-actions">
         <div className="topbar-private-spacer" aria-hidden="true" />
-        <div className="turn-indicator">
-          <span className="turn-indicator__name">{game.players[game.activePlayerIndex]?.name}</span>
-          <span className="turn-indicator__label">active</span>
-        </div>
+        <TurnIndicator playerName={game.players[game.activePlayerIndex]?.name ?? ""} />
         <div className="topbar-actions">
           <Button onClick={openTutorial}>
             Guide
