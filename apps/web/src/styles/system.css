@@ -526,7 +526,7 @@ h3 {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 42px;
+  min-height: var(--control-height-base);
   min-width: 132px;
   padding: 10px 17px;
   position: relative;
@@ -717,7 +717,7 @@ h3 {
 }
 
 .score-guide--subtle .score-guide__trigger.system-button {
-  min-height: 38px;
+  min-height: var(--control-height-row);
   padding-inline: 12px;
   font-size: 0.84rem;
   font-weight: 680;
@@ -2538,7 +2538,7 @@ h3 {
 .action-rail__timer {
   display: inline-flex;
   align-items: center;
-  min-height: 42px;
+  min-height: var(--control-height-base);
   padding: 10px 14px;
   border-radius: 999px;
   border: 1px solid rgba(92, 70, 46, 0.14);
@@ -3087,7 +3087,7 @@ h3 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 42px;
+  min-height: var(--control-height-base);
   padding: 10px 14px;
   color: rgba(255, 249, 239, 0.9);
   border: 1px solid color-mix(in srgb, var(--choice-chip-accent) 34%, rgba(244, 235, 219, 0.18));

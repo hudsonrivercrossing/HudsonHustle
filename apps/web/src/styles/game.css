@@ -9,7 +9,7 @@
   grid-template-columns: 1fr;
   justify-items: end;
   gap: 0;
-  min-height: 38px;
+  min-height: var(--control-height-row);
   margin: 0;
 }
 
@@ -20,8 +20,8 @@
 
 .app-shell--gameplay-hud .topbar-actions .system-button,
 .app-shell--gameplay-hud .score-guide__trigger.system-button {
-  min-height: 36px;
-  min-width: 112px;
+  min-height: var(--control-height-compact);
+  min-width: var(--button-min-width-sm);
   padding: 8px 13px;
   font-size: 0.86rem;
   font-weight: 800;
@@ -46,7 +46,7 @@
 }
 
 .app-shell--gameplay-hud .player-roster--top .player-roster__row {
-  min-height: 42px;
+  min-height: var(--control-height-base);
   padding: 7px 9px;
   border-radius: 12px;
 }
@@ -112,7 +112,7 @@
 .app-shell--gameplay-hud .hand-color-slot__count,
 .app-shell--gameplay-hud .market-color-slot__count {
   min-width: 36px;
-  min-height: 36px;
+  min-height: var(--control-height-compact);
   font-size: 1rem;
   font-variant-numeric: tabular-nums;
 }
@@ -141,7 +141,7 @@
 }
 
 .app-shell--gameplay-hud .inspector-dock .supply-dock--board .system-button {
-  min-height: 42px;
+  min-height: var(--control-height-base);
   font-size: 0.88rem;
 }
 
@@ -1937,7 +1937,7 @@ border-color: rgba(232, 220, 194, 0.72);
 
 /* Build tab claim buttons: show actual card colors */
 .app-shell--gameplay-hud .inspector-dock--build .choice-chip-button {
-  min-height: 36px;
+  min-height: var(--control-height-compact);
   border-radius: 4px;
   font-size: var(--hud-type-sm);
   font-weight: var(--weight-bold);
@@ -2441,7 +2441,7 @@ border-color: rgba(232, 220, 194, 0.72);
 
 .app-shell--gameplay-hud .market-color-slot,
 .app-shell--gameplay-hud .supply-dock--board .system-button {
-  min-height: 42px;
+  min-height: var(--control-height-base);
 }
 
 .app-shell--gameplay-hud .market-color-slot {
@@ -2583,7 +2583,7 @@ border-color: rgba(232, 220, 194, 0.72);
 }
 
 .app-shell--gameplay-hud .player-roster--top .player-roster__row {
-  min-height: 38px;
+  min-height: var(--control-height-row);
 }
 
 .app-shell--gameplay-hud .player-roster--top .row-object__stats {

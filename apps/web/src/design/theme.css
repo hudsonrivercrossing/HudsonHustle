@@ -42,6 +42,12 @@
   --radius-sm: 12px;
   --radius-control: 6px;
 
+  /* --- Control Sizing --- */
+  --control-height-compact: 36px;  /* compact HUD controls, icon slots */
+  --control-height-row: 38px;      /* compact button/row variant */
+  --control-height-base: 42px;     /* standard interactive control (matches system-button) */
+  --button-min-width-sm: 112px;    /* HUD action button min-width */
+
   /* --- Motion Scale --- */
   --duration-fast: 140ms;   /* snappy interactive feedback */
   --duration-base: 160ms;   /* standard UI transitions */
