@@ -64,7 +64,7 @@ export function PlayerRoster({ players, activePlayerIndex, playerPalette, timer 
   const timerLabel = timer?.activePlayerIndex === activePlayerIndex ? formatRosterTimer(timer.secondsRemaining) : null;
 
   return (
-    <Panel variant="status" className={["player-roster", className].filter(Boolean).join(" ")}>
+    <Panel variant="info" className={["player-roster", className].filter(Boolean).join(" ")}>
       <div className="scoreboard player-roster__list">
         {rosterSlots.map((player, index) => {
           const isActive = index === activePlayerIndex;
@@ -195,7 +195,7 @@ export function PrivateHandRail({ hand, cardPalette, paymentPreview = null, clas
   const spend = paymentPreview ? buildPaymentSpend(counts, paymentPreview) : {};
 
   return (
-    <Panel variant="private-info" className={["private-hand-rail", className].filter(Boolean).join(" ")}>
+    <Panel variant="private" className={["private-hand-rail", className].filter(Boolean).join(" ")}>
       <SectionHeader title="Hand" meta="Color counts" variant="compact" />
       <div className="private-hand-rail__slots">
         {faces.map((face) => {
@@ -250,7 +250,7 @@ export function TicketDock({
   const visibleTickets = sortedTickets.slice(safePageIndex * pageSize, safePageIndex * pageSize + pageSize);
 
   return (
-    <Panel variant="private-info" className={["ticket-dock", className].filter(Boolean).join(" ")}>
+    <Panel variant="private" className={["ticket-dock", className].filter(Boolean).join(" ")}>
       <div className="ticket-dock__header">
         <SectionHeader title="Tickets" meta={`${connectedCount}/${sortedTickets.length} connected`} variant="compact" />
         <div className="ticket-dock__pager" aria-label="Ticket pages">
@@ -480,7 +480,7 @@ export function InspectorDock({
   }, [activeBuildKey]);
 
   return (
-    <Panel variant="status" className={["inspector-dock", `inspector-dock--${activeTab}`, className].filter(Boolean).join(" ")}>
+    <Panel variant="info" className={["inspector-dock", `inspector-dock--${activeTab}`, className].filter(Boolean).join(" ")}>
       <SideTabRail
         ariaLabel="Right rail modules"
         activeTab={activeTab}

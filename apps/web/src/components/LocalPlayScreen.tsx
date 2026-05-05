@@ -550,7 +550,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
               />
             </div>
           ) : (
-            <Panel variant="alert" className="hidden-panel">
+            <Panel variant="danger" className="hidden-panel">
               <SectionHeader eyebrow="Privacy shield" title="Private info hidden" variant="standard" />
               <p>The next player should only see the public board until they click `I'm ready`.</p>
             </Panel>

@@ -86,7 +86,7 @@ export function MultiplayerSetupScreen({
   );
   const plannedBotCount = botSeatIds.filter((seatId) => seatId !== "seat-1" && setupSeatIds.includes(seatId)).length;
   const plannedHumanOpenSeats = Math.max(0, playerCount - 1 - plannedBotCount);
-  const setupBannerTone = error || reconnectState === "reconnect-failed" ? "failure" : reconnectState === "attempting-reconnect" ? "waiting" : "neutral";
+  const setupBannerTone = error || reconnectState === "reconnect-failed" ? "danger" : reconnectState === "attempting-reconnect" ? "waiting" : "neutral";
   const setupBannerEyebrow =
     error || reconnectState === "reconnect-failed" ? "Connection issue" : reconnectState === "attempting-reconnect" ? "Reconnect" : "Separate-device multiplayer";
   const setupBannerHeadline =

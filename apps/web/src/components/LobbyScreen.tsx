@@ -74,7 +74,7 @@ export function LobbyScreen({
   const canStart = realtimeReady && localSeat?.isHost && room.seats.every((seat) => seat.playerName) && room.seats.every((seat) => seat.ready);
   const occupiedCount = room.seats.filter((seat) => seat.playerName).length;
   const readyCount = room.seats.filter((seat) => seat.ready).length;
-  const lobbyTone = realtimeMessage ? "failure" : canStart ? "active" : "waiting";
+  const lobbyTone = realtimeMessage ? "danger" : canStart ? "active" : "waiting";
   const lobbyHeadline = realtimeMessage
     ? "Realtime connection needs attention."
     : canStart

@@ -37,20 +37,20 @@ type Story = StoryObj<typeof meta>;
 
 export const Neutral: Story = {};
 
-export const Status: Story = {
+export const Info: Story = {
   args: {
-    variant: "status"
+    variant: "info"
   }
 };
 
 export const PrivateInfo: Story = {
   args: {
-    variant: "private-info"
+    variant: "private"
   }
 };
 
 export const Alert: Story = {
   args: {
-    variant: "alert"
+    variant: "danger"
   }
 };

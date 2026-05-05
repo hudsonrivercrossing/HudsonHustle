@@ -33,7 +33,7 @@ export const Neutral: Story = {
 
 export const Recovery: Story = {
   args: {
-    tone: "failure",
+    tone: "danger",
     eyebrow: "Reconnect",
     headline: "This room needs attention.",
     copy: "Use this for reconnect failures and larger error blocks that need copy plus a clear recovery path.",

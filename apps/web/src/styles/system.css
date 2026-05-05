@@ -1123,7 +1123,7 @@ h3 {
   box-shadow: var(--status-warning-shadow);
 }
 
-.status-banner--failure {
+.status-banner--danger {
   background: var(--status-failure-bg);
   border-color: var(--status-failure-border);
   box-shadow: var(--status-failure-shadow);
@@ -1153,7 +1153,7 @@ h3 {
   box-shadow: var(--status-warning-shadow);
 }
 
-.state-surface--failure {
+.state-surface--danger {
   background: var(--status-failure-bg);
   border-color: var(--status-failure-border);
   box-shadow: var(--status-failure-shadow);
@@ -1329,7 +1329,7 @@ h3 {
   color: color-mix(in srgb, var(--ink-soft) 88%, var(--accent-strong) 12%);
 }
 
-.panel--status {
+.panel--info {
   background:
     radial-gradient(circle at top left, rgba(53, 111, 176, 0.08), transparent 30%),
     linear-gradient(180deg, rgba(250, 248, 243, 0.98), rgba(236, 230, 218, 0.94));
@@ -1339,15 +1339,15 @@ h3 {
     0 12px 24px rgba(62, 41, 20, 0.07);
 }
 
-.panel--status .section-header__eyebrow {
+.panel--info .section-header__eyebrow {
   color: color-mix(in srgb, var(--accent-strong) 34%, var(--ink-soft) 66%);
 }
 
-.panel--status .section-header__meta {
+.panel--info .section-header__meta {
   color: color-mix(in srgb, var(--ink-soft) 82%, var(--accent-strong) 18%);
 }
 
-.panel--private-info {
+.panel--private {
   background:
     radial-gradient(circle at top right, rgba(66, 112, 163, 0.08), transparent 28%),
     linear-gradient(180deg, rgba(254, 251, 245, 0.97), rgba(241, 232, 214, 0.92));
@@ -1357,15 +1357,15 @@ h3 {
     0 12px 25px rgba(60, 42, 24, 0.075);
 }
 
-.panel--private-info .section-header__eyebrow {
+.panel--private .section-header__eyebrow {
   color: color-mix(in srgb, var(--accent-strong) 36%, var(--ink-soft) 64%);
 }
 
-.panel--private-info .section-header__meta {
+.panel--private .section-header__meta {
   color: color-mix(in srgb, var(--accent-strong) 18%, var(--ink-soft) 82%);
 }
 
-.panel--alert {
+.panel--danger {
   background:
     radial-gradient(circle at top left, rgba(161, 61, 47, 0.12), transparent 28%),
     linear-gradient(180deg, rgba(252, 242, 240, 0.98), rgba(247, 231, 228, 0.94));
@@ -1375,11 +1375,11 @@ h3 {
     0 14px 28px rgba(90, 42, 32, 0.09);
 }
 
-.panel--alert .section-header__eyebrow {
+.panel--danger .section-header__eyebrow {
   color: color-mix(in srgb, var(--danger) 38%, var(--ink-soft) 62%);
 }
 
-.panel--alert .section-header__meta {
+.panel--danger .section-header__meta {
   color: color-mix(in srgb, var(--danger) 16%, var(--ink-soft) 84%);
 }
 
