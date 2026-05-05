@@ -48,3 +48,42 @@ export const ReconnectToken: Story = {
     children: <input defaultValue="hh1.room.seat.secret" spellCheck={false} style={inputStyle} />
   }
 };
+
+export const WithHelper: Story = {
+  args: {
+    label: "Timer",
+    helper: "Enter seconds. 0 = untimed · 30 = 30 s · 60 = 1 min.",
+    children: <input defaultValue="60" style={inputStyle} />
+  }
+};
+
+export const ErrorState: Story = {
+  args: {
+    label: "Your name",
+    error: "Name is required.",
+    children: <input defaultValue="" style={inputStyle} />
+  }
+};
+
+export const ErrorStateSelect: Story = {
+  args: {
+    label: "Map",
+    error: "Please select a map before continuing.",
+    children: (
+      <select defaultValue="" style={inputStyle}>
+        <option value="" disabled>
+          Choose map…
+        </option>
+        <option value="hh1">Hudson Hustle v1</option>
+      </select>
+    )
+  }
+};
+
+export const Disabled: Story = {
+  args: {
+    label: "Reconnect token",
+    helper: "Provided by the host.",
+    children: <input defaultValue="" disabled placeholder="Waiting for host…" style={inputStyle} />
+  }
+};

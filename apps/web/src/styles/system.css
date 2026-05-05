@@ -355,6 +355,28 @@ h3 {
     0 6px 14px rgba(62, 41, 20, 0.06);
 }
 
+.form-field--error {
+  border-color: rgba(161, 61, 47, 0.32);
+}
+
+.form-field--error input,
+.form-field--error select {
+  border-color: rgba(161, 61, 47, 0.36);
+}
+
+.form-field--error input:focus-visible,
+.form-field--error select:focus-visible {
+  border-color: rgba(161, 61, 47, 0.52);
+  box-shadow:
+    0 0 0 3px rgba(161, 61, 47, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.58),
+    0 6px 14px rgba(62, 41, 20, 0.06);
+}
+
+.form-field__error {
+  color: var(--color-danger);
+}
+
 .setup-actions,
 .topbar-actions,
 .chip-row {
