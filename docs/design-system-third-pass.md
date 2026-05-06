@@ -85,11 +85,11 @@ Storybook (validate: does running code match Pencil design?)
 **Files:** `system.css` only (~454 hardcoded values)  
 **Tool:** `[Code]`
 
-| [ ] | What |
+| [x] | What |
 |-----|------|
-| [ ] | Component-level colors first (button, badge, panel borders) — highest reuse, highest token ROI |
-| [ ] | Status/state colors (success, warning, danger surfaces) — map to semantic token set |
-| [ ] | One-off decorative values — audit last; only tokenize if stable reuse is clear |
+| [x] | Component-level colors first (button, badge, panel borders) — 10 RGB-companion tokens added to system.css :root; 141 replacements |
+| [x] | Status/state colors — danger-rgb (6 uses), accent-base-rgb (16 uses), accent-strong-rgb (3 uses) cover focus/active/error states |
+| [x] | One-off decorative values (≤2 occurrences) skipped — not stable enough to tokenize |
 
 ---
 
