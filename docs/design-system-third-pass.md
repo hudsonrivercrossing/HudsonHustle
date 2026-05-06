@@ -98,12 +98,12 @@ Storybook (validate: does running code match Pencil design?)
 **Files:** `system.css`, `game.css`  
 **Tool:** `[Code]`
 
-| [ ] | What |
+| [x] | What |
 |-----|------|
-| [ ] | Audit all 16 `var(--font-display)` usages — confirm each is a ceremony / signage / reveal moment |
-| [ ] | Suspect candidates: `.status-banner__headline`, `.state-surface__headline` — check if body font is correct there |
-| [ ] | Verify zero `--font-display` on chips, controls, dense facts, timers, compact labels |
-| [ ] | Add a short inline comment above each legitimate display use so intent is explicit |
+| [x] | Audited all 16 `var(--font-display)` usages — 14 confirmed legitimate, 2 corrected |
+| [x] | `.status-banner__headline` and `.state-surface__headline` — confirmed appropriate (large ceremonial headlines) |
+| [x] | 2 violations fixed: `.timer-picker__value` (timer control) and `.ticket-route__cities` (dense label) → `--font-body` |
+| [x] | Short inline comment added above each of the 14 legitimate display uses |
 
 ---
 

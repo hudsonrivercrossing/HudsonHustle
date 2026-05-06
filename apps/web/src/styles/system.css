@@ -204,6 +204,7 @@ button {
   letter-spacing: -0.025em;
 }
 
+/* ceremony section — display font for reveal/announcement framing */
 .section-header--ceremony .section-header__title {
   font-family: var(--font-display);
   font-size: 1.45rem;
@@ -234,6 +235,7 @@ h3 {
   margin: 0;
 }
 
+/* top-level page title — display font for ceremonial entry point */
 h1 {
   font-family: var(--font-display);
   letter-spacing: -0.04em;
@@ -713,7 +715,7 @@ h3 {
   min-width: 88px;
   padding: 0 6px;
   color: color-mix(in srgb, var(--accent-strong) 30%, var(--ink) 70%);
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 1.12rem;
   font-weight: 700;
   letter-spacing: -0.03em;
@@ -1109,6 +1111,7 @@ h3 {
   color: var(--ink-soft);
 }
 
+/* game-phase announcement banner — display font for large reveal headlines */
 .status-banner__headline {
   display: block;
   font-family: var(--font-display);
@@ -1159,6 +1162,7 @@ h3 {
   color: var(--ink-soft);
 }
 
+/* loading/waiting state surface — display font for prominent state message */
 .state-surface__headline {
   display: block;
   font-family: var(--font-display);
@@ -2082,6 +2086,7 @@ h3 {
   padding: 0 14px;
 }
 
+/* physical game card title — display font for printed-card artifact aesthetic */
 .transit-card__title {
   display: block;
   font-family: var(--font-display);
@@ -2316,6 +2321,7 @@ h3 {
     0 16px 30px rgba(60, 42, 24, 0.1);
 }
 
+/* route artifact detail — display font for route name as transit signage */
 .surface-card.detail-card[aria-label="Route detail"] .surface-card__title,
 .surface-card.detail-card[data-detail-kind="route"] .surface-card__title {
   font-family: var(--font-display);
@@ -2425,6 +2431,7 @@ h3 {
   line-height: 1.35;
 }
 
+/* summary/results card — display font for reveal-moment title */
 .surface-card--summary .surface-card__title {
   font-family: var(--font-display);
   font-size: 1.24rem;
@@ -2432,6 +2439,7 @@ h3 {
   letter-spacing: -0.04em;
 }
 
+/* endgame player card — display font for post-game ceremony */
 .endgame-card .surface-card__title {
   font-family: var(--font-display);
   font-size: 1.34rem;
@@ -2485,6 +2493,7 @@ h3 {
   border-bottom: 1px solid rgba(var(--border-warm-rgb), 0.12);
 }
 
+/* endgame score — display font for ceremonial final-score reveal */
 .endgame-score {
   margin: 0;
   font-family: var(--font-display);
@@ -2604,7 +2613,7 @@ h3 {
 }
 
 .ticket-route__cities {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-size: 0.92rem;
   font-weight: 650;
   line-height: 1.02;
@@ -2777,6 +2786,7 @@ h3 {
   stroke-width: 0.8;
 }
 
+/* map city label — display font for transit map station signage */
 .board-label {
   font-size: 13px;
   fill: #33281d;
@@ -2924,6 +2934,7 @@ h3 {
   stroke-dasharray: none;
 }
 
+/* map region watermark — display font for geographic area signage */
 .region-label {
   display: block;
   fill: rgba(88, 64, 38, 0.12);
@@ -3101,6 +3112,7 @@ h3 {
   text-align: left;
 }
 
+/* modal ceremony/summary context — reinforces display font from base rules above */
 .modal-shell .section-header--ceremony .section-header__title,
 .modal-shell .surface-card--summary .surface-card__title {
   font-family: var(--font-display);
@@ -3212,6 +3224,7 @@ h3 {
   gap: 14px;
 }
 
+/* guidebook editorial title — display font for large section heading */
 .guidebook-copy h1 {
   font-family: var(--font-display);
   font-size: clamp(2.15rem, 5.4vw, 3.45rem);
@@ -3532,6 +3545,7 @@ h3 {
   color: color-mix(in srgb, var(--accent-strong) 24%, var(--ink-soft) 76%);
 }
 
+/* printed ticket card route — display font for ticket-as-artifact aesthetic */
 .ticket-card__route {
   display: block;
   font-family: var(--font-display);
