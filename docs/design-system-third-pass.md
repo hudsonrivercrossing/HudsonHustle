@@ -70,13 +70,13 @@ Storybook (validate: does running code match Pencil design?)
 **Files:** `game.css` only  
 **Tool:** `[Code]`
 
-| [ ] | What |
+| [x] | What |
 |-----|------|
-| [ ] | `rgba(246, 235, 214, ...)` → `var(--color-ink-primary)` / `var(--color-ink-secondary)` with opacity |
-| [ ] | `rgba(222, 199, 158, ...)` borders → `var(--color-border-warm)` or equivalent token |
-| [ ] | `#b7e0bc` success green → `var(--color-status-success)` or appropriate semantic token |
-| [ ] | Gradient backgrounds — map to canvas tokens where stable |
-| [ ] | Do NOT touch `system.css` in this pass |
+| [x] | `rgba(246, 235, 214, ...)` → `var(--hud-paper-rgb)` with opacity (14 occurrences) |
+| [x] | `rgba(222, 199, 158, ...)` borders → `var(--hud-brass-light-rgb)` with opacity (21 occurrences) |
+| [x] | `#b7e0bc` success green → `var(--hud-status-connected)` |
+| [x] | Gradient backgrounds — `rgba(246, 237, 215, ...)` ticket-paper → `var(--hud-ticket-paper-rgb)` (3 occurrences); deep pair values skipped (not identical to canvas tokens) |
+| [x] | Did NOT touch `system.css` in this pass |
 
 ---
 
