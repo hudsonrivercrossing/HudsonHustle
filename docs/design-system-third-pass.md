@@ -112,11 +112,12 @@ Storybook (validate: does running code match Pencil design?)
 **Files:** `system.css`  
 **Tool:** `[Code]`
 
-| [ ] | What |
+| [x] | What |
 |-----|------|
-| [ ] | Tokens exist in `theme.css`: `--duration-fast/base/slow`, `--easing-standard/expressive` |
-| [ ] | Replace remaining hardcoded `ms` values in `system.css` transitions with tokens |
-| [ ] | `game.css` is already clean — skip |
+| [x] | Tokens exist in `theme.css`: `--duration-fast/base/slow`, `--easing-standard/expressive` |
+| [x] | All `system.css` transitions already use motion tokens — no hardcoded `ms` values found |
+| [x] | `game.css` clean — only `0.01ms !important` in `prefers-reduced-motion` override (intentional a11y, not replaced) |
+| [x] | `notification-drift 4.2s` skipped — one-off decorative animation, no standard token maps to it |
 
 ---
 
