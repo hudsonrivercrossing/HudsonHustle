@@ -1751,7 +1751,7 @@ border-color: rgba(232, 220, 194, 0.72);
 }
 
 .app-shell--gameplay-hud .ticket-row {
-  --ticket-status-accent: #b79b61;
+  --ticket-status-accent: var(--hud-brass);
   --ticket-status-ink: #2b2217;
   border-left: 5px solid var(--ticket-status-accent);
 }
@@ -1850,7 +1850,7 @@ border-color: rgba(232, 220, 194, 0.72);
     linear-gradient(180deg, rgba(183, 155, 97, 0.2), rgba(12, 10, 8, 0.14)),
     var(--hud-grain),
     linear-gradient(180deg, #2d3432, #131815);
-  border-color: rgba(var(--hud-brass-rgb), 0.32);
+  border-color: rgba(183, 155, 97, 0.32);
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
   font-weight: var(--weight-bold);
@@ -2881,5 +2881,82 @@ border-color: rgba(232, 220, 194, 0.72);
 
 .app-shell--gameplay-hud .chat-panel__messages {
   gap: 5px;
+}
+
+/* ── D3: Ticket-Desk Overlay — printed transit ticket lift ── */
+
+/* ticket route: uppercase printed label, tight cap spacing */
+.app-shell--gameplay-hud .ticket-route__cities {
+  font-size: 0.65rem;
+  font-weight: 840;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+/* arrow: warmer, lighter — printed rule divider feel */
+.app-shell--gameplay-hud .ticket-arrow {
+  color: rgba(109, 88, 48, 0.62);
+  font-size: 0.54rem;
+  letter-spacing: 0.06em;
+}
+
+/* points badge: punched-hole stamp */
+.app-shell--gameplay-hud .ticket-row .ticket-points {
+  font-variant-numeric: tabular-nums;
+  font-weight: 870;
+  background:
+    radial-gradient(circle at center, rgba(36, 29, 21, 0.18) 0 54%, transparent 55%),
+    rgba(255, 248, 232, 0.22);
+  border: 1px solid rgba(92, 70, 46, 0.28);
+  box-shadow: inset 0 1px 0 rgba(255, 252, 242, 0.44);
+}
+
+/* TicketChoiceSheet panel — envelope inset decorative border */
+.app-shell--gameplay-hud .ticket-choice-sheet__panel {
+  position: relative;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet__panel::before {
+  display: block;
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px dashed rgba(183, 155, 97, 0.2);
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app-shell--gameplay-hud .ticket-choice-sheet__panel::after {
+  display: block;
+  content: "";
+  position: absolute;
+  inset: 12px;
+  border: 1px solid rgba(183, 155, 97, 0.08);
+  border-radius: 3px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* TicketDock pager buttons — ghost/subdued treatment */
+.app-shell--gameplay-hud .ticket-dock__pager-button.system-button {
+  background:
+    var(--hud-grain),
+    linear-gradient(180deg, rgba(183, 155, 97, 0.06), rgba(8, 10, 9, 0.1));
+  border-color: rgba(183, 155, 97, 0.16);
+  color: rgba(255, 248, 232, 0.46);
+  min-height: 26px;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+}
+
+.app-shell--gameplay-hud .ticket-dock__pager-button.system-button:hover,
+.app-shell--gameplay-hud .ticket-dock__pager-button.system-button:focus-visible {
+  background:
+    var(--hud-grain),
+    linear-gradient(180deg, rgba(183, 155, 97, 0.12), rgba(8, 10, 9, 0.1));
+  border-color: rgba(183, 155, 97, 0.28);
+  color: rgba(255, 248, 232, 0.7);
 }
 

@@ -56,12 +56,12 @@ Storybook (validate: does running code match Pencil design?)
 **Files:** `game.css` (ticket sections), `TicketChoiceSheet`, `TicketDock`  
 **Tool:** `[Pencil → Code]`
 
-| [ ] | What |
+| [x] | What |
 |-----|------|
-| [ ] | Ticket rows — city pair + points layout feels like a printed transit ticket |
-| [ ] | Ticket choice sheet — `::before`/`::after` decorative borders refined to feel like a physical deal/envelope |
-| [ ] | Ticket status colors (open / connected / keep / review) — audit against semantic tokens, replace hardcoded values |
-| [ ] | TicketDock pager ghost buttons — need a visual treatment once ghost variant is styled |
+| [x] | Ticket rows — city pair + points layout feels like a printed transit ticket |
+| [x] | Ticket choice sheet — `::before`/`::after` decorative borders refined to feel like a physical deal/envelope |
+| [x] | Ticket status colors (open / connected / keep / review) — audit against semantic tokens, replace hardcoded values |
+| [x] | TicketDock pager ghost buttons — need a visual treatment once ghost variant is styled |
 
 ---
 
