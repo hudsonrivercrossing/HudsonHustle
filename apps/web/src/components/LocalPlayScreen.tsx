@@ -3,15 +3,12 @@ import {
   chooseBotAction,
   getAffordableRouteColors,
   getAffordableStationColors,
-  getCityName,
   getCurrentPlayer,
   getTicketProgress,
   reduceGame,
   startGame,
   type GameAction,
   type GameState,
-  type PublicGameState,
-  type SeatPrivateState,
   type TicketDef,
   type TrainCardColor
 } from "@hudson-hustle/game-core";
@@ -24,7 +21,6 @@ import {
   playerColorPalette
 } from "@hudson-hustle/game-data";
 import { BoardMap } from "./BoardMap";
-import { EndgameBreakdown } from "./EndgameBreakdown";
 import {
   BoardStage,
   FloatingPlayerRoster,
@@ -36,130 +32,38 @@ import {
   TicketChoiceSheet,
   TicketDock,
   TurnIndicator,
-  formatCardLabel,
   type GameplayNotification
 } from "./GameplayHud";
 import { GuidebookScreen } from "./GuidebookScreen";
+import {
+  EndgameGrid,
+  HandoffModal,
+  RouteBuildPanel,
+  StationBuildPanel,
+  botPlayerIdsFromSavedGame,
+  botPlayerIdsFromSeatIds,
+  buildLocalPrivateState,
+  buildLocalPublicGameState,
+  configIdForSavedMap,
+  formatFaceLabel,
+  LOCAL_SAVE_KEY,
+  readSavedGame,
+  shuffleAvatars,
+  type LocalStartSetup,
+  type VisibilityMode
+} from "./local";
 import { ScoreGuide } from "./ScoreGuide";
 import { SetupScreen } from "./SetupScreen";
 import { TransitCard } from "./TransitCard";
 import { Button } from "./system/Button";
-import { ChoiceChipButton } from "./system/ChoiceChipButton";
 import { ModalShell } from "./system/ModalShell";
 import { Panel } from "./system/Panel";
 import { StatusBanner } from "./system/StatusBanner";
 import { SectionHeader } from "./system/SectionHeader";
 import { SurfaceCard } from "./system/SurfaceCard";
 
-const AVATAR_NAMES = [
-  "Conductor", "Milo", "Engineer", "Rosa", "Switchman",
-  "Jack", "Dispatcher", "Lily", "Caboose", "Nellie"
-];
-
-function seededRandom(seed: string): () => number {
-  let h = 0;
-  for (let i = 0; i < seed.length; i++) h = ((h << 5) - h + seed.charCodeAt(i)) | 0;
-  return () => {
-    h = (h ^ (h >>> 16)) * 0x45d9f3b | 0;
-    h = (h ^ (h >>> 16)) * 0x45d9f3b | 0;
-    h ^= h >>> 16;
-    return (h >>> 0) / 4294967296;
-  };
-}
-
-function shuffleAvatars(seed: string, count: number): string[] {
-  const rng = seededRandom(seed);
-  const pool = [...AVATAR_NAMES];
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [pool[i], pool[j]] = [pool[j], pool[i]];
-  }
-  return pool.slice(0, count);
-}
-
-const saveKey = "hudson-hustle-save-v1";
-
-type VisibilityMode = "visible" | "postTurn" | "handoff";
-type LocalStartSetup = { playerNames: string[]; botSeatIds: string[]; configId: string; turnTimeLimitSeconds: number };
-
 interface LocalPlayScreenProps {
   onReturnToGateway?: () => void;
-}
-
-function formatFaceLabel(face: string): string {
-  return face
-    .split("-")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-}
-
-function readSavedGame(): GameState | null {
-  const raw = window.localStorage.getItem(saveKey);
-  if (!raw) {
-    return null;
-  }
-
-  try {
-    return JSON.parse(raw) as GameState;
-  } catch {
-    return null;
-  }
-}
-
-function configIdForSavedMap(mapId: string): string {
-  return hudsonHustleReleasedConfigs.find((config) => getHudsonHustleMapByConfigId(config.configId).id === mapId)?.configId ?? hudsonHustleCurrentConfigId;
-}
-
-function buildLocalPublicGameState(game: GameState): PublicGameState {
-  return {
-    version: game.version,
-    mapId: game.mapId,
-    players: game.players.map((player) => ({
-      id: player.id,
-      name: player.name,
-      color: player.color,
-      score: player.score,
-      trainsLeft: player.trainsLeft,
-      stationsLeft: player.stationsLeft,
-      handCount: player.hand.length,
-      ticketCount: player.tickets.length,
-      pendingTicketCount: player.pendingTickets.length,
-      endgame: player.endgame
-    })),
-    activePlayerIndex: game.activePlayerIndex,
-    phase: game.phase,
-    routeClaims: game.routeClaims,
-    stations: game.stations,
-    market: game.market,
-    discardCount: game.discardPile.length,
-    trainDeckCount: game.trainDeck.length,
-    regularTicketsCount: game.regularTickets.length,
-    longTicketsCount: game.longTickets.length,
-    discardedTicketsCount: game.discardedTickets.length,
-    turn: game.turn,
-    finalRoundRemaining: game.finalRoundRemaining,
-    finalRoundTriggeredBy: game.finalRoundTriggeredBy,
-    log: game.log
-  };
-}
-
-function buildLocalPrivateState(game: GameState): SeatPrivateState {
-  const player = getCurrentPlayer(game);
-  return {
-    seatId: `seat-${game.activePlayerIndex + 1}`,
-    playerId: player.id,
-    hand: player.hand,
-    tickets: player.tickets,
-    pendingTickets: player.pendingTickets
-  };
-}
-
-function botPlayerIdsFromSeatIds(botSeatIds: string[]): string[] {
-  return botSeatIds.map((seatId) => `player-${seatId.replace("seat-", "")}`);
-}
-
-function botPlayerIdsFromSavedGame(game: GameState): string[] {
-  return game.players.filter((player) => /^Bot\s+\d+/i.test(player.name)).map((player) => player.id);
 }
 
 export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JSX.Element {
@@ -185,10 +89,8 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   const localVisuals = useMemo(() => getHudsonHustleVisualsByConfigId(localConfigId), [localConfigId]);
 
   useEffect(() => {
-    if (!game) {
-      return;
-    }
-    window.localStorage.setItem(saveKey, JSON.stringify(game));
+    if (!game) return;
+    window.localStorage.setItem(LOCAL_SAVE_KEY, JSON.stringify(game));
     setHasSavedGame(true);
   }, [game]);
 
@@ -197,24 +99,21 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
     const id = `local-${Date.now()}-${notificationIdRef.current}`;
     setNotifications((current) => [...current.slice(-3), { id, message, tone }]);
     window.setTimeout(() => {
-      setNotifications((current) => current.filter((notification) => notification.id !== id));
+      setNotifications((current) => current.filter((n) => n.id !== id));
     }, 4200);
   }
 
   function announceGameChange(previous: GameState, nextGame: GameState) {
     const nextLog = nextGame.log.at(-1);
-
     if (nextGame.phase === "gameOver" && previous.phase !== "gameOver") {
       pushNotification("Final scores are in.", "success");
       return;
     }
-
     if (nextGame.finalRoundTriggeredBy && previous.finalRoundTriggeredBy !== nextGame.finalRoundTriggeredBy) {
-      const triggerPlayer = nextGame.players.find((player) => player.id === nextGame.finalRoundTriggeredBy);
+      const triggerPlayer = nextGame.players.find((p) => p.id === nextGame.finalRoundTriggeredBy);
       pushNotification(`${triggerPlayer?.name ?? "A player"} triggered the final round.`, "warning");
       return;
     }
-
     if (nextLog && nextGame.log.length > previous.log.length && nextLog !== "Game setup complete.") {
       pushNotification(nextLog);
     }
@@ -223,42 +122,30 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   const currentPlayer = game ? getCurrentPlayer(game) : null;
   const isCurrentPlayerLocalBot = currentPlayer ? localBotPlayerIds.includes(currentPlayer.id) : false;
   const pendingTickets = currentPlayer?.pendingTickets ?? [];
-  const pendingTicketIds = useMemo(() => pendingTickets.map((ticket) => ticket.id).join("|"), [pendingTickets]);
+  const pendingTicketIds = useMemo(() => pendingTickets.map((t) => t.id).join("|"), [pendingTickets]);
 
   useEffect(() => {
     if (!game || pendingTickets.length === 0) {
       setSelectedTicketIds([]);
       return;
     }
-
     const minimumKeep = game.phase === "initialTickets" ? 2 : 1;
-    setSelectedTicketIds(pendingTickets.slice(0, minimumKeep).map((ticket) => ticket.id));
+    setSelectedTicketIds(pendingTickets.slice(0, minimumKeep).map((t) => t.id));
   }, [game?.phase, pendingTicketIds]);
 
   useEffect(() => {
-    if (!game || game.phase === "gameOver" || localBotPlayerIds.length === 0) {
-      return;
-    }
-
+    if (!game || game.phase === "gameOver" || localBotPlayerIds.length === 0) return;
     const activePlayer = getCurrentPlayer(game);
-    if (!localBotPlayerIds.includes(activePlayer.id)) {
-      return;
-    }
+    if (!localBotPlayerIds.includes(activePlayer.id)) return;
 
     const timeout = window.setTimeout(() => {
       setGame((current) => {
-        if (!current || current.phase === "gameOver") {
-          return current;
-        }
-
+        if (!current || current.phase === "gameOver") return current;
         try {
           let nextGame = current;
           for (let steps = 0; steps < 8; steps += 1) {
             const nextActivePlayer = getCurrentPlayer(nextGame);
-            if (!localBotPlayerIds.includes(nextActivePlayer.id) || nextGame.phase === "gameOver") {
-              break;
-            }
-
+            if (!localBotPlayerIds.includes(nextActivePlayer.id) || nextGame.phase === "gameOver") break;
             const action = chooseBotAction({
               config: localMap,
               game: buildLocalPublicGameState(nextGame),
@@ -269,7 +156,6 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
               nextGame = reduceGame(nextGame, { type: "advance_turn" }, localMap);
             }
           }
-
           announceGameChange(current, nextGame);
           setSelectedRouteId(null);
           setSelectedCityId(null);
@@ -312,9 +198,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
 
   function resumeGame() {
     const saved = readSavedGame();
-    if (!saved) {
-      return;
-    }
+    if (!saved) return;
     setLocalConfigId(configIdForSavedMap(saved.mapId));
     setLocalBotPlayerIds(botPlayerIdsFromSavedGame(saved));
     setGame(saved);
@@ -329,7 +213,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   }
 
   function resetGame() {
-    window.localStorage.removeItem(saveKey);
+    window.localStorage.removeItem(LOCAL_SAVE_KEY);
     setHasSavedGame(false);
     setGame(null);
     setLocalBotPlayerIds([]);
@@ -346,15 +230,8 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
     setShowLeaveConfirm(false);
   }
 
-  function openTutorial() {
-    setGuideOpen(true);
-  }
-
   function applyAction(action: GameAction) {
-    if (!game) {
-      return;
-    }
-
+    if (!game) return;
     try {
       const activeBefore = getCurrentPlayer(game);
       const nextGame = reduceGame(game, action, localMap);
@@ -366,28 +243,17 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
         const activeAfter = nextGame.players[nextGame.activePlayerIndex];
         const knownIds = new Set(activeBefore.hand.map((card) => card.id));
         const drawnCard = activeAfter.hand.find((card) => !knownIds.has(card.id));
-        if (drawnCard) {
-          setRevealedDeckCard(drawnCard.color);
-        }
+        if (drawnCard) setRevealedDeckCard(drawnCard.color);
       }
 
-      if (nextGame.phase === "gameOver") {
-        setVisibility("visible");
-        return;
-      }
-
-      if (action.type === "select_initial_tickets") {
-        setVisibility("handoff");
-        return;
-      }
-
+      if (nextGame.phase === "gameOver") { setVisibility("visible"); return; }
+      if (action.type === "select_initial_tickets") { setVisibility("handoff"); return; }
       if (action.type === "advance_turn") {
         setSelectedRouteId(null);
         setSelectedCityId(null);
         setVisibility("handoff");
         return;
       }
-
       if (nextGame.turn.stage === "awaitingHandoff") {
         setVisibility("postTurn");
       } else {
@@ -423,62 +289,39 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   }, [game, playerAvatars]);
 
   const routeOptions = useMemo(() => {
-    if (!game || !selectedRouteId) {
-      return [];
-    }
-    if (!localMap.routes.find((route) => route.id === selectedRouteId)) {
-      return [];
-    }
+    if (!game || !selectedRouteId) return [];
+    if (!localMap.routes.find((r) => r.id === selectedRouteId)) return [];
     return getAffordableRouteColors(game, localMap, selectedRouteId);
   }, [game, localMap, selectedRouteId]);
 
   const stationOptions = useMemo(() => {
-    if (!game || !selectedCityId) {
-      return [];
-    }
+    if (!game || !selectedCityId) return [];
     return getAffordableStationColors(game, localMap);
   }, [game, localMap, selectedCityId]);
 
   const ticketProgress = useMemo(() => {
-    if (!game || !currentPlayer) {
-      return [];
-    }
-
+    if (!game || !currentPlayer) return [];
     return getTicketProgress(game, localMap, currentPlayer.id).sort(
-      (left, right) => Number(left.completed) - Number(right.completed)
+      (a, b) => Number(a.completed) - Number(b.completed)
     );
   }, [currentPlayer, game, localMap]);
 
   const currentRouteUnavailableReason = useMemo(() => {
-    if (!game || !selectedRouteId) {
-      return null;
-    }
-
-    const currentRoute = localMap.routes.find((route) => route.id === selectedRouteId);
-    if (!currentRoute) {
-      return null;
-    }
-
-    const currentRouteClaim = game.routeClaims.find((claim) => claim.routeId === currentRoute.id);
-    const currentRouteOwner = currentRouteClaim ? game.players.find((player) => player.id === currentRouteClaim.playerId) : null;
-
-    if (currentRoute.twinGroup && game.players.length <= 3) {
-      const twinIds = localMap.routes.filter((item) => item.twinGroup === currentRoute.twinGroup).map((item) => item.id);
-      const twinClaim = game.routeClaims.find((claim) => twinIds.includes(claim.routeId) && claim.routeId !== currentRoute.id);
+    if (!game || !selectedRouteId) return null;
+    const route = localMap.routes.find((r) => r.id === selectedRouteId);
+    if (!route) return null;
+    const claim = game.routeClaims.find((c) => c.routeId === route.id);
+    const owner = claim ? game.players.find((p) => p.id === claim.playerId) : null;
+    if (route.twinGroup && game.players.length <= 3) {
+      const twinIds = localMap.routes.filter((r) => r.twinGroup === route.twinGroup).map((r) => r.id);
+      const twinClaim = game.routeClaims.find((c) => twinIds.includes(c.routeId) && c.routeId !== route.id);
       if (twinClaim) {
-        const twinOwner = game.players.find((player) => player.id === twinClaim.playerId);
+        const twinOwner = game.players.find((p) => p.id === twinClaim.playerId);
         return `This parallel route is unavailable in a ${game.players.length}-player game because its twin is already claimed${twinOwner ? ` by ${twinOwner.name}` : ""}.`;
       }
     }
-
-    if (!currentRouteOwner) {
-      return null;
-    }
-
-    if (currentPlayer && currentRouteOwner.id !== currentPlayer.id) {
-      return `Already claimed by ${currentRouteOwner.name}.`;
-    }
-
+    if (!owner) return null;
+    if (currentPlayer && owner.id !== currentPlayer.id) return `Already claimed by ${owner.name}.`;
     return "No affordable claim options right now.";
   }, [game, localMap, selectedRouteId]);
 
@@ -492,7 +335,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
         onStart={startNewGame}
         canResume={hasSavedGame}
         onResume={resumeGame}
-        onOpenGuide={openTutorial}
+        onOpenGuide={() => setGuideOpen(true)}
         onBack={onReturnToGateway}
         releasedConfigs={hudsonHustleReleasedConfigs}
         initialConfigId={localConfigId}
@@ -501,15 +344,14 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   }
 
   const activePlayer = getCurrentPlayer(game);
-  const endgameWinnerScore = Math.max(...game.players.map((p) => p.score));
   const tutorialTarget = null;
   const canTakeTurnAction = visibility === "visible" && game.phase === "main" && game.turn.stage === "idle";
   const marketDisabled = visibility !== "visible" || game.phase !== "main" || game.turn.stage === "awaitingHandoff";
-  const currentCity = selectedCityId ? localMap.cities.find((city) => city.id === selectedCityId) : null;
-  const currentCityOccupied = currentCity ? game.stations.some((station) => station.cityId === currentCity.id) : false;
-  const currentRoute = selectedRouteId ? localMap.routes.find((route) => route.id === selectedRouteId) : null;
-  const currentRouteClaim = currentRoute ? game.routeClaims.find((claim) => claim.routeId === currentRoute.id) : null;
-  const currentRouteOwner = currentRouteClaim ? game.players.find((player) => player.id === currentRouteClaim.playerId) : null;
+  const currentCity = selectedCityId ? localMap.cities.find((c) => c.id === selectedCityId) : null;
+  const currentCityOccupied = currentCity ? game.stations.some((s) => s.cityId === currentCity.id) : false;
+  const currentRoute = selectedRouteId ? localMap.routes.find((r) => r.id === selectedRouteId) : null;
+  const currentRouteClaim = currentRoute ? game.routeClaims.find((c) => c.routeId === currentRoute.id) : null;
+  const currentRouteOwner = currentRouteClaim ? game.players.find((p) => p.id === currentRouteClaim.playerId) : null;
   const currentStationCost = localMap.settings.stationsPerPlayer - activePlayer.stationsLeft + 1;
   const highlightedTicket = focusedTicket ?? pinnedTicket;
   const highlightedCityIds = highlightedTicket ? [highlightedTicket.from, highlightedTicket.to] : [];
@@ -520,13 +362,9 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
         <div className="topbar-private-spacer" aria-hidden="true" />
         <TurnIndicator playerName={game.players[game.activePlayerIndex]?.name ?? ""} />
         <div className="topbar-actions">
-          <Button onClick={openTutorial}>
-            Guide
-          </Button>
+          <Button onClick={() => setGuideOpen(true)}>Guide</Button>
           <ScoreGuide className="score-guide--subtle" label="Score" />
-          <Button onClick={() => setShowLeaveConfirm(true)}>
-            Leave room
-          </Button>
+          <Button onClick={() => setShowLeaveConfirm(true)}>Leave room</Button>
         </div>
       </header>
 
@@ -556,7 +394,6 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
               <p>The next player should only see the public board until they click `I'm ready`.</p>
             </Panel>
           )}
-
         </aside>
 
         <main className="board-column">
@@ -573,11 +410,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
               playerPalette={playerColorPalette}
               viewerPlayerId={game.players[game.activePlayerIndex]?.id}
               game={{
-                players: game.players.map((player) => ({
-                  id: player.id,
-                  name: player.name,
-                  color: player.color
-                })),
+                players: game.players.map((p) => ({ id: p.id, name: p.name, color: p.color })),
                 activePlayerIndex: game.activePlayerIndex,
                 routeClaims: game.routeClaims,
                 stations: game.stations
@@ -585,16 +418,8 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
               selectedRouteId={selectedRouteId}
               selectedCityId={selectedCityId}
               highlightedCityIds={highlightedCityIds}
-              onSelectRoute={(routeId) => {
-                setSelectedRouteId(routeId);
-                setSelectedCityId(null);
-                setPaymentPreview(null);
-              }}
-              onSelectCity={(cityId) => {
-                setSelectedCityId(cityId);
-                setSelectedRouteId(null);
-                setPaymentPreview(null);
-              }}
+              onSelectRoute={(routeId) => { setSelectedRouteId(routeId); setSelectedCityId(null); setPaymentPreview(null); }}
+              onSelectCity={(cityId) => { setSelectedCityId(cityId); setSelectedRouteId(null); setPaymentPreview(null); }}
             />
             <FloatingPlayerRoster
               players={rosterPlayers}
@@ -634,91 +459,40 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
                 ) : null}
 
                 {currentRoute && game.phase === "main" && visibility === "visible" ? (
-              <SurfaceCard
-                variant="detail"
-                className="detail-card"
-                data-detail-kind="route"
-                title={`${getCityName(localMap, currentRoute.from)} → ${getCityName(localMap, currentRoute.to)}`}
-              >
-                <div className="detail-card__summary">
-                  <div className="detail-card__facts">
-                    <span className="detail-card__fact">{currentRoute.length} train{currentRoute.length === 1 ? "" : "s"}</span>
-                    <span className="detail-card__fact">{localMap.typeLabelOverrides?.[currentRoute.type] ?? currentRoute.type}</span>
-                    <span className="detail-card__fact">{currentRoute.color === "gray" ? "gray route" : currentRoute.color}</span>
-                    {currentRoute.locomotiveCost ? (
-                      <span className="detail-card__fact">{currentRoute.locomotiveCost} locomotive{currentRoute.locomotiveCost === 1 ? "" : "s"}</span>
-                    ) : null}
-                  </div>
-                  <p className="detail-card__prompt">
-                    {currentRouteOwner ? `Claimed by ${currentRouteOwner.name}.` : "Choose payment color."}
-                  </p>
-                </div>
-                <div className="detail-card__decision-shelf chip-row">
-                  {routeOptions.length > 0 ? (
-                    routeOptions.map((color) => (
-                      <ChoiceChipButton
-                        key={color}
-                        style={{ ["--choice-chip-accent" as string]: cardColorPalette[color] }}
-                        disabled={!canTakeTurnAction}
-                        onMouseEnter={() =>
-                          setPaymentPreview({ color, totalCost: currentRoute.length, minimumLocomotives: currentRoute.locomotiveCost ?? 0 })
-                        }
-                        onMouseLeave={() => setPaymentPreview(null)}
-                        onFocus={() =>
-                          setPaymentPreview({ color, totalCost: currentRoute.length, minimumLocomotives: currentRoute.locomotiveCost ?? 0 })
-                        }
-                        onBlur={() => setPaymentPreview(null)}
-                        onClick={() => applyAction({ type: "claim_route", routeId: currentRoute.id, color })}
-                      >
-                        Claim {formatCardLabel(color)}
-                      </ChoiceChipButton>
-                    ))
-                  ) : (
-                    <span className="muted-copy">{currentRouteUnavailableReason}</span>
-                  )}
-                </div>
-              </SurfaceCard>
+                  <RouteBuildPanel
+                    route={currentRoute}
+                    config={localMap}
+                    options={routeOptions}
+                    unavailableReason={currentRouteUnavailableReason}
+                    cardPalette={cardColorPalette}
+                    disabled={!canTakeTurnAction}
+                    claimedByName={currentRouteOwner?.name ?? null}
+                    onClaim={(color) => applyAction({ type: "claim_route", routeId: currentRoute.id, color })}
+                    onPaymentPreviewEnter={(preview) => setPaymentPreview(preview)}
+                    onPaymentPreviewLeave={() => setPaymentPreview(null)}
+                  />
                 ) : null}
 
                 {currentCity && game.phase === "main" && visibility === "visible" ? (
-              <SurfaceCard variant="detail" className="detail-card" title={currentCity.name}>
-                <div className="detail-card__summary">
-                  <div className="detail-card__facts">
-                    <span className="detail-card__fact">Station</span>
-                  </div>
-                  <p className="detail-card__prompt">Choose payment color.</p>
-                </div>
-                <div className="detail-card__decision-shelf chip-row">
-                  {currentCityOccupied ? (
-                    <span className="muted-copy">A station is already built in this city.</span>
-                  ) : stationOptions.length > 0 ? (
-                    stationOptions.map((color) => (
-                      <ChoiceChipButton
-                        key={color}
-                        style={{ ["--choice-chip-accent" as string]: cardColorPalette[color] }}
-                        disabled={!canTakeTurnAction}
-                        onMouseEnter={() => setPaymentPreview({ color, totalCost: currentStationCost })}
-                        onMouseLeave={() => setPaymentPreview(null)}
-                        onFocus={() => setPaymentPreview({ color, totalCost: currentStationCost })}
-                        onBlur={() => setPaymentPreview(null)}
-                        onClick={() => applyAction({ type: "build_station", cityId: currentCity.id, color })}
-                      >
-                        Build {formatCardLabel(color)}
-                      </ChoiceChipButton>
-                    ))
-                  ) : (
-                    <span className="muted-copy">
-                      {game.turn.stage === "idle" ? "No affordable station payment colors right now." : "Finish the current draw before building a station."}
-                    </span>
-                  )}
-                </div>
-              </SurfaceCard>
+                  <StationBuildPanel
+                    city={currentCity}
+                    config={localMap}
+                    options={stationOptions}
+                    cityOccupied={currentCityOccupied}
+                    stationCost={currentStationCost}
+                    cardPalette={cardColorPalette}
+                    disabled={!canTakeTurnAction}
+                    turnStage={game.turn.stage}
+                    onBuild={(color) => applyAction({ type: "build_station", cityId: currentCity.id, color })}
+                    onPaymentPreviewEnter={(preview) => setPaymentPreview(preview)}
+                    onPaymentPreviewLeave={() => setPaymentPreview(null)}
+                  />
                 ) : null}
 
                 {game.turn.latestTunnelReveal.length > 0 && visibility === "visible" ? (
-              <SurfaceCard variant="detail" className="detail-card detail-card--tunnel" eyebrow="Tunnel check" title="Tunnel reveal">
-                <p>{game.turn.latestTunnelReveal.join(", ")}</p>
-              </SurfaceCard>
+                  <SurfaceCard variant="detail" className="detail-card detail-card--tunnel" eyebrow="Tunnel check" title="Tunnel reveal">
+                    <p>{game.turn.latestTunnelReveal.join(", ")}</p>
+                  </SurfaceCard>
                 ) : null}
 
                 {error && visibility === "visible" ? (
@@ -737,54 +511,31 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
           actions={
             <>
               <Button disabled>Share result</Button>
-              <Button variant="primary" onClick={resetGame}>
-                Play again
-              </Button>
+              <Button variant="primary" onClick={resetGame}>Play again</Button>
             </>
           }
         >
-          <div className="endgame-grid">
-            {game.players.map((player) => {
-              const isWinner = player.score === endgameWinnerScore;
-              return (
-                <SurfaceCard
-                  key={player.id}
-                  as="article"
-                  variant="summary"
-                  eyebrow={isWinner ? "Winner" : "Final score"}
-                  title={player.name}
-                  className={`endgame-card ${isWinner ? "endgame-card--winner" : ""}`}
-                >
-                  <div className="endgame-card__hero">
-                    <p className="endgame-score">{player.score}</p>
-                    <span className="endgame-score__label">points</span>
-                  </div>
-                  <EndgameBreakdown player={player} config={localMap} />
-                </SurfaceCard>
-              );
-            })}
-          </div>
+          <EndgameGrid players={game.players} config={localMap} />
         </GameOverLayer>
       ) : null}
 
       {visibility === "postTurn" && game.phase !== "gameOver" ? (
-        <ModalShell variant={tutorialTarget === "handoff" ? "tutorial" : "default"} width="md" align="center">
-            <SectionHeader eyebrow="Turn complete" title={`${activePlayer.name}, pass the laptop.`} variant="ceremony" />
-            <p>{game.turn.summary ?? "Your action is locked in."}</p>
-            <Button variant="primary" onClick={() => applyAction({ type: "advance_turn" })}>
-              I&apos;m done
-            </Button>
-        </ModalShell>
+        <HandoffModal
+          mode="postTurn"
+          playerName={activePlayer.name}
+          summary={game.turn.summary}
+          onAdvance={() => applyAction({ type: "advance_turn" })}
+          onReady={() => setVisibility("visible")}
+        />
       ) : null}
 
       {visibility === "handoff" && game.phase !== "gameOver" ? (
-        <ModalShell variant={tutorialTarget === "handoff" ? "tutorial" : "default"} width="md" align="center">
-            <SectionHeader eyebrow="Next player" title={`${activePlayer.name}, take over.`} variant="ceremony" />
-            <p>The board is safe to look at. Private cards and tickets stay hidden until you are ready.</p>
-            <Button variant="primary" onClick={() => setVisibility("visible")}>
-              I&apos;m ready
-            </Button>
-        </ModalShell>
+        <HandoffModal
+          mode="handoff"
+          playerName={activePlayer.name}
+          onAdvance={() => applyAction({ type: "advance_turn" })}
+          onReady={() => setVisibility("visible")}
+        />
       ) : null}
 
       {pendingTickets.length > 0 && visibility === "visible" && !isCurrentPlayerLocalBot ? (
@@ -818,11 +569,9 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
 
       {revealedDeckCard ? (
         <ModalShell width="md" align="center" cardClassName="draw-reveal-card">
-            <SectionHeader eyebrow="Deck draw" title={`You drew ${formatFaceLabel(revealedDeckCard)}`} variant="ceremony" />
-            <TransitCard className="draw-reveal-preview" color={revealedDeckCard} context="hand" />
-            <Button variant="primary" onClick={() => setRevealedDeckCard(null)}>
-              Continue
-            </Button>
+          <SectionHeader eyebrow="Deck draw" title={`You drew ${formatFaceLabel(revealedDeckCard)}`} variant="ceremony" />
+          <TransitCard className="draw-reveal-preview" color={revealedDeckCard} context="hand" />
+          <Button variant="primary" onClick={() => setRevealedDeckCard(null)}>Continue</Button>
         </ModalShell>
       ) : null}
 
@@ -831,12 +580,8 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
           <SectionHeader eyebrow="Leave game" title="Leave this game?" variant="ceremony" />
           <p>Your local match will return to setup.</p>
           <div className="setup-actions">
-            <Button onClick={() => setShowLeaveConfirm(false)}>
-              Cancel
-            </Button>
-            <Button variant="primary" onClick={resetGame}>
-              Leave
-            </Button>
+            <Button onClick={() => setShowLeaveConfirm(false)}>Cancel</Button>
+            <Button variant="primary" onClick={resetGame}>Leave</Button>
           </div>
         </ModalShell>
       ) : null}
