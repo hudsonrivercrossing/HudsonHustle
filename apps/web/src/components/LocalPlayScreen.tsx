@@ -47,6 +47,7 @@ import { Button } from "./system/Button";
 import { ChoiceChipButton } from "./system/ChoiceChipButton";
 import { ModalShell } from "./system/ModalShell";
 import { Panel } from "./system/Panel";
+import { StatusBanner } from "./system/StatusBanner";
 import { SectionHeader } from "./system/SectionHeader";
 import { SurfaceCard } from "./system/SurfaceCard";
 
@@ -171,7 +172,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   const [pinnedTicket, setPinnedTicket] = useState<TicketDef | null>(null);
   const [paymentPreview, setPaymentPreview] = useState<{ color: TrainCardColor; totalCost: number; minimumLocomotives?: number } | null>(null);
   const [revealedDeckCard, setRevealedDeckCard] = useState<keyof typeof cardColorPalette | null>(null);
-  const [, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [guideOpen, setGuideOpen] = useState(false);
   const [hasSavedGame, setHasSavedGame] = useState<boolean>(() => typeof window !== "undefined" && Boolean(readSavedGame()));
   const [localConfigId, setLocalConfigId] = useState(hudsonHustleCurrentConfigId);
@@ -718,6 +719,10 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
               <SurfaceCard variant="detail" className="detail-card detail-card--tunnel" eyebrow="Tunnel check" title="Tunnel reveal">
                 <p>{game.turn.latestTunnelReveal.join(", ")}</p>
               </SurfaceCard>
+                ) : null}
+
+                {error && visibility === "visible" ? (
+                  <StatusBanner tone="warning" eyebrow="Action error" headline={error} />
                 ) : null}
               </>
             }
