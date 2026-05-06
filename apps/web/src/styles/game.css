@@ -65,8 +65,34 @@
   letter-spacing: 0;
 }
 
+.app-shell--gameplay-hud .player-roster--top .row-object__stat {
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+}
+
+/* Active player row — brighter stats so the current seat reads as the live seat */
+.app-shell--gameplay-hud .player-roster--top .player-strip--active .row-object__title {
+  color: var(--hud-paper-bright);
+}
+
+.app-shell--gameplay-hud .player-roster--top .player-strip--active .row-object__stat {
+  color: rgba(246, 235, 214, 0.95);
+  font-weight: 880;
+}
+
 .app-shell--gameplay-hud .player-roster--top .row-object__stats {
   min-width: 70px;
+}
+
+/* Active label — shown as a small footer line inside the roster panel */
+.app-shell--gameplay-hud .player-roster--top .player-roster__active-label {
+  display: block;
+  padding: 3px 9px 4px;
+  color: color-mix(in srgb, var(--hud-paper) 62%, var(--hud-brass) 38%);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .app-shell--gameplay-hud .private-hand-rail,
@@ -481,12 +507,19 @@
 .app-shell--gameplay-hud .turn-indicator__timer {
   font-family: var(--font-body);
   font-size: 0.78rem;
-  font-weight: 600;
-  color: rgba(246, 235, 214, 0.85);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: rgba(246, 235, 214, 0.92);
   padding: 2px 8px;
   border-radius: 6px;
   background: rgba(212, 79, 76, 0.15);
   border: 1px solid rgba(212, 79, 76, 0.3);
+}
+
+/* Per-seat timer in the scoreboard row */
+.app-shell--gameplay-hud .player-roster__timer {
+  font-variant-numeric: tabular-nums;
 }
 
 .app-shell--gameplay-hud .topbar {
@@ -807,11 +840,12 @@
 
 .app-shell--gameplay-hud .hand-color-slot--empty {
   border-style: dashed;
+  border-color: color-mix(in srgb, var(--hand-slot-color) 22%, rgba(222, 199, 158, 0.14));
   background:
-    linear-gradient(90deg, color-mix(in srgb, var(--hand-slot-color) 30%, transparent) 0 8px, transparent 8px),
+    linear-gradient(90deg, color-mix(in srgb, var(--hand-slot-color) 16%, transparent) 0 8px, transparent 8px),
     var(--hud-grain),
-    linear-gradient(180deg, rgba(28, 29, 27, 0.62), rgba(11, 13, 12, 0.68));
-  opacity: 0.82;
+    linear-gradient(180deg, rgba(22, 23, 21, 0.72), rgba(8, 9, 8, 0.78));
+  opacity: 0.52;
 }
 
 .app-shell--gameplay-hud .hand-color-slot__count,
