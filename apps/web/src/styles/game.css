@@ -2820,3 +2820,66 @@ border-color: rgba(232, 220, 194, 0.72);
   color: var(--hud-paper-bright);
 }
 
+/* ── D2: Supply Dock & Inspector — physical material lift ──────────────────
+   Targets: SupplyDock deck label, draw-deck stacked shadow, InspectorDock
+   tab rail active state, detail-card route artifact, chat panel spacing.
+   ─────────────────────────────────────────────────────────────────────── */
+
+/* Deck count: stamped supply label — tabular, uppercase, brass-tinted */
+.app-shell--gameplay-hud .supply-dock--board .section-header__meta {
+  font-variant-numeric: tabular-nums;
+  font-weight: 780;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--hud-paper) 68%, var(--hud-brass) 32%);
+}
+
+/* Draw deck button: box-shadow layers simulate a physical stack of cards */
+.app-shell--gameplay-hud .inspector-dock .supply-dock__draw-deck.system-button {
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 244, 217, 0.08),
+    0 2px 0 rgba(17, 21, 20, 0.90),
+    0 4px 0 rgba(14, 18, 17, 0.74),
+    0 6px 0 rgba(11, 14, 13, 0.52);
+}
+
+/* Active tab: stronger pop + deeper raised shadow for a pressed-tab feel */
+.app-shell--gameplay-hud .inspector-tabs__tab--active {
+  transform: rotate(180deg) translateX(-9px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 248, 232, 0.54),
+    inset 0 2px 0 rgba(255, 255, 255, 0.22),
+    7px 4px 0 rgba(0, 0, 0, 0.34),
+    9px 7px 0 rgba(0, 0, 0, 0.16);
+}
+
+/* detail-card: left brass stripe marks it as a route artifact */
+.app-shell--gameplay-hud .inspector-dock--build .detail-card {
+  border-left: 3px solid rgba(183, 155, 97, 0.62);
+  padding-left: 10px;
+}
+
+/* Route fact chips: printed manifest labels — bordered, uppercase, tight */
+.app-shell--gameplay-hud .detail-card__fact {
+  border: 1px solid rgba(183, 155, 97, 0.22);
+  font-size: 0.62rem;
+  font-weight: 760;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Decision shelf: dashed separator between facts and payment options */
+.app-shell--gameplay-hud .detail-card__decision-shelf {
+  border-top: 1px dashed rgba(183, 155, 97, 0.24);
+  padding-top: 10px;
+}
+
+/* Chat panel: slightly more breathing room between sections */
+.app-shell--gameplay-hud .chat-panel {
+  gap: 10px;
+}
+
+.app-shell--gameplay-hud .chat-panel__messages {
+  gap: 5px;
+}
+

@@ -42,12 +42,12 @@ Storybook (validate: does running code match Pencil design?)
 **Files:** `game.css`, `SupplyDock`, `InspectorDock`  
 **Tool:** `[Pencil → Code]`
 
-| [ ] | What |
+| [x] | What |
 |-----|------|
-| [ ] | Market card slots — stronger draw pile indicator; deck count label feels like a physical deck label |
-| [ ] | Inspector dock tab rail — active tab state more physical/tactile |
-| [ ] | Build panel — `detail-card` inside inspector reads as a route artifact, not a generic card |
-| [ ] | Chat panel — spacing + input polish only |
+| [x] | Market card slots — stronger draw pile indicator; deck count label feels like a physical deck label |
+| [x] | Inspector dock tab rail — active tab state more physical/tactile |
+| [x] | Build panel — `detail-card` inside inspector reads as a route artifact, not a generic card |
+| [x] | Chat panel — spacing + input polish only |
 
 ---
 
