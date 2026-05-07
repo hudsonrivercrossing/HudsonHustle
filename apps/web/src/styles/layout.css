@@ -1,9 +1,96 @@
-/* Layout module — pending extraction from system.css
- *
- * Rules to migrate here during the design system phase:
- *   .app-shell and variants
- *   .game-layout and variants
- *   .board-column, .side-panel
- *   .setup-flow-grid, .setup-entry-grid, .setup-field-grid, .field-grid
- *   .setup-actions, .action-rail, .chip-row, .topbar-actions
- */
+/* ─────────────────────────────────────────────────────────────────────────────
+   Layout — structural / flow rules extracted from system.css.
+   Visual properties (color, shadow, filter) stay in system.css.
+───────────────────────────────────────────────────────────────────────────── */
+
+/* Shell */
+.app-shell {
+  min-height: 100vh;
+  padding: var(--space-page-y) var(--space-page-x);
+}
+
+/* Game layout */
+.game-layout {
+  display: grid;
+  grid-template-columns: minmax(252px, 272px) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.side-panel,
+.board-column {
+  display: grid;
+  gap: var(--space-stack-md);
+  align-content: start;
+}
+
+.side-panel__private-stack {
+  display: grid;
+  gap: 10px;
+}
+
+/* Setup flows */
+.setup-flow-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.setup-flow-grid--create,
+.setup-flow-grid--join {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.setup-entry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.setup-field-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.setup-field-grid--split {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.setup-field-grid--launch {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+}
+
+.setup-field-grid--launch .join-preview-button {
+  align-self: end;
+}
+
+/* Field grid */
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-stack-sm);
+  margin: var(--space-stack-lg) 0;
+}
+
+/* Action rows */
+.setup-actions,
+.topbar-actions,
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.topbar-actions {
+  justify-content: flex-end;
+  align-items: start;
+  gap: 10px;
+}
+
+.topbar-actions .system-button {
+  min-width: auto;
+}
+
+.topbar-actions__leave {
+  padding-inline: 14px;
+}

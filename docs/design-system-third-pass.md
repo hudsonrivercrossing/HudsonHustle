@@ -28,12 +28,12 @@ Storybook (validate: does running code match Pencil design?)
 **Files:** `game.css`, `PlayerRosterPanel`, `PlayerHandPanel`  
 **Tool:** `[Pencil → Code]`
 
-| [ ] | What |
+| [x] | What |
 |-----|------|
-| [ ] | Scoreboard row typography — player name + stats feel like a game card printout (denser, stronger number weight for trains/tickets/stations) |
-| [ ] | Hand rail card slots — increase visual contrast between 0-count and filled cards; add subtle slot texture |
-| [ ] | Timer label — feels like a physical countdown display, not a UI label |
-| [ ] | No new components. CSS object changes only. |
+| [x] | Scoreboard row typography — player name + stats feel like a game card printout (denser, stronger number weight for trains/tickets/stations) |
+| [x] | Hand rail card slots — increase visual contrast between 0-count and filled cards; add subtle slot texture |
+| [x] | Timer label — feels like a physical countdown display, not a UI label |
+| [x] | No new components. CSS object changes only. |
 
 ---
 
