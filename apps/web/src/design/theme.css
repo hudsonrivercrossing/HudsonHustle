@@ -63,12 +63,12 @@
   --layout-setup-max-width: 880px;
   --space-page-x: 24px;
   --space-page-y: 24px;
-  --space-stack-xs: 6px;
-  --space-stack-sm: 12px;
-  --space-stack-md: 18px;
+  --space-stack-xs: 4px;
+  --space-stack-sm: 8px;
+  --space-stack-md: 16px;
   --space-stack-lg: 24px;
   --space-stack-xl: 32px;
-  --space-panel-md: 18px;
+  --space-panel-md: 16px;
   --space-panel-xl: 40px;
 
   /* --- Font Families --- */
