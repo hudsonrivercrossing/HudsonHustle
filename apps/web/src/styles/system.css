@@ -37,11 +37,6 @@ button {
   cursor: pointer;
 }
 
-.app-shell {
-  min-height: 100vh;
-  padding: var(--space-page-y) var(--space-page-x);
-}
-
 .panel,
 .modal-card,
 .modal-shell__card {
@@ -67,16 +62,6 @@ button {
     linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent 34%),
     linear-gradient(180deg, rgba(142, 170, 187, 0.06), transparent 52%);
   pointer-events: none;
-}
-
-.setup-flow-grid {
-  display: grid;
-  gap: 16px;
-}
-
-.setup-flow-grid--create,
-.setup-flow-grid--join {
-  grid-template-columns: minmax(0, 1fr);
 }
 
 .eyebrow {
@@ -250,41 +235,10 @@ h3 {
 .lead,
 .modal-copy,
 .hidden-panel p,
-.detail-card p,
-
-.setup-entry-grid {
+.detail-card p {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
-}
-
-.setup-field-grid {
-  display: grid;
-  gap: 12px;
-}
-
-.setup-field-grid--split {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.setup-field-grid--launch {
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
-}
-
-.setup-field-grid--launch .join-preview-button {
-  align-self: end;
-}
-
-.field-grid {
-  margin: 0;
-}
-
-.field-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: var(--space-stack-sm);
-  margin: var(--space-stack-lg) 0;
 }
 
 .field {
@@ -391,14 +345,6 @@ h3 {
 
 .form-field__error {
   color: var(--color-danger);
-}
-
-.setup-actions,
-.topbar-actions,
-.chip-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
 }
 
 .system-button,
@@ -656,20 +602,6 @@ h3 {
   gap: 10px;
 }
 
-.topbar-actions {
-  justify-content: flex-end;
-  align-items: start;
-  gap: 10px;
-}
-
-.topbar-actions .system-button {
-  min-width: auto;
-}
-
-.topbar-actions__leave {
-  padding-inline: 14px;
-}
-
 .score-guide--subtle .score-guide__trigger.system-button {
   min-height: var(--control-height-row);
   padding-inline: 12px;
@@ -682,13 +614,6 @@ h3 {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.58),
     0 5px 12px rgba(var(--shadow-warm-rgb), 0.05);
-}
-
-.game-layout {
-  display: grid;
-  grid-template-columns: minmax(252px, 272px) minmax(0, 1fr);
-  gap: 14px;
-  align-items: start;
 }
 
 .join-preview-button {
@@ -1223,18 +1148,6 @@ h3 {
 
 .game-layout--obscured {
   filter: blur(12px);
-}
-
-.side-panel,
-.board-column {
-  display: grid;
-  gap: var(--space-stack-md);
-  align-content: start;
-}
-
-.side-panel__private-stack {
-  display: grid;
-  gap: 10px;
 }
 
 .panel {
