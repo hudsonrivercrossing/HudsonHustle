@@ -129,7 +129,7 @@ button {
 
 .score-guide__heading {
   font-family: var(--font-body);
-  font-size: var(--type-body);
+  font-size: var(--type-sm);
   font-weight: 700;
   color: var(--ink);
 }
@@ -184,7 +184,7 @@ button {
 }
 
 .section-header--compact .section-header__title {
-  font-size: 0.98rem;
+  font-size: var(--type-body);
   line-height: 1.08;
   letter-spacing: -0.025em;
 }
@@ -291,7 +291,7 @@ h3 {
   background:
     linear-gradient(180deg, rgba(255, 254, 250, 0.98), rgba(247, 240, 228, 0.92));
   color: var(--ink);
-  font-size: 1rem;
+  font-size: var(--type-body);
   line-height: 1.35;
   font-weight: 550;
   letter-spacing: -0.01em;
@@ -377,7 +377,7 @@ h3 {
   text-align: center;
   letter-spacing: 0;
   line-height: 1.02;
-  font-size: 0.96rem;
+  font-size: var(--type-body);
   font-family: var(--font-body);
   font-weight: 740;
   color: rgba(var(--control-surface-rgb), 0.94);
@@ -561,7 +561,7 @@ h3 {
   min-height: 0;
   padding: 4px 0;
   color: rgba(var(--control-ink-rgb), 0.52);
-  font-size: 0.8rem;
+  font-size: var(--type-xs);
   letter-spacing: 0.04em;
   font-weight: 500;
   box-shadow: none;
@@ -680,7 +680,7 @@ h3 {
 
 .seat-plan__title {
   font-family: var(--font-body);
-  font-size: 0.95rem;
+  font-size: var(--type-body);
   font-weight: 700;
   line-height: 1.1;
 }
@@ -704,7 +704,7 @@ h3 {
 }
 
 .room-preview .muted-copy {
-  font-size: 0.78rem;
+  font-size: var(--type-xs);
   line-height: 1.3;
 }
 
@@ -792,7 +792,7 @@ h3 {
 .row-object__title {
   min-width: 0;
   font-family: var(--font-body);
-  font-size: 0.98rem;
+  font-size: var(--type-body);
   font-weight: 700;
   line-height: 1.15;
   letter-spacing: -0.02em;
@@ -817,7 +817,7 @@ h3 {
 .row-object__stat {
   font-family: var(--font-body);
   color: var(--ink-soft);
-  font-size: var(--type-body);
+  font-size: var(--type-sm);
   line-height: 1.2;
   letter-spacing: -0.01em;
   white-space: nowrap;
@@ -850,7 +850,7 @@ h3 {
   border: 1px solid var(--chip-border, rgba(var(--control-ink-rgb), 0.16));
   background: var(--chip-bg, linear-gradient(180deg, rgba(43, 52, 58, 0.94), rgba(29, 38, 45, 0.94)));
   color: rgba(var(--control-surface-rgb), 0.84);
-  font-size: 0.62rem;
+  font-size: var(--type-xs);
   font-weight: 760;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -917,7 +917,7 @@ h3 {
   min-height: 24px;
   padding-inline: 9px;
   letter-spacing: 0.08em;
-  font-size: 0.6rem;
+  font-size: var(--type-xs);
 }
 
 .ticket-status {
@@ -1249,7 +1249,7 @@ h3 {
 
 .panel-header h2 {
   font-family: var(--font-body);
-  font-size: 1.08rem;
+  font-size: var(--type-md);
   font-weight: 700;
   letter-spacing: -0.02em;
 }
@@ -1300,7 +1300,7 @@ h3 {
 }
 
 .player-roster--top .row-object__stat {
-  font-size: 0.68rem;
+  font-size: var(--type-xs);
 }
 
 .player-roster--top .row-object__title,
@@ -1311,11 +1311,11 @@ h3 {
 }
 
 .player-roster--top .row-object__title {
-  font-size: 0.82rem;
+  font-size: var(--type-xs);
 }
 
 .player-roster--top .row-object__meta {
-  font-size: 0.72rem;
+  font-size: var(--type-xs);
 }
 
 .player-roster--top .player-swatch {
@@ -1390,7 +1390,7 @@ h3 {
   border-radius: 999px;
   background: rgba(7, 12, 17, 0.88);
   color: #ffedbd;
-  font-size: 0.7rem;
+  font-size: var(--type-xs);
   font-weight: 880;
   line-height: 1;
   letter-spacing: 0.06em;
@@ -1463,7 +1463,7 @@ h3 {
 
 .floating-player-panel__name {
   font-family: var(--font-sans);
-  font-size: var(--type-xs);
+  font-size: var(--type-sm);
   font-weight: 700;
   color: #fff8ea;
   white-space: nowrap;
@@ -1473,7 +1473,7 @@ h3 {
 
 .floating-player-panel__stats {
   font-family: var(--font-body);
-  font-size: 0.72rem;
+  font-size: var(--type-xs);
   color: rgba(var(--paper-warm-rgb), 0.7);
   white-space: nowrap;
   letter-spacing: 0.02em;
@@ -1584,7 +1584,7 @@ h3 {
   border-radius: 999px;
   background: color-mix(in srgb, var(--hand-slot-color) 72%, rgba(255, 252, 246, 0.68));
   color: #fffaf0;
-  font-size: 1rem;
+  font-size: var(--type-body);
   font-weight: 840;
   line-height: 1;
   text-shadow: 0 1px 2px rgba(45, 35, 25, 0.26);
@@ -1608,7 +1608,7 @@ h3 {
   border-radius: 999px;
   background: rgba(7, 12, 17, 0.72);
   color: #ffb3a8;
-  font-size: 0.58rem;
+  font-size: var(--type-xs);
   font-weight: 840;
   letter-spacing: 0.02em;
   line-height: 1;
@@ -1622,7 +1622,7 @@ h3 {
   max-width: 100%;
   overflow: hidden;
   color: var(--ink-soft);
-  font-size: 0.68rem;
+  font-size: var(--type-xs);
   font-weight: 760;
   letter-spacing: 0.08em;
   line-height: 1;
@@ -1655,13 +1655,13 @@ h3 {
   min-height: 28px;
   padding: 0;
   border-radius: var(--radius-control);
-  font-size: 1rem;
+  font-size: var(--type-body);
 }
 
 .ticket-dock__page-label {
   min-width: 34px;
   color: rgba(var(--paper-warm-rgb), 0.62);
-  font-size: 0.68rem;
+  font-size: var(--type-xs);
   font-weight: 780;
   text-align: center;
 }
@@ -1677,7 +1677,7 @@ h3 {
 }
 
 .ticket-row--compact .row-object__title {
-  font-size: 0.82rem;
+  font-size: var(--type-xs);
 }
 
 .ticket-row--button {
@@ -1763,7 +1763,7 @@ h3 {
   justify-self: end;
   margin-top: -2px;
   color: color-mix(in srgb, var(--ink-soft) 82%, transparent);
-  font-size: 0.72rem;
+  font-size: var(--type-xs);
   font-weight: 720;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1890,7 +1890,7 @@ h3 {
 .transit-card__footer,
 .transit-card__stamp {
   font-family: var(--font-body);
-  font-size: 0.45rem;
+  font-size: var(--type-xs);
   line-height: 1;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -2004,7 +2004,7 @@ h3 {
   display: block;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 0.96rem;
+  font-size: var(--type-body);
   line-height: 0.98;
   letter-spacing: -0.015em;
   white-space: nowrap;
@@ -2013,11 +2013,11 @@ h3 {
 }
 
 .transit-card__title--medium {
-  font-size: 0.86rem;
+  font-size: var(--type-xs);
 }
 
 .transit-card__title--compact {
-  font-size: 0.78rem;
+  font-size: var(--type-xs);
   letter-spacing: 0;
 }
 
@@ -2034,7 +2034,7 @@ h3 {
     inset 0 1px 0 rgba(255, 255, 255, 0.28),
     0 2px 6px rgba(74, 53, 33, 0.05);
   font-family: var(--font-body);
-  font-size: 0.42rem;
+  font-size: var(--type-xs);
   font-weight: 700;
   line-height: 1;
   letter-spacing: 0.09em;
@@ -2076,7 +2076,7 @@ h3 {
 }
 
 .transit-card--locomotive .transit-card__title {
-  font-size: 0.82rem;
+  font-size: var(--type-xs);
   letter-spacing: 0;
 }
 
@@ -2215,7 +2215,7 @@ h3 {
 .surface-card__title {
   margin: 0;
   font-family: var(--font-body);
-  font-size: 1.02rem;
+  font-size: var(--type-body);
   font-weight: 720;
   letter-spacing: -0.02em;
   line-height: 1.06;
@@ -2238,7 +2238,7 @@ h3 {
 .surface-card.detail-card[aria-label="Route detail"] .surface-card__title,
 .surface-card.detail-card[data-detail-kind="route"] .surface-card__title {
   font-family: var(--font-display);
-  font-size: 1.2rem;
+  font-size: var(--type-lg);
   font-weight: 700;
   letter-spacing: -0.035em;
   line-height: 0.98;
@@ -2246,7 +2246,7 @@ h3 {
 
 .surface-card__meta {
   color: var(--ink-soft);
-  font-size: 0.8rem;
+  font-size: var(--type-xs);
   line-height: 1.2;
 }
 
@@ -2280,7 +2280,7 @@ h3 {
     linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(241, 232, 215, 0.88));
   border: 1px solid rgba(var(--border-warm-rgb), 0.12);
   color: color-mix(in srgb, var(--ink-soft) 80%, var(--accent-strong) 20%);
-  font-size: 0.82rem;
+  font-size: var(--type-xs);
   font-weight: 700;
   letter-spacing: 0.01em;
 }
@@ -2288,7 +2288,7 @@ h3 {
 .detail-card__prompt {
   margin: 0;
   color: var(--ink);
-  font-size: 0.94rem;
+  font-size: var(--type-body);
   line-height: 1.35;
   font-weight: 620;
 }
@@ -2333,21 +2333,21 @@ h3 {
 
 .action-empty-prompt__title {
   font-family: var(--font-body);
-  font-size: 0.96rem;
+  font-size: var(--type-body);
   font-weight: 700;
   color: var(--ink);
 }
 
 .action-empty-prompt__copy {
   color: var(--ink-soft);
-  font-size: 0.84rem;
+  font-size: var(--type-xs);
   line-height: 1.35;
 }
 
 /* summary/results card — display font for reveal-moment title */
 .surface-card--summary .surface-card__title {
   font-family: var(--font-display);
-  font-size: 1.24rem;
+  font-size: var(--type-lg);
   line-height: 1;
   letter-spacing: -0.04em;
 }
@@ -2355,7 +2355,7 @@ h3 {
 /* endgame player card — display font for post-game ceremony */
 .endgame-card .surface-card__title {
   font-family: var(--font-display);
-  font-size: 1.34rem;
+  font-size: var(--type-xl);
   line-height: 0.98;
   letter-spacing: -0.035em;
 }
@@ -2446,7 +2446,7 @@ h3 {
 
 .endgame-breakdown__label {
   color: var(--ink-soft);
-  font-size: 0.8rem;
+  font-size: var(--type-xs);
   line-height: 1.2;
 }
 
@@ -2527,7 +2527,7 @@ h3 {
 
 .ticket-route__cities {
   font-family: var(--font-body);
-  font-size: 0.92rem;
+  font-size: var(--type-sm);
   font-weight: 650;
   line-height: 1.02;
   letter-spacing: -0.03em;
@@ -2535,7 +2535,7 @@ h3 {
 
 .ticket-arrow {
   color: var(--ink-soft);
-  font-size: 0.86rem;
+  font-size: var(--type-xs);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -2545,7 +2545,7 @@ h3 {
   align-items: center;
   min-width: 48px;
   color: var(--ink-soft);
-  font-size: 5.0rem;
+  font-size: var(--type-display);
   font-weight: 840;
   text-transform: uppercase;
   letter-spacing: 0.11em;
@@ -2565,7 +2565,7 @@ h3 {
   padding: 8px 10px;
   border-radius: 999px;
   background: rgba(80, 57, 34, 0.08);
-  font-size: 0.96rem;
+  font-size: var(--type-body);
   font-weight: 760;
   line-height: 1;
   letter-spacing: -0.01em;
@@ -2574,7 +2574,7 @@ h3 {
 .ticket-row .ticket-points {
   min-width: 38px;
   padding: 7px 8px;
-  font-size: 0.82rem;
+  font-size: var(--type-xs);
 }
 
 .market-color-slot {
@@ -2604,7 +2604,7 @@ h3 {
   border-radius: 999px;
   background: color-mix(in srgb, var(--hand-slot-color) 76%, rgba(255, 252, 246, 0.72));
   color: #fffaf0;
-  font-size: 0.96rem;
+  font-size: var(--type-body);
   font-weight: 900;
   line-height: 1;
   text-shadow: 0 1px 2px rgba(45, 35, 25, 0.32);
@@ -2619,7 +2619,7 @@ h3 {
   max-width: 100%;
   overflow: hidden;
   color: rgba(var(--paper-warm-rgb), 0.84);
-  font-size: 0.66rem;
+  font-size: var(--type-xs);
   font-weight: 840;
   letter-spacing: 0.08em;
   line-height: 1;
@@ -2630,7 +2630,7 @@ h3 {
 
 .market-color-slot__tag {
   color: rgba(var(--paper-warm-rgb), 0.58);
-  font-size: 0.52rem;
+  font-size: var(--type-xs);
   font-weight: 820;
   letter-spacing: 0.1em;
   line-height: 1;
@@ -2701,7 +2701,7 @@ h3 {
 
 /* map city label — display font for transit map station signage */
 .board-label {
-  font-size: 13px;
+  font-size: var(--type-sm);
   fill: #33281d;
   font-family: var(--font-display);
   font-weight: 650;
@@ -2797,7 +2797,7 @@ h3 {
 }
 
 .route-badge__label {
-  font-size: 10px;
+  font-size: var(--type-xs);
   font-weight: 800;
   fill: #fff9ec;
   letter-spacing: 0.08em;
@@ -2810,7 +2810,7 @@ h3 {
 }
 
 .claim-badge__label {
-  font-size: 10px;
+  font-size: var(--type-xs);
   font-weight: 800;
   fill: #fff9ec;
   letter-spacing: 0.04em;
@@ -2852,7 +2852,7 @@ h3 {
   display: block;
   fill: rgba(88, 64, 38, 0.12);
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: var(--type-xl);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   pointer-events: none;
@@ -2860,12 +2860,12 @@ h3 {
 
 .region-label--muted {
   fill: rgba(88, 64, 38, 0.10);
-  font-size: 20px;
+  font-size: var(--type-lg);
 }
 
 .region-label--minimal {
   fill: rgba(88, 64, 38, 0.08);
-  font-size: 18px;
+  font-size: var(--type-md);
   letter-spacing: 0.14em;
 }
 
@@ -2942,7 +2942,7 @@ h3 {
   justify-content: center;
   min-height: 1em;
   font-family: var(--font-body);
-  font-size: 0.9rem;
+  font-size: var(--type-sm);
   line-height: 1.15;
   font-weight: 760;
   letter-spacing: -0.01em;
@@ -3033,7 +3033,7 @@ h3 {
 }
 
 .modal-shell .section-header--ceremony .section-header__title {
-  font-size: 1.5rem;
+  font-size: var(--type-xl);
   line-height: 1;
 }
 
@@ -3122,7 +3122,7 @@ h3 {
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.18em;
-  font-size: 0.72rem;
+  font-size: var(--type-xs);
   font-weight: 800;
   color: var(--guidebook-muted);
 }
@@ -3151,7 +3151,7 @@ h3 {
   margin: 0;
   max-width: 42ch;
   color: var(--guidebook-ink);
-  font-size: 1.08rem;
+  font-size: var(--type-md);
   line-height: 1.45;
   font-weight: 680;
 }
@@ -3168,7 +3168,7 @@ h3 {
   position: relative;
   padding-left: 18px;
   color: var(--guidebook-muted);
-  font-size: 0.98rem;
+  font-size: var(--type-body);
   line-height: 1.45;
 }
 
@@ -3334,7 +3334,7 @@ h3 {
 }
 
 .ticket-picker__rule-value {
-  font-size: 1.05rem;
+  font-size: var(--type-md);
   letter-spacing: -0.02em;
   color: var(--ink);
 }
@@ -3452,7 +3452,7 @@ h3 {
   margin-bottom: 7px;
   text-transform: uppercase;
   letter-spacing: 0.16em;
-  font-size: 0.64rem;
+  font-size: var(--type-xs);
   font-weight: 800;
   color: color-mix(in srgb, var(--accent-strong) 24%, var(--ink-soft) 76%);
 }
@@ -3461,7 +3461,7 @@ h3 {
 .ticket-card__route {
   display: block;
   font-family: var(--font-display);
-  font-size: 1.08rem;
+  font-size: var(--type-md);
   font-weight: 650;
   line-height: 1.02;
   letter-spacing: -0.03em;
@@ -3497,7 +3497,7 @@ h3 {
 }
 
 .endgame-score {
-  font-size: 2rem;
+  font-size: var(--type-display);
   margin: 8px 0 14px;
 }
 
@@ -3569,7 +3569,7 @@ h3 {
     inset 0 1px 0 rgba(255, 255, 255, 0.14),
     0 18px 44px rgba(0, 0, 0, 0.34);
   color: #fff6e5;
-  font-size: 0.88rem;
+  font-size: var(--type-sm);
   font-weight: 760;
   line-height: 1.25;
   text-align: center;
@@ -3624,7 +3624,7 @@ h3 {
   margin: 0;
   max-width: 34ch;
   color: rgba(248, 238, 220, 0.72);
-  font-size: 0.96rem;
+  font-size: var(--type-body);
   line-height: 1.45;
 }
 
