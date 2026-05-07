@@ -95,7 +95,7 @@ button {
   gap: 10px;
   padding: 14px 15px;
   border: 1px solid rgba(var(--border-subtle-rgb), 0.18);
-  border-radius: 16px;
+  border-radius: var(--card-radius);
   background:
     radial-gradient(circle at top left, rgba(255, 255, 255, 0.22), transparent 28%),
     rgba(255, 248, 235, 0.985);
@@ -129,7 +129,7 @@ button {
 
 .score-guide__heading {
   font-family: var(--font-body);
-  font-size: 0.92rem;
+  font-size: var(--type-body);
   font-weight: 700;
   color: var(--ink);
 }
@@ -139,7 +139,7 @@ button {
   padding-left: 18px;
   display: grid;
   gap: 4px;
-  font-size: 0.84rem;
+  font-size: var(--type-xs);
   line-height: 1.35;
 }
 
@@ -177,7 +177,7 @@ button {
 .section-header__title {
   margin: 0;
   font-family: var(--font-body);
-  font-size: 1.12rem;
+  font-size: var(--type-md);
   line-height: 1.06;
   font-weight: 660;
   letter-spacing: -0.03em;
@@ -192,7 +192,7 @@ button {
 /* ceremony section — display font for reveal/announcement framing */
 .section-header--ceremony .section-header__title {
   font-family: var(--font-display);
-  font-size: 1.45rem;
+  font-size: var(--type-xl);
   line-height: 1;
   letter-spacing: -0.04em;
 }
@@ -204,13 +204,13 @@ button {
 
 .section-header__meta {
   color: var(--ink-soft);
-  font-size: 0.74rem;
+  font-size: var(--type-xs);
   letter-spacing: 0.01em;
   opacity: 0.76;
 }
 
 .section-header--compact .section-header__meta {
-  font-size: 0.74rem;
+  font-size: var(--type-xs);
   opacity: 0.78;
 }
 
@@ -249,7 +249,7 @@ h3 {
 .form-field {
   padding: 12px 14px 13px;
   border: 1px solid rgba(var(--border-warm-rgb), 0.16);
-  border-radius: 18px;
+  border-radius: var(--radius-md);
   background:
     linear-gradient(180deg, rgba(255, 253, 249, 0.98), rgba(246, 239, 225, 0.92));
   box-shadow:
@@ -287,7 +287,7 @@ h3 {
   width: 100%;
   padding: 12px 14px;
   border: 1px solid rgba(var(--border-warm-rgb), 0.18);
-  border-radius: 16px;
+  border-radius: var(--card-radius);
   background:
     linear-gradient(180deg, rgba(255, 254, 250, 0.98), rgba(247, 240, 228, 0.92));
   color: var(--ink);
@@ -605,7 +605,7 @@ h3 {
 .score-guide--subtle .score-guide__trigger.system-button {
   min-height: var(--control-height-row);
   padding-inline: 12px;
-  font-size: 0.84rem;
+  font-size: var(--type-xs);
   font-weight: 680;
 }
 
@@ -641,7 +641,7 @@ h3 {
   padding: 0 6px;
   color: color-mix(in srgb, var(--accent-strong) 30%, var(--ink) 70%);
   font-family: var(--font-body);
-  font-size: 1.12rem;
+  font-size: var(--type-md);
   font-weight: 700;
   letter-spacing: -0.03em;
 }
@@ -735,7 +735,7 @@ h3 {
 .seat-avatar {
   width: 44px;
   height: 44px;
-  border-radius: 10px;
+  border-radius: var(--radius-slot);
   object-fit: cover;
   border: 2px solid rgba(255, 255, 255, 0.15);
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
@@ -817,7 +817,7 @@ h3 {
 .row-object__stat {
   font-family: var(--font-body);
   color: var(--ink-soft);
-  font-size: 0.92rem;
+  font-size: var(--type-body);
   line-height: 1.2;
   letter-spacing: -0.01em;
   white-space: nowrap;
@@ -1287,7 +1287,7 @@ h3 {
   padding: 8px 9px 8px 7px;
   grid-template-columns: 7px minmax(0, 1fr) auto;
   gap: 8px;
-  border-radius: 14px;
+  border-radius: var(--radius-panel);
 }
 
 .player-roster--top .row-object__stats {
@@ -1343,7 +1343,7 @@ h3 {
 .seat-avatar--tiny {
   width: 32px;
   height: 32px;
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   object-fit: cover;
   border: 1.5px solid rgba(255, 255, 255, 0.12);
   flex-shrink: 0;
@@ -1433,7 +1433,7 @@ h3 {
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   border: 1px solid rgba(183, 155, 97, 0.25);
   background: linear-gradient(180deg, rgba(31, 25, 18, 0.92), rgba(10, 8, 6, 0.92));
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
@@ -1449,7 +1449,7 @@ h3 {
 .floating-player-panel__avatar {
   width: 44px;
   height: 44px;
-  border-radius: 10px;
+  border-radius: var(--radius-slot);
   object-fit: cover;
   flex-shrink: 0;
 }
@@ -1463,7 +1463,7 @@ h3 {
 
 .floating-player-panel__name {
   font-family: var(--font-sans);
-  font-size: 0.88rem;
+  font-size: var(--type-xs);
   font-weight: 700;
   color: #fff8ea;
   white-space: nowrap;
@@ -1549,7 +1549,7 @@ h3 {
   padding: 10px 8px;
   position: relative;
   grid-template-rows: 34px 1fr;
-  border-radius: 14px;
+  border-radius: var(--radius-panel);
   border: 1px solid color-mix(in srgb, var(--hand-slot-color) 42%, rgba(var(--border-warm-rgb), 0.24));
   background:
     radial-gradient(circle at top left, color-mix(in srgb, var(--hand-slot-color) 24%, transparent), transparent 52%),
@@ -1654,7 +1654,7 @@ h3 {
   width: 28px;
   min-height: 28px;
   padding: 0;
-  border-radius: 9px;
+  border-radius: var(--radius-control);
   font-size: 1rem;
 }
 
@@ -1804,7 +1804,7 @@ h3 {
   content: "";
   position: absolute;
   inset: 8px;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   border: 1px solid rgba(176, 138, 67, 0.1);
   box-shadow:
     inset 0 0 0 1px rgba(255, 248, 232, 0.18),
@@ -1914,7 +1914,7 @@ h3 {
   display: grid;
   align-items: stretch;
   padding: 0;
-  border-radius: 14px;
+  border-radius: var(--radius-panel);
   background:
     radial-gradient(circle at top left, rgba(255, 255, 255, 0.11), transparent 28%),
     linear-gradient(180deg, var(--transit-card-route-light), var(--transit-card-route));
@@ -2301,7 +2301,7 @@ h3 {
   padding: 14px 14px 12px;
   margin-top: 0;
   border: 1px solid rgba(var(--border-warm-rgb), 0.1);
-  border-radius: 18px;
+  border-radius: var(--radius-md);
   background:
     linear-gradient(180deg, rgba(255, 251, 244, 0.76), rgba(247, 239, 224, 0.56));
   position: relative;
@@ -2585,7 +2585,7 @@ h3 {
   gap: 5px;
   padding: 8px 7px;
   border: 1px solid color-mix(in srgb, var(--hand-slot-color) 48%, rgba(222, 199, 158, 0.2));
-  border-radius: 14px;
+  border-radius: var(--radius-panel);
   background:
     radial-gradient(circle at top left, color-mix(in srgb, var(--hand-slot-color) 22%, transparent), transparent 52%),
     linear-gradient(180deg, rgba(255, 247, 231, 0.11), rgba(7, 12, 17, 0.18));
@@ -2644,7 +2644,7 @@ h3 {
 .board-shell {
   width: 100%;
   overflow: auto;
-  border-radius: 20px;
+  border-radius: var(--radius-md);
   box-shadow: inset 0 0 0 1px rgba(87, 64, 39, 0.12);
 }
 
@@ -2653,7 +2653,7 @@ h3 {
   max-width: 1180px;
   min-width: 780px;
   margin-inline: auto;
-  border-radius: 20px;
+  border-radius: var(--radius-md);
   display: block;
 }
 
@@ -3100,7 +3100,7 @@ h3 {
   gap: 18px;
   padding: clamp(18px, 3vw, 28px);
   border: 1px solid rgba(var(--control-ink-rgb), 0.18);
-  border-radius: 8px;
+  border-radius: var(--radius-ticket);
   background:
     linear-gradient(180deg, rgba(20, 30, 37, 0.94), rgba(8, 15, 20, 0.96)),
     repeating-linear-gradient(90deg, rgba(var(--control-ink-rgb), 0.018) 0 1px, transparent 1px 34px);
@@ -3239,7 +3239,7 @@ h3 {
     radial-gradient(circle at top left, rgba(255, 255, 255, 0.3), transparent 34%),
     linear-gradient(180deg, rgba(255, 252, 246, 0.96), rgba(240, 231, 214, 0.92));
   border: 1px solid rgba(var(--border-warm-rgb), 0.18);
-  border-radius: 24px;
+  border-radius: var(--radius-lg);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.56),
     0 24px 60px rgba(var(--shadow-warm-rgb), 0.18);
@@ -3317,7 +3317,7 @@ h3 {
   margin-top: 0;
   padding: 14px 16px;
   border: 1px solid rgba(var(--border-warm-rgb), 0.14);
-  border-radius: 20px;
+  border-radius: var(--radius-md);
   background:
     linear-gradient(180deg, rgba(255, 252, 246, 0.96), rgba(244, 236, 221, 0.86));
   box-shadow:
@@ -3604,7 +3604,7 @@ h3 {
   overflow: hidden;
   padding: 22px;
   border: 1px solid rgba(222, 199, 158, 0.24);
-  border-radius: 28px;
+  border-radius: var(--radius-lg);
   background:
     radial-gradient(circle at 72% 20%, rgba(92, 145, 184, 0.2), transparent 34%),
     linear-gradient(135deg, rgba(19, 28, 36, 0.92), rgba(9, 14, 19, 0.9));

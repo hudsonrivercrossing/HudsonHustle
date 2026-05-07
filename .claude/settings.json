@@ -65,7 +65,11 @@
       "Bash(mkdir -p /Users/djfan/Workspace/HudsonHustle/.codex/skills/pencil-sync)",
       "Bash(grep -v '^$')",
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d['state'], d.get\\('mergedAt',''\\)\\)\")",
-      "Bash(git fetch *)"
+      "Bash(git fetch *)",
+      "Bash(git -C /Users/djfan/Workspace/HudsonHustle/.claude/worktrees/agent-aea66cdb1accaccf0 log --oneline -5)",
+      "Bash(git -C /Users/djfan/Workspace/HudsonHustle/.claude/worktrees/agent-a168f91b4769992af log --oneline -3)",
+      "Bash(git -C /Users/djfan/Workspace/HudsonHustle/.claude/worktrees/agent-a168f91b4769992af diff HEAD)",
+      "Bash(git -C /Users/djfan/Workspace/HudsonHustle/.claude/worktrees/agent-a168f91b4769992af status)"
     ],
     "additionalDirectories": [
       "/Users/djfan/.claude/projects/-Users-djfan-Workspace-HudsonHustle",
