@@ -63,7 +63,9 @@
       "Bash(cursor --version)",
       "Read(//Applications/**)",
       "Bash(mkdir -p /Users/djfan/Workspace/HudsonHustle/.codex/skills/pencil-sync)",
-      "Bash(grep -v '^$')"
+      "Bash(grep -v '^$')",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d['state'], d.get\\('mergedAt',''\\)\\)\")",
+      "Bash(git fetch *)"
     ],
     "additionalDirectories": [
       "/Users/djfan/.claude/projects/-Users-djfan-Workspace-HudsonHustle",
