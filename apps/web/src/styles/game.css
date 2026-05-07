@@ -1757,7 +1757,7 @@ border-color: rgba(232, 220, 194, 0.72);
 .app-shell--gameplay-hud .ticket-row {
   --ticket-status-accent: var(--hud-brass);
   --ticket-status-ink: #2b2217;
-  border-left: 5px solid var(--ticket-status-accent);
+  box-shadow: inset 4px 0 0 var(--ticket-status-accent);
 }
 
 .app-shell--gameplay-hud .ticket-row--connected {
@@ -2859,7 +2859,7 @@ border-color: rgba(232, 220, 194, 0.72);
 
 /* detail-card: left brass stripe marks it as a route artifact */
 .app-shell--gameplay-hud .inspector-dock--build .detail-card {
-  border-left: 3px solid rgba(183, 155, 97, 0.62);
+  box-shadow: inset 3px 0 0 var(--material-brass);
   padding-left: 10px;
 }
 
