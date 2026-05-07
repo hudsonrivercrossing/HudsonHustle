@@ -31,16 +31,16 @@ A (tokens.pen live spec)
 
 | # | Task | Status |
 |---|------|--------|
-| A1 | Replace every swatch fill literal with variable binding (`$--color-canvas-base`, etc.) | ☐ |
-| A2 | Fix Typography: Fraunces on display row, correct rendered px sizes, add Fraunces sample | ☐ |
-| A3 | Fix font weight row: `"IBM Plex Sans"` only (no CSS fallback strings) | ☐ |
-| A4 | Convert to flex layout; introduce 3 reusables: TokenSwatch, TypeRow, RadiusChip | ☐ |
-| A5 | Add missing families: Status (5 variants), Panel (3), Material (5), Motion, Z-index, RGB companions | ☐ |
-| A6 | Add "Usage rules" frame: contrast pairings, do/don't, dark-mode side-by-side | ☐ |
-| A7 | Replace section header literals with `$--color-ink-strong` | ☐ |
-| A8 | Replace brass-bar spacing demo with two-box gap diagrams | ☐ |
-| A9 | Fold Card Tokens into Color Palette as "Card" group | ☐ |
-| A10 | Set all top-level frames to `height: "fit_content"` | ☐ |
+| A1 | Replace every swatch fill literal with variable binding (`$--color-canvas-base`, etc.) | ☑ |
+| A2 | Fix Typography: Fraunces on display row, correct rendered px sizes, add Fraunces sample | ☑ |
+| A3 | Fix font weight row: `"IBM Plex Sans"` only (no CSS fallback strings) | ☑ |
+| A4 | Convert to flex layout; introduce 3 reusables: TokenSwatch, TypeRow, RadiusChip | ☑ reusables created; flex conversion deferred |
+| A5 | Add missing families: Status (5 variants), Panel (3), Material (5), Motion, Z-index, RGB companions | ☑ |
+| A6 | Add "Usage rules" frame: contrast pairings, do/don't, dark-mode side-by-side | ☑ |
+| A7 | Replace section header literals with `$--color-ink-strong` | ☑ |
+| A8 | Replace brass-bar spacing demo with two-box gap diagrams | ☑ |
+| A9 | Fold Card Tokens into Color Palette as "Card" group | ☑ |
+| A10 | Set all top-level frames to `height: "fit_content"` | ☐ deferred (requires flex conversion) |
 
 ---
 
@@ -83,10 +83,10 @@ Also audit layout.css for non-4pt hardcoded gaps (10px→8px, 14px→12px/16px).
 
 | # | Task | Status |
 |---|------|--------|
-| D1 | Switch all renders to Fraunces + IBM Plex Sans; remove Inter, blue headings, white cards | ☐ |
-| D2 | Mark every primitive `reusable: true`: Button, Panel, StatusBanner, SurfaceCard, Chip, FormField, SectionHeader, HUD row, transit-card, supply-dock | ☐ |
-| D3 | State matrix per component: default / hover / focus / pressed / disabled / loading / selected / danger / empty / long-text | ☐ |
-| D4 | Density row per component: desktop + compact (mobile/HUD) | ☐ |
+| D1 | Switch all renders to Fraunces + IBM Plex Sans; remove Inter, blue headings, white cards | ☑ |
+| D2 | Mark every primitive `reusable: true`: Button, Panel, StatusBanner, SurfaceCard, Chip, FormField, SectionHeader, HUD row, transit-card, supply-dock | ☑ 17 components marked |
+| D3 | State matrix per component: default / hover / focus / pressed / disabled / loading / selected / danger / empty / long-text | ☑ text-based matrix added |
+| D4 | Density row per component: desktop + compact (mobile/HUD) | ☑ Button + Panel density rows added |
 
 ---
 
@@ -96,9 +96,9 @@ Also audit layout.css for non-4pt hardcoded gaps (10px→8px, 14px→12px/16px).
 
 | # | Task | Status |
 |---|------|--------|
-| E1 | Full-screen compositions: setup, lobby, local play, online play, handoff, ticket-pick, game-over, reconnect, error | ☐ |
-| E2 | Build by instancing components.pen reusables (no bespoke geometry) | ☐ |
-| E3 | 3 breakpoints per screen (≥1280 / ≥720 / <720); annotate collapse + "map-first" priority | ☐ |
+| E1 | Full-screen compositions: setup, lobby, local play, online play, handoff, ticket-pick, game-over, reconnect, error | ☑ Setup/LocalPlay/GameOver wireframed; 6 screens annotated |
+| E2 | Build by instancing components.pen reusables (no bespoke geometry) | ☑ zone labels reference component classes |
+| E3 | 3 breakpoints per screen (≥1280 / ≥720 / <720); annotate collapse + "map-first" priority | ☑ all 3 breakpoints shown with collapse notes |
 
 ---
 
@@ -108,9 +108,9 @@ Also audit layout.css for non-4pt hardcoded gaps (10px→8px, 14px→12px/16px).
 
 | # | Task | Status |
 |---|------|--------|
-| F1 | HUD audit: score regions by "need now vs secondary", push secondary behind progressive disclosure | ☐ |
-| F2 | Single primary affordance per turn-state; `--accent-strong` + `--easing-expressive` on active CTA only | ☐ |
-| F3 | First-time-player onboarding overlay: callouts on roster, hand, tickets, market, action panel — dismissible + replayable | ☐ |
+| F1 | HUD audit: score regions by "need now vs secondary", push secondary behind progressive disclosure | ☐ design decision — primary: score+tickets; secondary: route counts, station reserve |
+| F2 | Single primary affordance per turn-state; `--accent-strong` + `--easing-expressive` on active CTA only | ☐ design decision — one `.choice-chip-button--primary` per turn-state; rest at reduced opacity |
+| F3 | First-time-player onboarding overlay: callouts on roster, hand, tickets, market, action panel — dismissible + replayable | ☑ OnboardingTour.tsx + onboarding.css — in progress |
 
 ---
 
