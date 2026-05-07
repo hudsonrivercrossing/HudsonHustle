@@ -1,0 +1,121 @@
+/* ─── Onboarding Tour Overlay ─────────────────────────────────────────── */
+
+@keyframes onboarding-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes onboarding-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal, 100);
+  background: rgba(10, 8, 6, 0.72);
+  display: grid;
+  place-items: center;
+  animation: onboarding-fade-in var(--duration-base, 160ms) var(--easing-standard, ease) both;
+}
+
+.onboarding-card {
+  max-width: 480px;
+  width: 90%;
+  background: var(--color-canvas-base);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-subtle);
+  padding: 28px;
+  box-shadow: var(--shadow-strong);
+  position: relative;
+  overflow: hidden;
+  animation: onboarding-card-in var(--duration-base, 160ms) var(--easing-standard, ease) both;
+}
+
+/* Subtle inner highlight, matching .modal-card::before pattern */
+.onboarding-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent 34%),
+    linear-gradient(180deg, rgba(142, 170, 187, 0.06), transparent 52%);
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.onboarding-card__eyebrow {
+  margin: 0 0 var(--space-stack-sm, 8px);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: var(--type-xs);
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--color-accent-base);
+}
+
+.onboarding-card__title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-ink-strong);
+  margin: 8px 0;
+  line-height: var(--lh-snug, 1.2);
+}
+
+.onboarding-card__body {
+  font-size: var(--type-body);
+  font-family: var(--font-body);
+  color: var(--color-ink-muted);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.onboarding-card__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ─── Progress dots ───────────────────────────────────────────────────── */
+
+.onboarding-dots {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.onboarding-dots__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-border-subtle);
+  transition: background var(--duration-fast, 140ms) var(--easing-standard, ease);
+}
+
+.onboarding-dots__dot--active {
+  background: var(--color-accent-strong);
+}
+
+/* ─── Footer button group ─────────────────────────────────────────────── */
+
+.onboarding-card__footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}

@@ -114,9 +114,10 @@ const guideSteps: GuideStep[] = [
 
 interface GuidebookScreenProps {
   onBack: () => void;
+  onReplayTour?: () => void;
 }
 
-export function GuidebookScreen({ onBack }: GuidebookScreenProps): JSX.Element {
+export function GuidebookScreen({ onBack, onReplayTour }: GuidebookScreenProps): JSX.Element {
   const [stepIndex, setStepIndex] = useState(0);
   const step = guideSteps[stepIndex];
   const isFirst = stepIndex === 0;
@@ -164,9 +165,22 @@ export function GuidebookScreen({ onBack }: GuidebookScreenProps): JSX.Element {
             ))}
           </div>
           {isLast ? (
-            <Button variant="primary" onClick={onBack}>
-              Finish
-            </Button>
+            <>
+              {onReplayTour && (
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    localStorage.removeItem("hh-tour-seen");
+                    onReplayTour();
+                  }}
+                >
+                  Replay tour
+                </Button>
+              )}
+              <Button variant="primary" onClick={onBack}>
+                Finish
+              </Button>
+            </>
           ) : (
             <Button variant="primary" onClick={() => setStepIndex((current) => Math.min(guideSteps.length - 1, current + 1))} aria-label="Next guide step">
               <span aria-hidden="true">→</span>
