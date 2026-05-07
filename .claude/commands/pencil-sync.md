@@ -98,11 +98,12 @@ Frame naming convention: match the CSS class name exactly (`.game-layout` → fr
 
 ## Pencil Connection
 
-The `pencil` MCP requires:
-- Pencil app open in VS Code with a `.pen` file active
-- Socket: `~/.pencil/socket/pencil-visual_studio_code.sock`
+The `pencil` MCP connects via the Pencil desktop app:
+- Binary: `/Applications/Pencil.app/Contents/Resources/app.asar.unpacked/out/mcp-server-darwin-arm64`
+- Args: `--app desktop`
+- **Requires:** Pencil desktop app open (not just the VS Code extension)
 
-If tools return "transport not connected": click any `.pen` file in the VS Code file explorer to reactivate the socket, then retry.
+If tools return "transport not connected": open the Pencil desktop app, then do `Cmd+Shift+P → Reload Window` in VS Code to reinitialize the MCP connection.
 
 ## Key Tools
 
