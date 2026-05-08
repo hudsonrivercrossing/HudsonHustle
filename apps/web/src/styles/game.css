@@ -23,7 +23,7 @@
   min-height: var(--control-height-compact);
   min-width: var(--button-min-width-sm);
   padding: 8px 13px;
-  font-size: var(--type-xs);
+  font-size: var(--type-sm);
   font-weight: 800;
 }
 
@@ -60,7 +60,7 @@
 .app-shell--gameplay-hud .player-roster--top .row-object__meta,
 .app-shell--gameplay-hud .player-roster--top .row-object__stat {
   color: rgba(var(--hud-paper-rgb), 0.76);
-  font-size: var(--type-xs);
+  font-size: var(--type-2xs);
   font-weight: 720;
   letter-spacing: 0;
 }
@@ -89,7 +89,7 @@
   display: block;
   padding: 3px 9px 4px;
   color: color-mix(in srgb, var(--hud-paper) 62%, var(--hud-brass) 38%);
-  font-size: var(--type-xs);
+  font-size: var(--type-2xs);
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -148,7 +148,7 @@
   width: 100%;
   overflow: visible;
   color: rgba(var(--hud-paper-rgb), 0.86);
-  font-size: var(--type-xs);
+  font-size: 0.5rem;
   font-weight: 860;
   letter-spacing: 0.035em;
   line-height: 1.08;
@@ -224,7 +224,7 @@
 
 .app-shell--gameplay-hud .ticket-arrow {
   color: rgba(var(--hud-brass-light-rgb), 0.62);
-  font-size: var(--type-xs);
+  font-size: var(--type-2xs);
   font-weight: 850;
   letter-spacing: 0.04em;
 }
@@ -242,7 +242,7 @@
 }
 
 .app-shell--gameplay-hud .inspector-tabs__tab {
-  font-size: var(--type-xs);
+  font-size: var(--type-2xs);
   font-weight: 850;
   letter-spacing: 0.08em;
 }
@@ -291,14 +291,14 @@
   min-height: 24px;
   padding: 4px 8px;
   color: rgba(var(--hud-paper-rgb), 0.78);
-  font-size: var(--type-xs);
+  font-size: var(--type-2xs);
   font-weight: 760;
 }
 
 .app-shell--gameplay-hud .detail-card__prompt,
 .app-shell--gameplay-hud .action-empty-prompt__title {
   color: var(--hud-paper-bright);
-  font-size: var(--type-xs);
+  font-size: var(--type-sm);
   font-weight: 800;
 }
 
@@ -879,7 +879,7 @@
 .app-shell--gameplay-hud .hand-color-slot__label,
 .app-shell--gameplay-hud .market-color-slot__label {
   color: var(--hud-paper);
-  font-size: var(--type-xs);
+  font-size: 0.48rem;
   font-weight: 900;
   letter-spacing: 0.075em;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.52);
@@ -1274,7 +1274,7 @@
   border-right: 1px solid rgba(92, 70, 46, 0.42);
   background: transparent;
   color: rgba(77, 61, 35, 0.82);
-  font-size: var(--type-xs);
+  font-size: 0.46rem;
 }
 
 .app-shell--gameplay-hud .ticket-status--done {
@@ -1304,7 +1304,7 @@
 .app-shell--gameplay-hud .topbar .system-button,
 .app-shell--gameplay-hud .score-guide__trigger.system-button {
   min-height: 48px;
-  font-size: var(--type-xs);
+  font-size: var(--type-sm);
 }
 
 .app-shell--gameplay-hud .game-over-layer,
@@ -1560,7 +1560,7 @@
 
 .app-shell--gameplay-hud .score-guide__list {
   color: var(--hud-paper-bright);
-  font-size: var(--type-xs);
+  font-size: var(--type-sm);
   line-height: 1.45;
 }
 
@@ -1653,7 +1653,7 @@
   min-width: 36px;
   min-height: 82px;
   padding: 8px 5px;
-  font-size: var(--type-xs);
+  font-size: var(--type-2xs);
   letter-spacing: 0.08em;
 }
 
@@ -2255,7 +2255,7 @@ border-color: rgba(232, 220, 194, 0.72);
 
 .app-shell--gameplay-hud .hand-color-slot__label {
   color: rgba(255, 248, 232, 0.84);
-  font-size: var(--type-xs);
+  font-size: var(--type-2xs);
   letter-spacing: 0.06em;
 }
 
@@ -2319,7 +2319,7 @@ border-color: rgba(232, 220, 194, 0.72);
   background:
     linear-gradient(180deg, rgba(34, 44, 52, 0.92), rgba(9, 14, 19, 0.92));
   color: rgba(255, 248, 232, 0.76);
-  font-size: var(--type-xs);
+  font-size: var(--type-2xs);
   font-weight: 840;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -2392,7 +2392,7 @@ border-color: rgba(232, 220, 194, 0.72);
 
 .app-shell--gameplay-hud .player-roster--top .row-object__meta,
 .app-shell--gameplay-hud .player-roster--top .row-object__stat {
-  font-size: var(--type-xs);
+  font-size: var(--type-2xs);
   line-height: 1;
 }
 
@@ -2415,7 +2415,7 @@ border-color: rgba(232, 220, 194, 0.72);
 }
 
 .app-shell--gameplay-hud .ticket-dock .section-header__meta {
-  font-size: var(--type-xs);
+  font-size: var(--type-2xs);
   line-height: 1.1;
 }
 
@@ -2435,7 +2435,7 @@ border-color: rgba(232, 220, 194, 0.72);
 
 .app-shell--gameplay-hud .ticket-dock__page-label {
   min-width: 30px;
-  font-size: var(--type-xs);
+  font-size: var(--type-2xs);
 }
 
 .app-shell--gameplay-hud .ticket-dock__scroll {
@@ -2454,20 +2454,20 @@ border-color: rgba(232, 220, 194, 0.72);
 
 .app-shell--gameplay-hud .ticket-route__cities {
   font-family: var(--font-body);
-  font-size: var(--type-xs);
+  font-size: var(--type-2xs);
   font-weight: 780;
   line-height: 1.03;
   letter-spacing: 0;
 }
 
 .app-shell--gameplay-hud .ticket-arrow {
-  font-size: var(--type-xs);
+  font-size: 0.52rem;
   letter-spacing: 0.04em;
 }
 
 .app-shell--gameplay-hud .ticket-status {
   min-width: 20px;
-  font-size: var(--type-xs);
+  font-size: 0.34rem;
   letter-spacing: 0.05em;
   line-height: 0.95;
 }
@@ -2475,7 +2475,7 @@ border-color: rgba(232, 220, 194, 0.72);
 .app-shell--gameplay-hud .ticket-row .ticket-points {
   min-width: 28px;
   padding: 5px 6px;
-  font-size: var(--type-xs);
+  font-size: var(--type-2xs);
 }
 
 .app-shell--gameplay-hud .supply-dock--board {
@@ -2489,11 +2489,11 @@ border-color: rgba(232, 220, 194, 0.72);
 }
 
 .app-shell--gameplay-hud .supply-dock--board .section-header__title {
-  font-size: var(--type-xs);
+  font-size: var(--type-sm);
 }
 
 .app-shell--gameplay-hud .supply-dock--board .section-header__meta {
-  font-size: var(--type-xs);
+  font-size: var(--type-2xs);
 }
 
 .app-shell--gameplay-hud .supply-dock--board .supply-dock__market {
@@ -2514,12 +2514,12 @@ border-color: rgba(232, 220, 194, 0.72);
 
 .app-shell--gameplay-hud .market-color-slot__label {
   color: rgba(255, 248, 232, 0.88);
-  font-size: var(--type-xs);
+  font-size: var(--type-2xs);
   letter-spacing: 0.06em;
 }
 
 .app-shell--gameplay-hud .market-color-slot__tag {
-  font-size: var(--type-xs);
+  font-size: 0.46rem;
 }
 
 .app-shell--gameplay-hud {
@@ -2556,7 +2556,7 @@ border-color: rgba(232, 220, 194, 0.72);
 
 .gameplay-brand span {
   color: rgba(255, 248, 232, 0.62);
-  font-size: var(--type-xs);
+  font-size: var(--type-2xs);
   font-weight: 840;
 }
 
@@ -2654,7 +2654,7 @@ border-color: rgba(232, 220, 194, 0.72);
 }
 
 .app-shell--gameplay-hud .player-roster--top .row-object__stat {
-  font-size: var(--type-xs);
+  font-size: 0.5rem;
   letter-spacing: 0.01em;
   white-space: nowrap;
 }
@@ -2758,7 +2758,7 @@ border-color: rgba(232, 220, 194, 0.72);
 .chat-panel__message strong {
   margin-bottom: 2px;
   color: rgba(255, 248, 232, 0.96);
-  font-size: var(--type-xs);
+  font-size: var(--type-2xs);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -2864,7 +2864,7 @@ border-color: rgba(232, 220, 194, 0.72);
 /* Route fact chips: printed manifest labels — bordered, uppercase, tight */
 .app-shell--gameplay-hud .detail-card__fact {
   border: 1px solid rgba(183, 155, 97, 0.22);
-  font-size: var(--type-xs);
+  font-size: var(--type-2xs);
   font-weight: 760;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -2889,7 +2889,7 @@ border-color: rgba(232, 220, 194, 0.72);
 
 /* ticket route: uppercase printed label, tight cap spacing */
 .app-shell--gameplay-hud .ticket-route__cities {
-  font-size: var(--type-xs);
+  font-size: var(--type-2xs);
   font-weight: 840;
   letter-spacing: 0.04em;
   line-height: 1.1;
@@ -2899,7 +2899,7 @@ border-color: rgba(232, 220, 194, 0.72);
 /* arrow: warmer, lighter — printed rule divider feel */
 .app-shell--gameplay-hud .ticket-arrow {
   color: rgba(109, 88, 48, 0.62);
-  font-size: var(--type-xs);
+  font-size: 0.54rem;
   letter-spacing: 0.06em;
 }
 
@@ -2949,7 +2949,7 @@ border-color: rgba(232, 220, 194, 0.72);
   border-color: rgba(183, 155, 97, 0.16);
   color: rgba(255, 248, 232, 0.46);
   min-height: 26px;
-  font-size: var(--type-xs);
+  font-size: var(--type-2xs);
   letter-spacing: 0.06em;
 }
 

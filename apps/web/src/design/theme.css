@@ -77,6 +77,7 @@
   --font-setup: "IBM Plex Sans", "Segoe UI", sans-serif;
 
   /* --- Type Scale (major-second 1.125) --- */
+  --type-2xs: 0.625rem;     /* 10px  — HUD micro-labels, badge counters, tight indicators */
   --type-xs: 0.75rem;       /* 12px  — caps, badges, helper info */
   --type-sm: 0.875rem;      /* 14px  — labels, metadata, helper text */
   --type-body: 0.9375rem;   /* 15px  — default UI body */

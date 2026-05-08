@@ -408,11 +408,13 @@ export default function App(): JSX.Element {
     return buildProjectedGameState(snapshot.game, snapshot.privateState);
   }, [snapshot]);
 
+  const tourInitRef = useRef(false);
   useEffect(() => {
-    if (projectedGame) {
+    if (projectedGame && !tourInitRef.current) {
+      tourInitRef.current = true;
       setTourOpen(shouldShowTour());
     }
-  }, [!!projectedGame]);
+  }, [projectedGame]);
 
   const localPlayer = useMemo(() => {
     if (!projectedGame || !snapshot?.privateState?.playerId) {
