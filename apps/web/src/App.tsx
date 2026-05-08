@@ -49,6 +49,7 @@ import {
   type GameplayNotification
 } from "./components/GameplayHud";
 import { GuidebookScreen } from "./components/GuidebookScreen";
+import OnboardingTour, { shouldShowTour } from "./components/OnboardingTour";
 import { LocalPlayScreen } from "./components/LocalPlayScreen";
 import { LobbyScreen } from "./components/LobbyScreen";
 import { MultiplayerSetupScreen } from "./components/MultiplayerSetupScreen";
@@ -205,6 +206,7 @@ export default function App(): JSX.Element {
   const [pinnedTicket, setPinnedTicket] = useState<TicketDef | null>(null);
   const [paymentPreview, setPaymentPreview] = useState<{ color: TrainCardColor; totalCost: number; minimumLocomotives?: number } | null>(null);
   const [guideOpen, setGuideOpen] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [notifications, setNotifications] = useState<GameplayNotification[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -405,6 +407,12 @@ export default function App(): JSX.Element {
     }
     return buildProjectedGameState(snapshot.game, snapshot.privateState);
   }, [snapshot]);
+
+  useEffect(() => {
+    if (projectedGame) {
+      setTourOpen(shouldShowTour());
+    }
+  }, [!!projectedGame]);
 
   const localPlayer = useMemo(() => {
     if (!projectedGame || !snapshot?.privateState?.playerId) {
@@ -802,7 +810,15 @@ export default function App(): JSX.Element {
     }
 
     if (setupMode === "guide") {
-      return <GuidebookScreen onBack={() => setSetupMode("gateway")} />;
+      return (
+        <GuidebookScreen
+          onBack={() => setSetupMode("gateway")}
+          onReplayTour={() => {
+            localStorage.removeItem("hh-tour-seen");
+            setTourOpen(true);
+          }}
+        />
+      );
     }
 
     if (setupMode === "local") {
@@ -840,7 +856,15 @@ export default function App(): JSX.Element {
   }
 
   if (guideOpen) {
-    return <GuidebookScreen onBack={() => setGuideOpen(false)} />;
+    return (
+      <GuidebookScreen
+        onBack={() => setGuideOpen(false)}
+        onReplayTour={() => {
+          localStorage.removeItem("hh-tour-seen");
+          setTourOpen(true);
+        }}
+      />
+    );
   }
 
   if (snapshot.room.status === "lobby" || !snapshot.game || !mapConfig || !visuals || !projectedGame || !localPlayer) {
@@ -1160,6 +1184,10 @@ export default function App(): JSX.Element {
           </div>
         </ModalShell>
       ) : null}
+
+      {tourOpen && (
+        <OnboardingTour onDismiss={() => setTourOpen(false)} />
+      )}
 
       <NotificationPipe notifications={notifications} />
     </div>

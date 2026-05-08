@@ -48,7 +48,7 @@
 .app-shell--gameplay-hud .player-roster--top .player-roster__row {
   min-height: var(--control-height-base);
   padding: 7px 9px;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
 }
 
 .app-shell--gameplay-hud .player-roster--top .row-object__title {
@@ -512,7 +512,7 @@
   letter-spacing: 0.02em;
   color: rgba(var(--hud-paper-rgb), 0.92);
   padding: 2px 8px;
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   background: rgba(212, 79, 76, 0.15);
   border: 1px solid rgba(212, 79, 76, 0.3);
 }
@@ -772,7 +772,7 @@
 .app-shell--gameplay-hud .inspector-dock,
 .app-shell--gameplay-hud .player-roster--top {
   border-color: color-mix(in srgb, var(--hud-brass) 42%, rgba(0, 0, 0, 0.34));
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   background:
     var(--hud-grain),
     linear-gradient(180deg, rgba(37, 31, 23, 0.94), rgba(12, 10, 8, 0.94));
@@ -811,7 +811,7 @@
   isolation: isolate;
   overflow: hidden;
   border-width: 1px;
-  border-radius: 8px;
+  border-radius: var(--radius-ticket);
   border-color: color-mix(in srgb, var(--hand-slot-color) 46%, var(--hud-brass-dark));
   background:
     linear-gradient(90deg, color-mix(in srgb, var(--hand-slot-color) 46%, transparent) 0 10px, transparent 10px),
@@ -927,7 +927,7 @@
 }
 
 .app-shell--gameplay-hud .inspector-tabs__tab {
-  border-radius: 6px 10px 10px 6px;
+  border-radius: var(--radius-control) var(--radius-slot) var(--radius-slot) var(--radius-control);
   border-color: rgba(183, 155, 97, 0.42);
   background:
     linear-gradient(90deg, rgba(183, 155, 97, 0.2), transparent 34%),
@@ -992,7 +992,7 @@
 .app-shell--gameplay-hud .game-over-layer,
 .app-shell--gameplay-hud .leave-confirm-card,
 .app-shell--gameplay-hud .ticket-choice-sheet__panel {
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   border-color: rgba(183, 155, 97, 0.34);
   background:
     var(--hud-grain),
@@ -1002,7 +1002,7 @@
 }
 
 .app-shell--gameplay-hud .game-over-layer .endgame-card {
-  border-radius: 8px;
+  border-radius: var(--radius-ticket);
   background:
     linear-gradient(180deg, rgba(232, 220, 194, 0.1), rgba(12, 10, 8, 0.2)),
     var(--hud-grain),
@@ -1322,12 +1322,12 @@
 
 /* Mixed shape refinement: use the shape that matches each tabletop object. */
 .app-shell--gameplay-hud .private-hand-rail {
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   clip-path: none;
 }
 
 .app-shell--gameplay-hud .player-roster--top {
-  border-radius: 10px;
+  border-radius: var(--radius-slot);
   clip-path: none;
 }
 
@@ -1357,7 +1357,7 @@
 .app-shell--gameplay-hud .game-over-layer,
 .app-shell--gameplay-hud .leave-confirm-card,
 .app-shell--gameplay-hud .ticket-choice-sheet__panel {
-  border-radius: 10px;
+  border-radius: var(--radius-slot);
   clip-path: none;
 }
 
@@ -1401,7 +1401,7 @@
 }
 
 .app-shell--gameplay-hud .board-shell {
-  border-radius: 8px;
+  border-radius: var(--radius-ticket);
   background:
     radial-gradient(circle at 21% 18%, rgba(255, 247, 226, 0.22), transparent 29%),
     radial-gradient(circle at 83% 78%, rgba(82, 103, 94, 0.16), transparent 34%),
@@ -1537,7 +1537,7 @@
   z-index: 7000;
   position: absolute;
   width: min(340px, calc(100vw - 28px));
-  border-radius: 8px;
+  border-radius: var(--radius-ticket);
   border-color: rgba(183, 155, 97, 0.48);
   background:
     var(--hud-grain),
@@ -2156,12 +2156,11 @@ border-color: rgba(232, 220, 194, 0.72);
   min-width: 0;
   padding: 6px;
   border: 1px solid rgba(var(--hud-brass-light-rgb), 0.18);
-  border-radius: 16px;
+  border-radius: var(--card-radius);
   background: rgba(11, 17, 22, 0.64);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
     0 14px 40px rgba(0, 0, 0, 0.24);
-  backdrop-filter: blur(14px);
 }
 
 .app-shell--gameplay-hud .topbar-actions .system-button,
@@ -2268,7 +2267,6 @@ border-color: rgba(232, 220, 194, 0.72);
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.52),
     0 22px 60px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(12px) saturate(1.05);
 }
 
 .app-shell--gameplay-hud .board-map > rect:first-child {
@@ -2317,7 +2315,7 @@ border-color: rgba(232, 220, 194, 0.72);
   min-height: 82px;
   padding: 10px 6px;
   border: 1px solid rgba(var(--hud-brass-light-rgb), 0.24);
-  border-radius: 10px;
+  border-radius: var(--radius-slot);
   background:
     linear-gradient(180deg, rgba(34, 44, 52, 0.92), rgba(9, 14, 19, 0.92));
   color: rgba(255, 248, 232, 0.76);
@@ -2379,7 +2377,7 @@ border-color: rgba(232, 220, 194, 0.72);
   min-height: 40px;
   padding: 5px 7px 5px 5px;
   gap: 6px;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
 }
 
 .app-shell--gameplay-hud .player-roster--top .player-swatch {
@@ -2545,7 +2543,7 @@ border-color: rgba(232, 220, 194, 0.72);
   justify-self: start;
   padding: 7px 14px;
   border: 1px solid rgba(var(--hud-brass-light-rgb), 0.18);
-  border-radius: 16px;
+  border-radius: var(--card-radius);
   background: rgba(11, 17, 22, 0.64);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
@@ -2745,7 +2743,7 @@ border-color: rgba(232, 220, 194, 0.72);
 .chat-panel__message {
   margin: 0;
   padding: 8px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   background: rgba(255, 247, 231, 0.08);
   color: rgba(255, 248, 232, 0.78);
   font-size: var(--type-xs);
@@ -2774,7 +2772,7 @@ border-color: rgba(232, 220, 194, 0.72);
 .chat-panel__composer input {
   min-width: 0;
   border: 1px solid rgba(var(--hud-brass-light-rgb), 0.18);
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   background: rgba(255, 247, 231, 0.08);
   color: rgba(255, 248, 232, 0.82);
   padding: 10px 11px;

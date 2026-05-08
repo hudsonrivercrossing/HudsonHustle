@@ -189,7 +189,7 @@
   display: grid;
   gap: 0;
   max-width: 23rem;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
   border: 1px solid rgba(244, 235, 219, 0.16);
   background: rgba(10, 16, 21, 0.7);
@@ -217,7 +217,7 @@
   height: 30px;
   padding-inline: 9px;
   border: 1px solid rgba(244, 235, 219, 0.18);
-  border-radius: 8px;
+  border-radius: var(--radius-ticket);
   background: rgba(255, 249, 239, 0.06);
   color: rgba(255, 249, 239, 0.86);
   font-size: 0.66rem;
@@ -299,7 +299,7 @@
   gap: 4px;
   padding: 5px;
   border: 1px solid rgba(244, 235, 219, 0.18);
-  border-radius: 8px;
+  border-radius: var(--radius-ticket);
   background: var(--setup-station-enamel);
   box-shadow: 0 10px 18px rgba(6, 12, 18, 0.14);
 }
@@ -327,7 +327,7 @@
 .setup-back-button.system-button.secondary-button {
   min-width: 118px;
   min-height: 50px;
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   background: var(--setup-station-enamel);
   border-color: rgba(244, 235, 219, 0.18);
   color: rgba(255, 249, 239, 0.94);
@@ -341,7 +341,7 @@
   display: grid;
   gap: 18px;
   padding: 18px;
-  border-radius: 8px;
+  border-radius: var(--radius-ticket);
   border: 1px solid var(--setup-rule);
   background:
     linear-gradient(180deg, var(--setup-station-enamel-soft), var(--setup-station-enamel)),
@@ -418,7 +418,7 @@
 }
 
 .setup-board-shell .system-button {
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   font-family: var(--font-setup);
   letter-spacing: 0;
 }
@@ -458,7 +458,7 @@
 
 .setup-step-panel .form-field {
   padding: 13px 14px;
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   border-color: rgba(244, 235, 219, 0.16);
   background: rgba(255, 249, 238, 0.06);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
@@ -687,7 +687,7 @@
   display: grid;
   gap: 12px;
   padding: 13px;
-  border-radius: 8px;
+  border-radius: var(--radius-ticket);
   border: 1px solid rgba(244, 235, 219, 0.16);
   background:
     linear-gradient(180deg, rgba(20, 28, 34, 0.9), rgba(10, 16, 21, 0.92)),
@@ -864,7 +864,7 @@
   min-height: 220px;
   padding: 18px;
   text-align: left;
-  border-radius: 8px;
+  border-radius: var(--radius-ticket);
   border: 1px solid rgba(244, 235, 219, 0.16);
   background:
     linear-gradient(180deg, var(--setup-station-enamel-soft), var(--setup-station-enamel)),
@@ -887,7 +887,6 @@
     repeating-linear-gradient(0deg, rgba(255, 249, 239, 0.07) 0 1px, transparent 1px 24px),
     linear-gradient(180deg, rgba(20, 28, 34, 0.58), rgba(8, 13, 17, 0.8));
   border-color: rgba(244, 235, 219, 0.18);
-  backdrop-filter: blur(5px);
 }
 
 .setup-board-shell--gateway .setup-entry-artifact::after {
@@ -966,7 +965,7 @@
 }
 
 .setup-board-shell--lobby .seat-row {
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   border-color: rgba(244, 235, 219, 0.16);
   background:
     linear-gradient(180deg, rgba(255, 249, 238, 0.08), rgba(255, 249, 238, 0.055)),
@@ -1141,7 +1140,7 @@
   display: grid;
   gap: 7px;
   padding: 12px 14px;
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   border: 1px dashed rgba(244, 235, 219, 0.18);
   background: rgba(207, 197, 178, 0.08);
 }
@@ -1197,7 +1196,7 @@
 
 .seat-plan__row,
 .seat-row {
-  border-radius: 6px;
+  border-radius: var(--radius-control);
 }
 
 .seat-choice-row {

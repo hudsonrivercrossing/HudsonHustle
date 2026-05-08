@@ -44,7 +44,6 @@ button {
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-strong);
-  backdrop-filter: blur(10px);
   transition:
     transform var(--duration-base) var(--easing-standard),
     box-shadow var(--duration-base) var(--easing-standard),

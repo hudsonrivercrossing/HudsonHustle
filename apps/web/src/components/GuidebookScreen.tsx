@@ -133,6 +133,9 @@ export function GuidebookScreen({ onBack, onReplayTour }: GuidebookScreenProps):
     >
       <div className="guidebook-page-action">
         <Button onClick={onBack}>Back</Button>
+        {onReplayTour ? (
+          <Button onClick={onReplayTour}>Replay tour</Button>
+        ) : null}
       </div>
       <section className="guidebook-card" aria-labelledby="guidebook-step-title">
         <div className="guidebook-rule-card">
@@ -165,22 +168,9 @@ export function GuidebookScreen({ onBack, onReplayTour }: GuidebookScreenProps):
             ))}
           </div>
           {isLast ? (
-            <>
-              {onReplayTour && (
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    localStorage.removeItem("hh-tour-seen");
-                    onReplayTour();
-                  }}
-                >
-                  Replay tour
-                </Button>
-              )}
-              <Button variant="primary" onClick={onBack}>
-                Finish
-              </Button>
-            </>
+            <Button variant="primary" onClick={onBack}>
+              Finish
+            </Button>
           ) : (
             <Button variant="primary" onClick={() => setStepIndex((current) => Math.min(guideSteps.length - 1, current + 1))} aria-label="Next guide step">
               <span aria-hidden="true">→</span>
