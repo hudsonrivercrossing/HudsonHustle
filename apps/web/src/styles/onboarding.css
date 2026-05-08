@@ -1,121 +1,176 @@
-/* ─── Onboarding Tour Overlay ─────────────────────────────────────────── */
+/* ─── Onboarding Tour ─────────────────────────────────────────────────── */
 
-@keyframes onboarding-fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+@keyframes tour-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-@keyframes onboarding-card-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes tour-callout-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
-.onboarding-overlay {
+/* Full-viewport layer — pointer-events off so user can still see content */
+.tour-overlay {
   position: fixed;
   inset: 0;
   z-index: var(--z-modal, 100);
-  background: rgba(10, 8, 6, 0.72);
-  display: grid;
-  place-items: center;
-  animation: onboarding-fade-in var(--duration-base, 160ms) var(--easing-standard, ease) both;
+  pointer-events: none;
+  animation: tour-fade-in var(--duration-base, 160ms) var(--easing-standard, ease) both;
 }
 
-.onboarding-card {
-  max-width: 480px;
-  width: 90%;
+/* Spotlight: transparent box, giant box-shadow dims everything outside */
+.tour-spotlight {
+  position: fixed;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 9999px rgba(10, 8, 6, 0.72);
+  transition:
+    top    var(--duration-base, 160ms) var(--easing-standard, ease),
+    left   var(--duration-base, 160ms) var(--easing-standard, ease),
+    width  var(--duration-base, 160ms) var(--easing-standard, ease),
+    height var(--duration-base, 160ms) var(--easing-standard, ease);
+  pointer-events: none;
+}
+
+/* Callout card */
+.tour-callout {
+  position: fixed;
+  width: 320px;
   background: var(--color-canvas-base);
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border-subtle);
-  padding: 28px;
+  padding: 20px 22px 18px;
   box-shadow: var(--shadow-strong);
-  position: relative;
-  overflow: hidden;
-  animation: onboarding-card-in var(--duration-base, 160ms) var(--easing-standard, ease) both;
+  pointer-events: auto;
+  animation: tour-callout-in var(--duration-base, 160ms) var(--easing-standard, ease) both;
 }
 
-/* Subtle inner highlight, matching .modal-card::before pattern */
-.onboarding-card::before {
+/* Centered fallback when target element isn't found */
+.tour-callout--centered {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Arrow pointer toward the spotlighted element */
+.tour-callout::after {
   content: "";
   position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent 34%),
-    linear-gradient(180deg, rgba(142, 170, 187, 0.06), transparent 52%);
+  width: 10px;
+  height: 10px;
+  background: var(--color-canvas-base);
+  border: 1px solid var(--color-border-subtle);
+  transform: rotate(45deg);
   pointer-events: none;
-  border-radius: inherit;
 }
 
-.onboarding-card__eyebrow {
-  margin: 0 0 var(--space-stack-sm, 8px);
+.tour-callout--arrow-left::after {
+  left: -6px;
+  top: 50%;
+  margin-top: -5px;
+  border-right: none;
+  border-top: none;
+}
+
+.tour-callout--arrow-right::after {
+  right: -6px;
+  top: 50%;
+  margin-top: -5px;
+  border-left: none;
+  border-bottom: none;
+}
+
+.tour-callout--arrow-bottom::after {
+  bottom: -6px;
+  left: 50%;
+  margin-left: -5px;
+  border-left: none;
+  border-top: none;
+}
+
+.tour-callout--arrow-top::after {
+  top: -6px;
+  left: 50%;
+  margin-left: -5px;
+  border-right: none;
+  border-bottom: none;
+}
+
+/* ─── Callout internals ──────────────────────────────────────────────── */
+
+.tour-callout__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-stack-sm, 8px);
+}
+
+.tour-callout__eyebrow {
   text-transform: uppercase;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   font-size: var(--type-xs);
   font-family: var(--font-body);
   font-weight: 600;
   color: var(--color-accent-base);
 }
 
-.onboarding-card__title {
+.tour-callout__counter {
+  font-size: var(--type-xs);
+  font-family: var(--font-body);
+  color: var(--color-ink-faint);
+}
+
+.tour-callout__title {
   font-family: var(--font-display);
-  font-size: 20px;
+  font-size: var(--type-lg);
   font-weight: 700;
   color: var(--color-ink-strong);
-  margin: 8px 0;
+  margin: 0 0 var(--space-stack-sm, 8px);
   line-height: var(--lh-snug, 1.2);
 }
 
-.onboarding-card__body {
-  font-size: var(--type-body);
+.tour-callout__body {
+  font-size: var(--type-sm);
   font-family: var(--font-body);
   color: var(--color-ink-muted);
-  line-height: 1.6;
-  margin-bottom: 24px;
+  line-height: 1.55;
+  margin-bottom: 16px;
 }
 
-.onboarding-card__footer {
+/* ─── Progress dots ──────────────────────────────────────────────────── */
+
+.tour-dots {
   display: flex;
-  justify-content: space-between;
+  gap: 5px;
   align-items: center;
-  gap: 12px;
+  margin-bottom: 14px;
 }
 
-/* ─── Progress dots ───────────────────────────────────────────────────── */
-
-.onboarding-dots {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.onboarding-dots__dot {
+.tour-dots__dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: var(--color-border-subtle);
-  transition: background var(--duration-fast, 140ms) var(--easing-standard, ease);
+  transition: background var(--duration-fast, 100ms) var(--easing-standard, ease);
 }
 
-.onboarding-dots__dot--active {
+.tour-dots__dot--active {
   background: var(--color-accent-strong);
+  width: 8px;
+  height: 8px;
 }
 
-/* ─── Footer button group ─────────────────────────────────────────────── */
+/* ─── Footer ─────────────────────────────────────────────────────────── */
 
-.onboarding-card__footer-actions {
+.tour-callout__footer {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
-  margin-left: auto;
+}
+
+.tour-callout__forward {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }

@@ -931,7 +931,10 @@ export default function App(): JSX.Element {
       <div className="game-layout">
         <aside className="side-panel">
           <div className="side-panel__private-stack">
-            <PrivateHandRail hand={localPlayer.hand} cardPalette={visuals.palettes.cards} paymentPreview={paymentPreview} />
+            <div data-tour-target="hand">
+              <PrivateHandRail hand={localPlayer.hand} cardPalette={visuals.palettes.cards} paymentPreview={paymentPreview} />
+            </div>
+            <div data-tour-target="tickets">
             <TicketDock
               ticketProgress={ticketProgress}
               config={mapConfig}
@@ -940,6 +943,7 @@ export default function App(): JSX.Element {
               onFocusTicket={setFocusedTicket}
               onTogglePinnedTicket={(ticket) => setPinnedTicket((current) => current?.id === ticket.id ? null : ticket)}
             />
+            </div>
           </div>
         </aside>
 
@@ -977,14 +981,17 @@ export default function App(): JSX.Element {
                 setPaymentPreview(null);
               }}
             />
-            <FloatingPlayerRoster
-              players={rosterPlayers}
-              activePlayerIndex={snapshot.game.activePlayerIndex}
-              playerPalette={visuals.palettes.players}
-              viewerPlayerId={snapshot.privateState?.playerId ?? null}
-            />
+            <div data-tour-target="roster">
+              <FloatingPlayerRoster
+                players={rosterPlayers}
+                activePlayerIndex={snapshot.game.activePlayerIndex}
+                playerPalette={visuals.palettes.players}
+                viewerPlayerId={snapshot.privateState?.playerId ?? null}
+              />
+            </div>
           </BoardStage>
 
+          <div data-tour-target="actions">
           <InspectorDock
             summary={publicGame.turn.summary}
             className="action-panel"
@@ -992,18 +999,20 @@ export default function App(): JSX.Element {
             chatMessages={chatMessages}
             onSendChat={sendChatMessage}
             marketContent={
-              <SupplyDock
-                market={publicGame.market}
-                deckCount={publicGame.trainDeckCount}
-                cardPalette={visuals.palettes.cards}
-                disabled={!canContinueDrawing}
-                isMarketCardDisabled={(card) => publicGame.turn.drawsTaken === 1 && card.color === "locomotive"}
-                onDrawFromMarket={(marketIndex) => sendGameAction({ type: "draw_card", source: "market", marketIndex })}
-                onDrawFromDeck={() => sendGameAction({ type: "draw_card", source: "deck" })}
-                onDrawTickets={() => sendGameAction({ type: "draw_tickets" })}
-                drawTicketsDisabled={!canTakeTurnAction}
-                className="supply-dock--board"
-              />
+              <div data-tour-target="market">
+                <SupplyDock
+                  market={publicGame.market}
+                  deckCount={publicGame.trainDeckCount}
+                  cardPalette={visuals.palettes.cards}
+                  disabled={!canContinueDrawing}
+                  isMarketCardDisabled={(card) => publicGame.turn.drawsTaken === 1 && card.color === "locomotive"}
+                  onDrawFromMarket={(marketIndex) => sendGameAction({ type: "draw_card", source: "market", marketIndex })}
+                  onDrawFromDeck={() => sendGameAction({ type: "draw_card", source: "deck" })}
+                  onDrawTickets={() => sendGameAction({ type: "draw_tickets" })}
+                  drawTicketsDisabled={!canTakeTurnAction}
+                  className="supply-dock--board"
+                />
+              </div>
             }
             buildContent={
               <>
@@ -1098,6 +1107,7 @@ export default function App(): JSX.Element {
               </>
             }
           />
+          </div>
         </main>
       </div>
 
