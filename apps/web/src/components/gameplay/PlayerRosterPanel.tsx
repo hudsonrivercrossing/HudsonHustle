@@ -110,7 +110,7 @@ export function FloatingPlayerRoster({ players, activePlayerIndex, playerPalette
   }
 
   return (
-    <div className="floating-player-roster">
+    <div className="floating-player-roster" data-tour-target="roster">
       {ordered.map(({ player, cornerIndex }) => (
         <FloatingPlayerPanel
           key={player.id}

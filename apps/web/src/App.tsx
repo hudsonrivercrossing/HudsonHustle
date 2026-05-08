@@ -981,17 +981,15 @@ export default function App(): JSX.Element {
                 setPaymentPreview(null);
               }}
             />
-            <div data-tour-target="roster">
-              <FloatingPlayerRoster
-                players={rosterPlayers}
-                activePlayerIndex={snapshot.game.activePlayerIndex}
-                playerPalette={visuals.palettes.players}
-                viewerPlayerId={snapshot.privateState?.playerId ?? null}
-              />
-            </div>
+            <FloatingPlayerRoster
+              players={rosterPlayers}
+              activePlayerIndex={snapshot.game.activePlayerIndex}
+              playerPalette={visuals.palettes.players}
+              viewerPlayerId={snapshot.privateState?.playerId ?? null}
+            />
           </BoardStage>
 
-          <div data-tour-target="actions">
+          <div data-tour-target="actions" style={{ display: "contents" }}>
           <InspectorDock
             summary={publicGame.turn.summary}
             className="action-panel"

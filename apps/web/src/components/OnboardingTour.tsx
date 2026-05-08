@@ -110,6 +110,19 @@ export default function OnboardingTour({ onDismiss }: OnboardingTourProps): JSX.
   const step = tourSteps[stepIndex];
   const isLast = stepIndex === tourSteps.length - 1;
 
+  function handleDismiss() {
+    localStorage.setItem(TOUR_SEEN_KEY, "1");
+    onDismiss();
+  }
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") handleDismiss();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   useEffect(() => {
     observerRef.current?.disconnect();
 
@@ -121,7 +134,13 @@ export default function OnboardingTour({ onDismiss }: OnboardingTourProps): JSX.
 
     function measure() {
       if (!el) return;
-      const r = el.getBoundingClientRect();
+      // display:contents elements have zero bounding rect — fall through to first child
+      let target: Element = el;
+      const r0 = el.getBoundingClientRect();
+      if (r0.width === 0 && r0.height === 0 && el.firstElementChild) {
+        target = el.firstElementChild;
+      }
+      const r = target.getBoundingClientRect();
       setSpotRect({
         top: r.top - SPOTLIGHT_PADDING,
         left: r.left - SPOTLIGHT_PADDING,
@@ -140,11 +159,6 @@ export default function OnboardingTour({ onDismiss }: OnboardingTourProps): JSX.
       window.removeEventListener("resize", measure);
     };
   }, [step.target]);
-
-  function handleDismiss() {
-    localStorage.setItem(TOUR_SEEN_KEY, "1");
-    onDismiss();
-  }
 
   const placement = spotRect ? computeCallout(spotRect) : null;
 
