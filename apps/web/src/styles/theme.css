@@ -41,6 +41,10 @@
   --radius-md: 18px;
   --radius-sm: 12px;
   --radius-control: 6px;
+  --radius-xs: 4px;          /* icon corners, palette tabs, tight chips */
+  --radius-map-tile: 3px;    /* transit route tile segments */
+  --radius-map-line: 2px;    /* transit line end caps */
+  --radius-map-marker: 1px;  /* ferry / tunnel micro markers */
 
   /* --- Border Width --- */
   --border-thin: 1px;
@@ -77,9 +81,12 @@
   --font-setup: "IBM Plex Sans", "Segoe UI", sans-serif;
 
   /* --- Type Scale (major-second 1.125) --- */
-  --type-2xs: 0.625rem;     /* 10px  — HUD micro-labels, badge counters, tight indicators */
-  --type-xs: 0.75rem;       /* 12px  — caps, badges, helper info */
-  --type-sm: 0.875rem;      /* 14px  — labels, metadata, helper text */
+  --type-map: 0.375rem;      /* 6px   — sub-micro map abbreviations, route prefixes */
+  --type-3xs: 0.5rem;        /* 8px   — map route labels, transit tile text */
+  --type-2xs: 0.625rem;      /* 10px  — HUD micro-labels, badge counters, tight indicators */
+  --type-xs: 0.75rem;        /* 12px  — caps, badges, helper info */
+  --type-2sm: 0.8125rem;     /* 13px  — setup secondary text, summary rows */
+  --type-sm: 0.875rem;       /* 14px  — labels, metadata, helper text */
   --type-body: 0.9375rem;   /* 15px  — default UI body */
   --type-md: 1.0625rem;     /* 17px  — emphasized body, buttons */
   --type-lg: 1.1875rem;     /* 19px  — card titles, small headings */
