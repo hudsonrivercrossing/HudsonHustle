@@ -1,6 +1,6 @@
 import type { Preview } from "@storybook/react-vite";
 import { createElement } from "react";
-import "../src/design/theme.css";
+import "../src/styles/theme.css";
 import "../src/styles.css";
 
 const preview: Preview = {
