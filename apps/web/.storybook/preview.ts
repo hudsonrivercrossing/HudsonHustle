@@ -1,6 +1,6 @@
 import type { Preview } from "@storybook/react-vite";
 import { createElement } from "react";
-import "../src/design/theme.css";
+import "../src/styles/theme.css";
 import "../src/styles.css";
 
 const preview: Preview = {
@@ -14,17 +14,32 @@ const preview: Preview = {
         order: [
           "System",
           [
-            "StatusBanner",
-            "StateSurface",
-            "Panel",
-            "SectionHeader",
-            "UtilityPill",
-            "Chip",
-            "Button",
-            "FormField",
-            "SurfaceCard",
-            "ChoiceChipButton",
-            "ModalShell"
+            "Primitives",
+            [
+              "StatusBanner",
+              "StateSurface",
+              "Panel",
+              "SectionHeader",
+              "Button",
+              "FormField",
+              "SurfaceCard",
+              "ChoiceChipButton",
+              "ModalShell",
+              "Badge"
+            ],
+            "Game",
+            [
+              "BoardStage",
+              "InspectorDock",
+              "PlayerRoster",
+              "SupplyDock",
+              "CardSlot",
+              "SeatTile",
+              "SideTabRail",
+              "NotificationStack",
+              "GameOverPanel",
+              "TicketSlip"
+            ]
           ]
         ]
       }

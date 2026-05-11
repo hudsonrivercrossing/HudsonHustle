@@ -33,6 +33,7 @@ This file is the source of truth for humans and agents working in this repo.
 - Use CSS variables for colors, spacing, radii, shadows, and typography hooks.
 
 ## 6. Verification Expectations
+- **Definition of Done**: A slice is shipped when the change is committed, any new export is imported by a caller, and `pnpm build` passes. No agent claim of "shipped" is accepted otherwise.
 - Run targeted tests for `game-core` whenever rules or scoring logic changes.
 - Prefer deterministic tests with fixed seeds.
 - If you cannot run installs or tests because of environment restrictions, say so explicitly.

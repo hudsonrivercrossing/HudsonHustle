@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Button } from "../system/Button";
+import { Button } from "../ui/primitives/Button";
 
 export type SetupStepStatus = "current" | "complete" | "upcoming";
 
