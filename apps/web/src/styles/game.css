@@ -672,7 +672,16 @@
 }
 
 .notification-pipe {
+  position: fixed;
+  bottom: var(--space-stack-lg, 24px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-stack-xs, 4px);
   z-index: 160;
+  pointer-events: none;
 }
 
 /* Right rail overflow fix: reserve a real tab spine instead of letting tabs crowd content. */
