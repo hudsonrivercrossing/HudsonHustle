@@ -9,9 +9,9 @@ import {
   type TrainCardColor,
   type TrainCardFace
 } from "@hudson-hustle/game-core";
-import { Button } from "../system/Button";
-import { Panel } from "../system/Panel";
-import { SectionHeader } from "../system/SectionHeader";
+import { Button } from "../ui/primitives/Button";
+import { Panel } from "../ui/primitives/Panel";
+import { SectionHeader } from "../ui/primitives/SectionHeader";
 import { CardSlot, TicketSlip } from "../system/game";
 
 function countHandByFace(hand: TrainCard[]): Record<TrainCardFace, number> {

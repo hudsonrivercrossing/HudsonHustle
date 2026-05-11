@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { HudsonHustleReleasedConfigSummary } from "@hudson-hustle/game-data";
 import type { ReconnectState, RoomSummary } from "@hudson-hustle/game-core";
-import { StateSurface } from "./system/StateSurface";
+import { StateSurface } from "./ui/primitives/StateSurface";
 import {
   ModeSwitch,
   SetupBackButton,

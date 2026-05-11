@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Panel } from "../system/Panel";
+import { Panel } from "../ui/primitives/Panel";
 import { SeatTile } from "../system/game";
 
 export type PlayerRosterEntry = {

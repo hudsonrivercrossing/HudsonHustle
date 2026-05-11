@@ -12,9 +12,9 @@ import {
   type SeatRow,
   type SetupStep
 } from "./setup";
-import { Button } from "./system/Button";
-import { FormField } from "./system/FormField";
-import { TimerPicker } from "./system/TimerPicker";
+import { Button } from "./ui/primitives/Button";
+import { FormField } from "./ui/primitives/FormField";
+import { TimerPicker } from "./ui/primitives/TimerPicker";
 import type { HudsonHustleReleasedConfigSummary } from "@hudson-hustle/game-data";
 
 interface LocalStartSetup {

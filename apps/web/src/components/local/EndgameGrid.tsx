@@ -1,6 +1,6 @@
 import { type GameState, type MapConfig } from "@hudson-hustle/game-core";
 import { EndgameBreakdown } from "../EndgameBreakdown";
-import { SurfaceCard } from "../system/SurfaceCard";
+import { SurfaceCard } from "../ui/primitives/SurfaceCard";
 
 interface EndgameGridProps {
   players: GameState["players"];

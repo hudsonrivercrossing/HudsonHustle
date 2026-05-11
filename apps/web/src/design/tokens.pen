@@ -2966,11 +2966,37 @@
     },
     "--color-canvas-glow-warm": {
       "type": "string",
-      "value": "rgba(255, 244, 216, 0.88)"
+      "value": [
+        {
+          "value": "rgba(255, 244, 216, 0.88)",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "rgba(255, 220, 140, 0.12)",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
     },
     "--color-canvas-glow-cool": {
       "type": "string",
-      "value": "rgba(123, 166, 189, 0.18)"
+      "value": [
+        {
+          "value": "rgba(123, 166, 189, 0.18)",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "rgba(80, 130, 160, 0.10)",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
     },
     "--color-surface-panel": {
       "type": "string",
@@ -3336,15 +3362,15 @@
     },
     "--space-stack-xs": {
       "type": "string",
-      "value": "6px"
+      "value": "4px"
     },
     "--space-stack-sm": {
       "type": "string",
-      "value": "12px"
+      "value": "8px"
     },
     "--space-stack-md": {
       "type": "string",
-      "value": "18px"
+      "value": "16px"
     },
     "--space-stack-lg": {
       "type": "string",
@@ -3530,7 +3556,7 @@
     },
     "--space-panel-md": {
       "type": "string",
-      "value": "18px"
+      "value": "16px"
     },
     "--space-panel-xl": {
       "type": "string",
@@ -3590,11 +3616,41 @@
     },
     "--material-ink-border": {
       "type": "string",
-      "value": "rgba(241, 226, 197, 0.22)"
+      "value": [
+        {
+          "value": "rgba(241, 226, 197, 0.22)",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "rgba(80, 60, 40, 0.32)",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
     },
     "--material-shadow-soft": {
       "type": "string",
-      "value": "0 14px 34px rgba(5, 10, 13, 0.24)"
+      "value": [
+        {
+          "value": "0 14px 34px rgba(5, 10, 13, 0.24)",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "0 14px 34px rgba(0, 0, 0, 0.38)",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "--type-2xs": {
+      "type": "string",
+      "value": "0.625rem"
     }
   }
 }

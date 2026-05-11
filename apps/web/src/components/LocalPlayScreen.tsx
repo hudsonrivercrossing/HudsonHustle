@@ -55,12 +55,12 @@ import {
 import { ScoreGuide } from "./ScoreGuide";
 import { SetupScreen } from "./SetupScreen";
 import { TransitCard } from "./TransitCard";
-import { Button } from "./system/Button";
-import { ModalShell } from "./system/ModalShell";
-import { Panel } from "./system/Panel";
-import { StatusBanner } from "./system/StatusBanner";
-import { SectionHeader } from "./system/SectionHeader";
-import { SurfaceCard } from "./system/SurfaceCard";
+import { Button } from "./ui/primitives/Button";
+import { ModalShell } from "./ui/primitives/ModalShell";
+import { Panel } from "./ui/primitives/Panel";
+import { StatusBanner } from "./ui/primitives/StatusBanner";
+import { SectionHeader } from "./ui/primitives/SectionHeader";
+import { SurfaceCard } from "./ui/primitives/SurfaceCard";
 
 interface LocalPlayScreenProps {
   onReturnToGateway?: () => void;

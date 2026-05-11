@@ -1,6 +1,6 @@
 import type { RoomSummary } from "@hudson-hustle/game-core";
-import { FormField } from "../system/FormField";
-import { Button } from "../system/Button";
+import { FormField } from "../ui/primitives/FormField";
+import { Button } from "../ui/primitives/Button";
 import { MapThumbnail, SetupActions, SetupStepPanel, TokenButton } from "../setup";
 import type { SetupFlowStep } from "./multiplayerSetup.types";
 

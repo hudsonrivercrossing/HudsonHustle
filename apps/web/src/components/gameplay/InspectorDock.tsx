@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { FormField } from "../system/FormField";
-import { Panel } from "../system/Panel";
-import { SectionHeader } from "../system/SectionHeader";
+import { FormField } from "../ui/primitives/FormField";
+import { Panel } from "../ui/primitives/Panel";
+import { SectionHeader } from "../ui/primitives/SectionHeader";
 import { SideTabRail } from "../system/game";
 
 type InspectorTab = "market" | "build" | "chat";

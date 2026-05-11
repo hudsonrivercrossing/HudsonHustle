@@ -9,30 +9,41 @@
   padding: var(--space-page-y) var(--space-page-x);
 }
 
-/* Game layout */
+/* Game layout — 3-column visual structure via nested grids:
+   .game-layout = left-rail | board-column
+   .board-column = board-stage | inspector-dock (right-rail) */
 .game-layout {
+  --game-left-rail: clamp(286px, 21vw, 312px);
+  --game-right-rail: clamp(324px, 24vw, 356px);
   display: grid;
-  grid-template-columns: minmax(252px, 272px) minmax(0, 1fr);
-  gap: 16px;
+  grid-template-columns: var(--game-left-rail) minmax(0, 1fr);
+  gap: var(--space-stack-md);
   align-items: start;
 }
 
-.side-panel,
+.side-panel {
+  display: grid;
+  gap: var(--space-stack-md);
+  align-content: start;
+}
+
 .board-column {
   display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--game-right-rail);
+  grid-template-rows: minmax(0, 1fr);
   gap: var(--space-stack-md);
   align-content: start;
 }
 
 .side-panel__private-stack {
   display: grid;
-  gap: 8px;
+  gap: var(--space-stack-sm);
 }
 
 /* Setup flows */
 .setup-flow-grid {
   display: grid;
-  gap: 16px;
+  gap: var(--space-stack-md);
 }
 
 .setup-flow-grid--create,
@@ -43,12 +54,12 @@
 .setup-entry-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: var(--space-stack-md);
 }
 
 .setup-field-grid {
   display: grid;
-  gap: 12px;
+  gap: var(--space-stack-sm);
 }
 
 .setup-field-grid--split {
@@ -78,13 +89,13 @@
 .chip-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: var(--space-stack-sm);
 }
 
 .topbar-actions {
   justify-content: flex-end;
   align-items: start;
-  gap: 8px;
+  gap: var(--space-stack-sm);
 }
 
 .topbar-actions .system-button {

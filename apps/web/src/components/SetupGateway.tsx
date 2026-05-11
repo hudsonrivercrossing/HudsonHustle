@@ -1,4 +1,4 @@
-import { Button } from "./system";
+import { Button } from "./ui/primitives";
 import { DepartureBoardTile, SetupShell, type SetupStep } from "./setup";
 
 interface SetupGatewayProps {

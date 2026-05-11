@@ -1,7 +1,7 @@
 import type { HudsonHustleReleasedConfigSummary } from "@hudson-hustle/game-data";
-import { FormField } from "../system/FormField";
-import { Button } from "../system/Button";
-import { TimerPicker } from "../system/TimerPicker";
+import { FormField } from "../ui/primitives/FormField";
+import { Button } from "../ui/primitives/Button";
+import { TimerPicker } from "../ui/primitives/TimerPicker";
 import {
   MapThumbnail,
   SeatPlan,

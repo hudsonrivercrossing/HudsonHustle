@@ -8,9 +8,9 @@ import {
   SetupSummaryRow,
   type SetupStep
 } from "./setup";
-import { Badge } from "./system/Badge";
-import { Button } from "./system/Button";
-import { StateSurface } from "./system/StateSurface";
+import { Badge } from "./ui/primitives/Badge";
+import { Button } from "./ui/primitives/Button";
+import { StateSurface } from "./ui/primitives/StateSurface";
 
 interface LobbyScreenProps {
   room: RoomSummary;

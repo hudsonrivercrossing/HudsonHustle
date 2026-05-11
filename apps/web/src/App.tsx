@@ -55,11 +55,11 @@ import { LobbyScreen } from "./components/LobbyScreen";
 import { MultiplayerSetupScreen } from "./components/MultiplayerSetupScreen";
 import { ScoreGuide } from "./components/ScoreGuide";
 import { SetupGateway } from "./components/SetupGateway";
-import { Button } from "./components/system/Button";
-import { ChoiceChipButton } from "./components/system/ChoiceChipButton";
-import { ModalShell } from "./components/system/ModalShell";
-import { SectionHeader } from "./components/system/SectionHeader";
-import { SurfaceCard } from "./components/system/SurfaceCard";
+import { Button } from "./components/ui/primitives/Button";
+import { ChoiceChipButton } from "./components/ui/primitives/ChoiceChipButton";
+import { ModalShell } from "./components/ui/primitives/ModalShell";
+import { SectionHeader } from "./components/ui/primitives/SectionHeader";
+import { SurfaceCard } from "./components/ui/primitives/SurfaceCard";
 import { encodeReconnectToken, readReconnectCredentials, type ReconnectCredentials } from "./reconnect-token";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8787";

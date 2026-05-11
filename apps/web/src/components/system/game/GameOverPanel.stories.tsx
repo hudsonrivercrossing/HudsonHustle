@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Button } from "../Button";
-import { SurfaceCard } from "../SurfaceCard";
+import { Button } from "../../ui/primitives/Button";
+import { SurfaceCard } from "../../ui/primitives/SurfaceCard";
 import { GameOverPanel } from "./GameOverPanel";
 
 const meta = {
