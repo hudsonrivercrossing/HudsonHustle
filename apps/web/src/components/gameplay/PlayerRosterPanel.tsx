@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Panel } from "../system/Panel";
 import { SeatTile } from "../system/game";
 
@@ -8,6 +9,8 @@ export type PlayerRosterEntry = {
   trainsLeft: number;
   stationsLeft: number;
   ticketCount: number;
+  score?: number;
+  routesCount?: number;
   avatarName?: string | null;
 };
 
@@ -73,6 +76,7 @@ interface FloatingPlayerPanelProps {
 }
 
 function FloatingPlayerPanel({ player, cornerIndex, isActive, color }: FloatingPlayerPanelProps): JSX.Element {
+  const [detailsOpen, setDetailsOpen] = useState(false);
   return (
     <div
       className={`floating-player-panel floating-player-panel--${CORNER_POSITIONS[cornerIndex]} ${isActive ? "floating-player-panel--active" : ""}`}
@@ -83,9 +87,25 @@ function FloatingPlayerPanel({ player, cornerIndex, isActive, color }: FloatingP
       ) : null}
       <div className="floating-player-panel__info">
         <span className="floating-player-panel__name">{player.name}</span>
-        <span className="floating-player-panel__stats">
-          {player.ticketCount ?? 0} tickets · {player.trainsLeft} trains · {player.stationsLeft} stations
-        </span>
+        <button
+          className="floating-player-panel__stats-toggle"
+          onClick={() => setDetailsOpen((v) => !v)}
+          aria-expanded={detailsOpen}
+          type="button"
+        >
+          <span className="floating-player-panel__primary-stats">
+            {player.score !== undefined ? `${player.score}pts · ` : ""}
+            {player.ticketCount ?? 0} tickets · {player.trainsLeft} trains
+          </span>
+          <span className="floating-player-panel__toggle-caret" aria-hidden="true">
+            {detailsOpen ? "▲" : "▼"}
+          </span>
+        </button>
+        {detailsOpen && (
+          <span className="floating-player-panel__secondary-stats">
+            {player.routesCount ?? 0} routes · {player.stationsLeft} stations
+          </span>
+        )}
       </div>
     </div>
   );

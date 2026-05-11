@@ -1470,12 +1470,44 @@ h3 {
   text-overflow: ellipsis;
 }
 
-.floating-player-panel__stats {
+.floating-player-panel__stats-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  text-align: left;
+}
+
+.floating-player-panel__primary-stats {
   font-family: var(--font-body);
   font-size: var(--type-xs);
   color: rgba(var(--paper-warm-rgb), 0.7);
   white-space: nowrap;
   letter-spacing: 0.02em;
+}
+
+.floating-player-panel__toggle-caret {
+  font-size: var(--type-2xs);
+  color: rgba(var(--paper-warm-rgb), 0.4);
+  flex-shrink: 0;
+}
+
+.floating-player-panel__secondary-stats {
+  font-family: var(--font-body);
+  font-size: var(--type-2xs);
+  color: rgba(var(--paper-warm-rgb), 0.52);
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+  animation: fade-in var(--duration-fast) var(--easing-standard) both;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .floating-player-panel--top-left {
@@ -2972,6 +3004,41 @@ h3 {
   box-shadow:
     inset 0 1px 0 rgba(var(--control-surface-rgb), 0.04),
     0 2px 0 rgba(var(--control-shadow-rgb), 0.12);
+}
+
+/* Primary affordance — one per turn-state */
+.choice-chip-button--primary {
+  border-color: color-mix(in srgb, var(--choice-chip-accent) 72%, rgba(var(--control-ink-rgb), 0.1));
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--choice-chip-accent) 28%, var(--control-face) 72%),
+      color-mix(in srgb, var(--choice-chip-accent) 16%, var(--control-face-strong) 84%)
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(var(--control-surface-rgb), 0.13),
+    0 4px 0 rgba(var(--control-shadow-rgb), 0.28),
+    0 0 0 2px color-mix(in srgb, var(--choice-chip-accent) 28%, transparent);
+  transition-timing-function: var(--easing-expressive);
+}
+
+.choice-chip-button--primary:hover,
+.choice-chip-button--primary:focus-visible {
+  border-color: color-mix(in srgb, var(--choice-chip-accent) 84%, rgba(var(--control-ink-rgb), 0.08));
+  box-shadow:
+    inset 0 1px 0 rgba(var(--control-surface-rgb), 0.15),
+    0 5px 0 rgba(var(--control-shadow-rgb), 0.32),
+    0 0 0 3px color-mix(in srgb, var(--choice-chip-accent) 36%, transparent);
+}
+
+/* De-emphasise non-primary siblings when a primary chip is present */
+.chip-row:has(.choice-chip-button--primary) .choice-chip-button:not(.choice-chip-button--primary) {
+  opacity: 0.48;
+  transition-timing-function: var(--easing-standard);
+}
+
+.chip-row:has(.choice-chip-button--primary) .choice-chip-button:not(.choice-chip-button--primary):hover,
+.chip-row:has(.choice-chip-button--primary) .choice-chip-button:not(.choice-chip-button--primary):focus-visible {
+  opacity: 1;
 }
 
 .hidden-panel {

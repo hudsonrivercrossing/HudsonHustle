@@ -108,8 +108,8 @@ Also audit layout.css for non-4pt hardcoded gaps (10px→8px, 14px→12px/16px).
 
 | # | Task | Status |
 |---|------|--------|
-| F1 | HUD audit: score regions by "need now vs secondary", push secondary behind progressive disclosure | ☐ design decision — primary: score+tickets; secondary: route counts, station reserve |
-| F2 | Single primary affordance per turn-state; `--accent-strong` + `--easing-expressive` on active CTA only | ☐ design decision — one `.choice-chip-button--primary` per turn-state; rest at reduced opacity |
+| F1 | HUD audit: score regions by "need now vs secondary", push secondary behind progressive disclosure | ☑ primary: score+tickets+trains always visible; routes+stations behind tap-to-expand toggle |
+| F2 | Single primary affordance per turn-state; `--accent-strong` + `--easing-expressive` on active CTA only | ☑ `.choice-chip-button--primary` on first option; siblings at 0.48 opacity, restore on hover |
 | F3 | First-time-player onboarding overlay: callouts on roster, hand, tickets, market, action panel — dismissible + replayable | ☑ OnboardingTour.tsx + onboarding.css — in progress |
 
 ---

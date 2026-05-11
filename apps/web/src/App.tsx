@@ -469,6 +469,8 @@ export default function App(): JSX.Element {
       trainsLeft: p.trainsLeft,
       stationsLeft: p.stationsLeft,
       ticketCount: p.ticketCount,
+      score: p.score,
+      routesCount: snapshot.game!.routeClaims.filter((c) => c.playerId === p.id).length,
       avatarName: playerAvatars[p.id] ?? null
     }));
   }, [snapshot?.game, playerAvatars]);
@@ -1045,9 +1047,10 @@ export default function App(): JSX.Element {
                 </div>
                 <div className="detail-card__decision-shelf chip-row">
                   {routeOptions.length > 0 ? (
-                    routeOptions.map((color) => (
+                    routeOptions.map((color, index) => (
                       <ChoiceChipButton
                         key={color}
+                        className={index === 0 && canTakeTurnAction ? "choice-chip-button--primary" : undefined}
                         style={{ ["--choice-chip-accent" as string]: visuals.palettes.cards[color] }}
                         disabled={!canTakeTurnAction}
                         onMouseEnter={() =>
@@ -1082,9 +1085,10 @@ export default function App(): JSX.Element {
                   {currentCityOccupied ? (
                     <span className="muted-copy">A station already exists in this city.</span>
                   ) : stationOptions.length > 0 ? (
-                    stationOptions.map((color) => (
+                    stationOptions.map((color, index) => (
                       <ChoiceChipButton
                         key={color}
+                        className={index === 0 && canTakeTurnAction ? "choice-chip-button--primary" : undefined}
                         style={{ ["--choice-chip-accent" as string]: visuals.palettes.cards[color] }}
                         disabled={!canTakeTurnAction}
                         onMouseEnter={() => setPaymentPreview({ color, totalCost: currentStationCost })}
