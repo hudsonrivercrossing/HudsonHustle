@@ -24,6 +24,7 @@ import {
   BoardMap,
   BoardStage,
   ChatPanel,
+  FloatingBuildPanel,
   FloatingPlayerRoster,
   GameOverLayer,
   NotificationPipe,
@@ -431,6 +432,50 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
                 onSelectRoute={(routeId) => { setSelectedRouteId(routeId); setSelectedCityId(null); setPaymentPreview(null); }}
                 onSelectCity={(cityId) => { setSelectedCityId(cityId); setSelectedRouteId(null); setPaymentPreview(null); }}
               />
+
+              {/* Floating build popup — appears on map when route/city selected */}
+              {(currentRoute || currentCity) && game.phase === "main" && visibility === "visible" ? (
+                <FloatingBuildPanel
+                  onClose={() => { setSelectedRouteId(null); setSelectedCityId(null); setPaymentPreview(null); }}
+                >
+                  {currentRoute ? (
+                    <RouteBuildPanel
+                      route={currentRoute}
+                      config={localMap}
+                      options={routeOptions}
+                      unavailableReason={currentRouteUnavailableReason}
+                      cardPalette={cardColorPalette}
+                      disabled={!canTakeTurnAction}
+                      claimedByName={currentRouteOwner?.name ?? null}
+                      onClaim={(color) => applyAction({ type: "claim_route", routeId: currentRoute.id, color })}
+                      onPaymentPreviewEnter={(preview) => setPaymentPreview(preview)}
+                      onPaymentPreviewLeave={() => setPaymentPreview(null)}
+                    />
+                  ) : currentCity ? (
+                    <StationBuildPanel
+                      city={currentCity}
+                      config={localMap}
+                      options={stationOptions}
+                      cityOccupied={currentCityOccupied}
+                      stationCost={currentStationCost}
+                      cardPalette={cardColorPalette}
+                      disabled={!canTakeTurnAction}
+                      turnStage={game.turn.stage}
+                      onBuild={(color) => applyAction({ type: "build_station", cityId: currentCity.id, color })}
+                      onPaymentPreviewEnter={(preview) => setPaymentPreview(preview)}
+                      onPaymentPreviewLeave={() => setPaymentPreview(null)}
+                    />
+                  ) : null}
+                  {game.turn.latestTunnelReveal.length > 0 ? (
+                    <SurfaceCard variant="detail" className="detail-card detail-card--tunnel" eyebrow="Tunnel check" title="Tunnel reveal">
+                      <p>{game.turn.latestTunnelReveal.join(", ")}</p>
+                    </SurfaceCard>
+                  ) : null}
+                  {error ? (
+                    <StatusBanner tone="warning" eyebrow="Action error" headline={error} />
+                  ) : null}
+                </FloatingBuildPanel>
+              ) : null}
             </BoardStage>
 
             {visibility === "visible" ? (
