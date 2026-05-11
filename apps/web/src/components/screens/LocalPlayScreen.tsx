@@ -23,9 +23,9 @@ import {
 import {
   BoardMap,
   BoardStage,
+  ChatPanel,
   FloatingPlayerRoster,
   GameOverLayer,
-  InspectorDock,
   NotificationPipe,
   PrivateHandRail,
   SupplyDock,
@@ -368,14 +368,15 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
       </header>
 
       <div className={`game-layout ${visibility !== "visible" ? "game-layout--obscured" : ""} ${tutorialTarget ? "game-layout--tutorial" : ""}`}>
-        <aside className="side-panel">
+        {/* Left column: roster + tickets + draw ticket */}
+        <aside className="side-panel" data-tour-target="roster">
           {visibility === "visible" ? (
-            <div className="side-panel__private-stack">
-              <PrivateHandRail
-                hand={activePlayer.hand}
-                cardPalette={cardColorPalette}
-                paymentPreview={paymentPreview}
-                className={tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}
+            <>
+              <FloatingPlayerRoster
+                players={rosterPlayers}
+                activePlayerIndex={game.activePlayerIndex}
+                playerPalette={playerColorPalette}
+                viewerPlayerId={game.players[game.activePlayerIndex]?.id ?? null}
               />
               <TicketDock
                 ticketProgress={ticketProgress}
@@ -384,9 +385,16 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
                 pinnedTicketId={pinnedTicket?.id ?? null}
                 onFocusTicket={setFocusedTicket}
                 onTogglePinnedTicket={(ticket) => setPinnedTicket((current) => current?.id === ticket.id ? null : ticket)}
-                className={tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}
+                className={tutorialTarget === "tickets" ? "panel--tutorial-focus" : ""}
               />
-            </div>
+              <Button
+                className="side-panel__draw-ticket"
+                disabled={!canTakeTurnAction}
+                onClick={() => applyAction({ type: "draw_tickets" })}
+              >
+                Draw tickets
+              </Button>
+            </>
           ) : (
             <Panel variant="danger" className="hidden-panel">
               <SectionHeader eyebrow="Privacy shield" title="Private info hidden" variant="standard" />
@@ -395,111 +403,59 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
           )}
         </aside>
 
+        {/* Center + right: board-column grid */}
         <main className="board-column">
-          <BoardStage
-            className={`board-panel ${tutorialTarget === "board" ? "panel--tutorial-focus" : ""}`}
-            isMyTurn={visibility === "visible" && game.phase === "main"}
-          >
-            <BoardMap
-              config={localMap}
-              backdrop={localVisuals.backdrop}
-              backdropMode={localVisuals.backdropMode}
-              boardLabelMode={localVisuals.boardLabelMode}
-              cardPalette={cardColorPalette}
-              playerPalette={playerColorPalette}
-              viewerPlayerId={game.players[game.activePlayerIndex]?.id}
-              game={{
-                players: game.players.map((p) => ({ id: p.id, name: p.name, color: p.color })),
-                activePlayerIndex: game.activePlayerIndex,
-                routeClaims: game.routeClaims,
-                stations: game.stations
-              }}
-              selectedRouteId={selectedRouteId}
-              selectedCityId={selectedCityId}
-              highlightedCityIds={highlightedCityIds}
-              onSelectRoute={(routeId) => { setSelectedRouteId(routeId); setSelectedCityId(null); setPaymentPreview(null); }}
-              onSelectCity={(cityId) => { setSelectedCityId(cityId); setSelectedRouteId(null); setPaymentPreview(null); }}
-            />
-            <FloatingPlayerRoster
-              players={rosterPlayers}
-              activePlayerIndex={game.activePlayerIndex}
-              playerPalette={playerColorPalette}
-              viewerPlayerId={game.players[game.activePlayerIndex]?.id ?? null}
-            />
-          </BoardStage>
-
-          <InspectorDock
-            summary={game.turn.summary}
-            className={`action-panel ${tutorialTarget === "action" ? "panel--tutorial-focus" : ""}`}
-            activeBuildKey={selectedRouteId ?? selectedCityId}
-            currentPlayerName={game.players[game.activePlayerIndex]?.name}
-            deckCount={game.trainDeck.length}
-            ticketDeckCount={game.regularTickets.length + game.longTickets.length}
-            marketContent={
-              <SupplyDock
-                market={game.market}
-                deckCount={game.trainDeck.length}
+          {/* Center: map + hand strip */}
+          <div className="map-col">
+            <BoardStage
+              className={`board-panel ${tutorialTarget === "board" ? "panel--tutorial-focus" : ""}`}
+              isMyTurn={visibility === "visible" && game.phase === "main"}
+            >
+              <BoardMap
+                config={localMap}
+                backdrop={localVisuals.backdrop}
+                backdropMode={localVisuals.backdropMode}
+                boardLabelMode={localVisuals.boardLabelMode}
                 cardPalette={cardColorPalette}
-                disabled={marketDisabled}
-                onDrawFromMarket={(marketIndex) => applyAction({ type: "draw_card", source: "market", marketIndex })}
-                onDrawFromDeck={() => applyAction({ type: "draw_card", source: "deck" })}
-                onDrawTickets={() => applyAction({ type: "draw_tickets" })}
-                drawTicketsDisabled={!canTakeTurnAction}
-                className={`supply-dock--board ${tutorialTarget === "market" ? "panel--tutorial-focus" : ""}`}
+                playerPalette={playerColorPalette}
+                viewerPlayerId={game.players[game.activePlayerIndex]?.id}
+                game={{
+                  players: game.players.map((p) => ({ id: p.id, name: p.name, color: p.color })),
+                  activePlayerIndex: game.activePlayerIndex,
+                  routeClaims: game.routeClaims,
+                  stations: game.stations
+                }}
+                selectedRouteId={selectedRouteId}
+                selectedCityId={selectedCityId}
+                highlightedCityIds={highlightedCityIds}
+                onSelectRoute={(routeId) => { setSelectedRouteId(routeId); setSelectedCityId(null); setPaymentPreview(null); }}
+                onSelectCity={(cityId) => { setSelectedCityId(cityId); setSelectedRouteId(null); setPaymentPreview(null); }}
               />
-            }
-            buildContent={
-              <>
-                {game.phase === "main" && visibility === "visible" && !currentRoute && !currentCity ? (
-                  <div className="action-empty-prompt" data-testid="action-empty-state">
-                    <span className="action-empty-prompt__title">Select a route or station.</span>
-                    <span className="action-empty-prompt__copy">Build options appear here.</span>
-                  </div>
-                ) : null}
+            </BoardStage>
 
-                {currentRoute && game.phase === "main" && visibility === "visible" ? (
-                  <RouteBuildPanel
-                    route={currentRoute}
-                    config={localMap}
-                    options={routeOptions}
-                    unavailableReason={currentRouteUnavailableReason}
-                    cardPalette={cardColorPalette}
-                    disabled={!canTakeTurnAction}
-                    claimedByName={currentRouteOwner?.name ?? null}
-                    onClaim={(color) => applyAction({ type: "claim_route", routeId: currentRoute.id, color })}
-                    onPaymentPreviewEnter={(preview) => setPaymentPreview(preview)}
-                    onPaymentPreviewLeave={() => setPaymentPreview(null)}
-                  />
-                ) : null}
+            {visibility === "visible" ? (
+              <PrivateHandRail
+                hand={activePlayer.hand}
+                cardPalette={cardColorPalette}
+                paymentPreview={paymentPreview}
+                className={tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}
+              />
+            ) : null}
+          </div>
 
-                {currentCity && game.phase === "main" && visibility === "visible" ? (
-                  <StationBuildPanel
-                    city={currentCity}
-                    config={localMap}
-                    options={stationOptions}
-                    cityOccupied={currentCityOccupied}
-                    stationCost={currentStationCost}
-                    cardPalette={cardColorPalette}
-                    disabled={!canTakeTurnAction}
-                    turnStage={game.turn.stage}
-                    onBuild={(color) => applyAction({ type: "build_station", cityId: currentCity.id, color })}
-                    onPaymentPreviewEnter={(preview) => setPaymentPreview(preview)}
-                    onPaymentPreviewLeave={() => setPaymentPreview(null)}
-                  />
-                ) : null}
-
-                {game.turn.latestTunnelReveal.length > 0 && visibility === "visible" ? (
-                  <SurfaceCard variant="detail" className="detail-card detail-card--tunnel" eyebrow="Tunnel check" title="Tunnel reveal">
-                    <p>{game.turn.latestTunnelReveal.join(", ")}</p>
-                  </SurfaceCard>
-                ) : null}
-
-                {error && visibility === "visible" ? (
-                  <StatusBanner tone="warning" eyebrow="Action error" headline={error} />
-                ) : null}
-              </>
-            }
-          />
+          {/* Right column: chat + market */}
+          <div className="right-col" data-tour-target="market">
+            <ChatPanel className={tutorialTarget === "action" ? "panel--tutorial-focus" : ""} />
+            <SupplyDock
+              market={game.market}
+              deckCount={game.trainDeck.length}
+              cardPalette={cardColorPalette}
+              disabled={marketDisabled}
+              onDrawFromMarket={(marketIndex) => applyAction({ type: "draw_card", source: "market", marketIndex })}
+              onDrawFromDeck={() => applyAction({ type: "draw_card", source: "deck" })}
+              className={`supply-dock--board ${tutorialTarget === "market" ? "panel--tutorial-focus" : ""}`}
+            />
+          </div>
         </main>
       </div>
 

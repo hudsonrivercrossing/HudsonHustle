@@ -738,17 +738,34 @@
   pointer-events: none;
 }
 
-/* Right rail overflow fix: reserve a real tab spine instead of letting tabs crowd content. */
+/* Gameplay HUD layout overrides */
 .app-shell--gameplay-hud {
-  --game-right-rail: clamp(376px, 28vw, 424px);
+  --game-right-rail: clamp(288px, 22vw, 340px);
 }
 
 .app-shell--gameplay-hud .topbar {
-  grid-template-columns: var(--game-left-rail) minmax(0, 1fr) var(--game-right-rail);
+  grid-template-columns: var(--game-left-rail) minmax(0, 1fr) auto;
 }
 
 .app-shell--gameplay-hud .board-column {
   grid-template-columns: minmax(0, 1fr) var(--game-right-rail);
+  align-items: start;
+}
+
+.app-shell--gameplay-hud .right-col {
+  background:
+    radial-gradient(circle at top left, rgba(142, 169, 188, 0.12), transparent 34%),
+    linear-gradient(180deg, rgba(30, 42, 51, 0.88), rgba(9, 15, 20, 0.9));
+  border: 1px solid rgba(var(--hud-brass-light-rgb), 0.18);
+  border-radius: var(--radius-panel);
+  padding: var(--space-stack-sm);
+}
+
+.app-shell--gameplay-hud .side-panel__draw-ticket.system-button {
+  background: rgba(var(--hud-brass-light-rgb), 0.12);
+  border-color: rgba(var(--hud-brass-light-rgb), 0.28);
+  color: var(--hud-paper-bright);
+  font-size: var(--type-xs);
 }
 
 .app-shell--gameplay-hud .inspector-dock {

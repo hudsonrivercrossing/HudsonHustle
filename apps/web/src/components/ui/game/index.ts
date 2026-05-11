@@ -1,4 +1,5 @@
 export { BoardMap } from "./BoardMap";
+export { ChatPanel } from "./ChatPanel";
 export { BoardStage } from "./BoardStage";
 export { CardSlot, formatCardLabel } from "./CardSlot";
 export type { CardSlotProps } from "./CardSlot";

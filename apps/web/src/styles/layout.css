@@ -11,10 +11,10 @@
 
 /* Game layout — 3-column visual structure via nested grids:
    .game-layout = left-rail | board-column
-   .board-column = board-stage | inspector-dock (right-rail) */
+   .board-column = map-col | right-col */
 .game-layout {
-  --game-left-rail: clamp(286px, 21vw, 312px);
-  --game-right-rail: clamp(324px, 24vw, 356px);
+  --game-left-rail: clamp(260px, 19vw, 300px);
+  --game-right-rail: clamp(288px, 22vw, 340px);
   display: grid;
   grid-template-columns: var(--game-left-rail) minmax(0, 1fr);
   gap: var(--space-stack-md);
@@ -22,22 +22,32 @@
 }
 
 .side-panel {
-  display: grid;
-  gap: var(--space-stack-md);
-  align-content: start;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-stack-sm);
 }
 
 .board-column {
   display: grid;
   grid-template-columns: minmax(0, 1fr) var(--game-right-rail);
-  grid-template-rows: minmax(0, 1fr);
   gap: var(--space-stack-md);
-  align-content: start;
+  align-items: start;
 }
 
-.side-panel__private-stack {
-  display: grid;
+.map-col {
+  display: flex;
+  flex-direction: column;
   gap: var(--space-stack-sm);
+}
+
+.right-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-stack-sm);
+}
+
+.side-panel__draw-ticket {
+  width: 100%;
 }
 
 /* Setup flows */
