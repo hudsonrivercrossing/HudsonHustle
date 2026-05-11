@@ -361,9 +361,9 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
         <div className="topbar-private-spacer" aria-hidden="true" />
         <TurnIndicator playerName={game.players[game.activePlayerIndex]?.name ?? ""} />
         <div className="topbar-actions">
-          <Button onClick={() => setGuideOpen(true)}>Guide</Button>
-          <ScoreGuide className="score-guide--subtle" label="Score" />
-          <Button onClick={() => setShowLeaveConfirm(true)}>Leave room</Button>
+          <Button className="topbar-icon-btn" aria-label="Guide" onClick={() => setGuideOpen(true)} data-label="Guide">?</Button>
+          <ScoreGuide className="score-guide--subtle topbar-icon-btn" label="★" />
+          <Button className="topbar-icon-btn topbar-icon-btn--leave" aria-label="Leave room" onClick={() => setShowLeaveConfirm(true)} data-label="Leave">✕</Button>
         </div>
       </header>
 

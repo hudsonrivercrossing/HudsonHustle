@@ -520,10 +520,10 @@
 
 .app-shell--gameplay-hud .topbar-actions {
   grid-column: 3;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  align-items: stretch;
-  gap: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-stack-xs, 4px);
   width: 100%;
 }
 
@@ -546,6 +546,60 @@
   padding: 7px 8px;
   font-size: var(--type-xs);
   line-height: 1.04;
+}
+
+/* Icon-only topbar buttons: square, same height as turn indicator, label reveals on hover */
+.app-shell--gameplay-hud .topbar-icon-btn.system-button,
+.app-shell--gameplay-hud .topbar-icon-btn .score-guide__trigger.system-button {
+  position: relative;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0;
+  font-size: var(--type-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.app-shell--gameplay-hud .score-guide.topbar-icon-btn {
+  position: relative;
+}
+
+.app-shell--gameplay-hud .topbar-icon-btn.system-button::after {
+  content: attr(data-label);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: var(--type-xs);
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--color-ink-strong);
+  background: var(--color-canvas-base);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-control);
+  padding: 3px 8px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--duration-fast, 100ms) ease;
+}
+
+.app-shell--gameplay-hud .topbar-icon-btn.system-button:hover::after,
+.app-shell--gameplay-hud .topbar-icon-btn.system-button:focus-visible::after {
+  opacity: 1;
+}
+
+.app-shell--gameplay-hud .topbar-actions {
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.app-shell--gameplay-hud .topbar-icon-btn--leave.system-button {
+  color: var(--color-status-danger, #d45a3f);
 }
 
 /* .game-layout and .board-column grid structure lives in layout.css */
