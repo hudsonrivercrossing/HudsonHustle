@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
-import type { StatusBannerTone } from "../../design/tokens";
+
+export const statusBannerTones = ["neutral", "active", "waiting", "warning", "danger"] as const;
+export type StatusBannerTone = (typeof statusBannerTones)[number];
 
 interface StatusBannerProps {
   tone?: StatusBannerTone;

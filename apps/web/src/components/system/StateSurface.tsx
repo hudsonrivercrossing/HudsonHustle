@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { StatusBannerTone } from "../../design/tokens";
+import type { StatusBannerTone } from "./StatusBanner";
 
 interface StateSurfaceProps {
   tone?: StatusBannerTone;

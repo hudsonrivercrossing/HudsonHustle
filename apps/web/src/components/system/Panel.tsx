@@ -1,5 +1,7 @@
 import type { HTMLAttributes, ReactNode } from "react";
-import type { PanelVariant } from "../../design/tokens";
+
+export const panelVariants = ["neutral", "info", "private", "danger"] as const;
+export type PanelVariant = (typeof panelVariants)[number];
 
 interface PanelProps extends HTMLAttributes<HTMLElement> {
   as?: "section" | "div" | "aside";
