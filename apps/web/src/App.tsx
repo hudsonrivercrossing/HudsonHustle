@@ -50,7 +50,7 @@ import {
   type GameplayNotification
 } from "./components/ui/game";
 import { GuidebookScreen } from "./components/screens/GuidebookScreen";
-import OnboardingTour, { shouldShowTour } from "./components/OnboardingTour";
+import OnboardingTour, { shouldShowTour } from "./components/shared/OnboardingTour";
 import { LocalPlayScreen } from "./components/screens/LocalPlayScreen";
 import { LobbyScreen } from "./components/screens/LobbyScreen";
 import { OnlineSetupScreen } from "./components/screens/OnlineSetupScreen";

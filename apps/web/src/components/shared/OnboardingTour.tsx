@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Button } from "./ui/primitives/Button";
+import { Button } from "../ui/primitives/Button";
 
 const TOUR_SEEN_KEY = "hh-tour-seen";
 const CALLOUT_WIDTH = 320;
