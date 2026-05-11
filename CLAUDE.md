@@ -113,12 +113,15 @@ This keeps `tokens.pen` and `components.pen` aligned with the live CSS.
 
 ## Pen file map
 
-| File | CSS source | Pencil column | Content |
-|---|---|---|---|
-| `design/tokens.pen` | `theme.css` | Column 1 | Color, space, type, motion, radius tokens |
-| `design/components.pen` | `ui.css` + `game.css` | Column 2 | Component specs and state matrices |
-| `design/layout.pen` | `layout.css` + `setup.css` | Column 3 | Screen compositions at 3 breakpoints |
-| `design/hudsonhustle.pen` | all of the above | all columns | Unified canvas — use this for cross-cutting review |
+**Active file:** `design/hudsonhustle.pen` — unified 3-column canvas, the only pen file in use.
+
+| Column | CSS source | Content |
+|---|---|---|
+| Column 1 — Tokens | `theme.css` | Color, space, type, motion, radius tokens |
+| Column 2 — Components | `ui.css` + `game.css` | Component specs and state matrices |
+| Column 3 — Layout | `layout.css` + `setup.css` | Screen compositions at 3 breakpoints |
+
+`tokens.pen`, `components.pen`, and `layout.pen` are deprecated — do not use or sync them.
 
 `.pen` files are encrypted — only access via `pencil` MCP tools, never `Read` or `grep`.
 
