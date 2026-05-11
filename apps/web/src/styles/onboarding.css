@@ -166,11 +166,20 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
 .tour-callout__forward {
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Keep tour buttons compact so they fit within the 320px callout width */
+.tour-callout .system-button {
+  min-width: 0;
+  padding-inline: var(--space-stack-md, 16px);
+  font-size: var(--type-xs);
 }
