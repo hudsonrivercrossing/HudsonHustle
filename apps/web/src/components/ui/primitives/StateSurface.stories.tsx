@@ -3,7 +3,7 @@ import { Button } from "./Button";
 import { StateSurface } from "./StateSurface";
 
 const meta = {
-  title: "System/StateSurface",
+  title: "System/Primitives/StateSurface",
   component: StateSurface,
   args: {
     tone: "neutral",

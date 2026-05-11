@@ -16,7 +16,7 @@ const samplePlayers = [
 ];
 
 const rosterMeta = {
-  title: "Gameplay/PlayerRoster",
+  title: "System/Game/PlayerRoster",
   component: PlayerRoster,
   args: {
     players: samplePlayers,

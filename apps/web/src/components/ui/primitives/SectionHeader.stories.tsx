@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { SectionHeader } from "./SectionHeader";
 
 const meta = {
-  title: "System/SectionHeader",
+  title: "System/Primitives/SectionHeader",
   component: SectionHeader,
   args: {
     eyebrow: "Shell family",

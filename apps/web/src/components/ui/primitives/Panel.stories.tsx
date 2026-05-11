@@ -4,7 +4,7 @@ import { Panel } from "./Panel";
 import { SectionHeader } from "./SectionHeader";
 
 const meta = {
-  title: "System/Panel",
+  title: "System/Primitives/Panel",
   component: Panel,
   args: {
     variant: "neutral",

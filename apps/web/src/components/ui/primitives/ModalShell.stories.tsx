@@ -4,7 +4,7 @@ import { ModalShell } from "./ModalShell";
 import { SectionHeader } from "./SectionHeader";
 
 const meta = {
-  title: "System/ModalShell",
+  title: "System/Primitives/ModalShell",
   component: ModalShell,
   args: {
     variant: "default",

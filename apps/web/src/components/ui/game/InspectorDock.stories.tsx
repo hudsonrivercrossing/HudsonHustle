@@ -43,7 +43,7 @@ const sampleBuildContent = (
 );
 
 const meta = {
-  title: "Gameplay/InspectorDock",
+  title: "System/Game/InspectorDock",
   component: InspectorDock,
   args: {
     summary: null,

@@ -23,7 +23,7 @@ const sampleMarket: TrainCard[] = [
 ];
 
 const meta = {
-  title: "Gameplay/SupplyDock",
+  title: "System/Game/SupplyDock",
   component: SupplyDock,
   args: {
     market: sampleMarket,

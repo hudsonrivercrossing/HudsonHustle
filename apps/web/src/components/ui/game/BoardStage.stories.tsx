@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { BoardStage } from "./BoardStage";
 
 const meta = {
-  title: "Gameplay/BoardStage",
+  title: "System/Game/BoardStage",
   component: BoardStage,
   args: {
     isMyTurn: false,

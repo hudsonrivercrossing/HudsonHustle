@@ -7,7 +7,7 @@ import { SectionHeader } from "./SectionHeader";
 import { SurfaceCard } from "./SurfaceCard";
 
 const meta = {
-  title: "System/SurfaceCard",
+  title: "System/Primitives/SurfaceCard",
   component: SurfaceCard,
   args: {
     variant: "detail",

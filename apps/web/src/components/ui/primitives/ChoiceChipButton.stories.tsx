@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ChoiceChipButton } from "./ChoiceChipButton";
 
 const meta = {
-  title: "System/ChoiceChipButton",
+  title: "System/Primitives/ChoiceChipButton",
   component: ChoiceChipButton,
   args: {
     children: "Claim with color"

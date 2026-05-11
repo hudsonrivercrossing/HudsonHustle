@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { StatusBanner } from "./StatusBanner";
 
 const meta = {
-  title: "System/StatusBanner",
+  title: "System/Primitives/StatusBanner",
   component: StatusBanner,
   args: {
     tone: "neutral",
