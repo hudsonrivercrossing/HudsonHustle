@@ -7,10 +7,10 @@ import {
   SetupStepPanel,
   SetupSummaryRow,
   type SetupStep
-} from "./setup";
-import { Badge } from "./ui/primitives/Badge";
-import { Button } from "./ui/primitives/Button";
-import { StateSurface } from "./ui/primitives/StateSurface";
+} from "../setup";
+import { Badge } from "../ui/primitives/Badge";
+import { Button } from "../ui/primitives/Button";
+import { StateSurface } from "../ui/primitives/StateSurface";
 
 interface LobbyScreenProps {
   room: RoomSummary;

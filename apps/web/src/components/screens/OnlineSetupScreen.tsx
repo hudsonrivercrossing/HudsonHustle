@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import type { HudsonHustleReleasedConfigSummary } from "@hudson-hustle/game-data";
 import type { ReconnectState, RoomSummary } from "@hudson-hustle/game-core";
-import { StateSurface } from "./ui/primitives/StateSurface";
+import { StateSurface } from "../ui/primitives/StateSurface";
 import {
   ModeSwitch,
   SetupBackButton,
   SetupShell,
   type SetupStep
-} from "./setup";
+} from "../setup";
 import {
   CreateRoomFlow,
   CreateRoomPreflight,
@@ -18,9 +18,9 @@ import {
   type CreateRoomForm,
   type OnlineSetupStage,
   type SetupFlowStep
-} from "./multiplayer";
+} from "../multiplayer";
 
-interface MultiplayerSetupScreenProps {
+interface OnlineSetupScreenProps {
   releasedConfigs: HudsonHustleReleasedConfigSummary[];
   reconnectState: ReconnectState;
   roomPreview: RoomSummary | null;
@@ -34,7 +34,7 @@ interface MultiplayerSetupScreenProps {
   onJoinRoom: (form: { roomCode: string; playerName: string; preferredSeatId?: string }) => void;
 }
 
-export function MultiplayerSetupScreen({
+export function OnlineSetupScreen({
   releasedConfigs,
   reconnectState,
   roomPreview,
@@ -45,7 +45,7 @@ export function MultiplayerSetupScreen({
   onPreviewRoom,
   onCreateRoom,
   onJoinRoom
-}: MultiplayerSetupScreenProps): JSX.Element {
+}: OnlineSetupScreenProps): JSX.Element {
   const setupHeroImageUrl = "/setup/landing-bg.png";
   const latestConfigId = releasedConfigs.at(-1)?.configId ?? "v0.4-flushing-newark-airport";
 

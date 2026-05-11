@@ -1,5 +1,5 @@
-import { Button } from "./ui/primitives";
-import { DepartureBoardTile, SetupShell, type SetupStep } from "./setup";
+import { Button } from "../ui/primitives";
+import { DepartureBoardTile, SetupShell, type SetupStep } from "../setup";
 
 interface SetupGatewayProps {
   onChooseLocal: () => void;

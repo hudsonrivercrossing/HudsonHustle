@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button } from "./ui/primitives/Button";
+import { Button } from "../ui/primitives/Button";
 
 interface GuideStep {
   eyebrow: string;

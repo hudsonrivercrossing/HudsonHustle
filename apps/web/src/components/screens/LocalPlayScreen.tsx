@@ -33,7 +33,7 @@ import {
   TicketDock,
   TurnIndicator,
   type GameplayNotification
-} from "./ui/game";
+} from "../ui/game";
 import { GuidebookScreen } from "./GuidebookScreen";
 import {
   EndgameGrid,
@@ -51,15 +51,15 @@ import {
   shuffleAvatars,
   type LocalStartSetup,
   type VisibilityMode
-} from "./local";
-import { ScoreGuide, TransitCard } from "./ui/game";
+} from "../local";
+import { ScoreGuide, TransitCard } from "../ui/game";
 import { SetupScreen } from "./SetupScreen";
-import { Button } from "./ui/primitives/Button";
-import { ModalShell } from "./ui/primitives/ModalShell";
-import { Panel } from "./ui/primitives/Panel";
-import { StatusBanner } from "./ui/primitives/StatusBanner";
-import { SectionHeader } from "./ui/primitives/SectionHeader";
-import { SurfaceCard } from "./ui/primitives/SurfaceCard";
+import { Button } from "../ui/primitives/Button";
+import { ModalShell } from "../ui/primitives/ModalShell";
+import { Panel } from "../ui/primitives/Panel";
+import { StatusBanner } from "../ui/primitives/StatusBanner";
+import { SectionHeader } from "../ui/primitives/SectionHeader";
+import { SurfaceCard } from "../ui/primitives/SurfaceCard";
 
 interface LocalPlayScreenProps {
   onReturnToGateway?: () => void;

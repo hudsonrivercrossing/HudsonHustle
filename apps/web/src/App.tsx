@@ -49,12 +49,12 @@ import {
   formatCardLabel,
   type GameplayNotification
 } from "./components/ui/game";
-import { GuidebookScreen } from "./components/GuidebookScreen";
+import { GuidebookScreen } from "./components/screens/GuidebookScreen";
 import OnboardingTour, { shouldShowTour } from "./components/OnboardingTour";
-import { LocalPlayScreen } from "./components/LocalPlayScreen";
-import { LobbyScreen } from "./components/LobbyScreen";
-import { MultiplayerSetupScreen } from "./components/MultiplayerSetupScreen";
-import { SetupGateway } from "./components/SetupGateway";
+import { LocalPlayScreen } from "./components/screens/LocalPlayScreen";
+import { LobbyScreen } from "./components/screens/LobbyScreen";
+import { OnlineSetupScreen } from "./components/screens/OnlineSetupScreen";
+import { SetupGateway } from "./components/screens/SetupGateway";
 import { Button } from "./components/ui/primitives/Button";
 import { ChoiceChipButton } from "./components/ui/primitives/ChoiceChipButton";
 import { ModalShell } from "./components/ui/primitives/ModalShell";
@@ -834,7 +834,7 @@ export default function App(): JSX.Element {
     }
 
     return (
-      <MultiplayerSetupScreen
+      <OnlineSetupScreen
         releasedConfigs={releasedConfigs}
         reconnectState={reconnectState}
         roomPreview={roomPreview}
