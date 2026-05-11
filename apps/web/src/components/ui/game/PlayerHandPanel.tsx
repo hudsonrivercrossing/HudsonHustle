@@ -141,7 +141,7 @@ export function TicketDock({
             fromLabel={getCityName(config, ticket.from)}
             toLabel={getCityName(config, ticket.to)}
             points={ticket.points}
-            status={completed ? "connected" : "open"}
+            status={completed ? "connected" : pinnedTicketId === ticket.id ? "keep" : "open"}
             focused={focusedTicketId === ticket.id || pinnedTicketId === ticket.id}
             onMouseEnter={() => onFocusTicket?.(ticket)}
             onMouseLeave={() => onFocusTicket?.(null)}
