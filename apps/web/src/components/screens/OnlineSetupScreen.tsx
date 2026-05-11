@@ -18,7 +18,7 @@ import {
   type CreateRoomForm,
   type OnlineSetupStage,
   type SetupFlowStep
-} from "../multiplayer";
+} from "../online";
 
 interface OnlineSetupScreenProps {
   releasedConfigs: HudsonHustleReleasedConfigSummary[];

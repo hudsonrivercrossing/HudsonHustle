@@ -111,7 +111,13 @@
       "Bash(git -C /Users/djfan/Workspace/HudsonHustle status)",
       "Bash(git -C /Users/djfan/Workspace/HudsonHustle add apps/web/src/design/theme.css apps/web/src/styles/system.css)",
       "Bash(/Users/djfan/Workspace/HudsonHustle/apps/web/node_modules/.bin/tsc -p /Users/djfan/Workspace/HudsonHustle/apps/web/tsconfig.json --noEmit)",
-      "Bash(git -C /Users/djfan/Workspace/HudsonHustle add -A)"
+      "Bash(git -C /Users/djfan/Workspace/HudsonHustle add -A)",
+      "Bash(git -C /Users/djfan/Workspace/HudsonHustle rm --cached .claude/worktrees/agent-a21412afeb7fb6896 .claude/worktrees/agent-a48cd9fb19b9f9695 .claude/worktrees/agent-af7edf3030a903a52)",
+      "Bash(git -C /Users/djfan/Workspace/HudsonHustle diff --cached --name-only)",
+      "Bash(grep -v \"\\\\.pen$\")",
+      "Bash(grep -v \"\\\\.css$\")",
+      "Bash(node_modules/.bin/tsc -p apps/web/tsconfig.json --noEmit)",
+      "Bash(/Users/djfan/Workspace/HudsonHustle/node_modules/.pnpm/typescript@5.9.3/node_modules/typescript/bin/tsc -p /Users/djfan/Workspace/HudsonHustle/apps/web/tsconfig.json --noEmit)"
     ],
     "additionalDirectories": [
       "/Users/djfan/.claude/projects/-Users-djfan-Workspace-HudsonHustle",
