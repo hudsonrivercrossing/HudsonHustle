@@ -1,0 +1,315 @@
+:root {
+  color-scheme: light;
+  --color-canvas-base: #e4d7bf;
+  --color-canvas-deep: #c5b18f;
+  --color-canvas-glow-warm: rgba(255, 244, 216, 0.88);
+  --color-canvas-glow-cool: rgba(123, 166, 189, 0.18);
+  --color-surface-panel: rgba(250, 244, 233, 0.9);
+  --color-surface-panel-strong: #fff8eb;
+  --color-surface-paper: rgba(255, 250, 242, 0.9);
+  --color-surface-paper-strong: rgba(255, 248, 235, 0.98);
+  --color-surface-private: rgba(250, 246, 238, 0.96);
+  --color-surface-alert: rgba(255, 241, 236, 0.96);
+  --color-ink-strong: #2e2317;
+  --color-ink-muted: #5d4d3e;
+  --color-border-subtle: rgba(68, 51, 34, 0.18);
+  --color-accent-base: #2a6fb6;
+  --color-accent-strong: #1f5285;
+  --color-accent-soft: #7ea7cf;
+  --color-setup-station-enamel: rgba(14, 21, 27, 0.94);
+  --color-setup-station-enamel-soft: rgba(25, 34, 41, 0.9);
+  --color-setup-ticket-field: #283239;
+  --color-setup-ticket-field-ink: rgba(255, 249, 239, 0.94);
+  --color-setup-departure-cell: #050a0d;
+  --color-setup-departure-letter: #efbf4e;
+  --color-setup-token-brass: #b78846;
+  --color-setup-token-blue: #203d4c;
+  --color-setup-printed-rule: rgba(244, 235, 219, 0.16);
+  --color-setup-metadata-muted: rgba(244, 235, 219, 0.68);
+  --color-control-face: #23313a;
+  --color-control-face-strong: #17232c;
+  --color-control-metal: rgba(244, 235, 219, 0.1);
+  --color-control-border: rgba(244, 235, 219, 0.2);
+  --color-control-accent: #b78846;
+  --map-water: #77a8ba;
+  --map-shore: rgba(72, 54, 34, 0.28);
+  --color-danger: #a13d2f;
+  --color-warning: #976125;
+  --shadow: 0 18px 38px rgba(67, 46, 24, 0.15);
+  --shadow-strong: 0 24px 56px rgba(62, 41, 20, 0.22);
+  --radius-lg: 24px;
+  --radius-md: 18px;
+  --radius-sm: 12px;
+  --radius-control: 6px;
+  --radius-xs: 4px;          /* icon corners, palette tabs, tight chips */
+  --radius-map-tile: 3px;    /* transit route tile segments */
+  --radius-map-line: 2px;    /* transit line end caps */
+  --radius-map-marker: 1px;  /* ferry / tunnel micro markers */
+
+  /* --- Border Width --- */
+  --border-thin: 1px;
+  --border-medium: 2px;
+
+  /* --- Control Sizing --- */
+  --control-height-compact: 36px;  /* compact HUD controls, icon slots */
+  --control-height-row: 38px;      /* compact button/row variant */
+  --control-height-base: 42px;     /* standard interactive control (matches system-button) */
+  --button-min-width-sm: 112px;    /* HUD action button min-width */
+
+  /* --- Motion Scale --- */
+  --duration-fast: 140ms;   /* snappy interactive feedback */
+  --duration-base: 160ms;   /* standard UI transitions */
+  --duration-slow: 220ms;   /* deliberate panel / overlay motion */
+  --easing-standard: ease;
+  --easing-expressive: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --layout-content-max-width: 1360px;
+  --layout-setup-max-width: 880px;
+  --space-page-x: 24px;
+  --space-page-y: 24px;
+  --space-stack-xs: 4px;
+  --space-stack-sm: 8px;
+  --space-stack-md: 16px;
+  --space-stack-lg: 24px;
+  --space-stack-xl: 32px;
+  --space-panel-md: 16px;
+  --space-panel-xl: 40px;
+
+  /* --- Font Families --- */
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", sans-serif;
+  --font-setup: "IBM Plex Sans", "Segoe UI", sans-serif;
+
+  /* --- Type Scale (major-second 1.125) --- */
+  --type-map: 0.375rem;      /* 6px   — sub-micro map abbreviations, route prefixes */
+  --type-3xs: 0.5rem;        /* 8px   — map route labels, transit tile text */
+  --type-2xs: 0.625rem;      /* 10px  — HUD micro-labels, badge counters, tight indicators */
+  --type-xs: 0.75rem;        /* 12px  — caps, badges, helper info */
+  --type-2sm: 0.8125rem;     /* 13px  — setup secondary text, summary rows */
+  --type-sm: 0.875rem;       /* 14px  — labels, metadata, helper text */
+  --type-body: 0.9375rem;   /* 15px  — default UI body */
+  --type-md: 1.0625rem;     /* 17px  — emphasized body, buttons */
+  --type-lg: 1.1875rem;     /* 19px  — card titles, small headings */
+  --type-xl: 1.375rem;      /* 22px  — panel titles */
+  --type-display: 1.75rem;  /* 28px  — ceremonial titles */
+  --type-display-lg: clamp(1.45rem, 2.4vw, 1.95rem);
+  --type-display-xl: clamp(2.8rem, 4.6vw, 4.4rem);
+
+  /* Legacy aliases for backward compatibility */
+  --type-eyebrow: var(--type-xs);
+  --type-body-sm: var(--type-sm);
+  --type-body-md: var(--type-body);
+  --type-body-xs: var(--type-xs);
+  --type-utility-xs: var(--type-xs);
+  --type-caption: var(--type-xs);
+  --type-title: var(--type-lg);
+
+  /* --- Font Weight Scale --- */
+  --weight-regular: 400;    /* body, secondary info */
+  --weight-medium: 500;     /* labels, emphasized body */
+  --weight-semibold: 600;   /* buttons, titles */
+  --weight-bold: 700;       /* important titles, eyebrow */
+  --weight-black: 800;      /* ceremonial titles, numeric displays */
+
+  /* --- Line Height Scale --- */
+  --lh-tight: 1;            /* large titles, numerics */
+  --lh-snug: 1.2;           /* small titles, compact headings */
+  --lh-normal: 1.4;         /* body text, labels */
+  --lh-relaxed: 1.5;        /* long paragraphs, guidebook */
+
+  /* --- Letter Spacing Scale --- */
+  --ls-tight: -0.02em;      /* large title tightening */
+  --ls-normal: 0;           /* default body */
+  --ls-loose: 0.04em;       /* small titles */
+  --ls-wide: 0.08em;        /* eyebrow, uppercase */
+  --ls-widest: 0.16em;      /* mechanical labels, departure codes */
+
+  --bg: var(--color-canvas-base);
+  --bg-deep: var(--color-canvas-deep);
+  --panel: var(--color-surface-panel);
+  --panel-strong: var(--color-surface-panel-strong);
+  --ink: var(--color-ink-strong);
+  --ink-soft: var(--color-ink-muted);
+  --line: var(--color-border-subtle);
+  --accent: var(--color-accent-base);
+  --accent-strong: var(--color-accent-strong);
+  --accent-soft: var(--color-accent-soft);
+  --setup-station-enamel: var(--color-setup-station-enamel);
+  --setup-station-enamel-soft: var(--color-setup-station-enamel-soft);
+  --setup-ticket-field: var(--color-setup-ticket-field);
+  --setup-ticket-field-ink: var(--color-setup-ticket-field-ink);
+  --setup-departure-cell: var(--color-setup-departure-cell);
+  --setup-departure-letter: var(--color-setup-departure-letter);
+  --setup-token-brass: var(--color-setup-token-brass);
+  --setup-token-blue: var(--color-setup-token-blue);
+  --setup-printed-rule: var(--color-setup-printed-rule);
+  --setup-metadata-muted: var(--color-setup-metadata-muted);
+  --control-face: var(--color-control-face);
+  --control-face-strong: var(--color-control-face-strong);
+  --control-metal: var(--color-control-metal);
+  --control-border: var(--color-control-border);
+  --control-accent: var(--color-control-accent);
+  --control-radius: var(--radius-control);
+  --control-shadow: inset 0 1px 0 rgba(255, 249, 239, 0.1), 0 5px 0 rgba(5, 12, 17, 0.22);
+  --control-shadow-pressed: inset 0 2px 6px rgba(0, 0, 0, 0.22), 0 2px 0 rgba(5, 12, 17, 0.22);
+  --danger: var(--color-danger);
+  --warning: var(--color-warning);
+  --surface-paper: var(--color-surface-paper);
+  --surface-paper-strong: var(--color-surface-paper-strong);
+  --surface-private: var(--color-surface-private);
+  --surface-alert: var(--color-surface-alert);
+  --surface-ink: rgba(11, 18, 23, 0.92);
+  --surface-rail: rgba(21, 31, 38, 0.88);
+  --surface-table: rgba(28, 24, 18, 0.72);
+  --surface-overlay: rgba(5, 10, 13, 0.78);
+  --material-paper-grain: repeating-linear-gradient(135deg, rgba(88, 68, 40, 0.035) 0 1px, transparent 1px 8px);
+  --material-brass: #b78846;
+  --material-ink-border: rgba(241, 226, 197, 0.22);
+  --material-enamel: #1b2a33;
+  --material-shadow-soft: 0 14px 34px rgba(5, 10, 13, 0.24);
+  --radius-ticket: 8px;
+  --radius-slot: 10px;
+  --radius-panel: 14px;
+  --radius-modal: 18px;
+  --z-dropdown: 20;
+  --z-sticky: 40;
+  --z-overlay: 80;
+  --z-modal: 100;
+  --z-toast: 120;
+  --z-tooltip: 140;
+
+  --panel-neutral-bg: var(--panel);
+  --panel-status-bg: linear-gradient(180deg, rgba(255, 249, 238, 0.95), rgba(247, 239, 225, 0.88));
+  --panel-private-bg: linear-gradient(180deg, rgba(255, 252, 246, 0.96), rgba(246, 238, 224, 0.9));
+  --panel-alert-bg: linear-gradient(180deg, rgba(255, 243, 238, 0.98), rgba(250, 231, 221, 0.92));
+  --panel-alert-border: rgba(161, 61, 47, 0.28);
+
+  --status-neutral-bg: linear-gradient(180deg, rgba(255, 251, 244, 0.94), rgba(249, 240, 227, 0.9));
+  --status-neutral-border: rgba(108, 84, 55, 0.18);
+  --status-neutral-shadow: 0 14px 30px rgba(62, 41, 20, 0.12);
+
+  --status-active-bg: linear-gradient(135deg, rgba(46, 111, 182, 0.18), rgba(255, 250, 242, 0.96));
+  --status-active-border: rgba(42, 111, 182, 0.34);
+  --status-active-shadow: 0 18px 38px rgba(31, 82, 133, 0.15);
+
+  --status-waiting-bg: linear-gradient(135deg, rgba(176, 138, 67, 0.16), rgba(255, 250, 242, 0.96));
+  --status-waiting-border: rgba(176, 138, 67, 0.28);
+  --status-waiting-shadow: 0 16px 34px rgba(122, 84, 34, 0.13);
+
+  --status-warning-bg: linear-gradient(135deg, rgba(191, 117, 36, 0.16), rgba(255, 250, 242, 0.96));
+  --status-warning-border: rgba(191, 117, 36, 0.3);
+  --status-warning-shadow: 0 16px 34px rgba(132, 87, 20, 0.14);
+
+  --status-failure-bg: linear-gradient(135deg, rgba(161, 61, 47, 0.18), rgba(255, 246, 243, 0.98));
+  --status-failure-border: rgba(161, 61, 47, 0.34);
+  --status-failure-shadow: 0 18px 38px rgba(130, 47, 36, 0.16);
+
+  --card-radius: 16px;
+  --card-border: #5a4636;
+  --card-paper: #f3ead8;
+  --card-paper-shadow: #e2d3b9;
+  --card-brass: #b08a43;
+  --card-rule: rgba(90, 70, 54, 0.28);
+  --card-highlight: rgba(255, 255, 255, 0.35);
+  --card-shadow: 0 10px 24px rgba(74, 53, 33, 0.18);
+}
+
+@media (max-width: 720px) {
+  :root {
+    --space-page-x: 16px;
+    --space-page-y: 16px;
+    --space-stack-lg: 20px;
+    --space-stack-xl: 28px;
+    --space-panel-xl: 28px;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    /* Canvas */
+    --color-canvas-base: #1c1710;
+    --color-canvas-deep: #131009;
+    --color-canvas-glow-warm: rgba(255, 220, 140, 0.12);
+    --color-canvas-glow-cool: rgba(80, 130, 160, 0.10);
+
+    /* Ink */
+    --color-ink-strong: #f0e6d0;
+    --color-ink-muted: #b09880;
+
+    /* Surfaces */
+    --color-surface-panel: rgba(36, 29, 20, 0.92);
+    --color-surface-panel-strong: #2c2318;
+    --color-surface-paper: rgba(42, 34, 24, 0.9);
+    --color-surface-paper-strong: rgba(46, 37, 26, 0.98);
+    --color-surface-private: rgba(38, 32, 24, 0.96);
+    --color-surface-alert: rgba(60, 25, 18, 0.96);
+
+    /* Border */
+    --color-border-subtle: rgba(220, 190, 150, 0.13);
+
+    /* Accent */
+    --color-accent-base: #5b9ad0;
+    --color-accent-strong: #4480be;
+    --color-accent-soft: #96bbdc;
+
+    /* Status */
+    --color-danger: #c85f4e;
+    --color-warning: #c07d3a;
+
+    /* Shadows */
+    --shadow: 0 18px 38px rgba(0, 0, 0, 0.36);
+    --shadow-strong: 0 24px 56px rgba(0, 0, 0, 0.52);
+
+    /* Alias updates */
+    --bg: var(--color-canvas-base);
+    --bg-deep: var(--color-canvas-deep);
+    --panel: var(--color-surface-panel);
+    --panel-strong: var(--color-surface-panel-strong);
+    --ink: var(--color-ink-strong);
+    --ink-soft: var(--color-ink-muted);
+    --line: var(--color-border-subtle);
+    --accent: var(--color-accent-base);
+    --accent-strong: var(--color-accent-strong);
+    --accent-soft: var(--color-accent-soft);
+    --danger: var(--color-danger);
+    --warning: var(--color-warning);
+    --surface-paper: var(--color-surface-paper);
+    --surface-paper-strong: var(--color-surface-paper-strong);
+    --surface-private: var(--color-surface-private);
+    --surface-alert: var(--color-surface-alert);
+
+    /* Panel variants */
+    --panel-alert-bg: linear-gradient(180deg, rgba(60, 25, 18, 0.98), rgba(50, 18, 12, 0.92));
+    --panel-alert-border: rgba(200, 95, 78, 0.28);
+
+    /* Status surfaces */
+    --status-neutral-bg: linear-gradient(180deg, rgba(42, 34, 24, 0.94), rgba(36, 28, 18, 0.9));
+    --status-neutral-border: rgba(180, 150, 110, 0.16);
+    --status-neutral-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
+
+    --status-active-bg: linear-gradient(135deg, rgba(60, 110, 180, 0.22), rgba(42, 34, 24, 0.96));
+    --status-active-border: rgba(90, 150, 208, 0.32);
+    --status-active-shadow: 0 18px 38px rgba(0, 0, 0, 0.32);
+
+    --status-warning-bg: linear-gradient(135deg, rgba(180, 120, 40, 0.20), rgba(42, 34, 24, 0.96));
+    --status-warning-border: rgba(192, 125, 58, 0.30);
+    --status-warning-shadow: 0 16px 34px rgba(0, 0, 0, 0.30);
+
+    --status-failure-bg: linear-gradient(135deg, rgba(200, 95, 78, 0.20), rgba(46, 28, 22, 0.98));
+    --status-failure-border: rgba(200, 95, 78, 0.32);
+    --status-failure-shadow: 0 18px 38px rgba(0, 0, 0, 0.34);
+
+    /* Material overrides */
+    --material-paper-grain: repeating-linear-gradient(135deg, rgba(255, 220, 160, 0.02) 0 1px, transparent 1px 8px);
+    --material-ink-border: rgba(80, 60, 40, 0.32);
+    --material-shadow-soft: 0 14px 34px rgba(0, 0, 0, 0.38);
+
+    /* Surface overlays */
+    --surface-overlay: rgba(0, 0, 0, 0.82);
+    --surface-table: rgba(12, 9, 5, 0.82);
+    --surface-rail: rgba(10, 8, 4, 0.90);
+    --surface-ink: rgba(6, 4, 2, 0.94);
+  }
+}

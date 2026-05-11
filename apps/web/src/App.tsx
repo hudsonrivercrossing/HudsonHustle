@@ -32,33 +32,34 @@ import {
   hudsonHustleReleasedConfigs,
   type HudsonHustleReleasedConfigSummary
 } from "@hudson-hustle/game-data";
-import { BoardMap } from "./components/BoardMap";
-import { EndgameBreakdown } from "./components/EndgameBreakdown";
 import {
+  BoardMap,
   BoardStage,
+  EndgameBreakdown,
   FloatingPlayerRoster,
   GameOverLayer,
   InspectorDock,
   NotificationPipe,
   PrivateHandRail,
+  ScoreGuide,
   SupplyDock,
   TicketChoiceSheet,
   TicketDock,
   TurnIndicator,
   formatCardLabel,
   type GameplayNotification
-} from "./components/GameplayHud";
-import { GuidebookScreen } from "./components/GuidebookScreen";
-import { LocalPlayScreen } from "./components/LocalPlayScreen";
-import { LobbyScreen } from "./components/LobbyScreen";
-import { MultiplayerSetupScreen } from "./components/MultiplayerSetupScreen";
-import { ScoreGuide } from "./components/ScoreGuide";
-import { SetupGateway } from "./components/SetupGateway";
-import { Button } from "./components/system/Button";
-import { ChoiceChipButton } from "./components/system/ChoiceChipButton";
-import { ModalShell } from "./components/system/ModalShell";
-import { SectionHeader } from "./components/system/SectionHeader";
-import { SurfaceCard } from "./components/system/SurfaceCard";
+} from "./components/ui/game";
+import { GuidebookScreen } from "./components/screens/GuidebookScreen";
+import OnboardingTour, { shouldShowTour } from "./components/shared/OnboardingTour";
+import { LocalPlayScreen } from "./components/screens/LocalPlayScreen";
+import { LobbyScreen } from "./components/screens/LobbyScreen";
+import { OnlineSetupScreen } from "./components/screens/OnlineSetupScreen";
+import { SetupGateway } from "./components/screens/SetupGateway";
+import { Button } from "./components/ui/primitives/Button";
+import { ChoiceChipButton } from "./components/ui/primitives/ChoiceChipButton";
+import { ModalShell } from "./components/ui/primitives/ModalShell";
+import { SectionHeader } from "./components/ui/primitives/SectionHeader";
+import { SurfaceCard } from "./components/ui/primitives/SurfaceCard";
 import { encodeReconnectToken, readReconnectCredentials, type ReconnectCredentials } from "./reconnect-token";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8787";
@@ -205,6 +206,7 @@ export default function App(): JSX.Element {
   const [pinnedTicket, setPinnedTicket] = useState<TicketDef | null>(null);
   const [paymentPreview, setPaymentPreview] = useState<{ color: TrainCardColor; totalCost: number; minimumLocomotives?: number } | null>(null);
   const [guideOpen, setGuideOpen] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [notifications, setNotifications] = useState<GameplayNotification[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -406,6 +408,14 @@ export default function App(): JSX.Element {
     return buildProjectedGameState(snapshot.game, snapshot.privateState);
   }, [snapshot]);
 
+  const tourInitRef = useRef(false);
+  useEffect(() => {
+    if (projectedGame && !tourInitRef.current) {
+      tourInitRef.current = true;
+      setTourOpen(shouldShowTour());
+    }
+  }, [projectedGame]);
+
   const localPlayer = useMemo(() => {
     if (!projectedGame || !snapshot?.privateState?.playerId) {
       return null;
@@ -459,6 +469,8 @@ export default function App(): JSX.Element {
       trainsLeft: p.trainsLeft,
       stationsLeft: p.stationsLeft,
       ticketCount: p.ticketCount,
+      score: p.score,
+      routesCount: snapshot.game!.routeClaims.filter((c) => c.playerId === p.id).length,
       avatarName: playerAvatars[p.id] ?? null
     }));
   }, [snapshot?.game, playerAvatars]);
@@ -802,7 +814,15 @@ export default function App(): JSX.Element {
     }
 
     if (setupMode === "guide") {
-      return <GuidebookScreen onBack={() => setSetupMode("gateway")} />;
+      return (
+        <GuidebookScreen
+          onBack={() => setSetupMode("gateway")}
+          onReplayTour={() => {
+            localStorage.removeItem("hh-tour-seen");
+            setTourOpen(true);
+          }}
+        />
+      );
     }
 
     if (setupMode === "local") {
@@ -814,7 +834,7 @@ export default function App(): JSX.Element {
     }
 
     return (
-      <MultiplayerSetupScreen
+      <OnlineSetupScreen
         releasedConfigs={releasedConfigs}
         reconnectState={reconnectState}
         roomPreview={roomPreview}
@@ -840,7 +860,15 @@ export default function App(): JSX.Element {
   }
 
   if (guideOpen) {
-    return <GuidebookScreen onBack={() => setGuideOpen(false)} />;
+    return (
+      <GuidebookScreen
+        onBack={() => setGuideOpen(false)}
+        onReplayTour={() => {
+          localStorage.removeItem("hh-tour-seen");
+          setTourOpen(true);
+        }}
+      />
+    );
   }
 
   if (snapshot.room.status === "lobby" || !snapshot.game || !mapConfig || !visuals || !projectedGame || !localPlayer) {
@@ -907,7 +935,10 @@ export default function App(): JSX.Element {
       <div className="game-layout">
         <aside className="side-panel">
           <div className="side-panel__private-stack">
-            <PrivateHandRail hand={localPlayer.hand} cardPalette={visuals.palettes.cards} paymentPreview={paymentPreview} />
+            <div data-tour-target="hand">
+              <PrivateHandRail hand={localPlayer.hand} cardPalette={visuals.palettes.cards} paymentPreview={paymentPreview} />
+            </div>
+            <div data-tour-target="tickets">
             <TicketDock
               ticketProgress={ticketProgress}
               config={mapConfig}
@@ -916,6 +947,7 @@ export default function App(): JSX.Element {
               onFocusTicket={setFocusedTicket}
               onTogglePinnedTicket={(ticket) => setPinnedTicket((current) => current?.id === ticket.id ? null : ticket)}
             />
+            </div>
           </div>
         </aside>
 
@@ -961,6 +993,7 @@ export default function App(): JSX.Element {
             />
           </BoardStage>
 
+          <div data-tour-target="actions" style={{ display: "contents" }}>
           <InspectorDock
             summary={publicGame.turn.summary}
             className="action-panel"
@@ -968,18 +1001,20 @@ export default function App(): JSX.Element {
             chatMessages={chatMessages}
             onSendChat={sendChatMessage}
             marketContent={
-              <SupplyDock
-                market={publicGame.market}
-                deckCount={publicGame.trainDeckCount}
-                cardPalette={visuals.palettes.cards}
-                disabled={!canContinueDrawing}
-                isMarketCardDisabled={(card) => publicGame.turn.drawsTaken === 1 && card.color === "locomotive"}
-                onDrawFromMarket={(marketIndex) => sendGameAction({ type: "draw_card", source: "market", marketIndex })}
-                onDrawFromDeck={() => sendGameAction({ type: "draw_card", source: "deck" })}
-                onDrawTickets={() => sendGameAction({ type: "draw_tickets" })}
-                drawTicketsDisabled={!canTakeTurnAction}
-                className="supply-dock--board"
-              />
+              <div data-tour-target="market">
+                <SupplyDock
+                  market={publicGame.market}
+                  deckCount={publicGame.trainDeckCount}
+                  cardPalette={visuals.palettes.cards}
+                  disabled={!canContinueDrawing}
+                  isMarketCardDisabled={(card) => publicGame.turn.drawsTaken === 1 && card.color === "locomotive"}
+                  onDrawFromMarket={(marketIndex) => sendGameAction({ type: "draw_card", source: "market", marketIndex })}
+                  onDrawFromDeck={() => sendGameAction({ type: "draw_card", source: "deck" })}
+                  onDrawTickets={() => sendGameAction({ type: "draw_tickets" })}
+                  drawTicketsDisabled={!canTakeTurnAction}
+                  className="supply-dock--board"
+                />
+              </div>
             }
             buildContent={
               <>
@@ -1012,9 +1047,10 @@ export default function App(): JSX.Element {
                 </div>
                 <div className="detail-card__decision-shelf chip-row">
                   {routeOptions.length > 0 ? (
-                    routeOptions.map((color) => (
+                    routeOptions.map((color, index) => (
                       <ChoiceChipButton
                         key={color}
+                        className={index === 0 && canTakeTurnAction ? "choice-chip-button--primary" : undefined}
                         style={{ ["--choice-chip-accent" as string]: visuals.palettes.cards[color] }}
                         disabled={!canTakeTurnAction}
                         onMouseEnter={() =>
@@ -1049,9 +1085,10 @@ export default function App(): JSX.Element {
                   {currentCityOccupied ? (
                     <span className="muted-copy">A station already exists in this city.</span>
                   ) : stationOptions.length > 0 ? (
-                    stationOptions.map((color) => (
+                    stationOptions.map((color, index) => (
                       <ChoiceChipButton
                         key={color}
+                        className={index === 0 && canTakeTurnAction ? "choice-chip-button--primary" : undefined}
                         style={{ ["--choice-chip-accent" as string]: visuals.palettes.cards[color] }}
                         disabled={!canTakeTurnAction}
                         onMouseEnter={() => setPaymentPreview({ color, totalCost: currentStationCost })}
@@ -1074,6 +1111,7 @@ export default function App(): JSX.Element {
               </>
             }
           />
+          </div>
         </main>
       </div>
 
@@ -1160,6 +1198,10 @@ export default function App(): JSX.Element {
           </div>
         </ModalShell>
       ) : null}
+
+      {tourOpen && (
+        <OnboardingTour onDismiss={() => setTourOpen(false)} />
+      )}
 
       <NotificationPipe notifications={notifications} />
     </div>

@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "pencil": {
-      "command": "/Users/djfan/.pencil/mcp/visual_studio_code/out/mcp-server-darwin-arm64",
-      "args": ["--app", "visual_studio_code"],
+      "command": "/Applications/Pencil.app/Contents/Resources/app.asar.unpacked/out/mcp-server-darwin-arm64",
+      "args": ["--app", "desktop"],
       "env": {}
     }
   }
