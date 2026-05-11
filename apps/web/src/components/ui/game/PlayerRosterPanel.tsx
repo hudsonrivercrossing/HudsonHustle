@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Panel } from "../ui/primitives/Panel";
-import { SeatTile } from "../system/game";
+import { Panel } from "../primitives/Panel";
+import { SeatTile } from "./SeatTile";
 
 export type PlayerRosterEntry = {
   id: string;

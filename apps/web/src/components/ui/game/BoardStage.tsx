@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Panel } from "../ui/primitives/Panel";
+import { Panel } from "../primitives/Panel";
 
 interface BoardStageProps {
   className?: string;

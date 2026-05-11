@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { Button } from "./ui/primitives/Button";
+import { Button } from "../primitives/Button";
 
 interface ScoreGuideProps {
   className?: string;

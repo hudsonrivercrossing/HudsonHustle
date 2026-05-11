@@ -32,28 +32,28 @@ import {
   hudsonHustleReleasedConfigs,
   type HudsonHustleReleasedConfigSummary
 } from "@hudson-hustle/game-data";
-import { BoardMap } from "./components/BoardMap";
-import { EndgameBreakdown } from "./components/EndgameBreakdown";
 import {
+  BoardMap,
   BoardStage,
+  EndgameBreakdown,
   FloatingPlayerRoster,
   GameOverLayer,
   InspectorDock,
   NotificationPipe,
   PrivateHandRail,
+  ScoreGuide,
   SupplyDock,
   TicketChoiceSheet,
   TicketDock,
   TurnIndicator,
   formatCardLabel,
   type GameplayNotification
-} from "./components/GameplayHud";
+} from "./components/ui/game";
 import { GuidebookScreen } from "./components/GuidebookScreen";
 import OnboardingTour, { shouldShowTour } from "./components/OnboardingTour";
 import { LocalPlayScreen } from "./components/LocalPlayScreen";
 import { LobbyScreen } from "./components/LobbyScreen";
 import { MultiplayerSetupScreen } from "./components/MultiplayerSetupScreen";
-import { ScoreGuide } from "./components/ScoreGuide";
 import { SetupGateway } from "./components/SetupGateway";
 import { Button } from "./components/ui/primitives/Button";
 import { ChoiceChipButton } from "./components/ui/primitives/ChoiceChipButton";

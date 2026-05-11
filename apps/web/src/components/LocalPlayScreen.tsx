@@ -20,8 +20,8 @@ import {
   getHudsonHustleVisualsByConfigId,
   playerColorPalette
 } from "@hudson-hustle/game-data";
-import { BoardMap } from "./BoardMap";
 import {
+  BoardMap,
   BoardStage,
   FloatingPlayerRoster,
   GameOverLayer,
@@ -33,7 +33,7 @@ import {
   TicketDock,
   TurnIndicator,
   type GameplayNotification
-} from "./GameplayHud";
+} from "./ui/game";
 import { GuidebookScreen } from "./GuidebookScreen";
 import {
   EndgameGrid,
@@ -52,9 +52,8 @@ import {
   type LocalStartSetup,
   type VisibilityMode
 } from "./local";
-import { ScoreGuide } from "./ScoreGuide";
+import { ScoreGuide, TransitCard } from "./ui/game";
 import { SetupScreen } from "./SetupScreen";
-import { TransitCard } from "./TransitCard";
 import { Button } from "./ui/primitives/Button";
 import { ModalShell } from "./ui/primitives/ModalShell";
 import { Panel } from "./ui/primitives/Panel";

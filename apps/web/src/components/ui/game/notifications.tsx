@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { GameOverPanel, NotificationStack, type GameplayNotification } from "../system/game";
+import { GameOverPanel } from "./GameOverPanel";
+import { NotificationStack, type GameplayNotification } from "./NotificationStack";
 
 interface NotificationPipeProps {
   notifications: GameplayNotification[];

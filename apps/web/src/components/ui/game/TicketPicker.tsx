@@ -1,7 +1,7 @@
 import { getCityName, type MapConfig, type TicketDef } from "@hudson-hustle/game-core";
-import { Button } from "./ui/primitives/Button";
-import { ModalShell } from "./ui/primitives/ModalShell";
-import { SectionHeader } from "./ui/primitives/SectionHeader";
+import { Button } from "../primitives/Button";
+import { ModalShell } from "../primitives/ModalShell";
+import { SectionHeader } from "../primitives/SectionHeader";
 
 interface TicketPickerProps {
   title: string;

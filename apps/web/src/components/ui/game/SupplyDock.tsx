@@ -1,7 +1,7 @@
 import { type TrainCard } from "@hudson-hustle/game-core";
-import { Button } from "../ui/primitives/Button";
-import { SectionHeader } from "../ui/primitives/SectionHeader";
-import { CardSlot } from "../system/game";
+import { Button } from "../primitives/Button";
+import { SectionHeader } from "../primitives/SectionHeader";
+import { CardSlot } from "./CardSlot";
 
 interface SupplyDockProps {
   market: TrainCard[];

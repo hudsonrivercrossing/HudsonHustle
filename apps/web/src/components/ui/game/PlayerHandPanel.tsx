@@ -9,10 +9,11 @@ import {
   type TrainCardColor,
   type TrainCardFace
 } from "@hudson-hustle/game-core";
-import { Button } from "../ui/primitives/Button";
-import { Panel } from "../ui/primitives/Panel";
-import { SectionHeader } from "../ui/primitives/SectionHeader";
-import { CardSlot, TicketSlip } from "../system/game";
+import { Button } from "../primitives/Button";
+import { Panel } from "../primitives/Panel";
+import { SectionHeader } from "../primitives/SectionHeader";
+import { CardSlot } from "./CardSlot";
+import { TicketSlip } from "./TicketSlip";
 
 function countHandByFace(hand: TrainCard[]): Record<TrainCardFace, number> {
   const counts = Object.fromEntries([...trainCardColors, "locomotive"].map((color) => [color, 0])) as Record<TrainCardFace, number>;

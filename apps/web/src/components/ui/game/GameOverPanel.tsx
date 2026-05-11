@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { SectionHeader } from "../../ui/primitives/SectionHeader";
+import { SectionHeader } from "../primitives/SectionHeader";
 
 interface GameOverPanelProps {
   title: string;
