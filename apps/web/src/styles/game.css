@@ -452,7 +452,7 @@
 .app-shell--gameplay-hud .topbar {
   display: grid;
   grid-template-columns: var(--game-left-rail) minmax(0, 1fr) var(--game-right-rail);
-  align-items: stretch;
+  align-items: center;
   gap: 12px;
   min-height: 56px;
   justify-items: stretch;
@@ -473,9 +473,10 @@
 .app-shell--gameplay-hud .turn-indicator {
   grid-column: 2;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 8px;
   justify-content: center;
+  align-self: center;
 }
 
 .app-shell--gameplay-hud .turn-indicator__name {
