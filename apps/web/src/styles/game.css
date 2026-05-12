@@ -24,10 +24,10 @@
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: 12px;
-  height: 24px;
-  min-height: 24px;
-  max-height: 24px;
+  gap: 6px;
+  height: 12px;
+  min-height: 12px;
+  max-height: 12px;
   margin: 0 !important;
   padding: 0;
   position: relative;
@@ -3463,4 +3463,37 @@ border-color: rgba(232, 220, 194, 0.72);
   grid-template-columns: 1fr !important;
   grid-template-rows: auto minmax(0, 1fr) auto !important;
   gap: 6px;
+}
+
+/* Chat input: dark, compact, consistent with HUD panels */
+.app-shell--gameplay-hud .chat-panel-dock .chat-panel__composer {
+  display: block;
+  padding: 0;
+  margin: 0;
+}
+
+.app-shell--gameplay-hud .chat-panel-dock .chat-panel__composer input {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(255, 247, 231, 0.04) !important;
+  border: 1px solid rgba(var(--hud-brass-light-rgb), 0.22) !important;
+  border-radius: var(--radius-control) !important;
+  color: var(--hud-paper-bright, #fff8ea) !important;
+  font-family: var(--font-body);
+  font-size: var(--type-xs);
+  font-style: normal;
+  padding: 6px 10px !important;
+  height: auto !important;
+  min-height: 0 !important;
+  box-shadow: none !important;
+}
+
+.app-shell--gameplay-hud .chat-panel-dock .chat-panel__composer input::placeholder {
+  color: rgba(var(--hud-paper-rgb), 0.4);
+  font-style: normal;
+}
+
+.app-shell--gameplay-hud .chat-panel-dock .chat-panel__composer input:focus-visible {
+  outline: none;
+  border-color: rgba(var(--hud-brass-light-rgb), 0.5) !important;
 }

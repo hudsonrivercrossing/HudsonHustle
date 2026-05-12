@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { FormField } from "../primitives/FormField";
 import { Panel } from "../primitives/Panel";
 import { SectionHeader } from "../primitives/SectionHeader";
 
@@ -46,10 +45,11 @@ export function ChatPanel({ messages = [], onSendMessage, className = "" }: Chat
           )}
         </div>
         {onSendMessage ? (
-          <FormField as="div" label="Message" className="chat-panel__composer">
+          <div className="chat-panel__composer">
             <input
               type="text"
               placeholder="Message room"
+              aria-label="Message"
               value={draft}
               maxLength={280}
               onChange={(event) => setDraft(event.target.value)}
@@ -61,7 +61,7 @@ export function ChatPanel({ messages = [], onSendMessage, className = "" }: Chat
                 }
               }}
             />
-          </FormField>
+          </div>
         ) : null}
       </form>
     </Panel>
