@@ -85,6 +85,8 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [notifications, setNotifications] = useState<GameplayNotification[]>([]);
   const notificationIdRef = useRef(0);
+  const [localChat, setLocalChat] = useState<Array<{ id: string; playerName: string; message: string }>>([]);
+  const chatIdRef = useRef(0);
   const [turnStartedAt, setTurnStartedAt] = useState<number>(() => Date.now());
   const [nowMs, setNowMs] = useState<number>(() => Date.now());
   const localMap = useMemo(() => getHudsonHustleMapByConfigId(localConfigId), [localConfigId]);
@@ -506,7 +508,17 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
 
           {/* Right column: chat + market — overlaid by ticket picker when active */}
           <div className="right-col" data-tour-target="market">
-            <ChatPanel className={tutorialTarget === "action" ? "panel--tutorial-focus" : ""} />
+            <ChatPanel
+              messages={localChat}
+              onSendMessage={(message) => {
+                chatIdRef.current += 1;
+                setLocalChat((current) => [
+                  ...current,
+                  { id: `local-chat-${chatIdRef.current}`, playerName: activePlayer.name, message }
+                ]);
+              }}
+              className={tutorialTarget === "action" ? "panel--tutorial-focus" : ""}
+            />
             <SupplyDock
               market={game.market}
               deckCount={game.trainDeck.length}
