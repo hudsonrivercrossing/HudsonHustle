@@ -37,7 +37,7 @@ export function PlayerRoster({ players, activePlayerIndex, playerPalette, timer 
   const timerLabel = timer?.activePlayerIndex === activePlayerIndex ? formatRosterTimer(timer.secondsRemaining) : null;
 
   return (
-    <Panel variant="info" className={["player-roster", className].filter(Boolean).join(" ")}>
+    <Panel variant="private" className={["player-roster", className].filter(Boolean).join(" ")}>
       <div className="scoreboard player-roster__list">
         {rosterSlots.map((player, index) => {
           const isActive = index === activePlayerIndex;

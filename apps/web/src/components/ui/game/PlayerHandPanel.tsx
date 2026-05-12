@@ -85,6 +85,8 @@ interface TicketDockProps {
   pinnedTicketId?: string | null;
   onFocusTicket?: (ticket: TicketDef | null) => void;
   onTogglePinnedTicket?: (ticket: TicketDef) => void;
+  onDrawTickets?: () => void;
+  drawTicketsDisabled?: boolean;
   className?: string;
 }
 
@@ -95,9 +97,11 @@ export function TicketDock({
   pinnedTicketId = null,
   onFocusTicket,
   onTogglePinnedTicket,
+  onDrawTickets,
+  drawTicketsDisabled = false,
   className = ""
 }: TicketDockProps): JSX.Element {
-  const pageSize = 4;
+  const pageSize = 3;
   const [pageIndex, setPageIndex] = useState(0);
   const sortedTickets = useMemo(
     () => [...ticketProgress].sort((left, right) => Number(left.completed) - Number(right.completed)),
@@ -142,18 +146,26 @@ export function TicketDock({
             toLabel={getCityName(config, ticket.to)}
             points={ticket.points}
             status={completed ? "connected" : "open"}
-            focused={focusedTicketId === ticket.id || pinnedTicketId === ticket.id}
+            focused={focusedTicketId === ticket.id}
             onMouseEnter={() => onFocusTicket?.(ticket)}
             onMouseLeave={() => onFocusTicket?.(null)}
             onFocus={() => onFocusTicket?.(ticket)}
             onBlur={() => onFocusTicket?.(null)}
-            onClick={() => onTogglePinnedTicket?.(ticket)}
           />
         ))}
         {Array.from({ length: Math.max(0, pageSize - visibleTickets.length) }, (_, index) => (
           <div key={`ticket-placeholder-${index}`} className="ticket-row ticket-row--placeholder" aria-hidden="true" />
         ))}
       </div>
+      {onDrawTickets ? (
+        <Button
+          className="ticket-dock__draw"
+          disabled={drawTicketsDisabled}
+          onClick={onDrawTickets}
+        >
+          Draw tickets
+        </Button>
+      ) : null}
     </Panel>
   );
 }
