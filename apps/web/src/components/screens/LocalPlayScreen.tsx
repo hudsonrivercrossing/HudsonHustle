@@ -115,13 +115,13 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
     return () => window.clearInterval(interval);
   }, [game, localTurnTimeLimitSeconds]);
 
-  // Show onboarding tour the first time the player reaches a playable game
+  // Show onboarding tour the first time the player reaches the game screen
   useEffect(() => {
-    if (game && game.phase === "main" && visibility === "visible" && !tourInitRef.current) {
+    if (game && !tourInitRef.current) {
       tourInitRef.current = true;
       setTourOpen(shouldShowTour());
     }
-  }, [game?.phase, visibility]);
+  }, [game]);
 
   const liveTimerSecondsRemaining = localTurnTimeLimitSeconds > 0
     ? Math.max(0, Math.ceil(localTurnTimeLimitSeconds - (nowMs - turnStartedAt) / 1000))

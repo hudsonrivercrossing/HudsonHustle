@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "../ui/primitives/Button";
 
-const TOUR_SEEN_KEY = "hh-tour-seen";
+const TOUR_SEEN_KEY = "hh-tour-seen-v2";
 const CALLOUT_WIDTH = 320;
 const CALLOUT_GAP = 14;
 const SPOTLIGHT_PADDING = 8;
