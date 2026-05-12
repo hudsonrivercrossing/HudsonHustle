@@ -123,10 +123,10 @@
   grid-template-rows: repeat(4, 1fr);
 }
 
-/* Chat panel height matches roster height */
+/* Chat panel fills top half of right column */
 .app-shell--gameplay-hud .right-col .chat-panel-dock {
-  flex-shrink: 0;
-  height: var(--roster-height);
+  height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -863,11 +863,10 @@
 }
 
 /* right-col is a transparent column container; ChatPanel and SupplyDock
-   each render their own dark panel — both children fill the full column width
-   and should not visually merge. */
+   each render their own dark panel — each fills its grid row. */
 .app-shell--gameplay-hud .right-col > * {
-  flex: 0 0 auto;
   width: 100%;
+  min-height: 0;
   box-sizing: border-box;
 }
 
@@ -882,9 +881,11 @@
     radial-gradient(circle at top left, rgba(142, 169, 188, 0.12), transparent 34%),
     linear-gradient(180deg, rgba(30, 42, 51, 0.88), rgba(9, 15, 20, 0.9));
   border: 1px solid rgba(var(--hud-brass-light-rgb), 0.18);
-  height: var(--ticket-dock-height);
+  height: 100%;
+  min-height: 0;
   width: 100%;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 /* Market grid grows to fill panel; deck button stays at bottom */
