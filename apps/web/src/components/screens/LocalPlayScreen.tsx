@@ -122,7 +122,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
     setNotifications((current) => [...current, { id, message, tone }]);
     window.setTimeout(() => {
       setNotifications((current) => current.filter((n) => n.id !== id));
-    }, 3000);
+    }, 2000);
   }
 
   function flushPendingDraws() {
