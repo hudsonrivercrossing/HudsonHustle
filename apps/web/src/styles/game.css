@@ -1218,6 +1218,13 @@ body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .system-butto
   margin: 0 !important;
 }
 
+.floating-build-panel .surface-card__header,
+.floating-build-panel .surface-card__row {
+  margin: 0 !important;
+  padding: 0 !important;
+  text-indent: 0 !important;
+}
+
 .floating-build-panel .surface-card__title,
 .floating-build-panel .detail-card__title {
   font-family: var(--font-display, var(--font-body));
@@ -1226,10 +1233,11 @@ body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .system-butto
   line-height: 1.2 !important;
   color: var(--hud-paper-bright, #fff8ea) !important;
   margin: 0 0 8px !important;
+  padding: 0 28px 0 0 !important;
   letter-spacing: 0;
+  text-indent: 0 !important;
   white-space: normal;
   overflow-wrap: anywhere;
-  padding-right: 28px;
 }
 
 .floating-build-panel .detail-card__summary {
@@ -1268,6 +1276,15 @@ body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .system-butto
 .floating-build-panel .detail-card__decision-shelf {
   gap: 6px !important;
   margin-top: 4px;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.floating-build-panel .detail-card__decision-shelf::before {
+  display: none !important;
+  content: none !important;
 }
 
 .floating-build-panel .choice-chip-button {
@@ -3200,9 +3217,11 @@ border-color: rgba(232, 220, 194, 0.72);
   grid-template-rows: auto minmax(0, 1fr);
 }
 
+/* Preserve 4-row footprint even though only 3 tickets render per page —
+   creates extra breathing room between the 3rd ticket and the Draw Tickets button. */
 .app-shell--gameplay-hud .ticket-dock__scroll {
   min-height: 0;
-  grid-template-rows: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(4, minmax(0, 1fr));
 }
 
 .app-shell--gameplay-hud .ticket-row {
