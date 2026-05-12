@@ -26,6 +26,7 @@ import {
   ChatPanel,
   FloatingBuildPanel,
   FloatingPlayerRoster,
+  PlayerRoster,
   GameOverLayer,
   NotificationPipe,
   PrivateHandRail,
@@ -373,11 +374,10 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
         <aside className="side-panel" data-tour-target="roster">
           {visibility === "visible" ? (
             <>
-              <FloatingPlayerRoster
+              <PlayerRoster
                 players={rosterPlayers}
                 activePlayerIndex={game.activePlayerIndex}
                 playerPalette={playerColorPalette}
-                viewerPlayerId={game.players[game.activePlayerIndex]?.id ?? null}
               />
               <TicketDock
                 ticketProgress={ticketProgress}
@@ -431,6 +431,13 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
                 highlightedCityIds={highlightedCityIds}
                 onSelectRoute={(routeId) => { setSelectedRouteId(routeId); setSelectedCityId(null); setPaymentPreview(null); }}
                 onSelectCity={(cityId) => { setSelectedCityId(cityId); setSelectedRouteId(null); setPaymentPreview(null); }}
+              />
+
+              <FloatingPlayerRoster
+                players={rosterPlayers}
+                activePlayerIndex={game.activePlayerIndex}
+                playerPalette={playerColorPalette}
+                viewerPlayerId={game.players[game.activePlayerIndex]?.id ?? null}
               />
 
               {/* Floating build popup — appears on map when route/city selected */}
