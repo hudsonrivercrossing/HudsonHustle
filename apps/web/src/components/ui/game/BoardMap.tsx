@@ -158,8 +158,8 @@ interface BoardMapProps {
   selectedRouteId: string | null;
   selectedCityId: string | null;
   highlightedCityIds?: string[];
-  onSelectRoute: (routeId: string) => void;
-  onSelectCity: (cityId: string) => void;
+  onSelectRoute: (routeId: string, position?: { x: number; y: number }) => void;
+  onSelectCity: (cityId: string, position?: { x: number; y: number }) => void;
 }
 
 export function BoardMap({
@@ -391,7 +391,7 @@ export function BoardMap({
                 stroke="transparent"
                 strokeWidth="28"
                 strokeLinecap="round"
-                onClick={() => onSelectRoute(route.id)}
+                onClick={(event) => onSelectRoute(route.id, { x: event.clientX, y: event.clientY })}
                 className="route-hitbox"
                 data-testid={`route-hitbox-${route.id}`}
                 fill="none"
@@ -424,7 +424,7 @@ export function BoardMap({
                 fill="#f8f5ef"
                 stroke="#453221"
                 strokeWidth="3"
-                onClick={() => onSelectCity(city.id)}
+                onClick={(event) => onSelectCity(city.id, { x: event.clientX, y: event.clientY })}
                 className="city-hitbox"
               />
               <circle cx={city.x} cy={city.y} r={selected ? 7 : 5} fill="#5b4633" opacity="0.85" />

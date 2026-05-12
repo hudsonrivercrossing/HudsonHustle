@@ -71,6 +71,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   const [visibility, setVisibility] = useState<VisibilityMode>("visible");
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
+  const [buildAnchor, setBuildAnchor] = useState<{ x: number; y: number } | null>(null);
   const [selectedTicketIds, setSelectedTicketIds] = useState<string[]>([]);
   const [focusedTicket, setFocusedTicket] = useState<TicketDef | null>(null);
   const [pinnedTicket, setPinnedTicket] = useState<TicketDef | null>(null);
@@ -447,14 +448,15 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
                 selectedRouteId={selectedRouteId}
                 selectedCityId={selectedCityId}
                 highlightedCityIds={highlightedCityIds}
-                onSelectRoute={(routeId) => { setSelectedRouteId(routeId); setSelectedCityId(null); setPaymentPreview(null); }}
-                onSelectCity={(cityId) => { setSelectedCityId(cityId); setSelectedRouteId(null); setPaymentPreview(null); }}
+                onSelectRoute={(routeId, position) => { setSelectedRouteId(routeId); setSelectedCityId(null); setPaymentPreview(null); setBuildAnchor(position ?? null); }}
+                onSelectCity={(cityId, position) => { setSelectedCityId(cityId); setSelectedRouteId(null); setPaymentPreview(null); setBuildAnchor(position ?? null); }}
               />
 
               {/* Floating build popup — appears on map when route/city selected */}
               {(currentRoute || currentCity) && game.phase === "main" && visibility === "visible" ? (
                 <FloatingBuildPanel
-                  onClose={() => { setSelectedRouteId(null); setSelectedCityId(null); setPaymentPreview(null); }}
+                  anchor={buildAnchor}
+                  onClose={() => { setSelectedRouteId(null); setSelectedCityId(null); setPaymentPreview(null); setBuildAnchor(null); }}
                 >
                   {currentRoute ? (
                     <RouteBuildPanel

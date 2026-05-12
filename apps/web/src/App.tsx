@@ -202,6 +202,7 @@ export default function App(): JSX.Element {
   const [realtimeStatus, setRealtimeStatus] = useState<RealtimeStatus>("idle");
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
+  const [buildAnchor, setBuildAnchor] = useState<{ x: number; y: number } | null>(null);
   const [selectedTicketIds, setSelectedTicketIds] = useState<string[]>([]);
   const [focusedTicket, setFocusedTicket] = useState<TicketDef | null>(null);
   const [pinnedTicket, setPinnedTicket] = useState<TicketDef | null>(null);
@@ -960,21 +961,24 @@ export default function App(): JSX.Element {
                 selectedRouteId={selectedRouteId}
                 selectedCityId={selectedCityId}
                 highlightedCityIds={highlightedCityIds}
-                onSelectRoute={(routeId) => {
+                onSelectRoute={(routeId, position) => {
                   setSelectedRouteId(routeId);
                   setSelectedCityId(null);
                   setPaymentPreview(null);
+                  setBuildAnchor(position ?? null);
                 }}
-                onSelectCity={(cityId) => {
+                onSelectCity={(cityId, position) => {
                   setSelectedCityId(cityId);
                   setSelectedRouteId(null);
                   setPaymentPreview(null);
+                  setBuildAnchor(position ?? null);
                 }}
               />
               {/* Floating build popup */}
               {(currentRoute || currentCity) && publicGame.phase === "main" ? (
                 <FloatingBuildPanel
-                  onClose={() => { setSelectedRouteId(null); setSelectedCityId(null); setPaymentPreview(null); }}
+                  anchor={buildAnchor}
+                  onClose={() => { setSelectedRouteId(null); setSelectedCityId(null); setPaymentPreview(null); setBuildAnchor(null); }}
                 >
                   {currentRoute ? (
                     <SurfaceCard
