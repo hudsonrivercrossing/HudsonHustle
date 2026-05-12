@@ -164,7 +164,27 @@
   letter-spacing: 0;
 }
 
-.app-shell--gameplay-hud .private-hand-rail__slots,
+/* Hand rail: 1x9 single-row strip showing all 8 colors + locomotive */
+.app-shell--gameplay-hud .private-hand-rail__slots {
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 4px;
+}
+
+/* Compact hand slots in the 1x9 strip — smaller than market slots */
+.app-shell--gameplay-hud .private-hand-rail .hand-color-slot {
+  min-height: 60px;
+  height: 60px;
+  padding: 6px 4px;
+}
+
+.app-shell--gameplay-hud .private-hand-rail .hand-color-slot__count {
+  font-size: var(--type-sm);
+}
+
+.app-shell--gameplay-hud .private-hand-rail .hand-color-slot__label {
+  font-size: var(--type-3xs);
+}
+
 .app-shell--gameplay-hud .inspector-dock .supply-dock__market {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
@@ -1781,12 +1801,6 @@
 
 .app-shell--gameplay-hud .inspector-dock .supply-dock--board .section-header {
   padding-inline: 0;
-}
-
-.app-shell--gameplay-hud .private-hand-rail__slots,
-.app-shell--gameplay-hud .inspector-dock .supply-dock__market {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
 }
 
 .app-shell--gameplay-hud .hand-color-slot,
