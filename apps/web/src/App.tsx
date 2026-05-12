@@ -932,14 +932,16 @@ export default function App(): JSX.Element {
       </header>
 
       <div className="game-layout">
-        {/* Left column: roster + tickets + draw ticket */}
+        {/* Left column: 50/50 split — roster (top), tickets + draw button (bottom) */}
         <aside className="side-panel" data-tour-target="roster">
-          <PlayerRoster
-            players={rosterPlayers}
-            activePlayerIndex={snapshot.game.activePlayerIndex}
-            playerPalette={visuals.palettes.players}
-          />
-          <div data-tour-target="tickets">
+          <div className="side-panel__top">
+            <PlayerRoster
+              players={rosterPlayers}
+              activePlayerIndex={snapshot.game.activePlayerIndex}
+              playerPalette={visuals.palettes.players}
+            />
+          </div>
+          <div className="side-panel__bottom" data-tour-target="tickets">
             <TicketDock
               ticketProgress={ticketProgress}
               config={mapConfig}
@@ -947,15 +949,10 @@ export default function App(): JSX.Element {
               pinnedTicketId={pinnedTicket?.id ?? null}
               onFocusTicket={setFocusedTicket}
               onTogglePinnedTicket={(ticket) => setPinnedTicket((current) => current?.id === ticket.id ? null : ticket)}
+              onDrawTickets={() => sendGameAction({ type: "draw_tickets" })}
+              drawTicketsDisabled={!canTakeTurnAction}
             />
           </div>
-          <Button
-            className="side-panel__draw-ticket"
-            disabled={!canTakeTurnAction}
-            onClick={() => sendGameAction({ type: "draw_tickets" })}
-          >
-            Draw tickets
-          </Button>
         </aside>
 
         <main className="board-column">
