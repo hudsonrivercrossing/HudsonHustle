@@ -100,10 +100,40 @@
   border-color: rgba(var(--hud-brass-light-rgb), 0.18);
 }
 
+/* Roster + chat heights are both bound to --roster-height so they always match.
+   4 seat tiles × 44px min-height + 3 gaps × 4px + panel padding ≈ 216px. */
+.app-shell--gameplay-hud {
+  --roster-height: 216px;
+  --ticket-dock-height: min(360px, 44vh);
+}
+
 /* Side-panel player roster: fixed sizing to fit exactly 4 seat tiles */
 .app-shell--gameplay-hud .side-panel .player-roster {
   flex-shrink: 0;
   gap: var(--space-stack-xs, 4px);
+  height: var(--roster-height);
+}
+
+/* Chat panel height matches roster height */
+.app-shell--gameplay-hud .right-col .chat-panel-dock {
+  flex-shrink: 0;
+  height: var(--roster-height);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.app-shell--gameplay-hud .right-col .chat-panel-dock .chat-panel {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.app-shell--gameplay-hud .right-col .chat-panel-dock .chat-panel__messages {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .app-shell--gameplay-hud .side-panel .player-roster__list,
