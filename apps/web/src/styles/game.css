@@ -3381,3 +3381,25 @@ border-color: rgba(232, 220, 194, 0.72);
 .app-shell--gameplay-hud .hidden-panel .section-header__eyebrow {
   color: rgba(var(--hud-brass-light-rgb), 0.82);
 }
+
+/* ─── Unify outer padding on the 3 bottom panels so their bottom edges land
+   at the same Y when columns are equal height. */
+.app-shell--gameplay-hud .ticket-dock,
+.app-shell--gameplay-hud .private-hand-rail,
+.app-shell--gameplay-hud .right-col .supply-dock--board {
+  padding: 10px 12px !important;
+  box-sizing: border-box;
+}
+
+/* Internal grids fill the panel area equally */
+.app-shell--gameplay-hud .right-col .supply-dock--board {
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 6px;
+}
+
+.app-shell--gameplay-hud .ticket-dock {
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 6px;
+}
