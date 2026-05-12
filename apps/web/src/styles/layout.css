@@ -12,17 +12,15 @@
 /* Game layout — 3-column visual structure via nested grids:
    .game-layout = left-rail | board-column
    .board-column = map-col | right-col
-   Layout fills viewport minus topbar so the map column can use 100% to anchor hand strip. */
+   Height is dictated by flex parent so topbar shrinkage flows down. */
 .game-layout {
   --game-rail: clamp(280px, 20vw, 320px);
   --game-left-rail: var(--game-rail);
   --game-right-rail: var(--game-rail);
-  --topbar-allowance: 30px;
   display: grid;
   grid-template-columns: var(--game-left-rail) minmax(0, 1fr);
-  gap: var(--space-stack-md);
-  align-items: start;
-  height: calc(100vh - var(--topbar-allowance));
+  gap: var(--space-stack-sm);
+  align-items: stretch;
   min-height: 0;
 }
 
@@ -51,7 +49,7 @@
 .board-column {
   display: grid;
   grid-template-columns: minmax(0, 1fr) var(--game-right-rail);
-  gap: var(--space-stack-md);
+  gap: var(--space-stack-sm);
   align-items: stretch;
   height: 100%;
   min-height: 0;

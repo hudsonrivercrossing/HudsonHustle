@@ -1,6 +1,8 @@
 /* Gameplay HUD type/layout convergence pass. Keep map labels untouched. */
 .app-shell--gameplay-hud {
-  padding: 0 12px 6px;
+  padding: 2px 10px 6px;
+  display: flex;
+  flex-direction: column;
   gap: 4px;
   font-size: var(--type-body);
   /* Lock to viewport so floating overlays (notifications, modals) never trigger page scroll */
@@ -8,6 +10,12 @@
   min-height: 0;
   max-height: 100vh;
   overflow: hidden;
+}
+
+/* Game-layout fills remaining viewport */
+.app-shell--gameplay-hud .game-layout {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 /* Topbar layout: 3-column grid — empty spacer | centered turn indicator | icon actions
@@ -20,10 +28,14 @@
   height: 24px;
   min-height: 24px;
   max-height: 24px;
-  margin: 0;
+  margin: 0 !important;
   padding: 0;
   position: relative;
   z-index: var(--z-modal);
+}
+
+.app-shell--gameplay-hud .topbar--gameplay-actions {
+  margin: 0 !important;
 }
 
 .app-shell--gameplay-hud .topbar-private-spacer {
