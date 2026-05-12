@@ -3669,9 +3669,9 @@ h3 {
 }
 
 .game-over-layer {
-  position: fixed;
-  inset: max(22px, var(--space-page-y)) max(22px, var(--space-page-x));
-  z-index: 42;
+  position: fixed !important;
+  inset: max(22px, var(--space-page-y)) max(22px, var(--space-page-x)) !important;
+  z-index: 9500 !important;
   display: grid;
   grid-template-columns: minmax(260px, 0.34fr) minmax(0, 1fr);
   gap: 20px;
