@@ -154,6 +154,25 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--hud-brass-light-rgb), 0.35) transparent;
+}
+
+.app-shell--gameplay-hud .right-col .chat-panel-dock .chat-panel__messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.app-shell--gameplay-hud .right-col .chat-panel-dock .chat-panel__messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.app-shell--gameplay-hud .right-col .chat-panel-dock .chat-panel__messages::-webkit-scrollbar-thumb {
+  background: rgba(var(--hud-brass-light-rgb), 0.32);
+  border-radius: 3px;
+}
+
+.app-shell--gameplay-hud .right-col .chat-panel-dock .chat-panel__messages::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--hud-brass-light-rgb), 0.5);
 }
 
 .app-shell--gameplay-hud .side-panel .player-roster__list,
