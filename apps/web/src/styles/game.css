@@ -793,13 +793,10 @@
   align-items: start;
 }
 
-.app-shell--gameplay-hud .right-col {
-  background:
-    radial-gradient(circle at top left, rgba(142, 169, 188, 0.12), transparent 34%),
-    linear-gradient(180deg, rgba(30, 42, 51, 0.88), rgba(9, 15, 20, 0.9));
-  border: 1px solid rgba(var(--hud-brass-light-rgb), 0.18);
-  border-radius: var(--radius-panel);
-  padding: var(--space-stack-sm);
+/* right-col is a transparent column container; ChatPanel and SupplyDock
+   each render their own dark panel — they should not visually merge. */
+.app-shell--gameplay-hud .right-col > * {
+  flex: 0 0 auto;
 }
 
 .app-shell--gameplay-hud .side-panel__draw-ticket.system-button {

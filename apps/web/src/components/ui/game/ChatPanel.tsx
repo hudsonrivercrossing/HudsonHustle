@@ -19,7 +19,7 @@ export function ChatPanel({ messages = [], onSendMessage, className = "" }: Chat
   const [draft, setDraft] = useState("");
 
   return (
-    <Panel variant="info" className={["chat-panel-dock", className].filter(Boolean).join(" ")}>
+    <Panel variant="private" className={["chat-panel-dock", className].filter(Boolean).join(" ")}>
       <form
         className="chat-panel"
         onSubmit={(event) => {
