@@ -26,16 +26,27 @@
   min-height: 0;
 }
 
+/* Left column: 50/50 split — roster top half, tickets+button bottom half */
 .side-panel {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
   gap: var(--space-stack-sm);
-  align-self: start;
+  height: 100%;
+  min-height: 0;
 }
 
-/* Each child in side-panel has fixed sizing — no flex-grow, no stretch */
-.side-panel > * {
-  flex: 0 0 auto;
+.side-panel__top,
+.side-panel__bottom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-stack-xs, 4px);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.side-panel__bottom {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
 }
 
 .board-column {

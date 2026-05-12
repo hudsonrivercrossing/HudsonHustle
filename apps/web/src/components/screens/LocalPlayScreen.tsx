@@ -387,31 +387,35 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
       </header>
 
       <div className={`game-layout ${visibility !== "visible" ? "game-layout--obscured" : ""} ${tutorialTarget ? "game-layout--tutorial" : ""}`}>
-        {/* Left column: roster + tickets + draw ticket */}
+        {/* Left column: 50/50 split — roster (top), tickets + draw button (bottom) */}
         <aside className="side-panel" data-tour-target="roster">
           {visibility === "visible" ? (
             <>
-              <PlayerRoster
-                players={rosterPlayers}
-                activePlayerIndex={game.activePlayerIndex}
-                playerPalette={playerColorPalette}
-              />
-              <TicketDock
-                ticketProgress={ticketProgress}
-                config={localMap}
-                focusedTicketId={focusedTicket?.id ?? null}
-                pinnedTicketId={pinnedTicket?.id ?? null}
-                onFocusTicket={setFocusedTicket}
-                onTogglePinnedTicket={(ticket) => setPinnedTicket((current) => current?.id === ticket.id ? null : ticket)}
-                className={tutorialTarget === "tickets" ? "panel--tutorial-focus" : ""}
-              />
-              <Button
-                className="side-panel__draw-ticket"
-                disabled={!canTakeTurnAction}
-                onClick={() => applyAction({ type: "draw_tickets" })}
-              >
-                Draw tickets
-              </Button>
+              <div className="side-panel__top">
+                <PlayerRoster
+                  players={rosterPlayers}
+                  activePlayerIndex={game.activePlayerIndex}
+                  playerPalette={playerColorPalette}
+                />
+              </div>
+              <div className="side-panel__bottom">
+                <TicketDock
+                  ticketProgress={ticketProgress}
+                  config={localMap}
+                  focusedTicketId={focusedTicket?.id ?? null}
+                  pinnedTicketId={pinnedTicket?.id ?? null}
+                  onFocusTicket={setFocusedTicket}
+                  onTogglePinnedTicket={(ticket) => setPinnedTicket((current) => current?.id === ticket.id ? null : ticket)}
+                  className={tutorialTarget === "tickets" ? "panel--tutorial-focus" : ""}
+                />
+                <Button
+                  className="side-panel__draw-ticket"
+                  disabled={!canTakeTurnAction}
+                  onClick={() => applyAction({ type: "draw_tickets" })}
+                >
+                  Draw tickets
+                </Button>
+              </div>
             </>
           ) : (
             <Panel variant="danger" className="hidden-panel">

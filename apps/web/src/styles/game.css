@@ -109,12 +109,18 @@
   --ticket-dock-height: min(360px, 44vh);
 }
 
-/* Side-panel player roster: fixed sizing to fit exactly 4 seat tiles */
+/* Side-panel player roster: fills top half of side-panel */
 .app-shell--gameplay-hud .side-panel .player-roster {
-  flex-shrink: 0;
+  height: 100%;
+  min-height: 0;
   gap: 0;
-  height: var(--roster-height);
   padding: 8px;
+  overflow: hidden;
+}
+
+.app-shell--gameplay-hud .side-panel .player-roster .scoreboard {
+  height: 100%;
+  grid-template-rows: repeat(4, 1fr);
 }
 
 /* Chat panel height matches roster height */
@@ -746,9 +752,11 @@
   min-width: 0;
 }
 
-.app-shell--gameplay-hud .ticket-dock {
-  height: var(--ticket-dock-height);
-  max-height: var(--ticket-dock-height);
+.app-shell--gameplay-hud .side-panel__bottom .ticket-dock {
+  height: 100%;
+  max-height: none;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .app-shell--gameplay-hud .game-over-layer {
