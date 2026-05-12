@@ -305,7 +305,8 @@ export default function App(): JSX.Element {
     });
 
     socket.on("game:update:public", (game) => {
-      announceGameLog(game);
+      // Notification firing handled by the useEffect on snapshot.game.log.length
+      // (calling announceGameLog here would race with the state update).
       setSnapshot((current) => (current ? { ...current, game } : current));
     });
 
@@ -499,27 +500,6 @@ export default function App(): JSX.Element {
     window.setTimeout(() => {
       setNotifications((current) => current.filter((notification) => notification.id !== id));
     }, 4200);
-  }
-
-  function announceGameLog(game: PublicGameState) {
-    const latestLog = game.log.at(-1);
-    if (!latestLog) {
-      return;
-    }
-
-    if (!lastAnnouncedLogRef.current) {
-      lastAnnouncedLogRef.current = latestLog;
-      lastAnnouncedLogLengthRef.current = game.log.length;
-      return;
-    }
-
-    if (game.log.length <= lastAnnouncedLogLengthRef.current) {
-      return;
-    }
-
-    lastAnnouncedLogRef.current = latestLog;
-    lastAnnouncedLogLengthRef.current = game.log.length;
-    pushNotification(latestLog, game.phase === "gameOver" ? "success" : "neutral");
   }
 
   useEffect(() => {
