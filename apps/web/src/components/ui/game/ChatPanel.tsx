@@ -34,8 +34,7 @@ export function ChatPanel({ messages = [], onSendMessage, className = "" }: Chat
           {messages.length > 0 ? (
             messages.map((msg) => (
               <p key={msg.id} className="chat-panel__message">
-                <strong>{msg.playerName}</strong>
-                <span>{msg.message}</span>
+                <strong>{msg.playerName}:</strong> <span>{msg.message}</span>
               </p>
             ))
           ) : (

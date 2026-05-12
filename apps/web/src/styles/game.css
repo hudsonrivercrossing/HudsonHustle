@@ -2269,36 +2269,50 @@ border-color: rgba(232, 220, 194, 0.72);
   font-size: var(--type-xs) !important;
 }
 
-/* Chat panel: serif font, tighter corners */
+/* Chat panel — tight one-liner messages, scrollable list */
 .app-shell--gameplay-hud .chat-panel {
-  font-family: var(--font-serif);
-  gap: 8px;
+  font-family: var(--font-body);
+  gap: 6px;
 }
 
 .app-shell--gameplay-hud .chat-panel__messages {
   border-radius: var(--radius-xs);
-  border-color: rgba(183, 155, 97, 0.12);
-  background: rgba(255, 247, 231, 0.03);
-  padding: 10px;
+  border: none;
+  background: transparent;
+  padding: 4px 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .app-shell--gameplay-hud .chat-panel__message {
-  border-radius: var(--radius-map-tile);
-  background: rgba(255, 247, 231, 0.05);
-  color: rgba(255, 248, 232, 0.72);
-  font-family: var(--font-serif);
-  font-size: var(--hud-type-sm);
-  line-height: var(--lh-relaxed);
-  padding: 6px 8px;
+  border-radius: 0;
+  background: transparent;
+  color: rgba(var(--hud-paper-rgb), 0.82);
+  font-family: var(--font-body);
+  font-size: var(--type-xs);
+  line-height: 1.4;
+  padding: 2px 4px;
+  margin: 0;
+  white-space: normal;
+  word-wrap: break-word;
 }
 
 .app-shell--gameplay-hud .chat-panel__message strong {
-  font-family: var(--font-sans);
-  font-size: var(--hud-type-label);
-  font-weight: var(--weight-bold);
-  letter-spacing: var(--ls-wide);
-  text-transform: uppercase;
-  color: rgba(255, 248, 232, 0.88);
+  font-family: var(--font-body);
+  font-size: var(--type-xs);
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--hud-paper-bright, #fff8ea);
+  margin-right: 4px;
+}
+
+.app-shell--gameplay-hud .chat-panel__message--system {
+  color: rgba(var(--hud-paper-rgb), 0.4);
+  font-style: italic;
+  text-align: center;
+  padding: 8px 4px;
 }
 
 .app-shell--gameplay-hud .chat-panel__composer {
