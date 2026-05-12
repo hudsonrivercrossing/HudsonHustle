@@ -1,9 +1,9 @@
 /* Gameplay HUD type/layout convergence pass. Keep map labels untouched. */
 .app-shell--gameplay-hud {
-  padding: 2px 10px 6px;
+  padding: 0 10px 6px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   font-size: var(--type-body);
   /* Lock to viewport so floating overlays (notifications, modals) never trigger page scroll */
   height: 100vh;
