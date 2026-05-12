@@ -847,15 +847,11 @@
   pointer-events: none;
 }
 
-/* Gameplay HUD layout overrides */
-.app-shell--gameplay-hud {
-  --game-right-rail: clamp(288px, 22vw, 340px);
-}
-
+/* Gameplay HUD layout overrides — rail widths defined in layout.css on .game-layout */
 
 .app-shell--gameplay-hud .board-column {
   grid-template-columns: minmax(0, 1fr) var(--game-right-rail);
-  align-items: start;
+  align-items: stretch;
 }
 
 /* right-col is a transparent column container; ChatPanel and SupplyDock
@@ -1736,9 +1732,8 @@
   stroke-width: 30px;
 }
 
-/* Gameplay HUD correction pass: translucent map, tighter right rail, equal cards, and calmer type. */
+/* Gameplay HUD correction pass: translucent map, equal cards, and calmer type. */
 .app-shell--gameplay-hud {
-  --game-right-rail: clamp(342px, 23.5vw, 378px);
   --hud-type-label: 0.67rem;
   --hud-type-small: 0.76rem;
   --hud-type-body: 0.9rem;
