@@ -1,30 +1,53 @@
 /* Gameplay HUD type/layout convergence pass. Keep map labels untouched. */
 .app-shell--gameplay-hud {
-  padding: var(--space-stack-sm) 14px var(--space-stack-sm);
-  gap: var(--space-stack-sm);
+  padding: 0 10px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   font-size: var(--type-body);
+  /* Lock to viewport so floating overlays (notifications, modals) never trigger page scroll */
+  height: 100vh;
+  min-height: 0;
+  max-height: 100vh;
+  overflow: hidden;
 }
 
+/* Game-layout fills remaining viewport */
+.app-shell--gameplay-hud .game-layout {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Topbar layout: 3-column grid — empty spacer | centered turn indicator | icon actions
+   Symmetric layout so turn indicator stays in the middle of the viewport. */
 .app-shell--gameplay-hud .topbar {
-  grid-template-columns: 1fr;
-  justify-items: end;
-  gap: 0;
-  min-height: var(--control-height-row);
-  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 6px;
+  height: 12px;
+  min-height: 12px;
+  max-height: 12px;
+  margin: 0 !important;
+  padding: 0;
+  position: relative;
+  z-index: var(--z-modal);
+}
+
+.app-shell--gameplay-hud .topbar--gameplay-actions {
+  margin: 0 !important;
+}
+
+.app-shell--gameplay-hud .topbar-private-spacer {
+  grid-column: 1;
 }
 
 .app-shell--gameplay-hud .topbar-actions {
+  grid-column: 3;
+  display: flex;
+  align-items: center;
   justify-content: flex-end;
-  gap: var(--space-stack-sm);
-}
-
-.app-shell--gameplay-hud .topbar-actions .system-button,
-.app-shell--gameplay-hud .score-guide__trigger.system-button {
-  min-height: var(--control-height-compact);
-  min-width: var(--button-min-width-sm);
-  padding: 8px 13px;
-  font-size: var(--type-sm);
-  font-weight: 800;
+  gap: var(--space-stack-xs, 4px);
 }
 
 /* .game-layout and .board-column grid structure lives in layout.css */
@@ -87,13 +110,166 @@
   text-transform: uppercase;
 }
 
-.app-shell--gameplay-hud .private-hand-rail,
-.app-shell--gameplay-hud .ticket-dock,
-.app-shell--gameplay-hud .inspector-dock {
+/* Panel base styling (gradient + border + shadow) is defined later
+   in the unified rule that covers all dark panels. */
+
+/* Roster + chat heights are both bound to --roster-height so they always match.
+   4 seat tiles × 40px + 3 gaps × 4px + panel padding (16px) ≈ 188px. */
+.app-shell--gameplay-hud {
+  --roster-height: 192px;
+  --ticket-dock-height: min(360px, 44vh);
+}
+
+/* Side-panel player roster: fills top half of side-panel */
+.app-shell--gameplay-hud .side-panel .player-roster {
+  height: 100%;
+  min-height: 0;
+  gap: 0;
+  padding: 8px;
+  overflow: hidden;
+}
+
+.app-shell--gameplay-hud .side-panel .player-roster .scoreboard {
+  height: 100%;
+  grid-template-rows: repeat(4, 1fr);
+}
+
+/* Chat panel fills top half of right column */
+.app-shell--gameplay-hud .right-col .chat-panel-dock {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.app-shell--gameplay-hud .right-col .chat-panel-dock .chat-panel {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.app-shell--gameplay-hud .right-col .chat-panel-dock .chat-panel__messages {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--hud-brass-light-rgb), 0.35) transparent;
+}
+
+.app-shell--gameplay-hud .right-col .chat-panel-dock .chat-panel__messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.app-shell--gameplay-hud .right-col .chat-panel-dock .chat-panel__messages::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.app-shell--gameplay-hud .right-col .chat-panel-dock .chat-panel__messages::-webkit-scrollbar-thumb {
+  background: rgba(var(--hud-brass-light-rgb), 0.32);
+  border-radius: 3px;
+}
+
+.app-shell--gameplay-hud .right-col .chat-panel-dock .chat-panel__messages::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--hud-brass-light-rgb), 0.5);
+}
+
+.app-shell--gameplay-hud .side-panel .player-roster__list,
+.app-shell--gameplay-hud .side-panel .player-roster .scoreboard {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-stack-xs, 4px);
+}
+
+/* Side-panel SeatTile: avatar | name+meta | stats (timer is hidden if no value) */
+.app-shell--gameplay-hud .side-panel .player-roster .player-strip {
+  height: 100%;
+  min-height: 0;
+  padding: 4px 8px;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  grid-template-rows: 1fr;
+  gap: 4px 8px;
+  align-items: center;
+}
+
+/* Hide the empty timer slot so the stats column lands next to the info */
+.app-shell--gameplay-hud .side-panel .player-roster .player-roster__timer:empty {
+  display: none;
+}
+
+/* Info column: name above one-line meta */
+.app-shell--gameplay-hud .side-panel .player-roster .row-object__main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  min-width: 0;
+}
+
+.app-shell--gameplay-hud .side-panel .player-roster .row-object__title {
+  font-size: var(--type-xs);
+  font-weight: 800;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-shell--gameplay-hud .side-panel .player-roster .row-object__meta {
+  font-size: var(--type-2xs);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+/* Stats column: single line, comma-separated style */
+.app-shell--gameplay-hud .side-panel .player-roster .row-object__stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0;
+  white-space: nowrap;
+}
+
+.app-shell--gameplay-hud .side-panel .player-roster .row-object__stat {
+  font-size: var(--type-2xs);
+  line-height: 1.1;
+}
+
+.app-shell--gameplay-hud .side-panel .player-roster .seat-avatar--tiny {
+  width: 28px;
+  height: 28px;
+}
+
+/* Side-panel player roster: dark seat tiles matching TicketDock */
+.app-shell--gameplay-hud .side-panel .player-roster .player-strip {
   background:
-    radial-gradient(circle at top left, rgba(142, 169, 188, 0.12), transparent 34%),
-    linear-gradient(180deg, rgba(30, 42, 51, 0.88), rgba(9, 15, 20, 0.9));
+    linear-gradient(180deg, rgba(255, 247, 231, 0.055), rgba(255, 247, 231, 0.025));
   border-color: rgba(var(--hud-brass-light-rgb), 0.18);
+  color: var(--hud-paper-bright, #fff8ea);
+  box-shadow: none;
+}
+
+.app-shell--gameplay-hud .side-panel .player-roster .player-strip--active {
+  border-color: rgba(var(--hud-brass-light-rgb), 0.48);
+  background:
+    linear-gradient(180deg, rgba(var(--hud-brass-light-rgb), 0.16), rgba(var(--hud-brass-light-rgb), 0.06));
+}
+
+.app-shell--gameplay-hud .side-panel .player-roster .row-object__title {
+  color: var(--hud-paper-bright, #fff8ea);
+}
+
+.app-shell--gameplay-hud .side-panel .player-roster .row-object__meta,
+.app-shell--gameplay-hud .side-panel .player-roster .row-object__stat {
+  color: rgba(var(--hud-paper-rgb), 0.66);
+}
+
+.app-shell--gameplay-hud .side-panel .player-roster__row--placeholder {
+  opacity: 0.42;
+}
+
+.app-shell--gameplay-hud .side-panel .player-roster__active-label {
+  display: none;
 }
 
 .app-shell--gameplay-hud .section-header__title {
@@ -111,7 +287,30 @@
   letter-spacing: 0;
 }
 
-.app-shell--gameplay-hud .private-hand-rail__slots,
+/* Hand rail: 1x9 single-row strip showing all 8 colors + locomotive */
+.app-shell--gameplay-hud .private-hand-rail__slots {
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 4px;
+}
+
+/* Hand slots in the 1x9 strip — larger fonts for better readability */
+.app-shell--gameplay-hud .private-hand-rail .hand-color-slot {
+  min-height: 72px;
+  height: 72px;
+  padding: 8px 6px;
+}
+
+.app-shell--gameplay-hud .private-hand-rail .hand-color-slot__count {
+  font-size: var(--type-lg);
+  font-weight: 900;
+}
+
+.app-shell--gameplay-hud .private-hand-rail .hand-color-slot__label {
+  font-size: var(--type-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
 .app-shell--gameplay-hud .inspector-dock .supply-dock__market {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
@@ -330,13 +529,16 @@
   white-space: normal;
 }
 
-/* TicketChoiceSheet: exact same size as inspector dock, solid background */
+/* Right-col is the positioning anchor for the ticket choice overlay */
+.app-shell--gameplay-hud .right-col {
+  position: relative;
+}
+
+/* TicketChoiceSheet: covers the right column (chat + market) when shown */
 .app-shell--gameplay-hud .ticket-choice-sheet {
   position: absolute !important;
-  top: 86px !important;
-  right: 18px !important;
-  bottom: 18px !important;
-  width: var(--game-right-rail) !important;
+  inset: 0 !important;
+  width: auto !important;
   max-height: none !important;
   pointer-events: auto !important;
   z-index: 35;
@@ -445,19 +647,6 @@
 }
 
 /* Gameplay HUD visual refinement. Rail widths defined in layout.css on .game-layout. */
-.app-shell--gameplay-hud {
-  padding-top: 6px;
-}
-
-.app-shell--gameplay-hud .topbar {
-  display: grid;
-  grid-template-columns: var(--game-left-rail) minmax(0, 1fr) var(--game-right-rail);
-  align-items: stretch;
-  gap: 12px;
-  min-height: 56px;
-  justify-items: stretch;
-}
-
 .app-shell--gameplay-hud .topbar-private-spacer {
   min-width: 0;
 }
@@ -473,57 +662,47 @@
 .app-shell--gameplay-hud .turn-indicator {
   grid-column: 2;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 8px;
   justify-content: center;
+  align-self: center;
 }
 
 .app-shell--gameplay-hud .turn-indicator__name {
   font-family: var(--font-sans);
-  font-size: var(--type-body);
+  font-size: var(--type-sm);
   font-weight: 700;
   color: #fff8ea;
   letter-spacing: 0.02em;
+  line-height: 1;
 }
 
 .app-shell--gameplay-hud .turn-indicator__label {
   font-family: var(--font-body);
-  font-size: var(--type-xs);
+  font-size: 11px;
   color: rgba(var(--hud-paper-rgb), 0.6);
   text-transform: lowercase;
   letter-spacing: 0.04em;
+  line-height: 1;
 }
 
 .app-shell--gameplay-hud .turn-indicator__timer {
   font-family: var(--font-body);
-  font-size: var(--type-xs);
+  font-size: 11px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
   color: rgba(var(--hud-paper-rgb), 0.92);
-  padding: 2px 8px;
+  padding: 1px 6px;
   border-radius: var(--radius-control);
   background: rgba(212, 79, 76, 0.15);
   border: 1px solid rgba(212, 79, 76, 0.3);
+  line-height: 1;
 }
 
 /* Per-seat timer in the scoreboard row */
 .app-shell--gameplay-hud .player-roster__timer {
   font-variant-numeric: tabular-nums;
-}
-
-.app-shell--gameplay-hud .topbar {
-  position: relative;
-  z-index: var(--z-modal);
-}
-
-.app-shell--gameplay-hud .topbar-actions {
-  grid-column: 3;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  align-items: stretch;
-  gap: 7px;
-  width: 100%;
 }
 
 .app-shell--gameplay-hud .topbar-actions .score-guide {
@@ -537,14 +716,63 @@
   z-index: 9999 !important;
 }
 
-.app-shell--gameplay-hud .topbar-actions .system-button,
-.app-shell--gameplay-hud .topbar-actions .score-guide__trigger.system-button {
-  width: 100%;
-  min-width: 0;
-  min-height: 52px;
-  padding: 7px 8px;
+/* Icon-only topbar buttons: square, same height as turn indicator, label reveals on hover */
+.app-shell--gameplay-hud .topbar-icon-btn.system-button,
+.app-shell--gameplay-hud .topbar-icon-btn .score-guide__trigger.system-button {
+  position: relative;
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+  min-height: 22px;
+  padding: 0;
+  font-size: 11px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  border-radius: var(--radius-control);
+}
+
+.app-shell--gameplay-hud .score-guide.topbar-icon-btn {
+  position: relative;
+}
+
+/* Hover tooltip rendered as ::after pseudo on the button itself.
+   Positioned BELOW the button (top: calc(100% + 6px)) so it doesn't get clipped
+   by the viewport top edge. */
+.app-shell--gameplay-hud .topbar-icon-btn.system-button::after,
+.app-shell--gameplay-hud .topbar-icon-btn .score-guide__trigger.system-button::after {
+  content: attr(data-label);
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
   font-size: var(--type-xs);
-  line-height: 1.04;
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--hud-paper-bright, #fff8ea);
+  background: rgba(11, 17, 22, 0.94);
+  border: 1px solid rgba(var(--hud-brass-light-rgb), 0.24);
+  border-radius: var(--radius-control);
+  padding: 4px 10px;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 200;
+  transition: opacity var(--duration-fast, 100ms) ease;
+}
+
+.app-shell--gameplay-hud .topbar-icon-btn.system-button:hover::after,
+.app-shell--gameplay-hud .topbar-icon-btn.system-button:focus-visible::after,
+.app-shell--gameplay-hud .topbar-icon-btn .score-guide__trigger.system-button:hover::after,
+.app-shell--gameplay-hud .topbar-icon-btn .score-guide__trigger.system-button:focus-visible::after {
+  opacity: 1;
+}
+
+.app-shell--gameplay-hud .topbar-icon-btn--leave.system-button {
+  color: var(--color-status-danger, #d45a3f);
 }
 
 /* .game-layout and .board-column grid structure lives in layout.css */
@@ -582,9 +810,25 @@
   min-width: 0;
 }
 
-.app-shell--gameplay-hud .ticket-dock {
-  height: min(360px, 44vh);
-  max-height: min(360px, 44vh);
+/* TicketDock fills the bottom half; layout: header / scroll / draw button */
+.app-shell--gameplay-hud .side-panel__bottom .ticket-dock {
+  height: 100%;
+  max-height: none;
+  min-height: 0;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: var(--space-stack-xs, 4px);
+}
+
+.app-shell--gameplay-hud .ticket-dock .ticket-dock__scroll {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.app-shell--gameplay-hud .ticket-dock__draw {
+  width: 100%;
+  margin-top: 4px;
 }
 
 .app-shell--gameplay-hud .game-over-layer {
@@ -617,6 +861,28 @@
 
 .app-shell--gameplay-hud .game-over-layer__actions .system-button {
   width: 100%;
+  background: rgba(var(--hud-brass-light-rgb), 0.14) !important;
+  border: 1px solid rgba(var(--hud-brass-light-rgb), 0.4) !important;
+  color: var(--hud-paper-bright, #fff8ea) !important;
+  font-weight: 700;
+  font-size: var(--type-sm);
+}
+
+.app-shell--gameplay-hud .game-over-layer__actions .system-button:hover:not(:disabled) {
+  background: rgba(var(--hud-brass-light-rgb), 0.26) !important;
+  border-color: rgba(var(--hud-brass-light-rgb), 0.6) !important;
+}
+
+.app-shell--gameplay-hud .game-over-layer__actions .system-button[variant="primary"],
+.app-shell--gameplay-hud .game-over-layer__actions .system-button.primary-button {
+  background: linear-gradient(180deg, #d6c391, #8c713b) !important;
+  border-color: #8c713b !important;
+  color: #1a150e !important;
+}
+
+.app-shell--gameplay-hud .game-over-layer__actions .system-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .app-shell--gameplay-hud .game-over-layer .endgame-card {
@@ -670,21 +936,372 @@
   border-color: #d45a3f !important;
 }
 
+/* All in-game modals (handoff, leave, draw-reveal): dark HUD treatment for contrast */
+.app-shell--gameplay-hud ~ .modal-shell .modal-shell__card,
+.app-shell--gameplay-hud .modal-shell .modal-shell__card,
+body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card {
+  background:
+    var(--hud-grain),
+    linear-gradient(180deg, rgba(37, 31, 23, 0.97), rgba(12, 10, 8, 0.97)) !important;
+  border: 1px solid color-mix(in srgb, var(--hud-brass) 48%, rgba(0, 0, 0, 0.4)) !important;
+  border-radius: var(--radius-sm) !important;
+  color: var(--hud-paper-bright, #fff8ea) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 235, 194, 0.08),
+    0 24px 48px rgba(0, 0, 0, 0.55) !important;
+}
+
+.app-shell--gameplay-hud .modal-shell .modal-shell__card p,
+body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card p {
+  color: rgba(var(--hud-paper-rgb), 0.78) !important;
+}
+
+.app-shell--gameplay-hud .modal-shell .modal-shell__card .section-header__eyebrow,
+body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .section-header__eyebrow {
+  color: rgba(var(--hud-brass-light-rgb), 0.82) !important;
+}
+
+.app-shell--gameplay-hud .modal-shell .modal-shell__card .section-header__title,
+body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .section-header__title {
+  color: var(--hud-paper-bright, #fff8ea) !important;
+}
+
+/* Primary action button in modals */
+.app-shell--gameplay-hud .modal-shell .modal-shell__card .system-button.primary-button,
+body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .system-button.primary-button {
+  background: linear-gradient(180deg, #d6c391, #8c713b) !important;
+  border-color: #8c713b !important;
+  color: #1a150e !important;
+  font-weight: 800;
+}
+
 .notification-pipe {
-  z-index: 160;
+  position: fixed !important;
+  bottom: var(--space-stack-lg, 24px) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-stack-xs, 4px);
+  z-index: 9000 !important;
+  pointer-events: none;
 }
 
-/* Right rail overflow fix: reserve a real tab spine instead of letting tabs crowd content. */
-.app-shell--gameplay-hud {
-  --game-right-rail: clamp(376px, 28vw, 424px);
-}
-
-.app-shell--gameplay-hud .topbar {
-  grid-template-columns: var(--game-left-rail) minmax(0, 1fr) var(--game-right-rail);
-}
+/* Gameplay HUD layout overrides — rail widths defined in layout.css on .game-layout */
 
 .app-shell--gameplay-hud .board-column {
   grid-template-columns: minmax(0, 1fr) var(--game-right-rail);
+  align-items: stretch;
+}
+
+/* right-col is a transparent column container; ChatPanel and SupplyDock
+   each render their own dark panel — each fills its grid row. */
+.app-shell--gameplay-hud .right-col > * {
+  width: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+/* Right-column SupplyDock layout: vertical stack with market as 2×3 grid */
+/* Layout-only — visual treatment (gradient/border/shadow) comes from the unified panel rule */
+.app-shell--gameplay-hud .right-col .supply-dock--board {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-stack-sm, 8px);
+  padding: var(--space-stack-sm) var(--space-stack-md);
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Market: 3 + 2 layout, RIGHT-aligned, cards rendered with hand-slot square shape */
+.app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 1fr 1fr;
+  gap: 6px;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0;
+}
+
+/* Row 1: cards 1, 2, 3 fill the row */
+.app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market > :nth-child(1) {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market > :nth-child(2) {
+  grid-row: 1;
+  grid-column: 2;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market > :nth-child(3) {
+  grid-row: 1;
+  grid-column: 3;
+}
+
+/* Row 2: cards 4, 5 — right-aligned (columns 2 and 3) */
+.app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market > :nth-child(4) {
+  grid-row: 2;
+  grid-column: 2;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market > :nth-child(5) {
+  grid-row: 2;
+  grid-column: 3;
+}
+
+/* Market slots styled identically to gameplay-hud hand slots: dark ticket card
+   with brass color stripe on the left edge, count and label centered. */
+/* Right-col market slot uses the unified hand-slot styling defined below.
+   Sized identical to hand slots (72px tall, same padding and fonts). */
+.app-shell--gameplay-hud .right-col .supply-dock--board .market-color-slot {
+  min-height: 72px;
+  height: 72px;
+  padding: 8px 6px;
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  grid-template-rows: auto 1fr;
+  position: relative;
+  text-align: center;
+  cursor: pointer;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .market-color-slot__count {
+  font-size: var(--type-lg);
+  font-weight: 900;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .market-color-slot__label {
+  font-size: var(--type-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .section-header {
+  min-width: 0;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .system-button {
+  width: 100%;
+  min-height: 44px;
+  min-width: 0;
+}
+
+/* Unified Draw button style for both Ticket Dock and Supply Dock */
+.app-shell--gameplay-hud .ticket-dock__draw.system-button,
+.app-shell--gameplay-hud .supply-dock__draw-deck.system-button {
+  width: 100%;
+  background: rgba(var(--hud-brass-light-rgb), 0.12);
+  border: 1px solid rgba(var(--hud-brass-light-rgb), 0.32);
+  border-radius: var(--radius-sm);
+  color: var(--hud-paper-bright);
+  font-family: var(--font-body);
+  font-size: var(--type-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  min-height: 36px;
+  padding: 6px 12px;
+  transition: background var(--duration-fast, 100ms) ease, border-color var(--duration-fast, 100ms) ease;
+}
+
+.app-shell--gameplay-hud .ticket-dock__draw.system-button:hover:not(:disabled),
+.app-shell--gameplay-hud .supply-dock__draw-deck.system-button:hover:not(:disabled) {
+  background: rgba(var(--hud-brass-light-rgb), 0.22);
+  border-color: rgba(var(--hud-brass-light-rgb), 0.5);
+}
+
+.app-shell--gameplay-hud .ticket-dock__draw.system-button:disabled,
+.app-shell--gameplay-hud .supply-dock__draw-deck.system-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Board map scales fluidly inside the gameplay HUD column;
+   override the base 780px min-width so it can shrink with the viewport. */
+.app-shell--gameplay-hud .board-map {
+  min-width: 0;
+  max-width: 100%;
+  height: 100%;
+  width: 100%;
+}
+
+.app-shell--gameplay-hud .board-stage__map {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Floating build popup — anchored to clicked route/city via inline style.
+   Falls back to fixed center if no anchor provided. */
+.floating-build-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 340px;
+  background:
+    var(--hud-grain),
+    linear-gradient(180deg, rgba(37, 31, 23, 0.97), rgba(12, 10, 8, 0.97));
+  border: 1px solid color-mix(in srgb, var(--hud-brass) 52%, rgba(0, 0, 0, 0.34));
+  border-radius: var(--radius-sm);
+  padding: 14px 16px 14px 18px;
+  z-index: 800;
+  color: var(--hud-paper-bright, #fff8ea);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 235, 194, 0.1),
+    0 24px 48px rgba(0, 0, 0, 0.55);
+  animation: floating-build-rise 160ms var(--easing-standard, ease) both;
+}
+
+@keyframes floating-build-rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Inline style overrides the centered fallback when anchor is set */
+.floating-build-panel[style*="position: fixed"][style*="top:"] {
+  transform: none;
+  animation: floating-build-rise-anchor 160ms var(--easing-standard, ease) both;
+}
+
+@keyframes floating-build-rise-anchor {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.floating-build-panel__close {
+  position: absolute;
+  top: var(--space-stack-xs, 4px);
+  right: var(--space-stack-xs, 4px);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid rgba(var(--hud-brass-light-rgb), 0.16);
+  border-radius: var(--radius-control);
+  color: rgba(var(--hud-paper-rgb), 0.6);
+  font-size: var(--type-xs);
+  cursor: pointer;
+  transition: color var(--duration-fast, 100ms) ease, border-color var(--duration-fast, 100ms) ease;
+}
+
+.floating-build-panel__close:hover {
+  color: var(--hud-paper-bright);
+  border-color: rgba(var(--hud-brass-light-rgb), 0.36);
+}
+
+.floating-build-panel__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-stack-sm, 8px);
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Build popup typography overrides — smaller and tighter for the compact 280px card */
+.floating-build-panel .surface-card,
+.floating-build-panel .detail-card {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.floating-build-panel .surface-card__header,
+.floating-build-panel .surface-card__row {
+  margin: 0 !important;
+  padding: 0 !important;
+  text-indent: 0 !important;
+}
+
+.floating-build-panel .surface-card__title,
+.floating-build-panel .detail-card__title {
+  font-family: var(--font-display, var(--font-body));
+  font-size: var(--type-sm) !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  color: var(--hud-paper-bright, #fff8ea) !important;
+  margin: 0 0 8px !important;
+  padding: 0 28px 0 0 !important;
+  letter-spacing: 0;
+  text-indent: 0 !important;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.floating-build-panel .detail-card__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.floating-build-panel .detail-card__facts {
+  gap: 4px !important;
+}
+
+.floating-build-panel .detail-card__fact {
+  font-size: var(--type-2xs) !important;
+  padding: 3px 8px !important;
+  min-height: 22px !important;
+  border-radius: var(--radius-control) !important;
+  background: rgba(var(--hud-brass-light-rgb), 0.12) !important;
+  border-color: rgba(var(--hud-brass-light-rgb), 0.24) !important;
+  color: rgba(var(--hud-paper-rgb), 0.82) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700 !important;
+}
+
+.floating-build-panel .detail-card__prompt {
+  font-size: var(--type-xs) !important;
+  line-height: 1.3 !important;
+  font-weight: 500 !important;
+  color: rgba(var(--hud-paper-rgb), 0.82) !important;
+  margin: 4px 0 8px !important;
+  white-space: nowrap;
+}
+
+.floating-build-panel .detail-card__decision-shelf {
+  gap: 6px !important;
+  margin-top: 4px;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.floating-build-panel .detail-card__decision-shelf::before {
+  display: none !important;
+  content: none !important;
+}
+
+.floating-build-panel .choice-chip-button {
+  font-size: var(--type-xs) !important;
+  padding: 6px 12px !important;
+  min-height: 32px !important;
+}
+
+.floating-build-panel .muted-copy {
+  font-size: var(--type-xs);
+  color: rgba(var(--hud-paper-rgb), 0.5);
+  font-style: italic;
+}
+
+/* Board stage must be position:relative for the floating panel to anchor */
+.board-stage {
+  position: relative;
 }
 
 .app-shell--gameplay-hud .inspector-dock {
@@ -753,8 +1370,11 @@
 .app-shell--gameplay-hud .private-hand-rail,
 .app-shell--gameplay-hud .ticket-dock,
 .app-shell--gameplay-hud .inspector-dock,
-.app-shell--gameplay-hud .player-roster--top {
-  border-color: color-mix(in srgb, var(--hud-brass) 42%, rgba(0, 0, 0, 0.34));
+.app-shell--gameplay-hud .player-roster--top,
+.app-shell--gameplay-hud .side-panel .player-roster,
+.app-shell--gameplay-hud .chat-panel-dock,
+.app-shell--gameplay-hud .right-col .supply-dock--board {
+  border: 1px solid color-mix(in srgb, var(--hud-brass) 42%, rgba(0, 0, 0, 0.34));
   border-radius: var(--radius-sm);
   background:
     var(--hud-grain),
@@ -769,7 +1389,10 @@
 .app-shell--gameplay-hud .private-hand-rail::before,
 .app-shell--gameplay-hud .ticket-dock::before,
 .app-shell--gameplay-hud .inspector-dock::before,
-.app-shell--gameplay-hud .player-roster--top::before {
+.app-shell--gameplay-hud .player-roster--top::before,
+.app-shell--gameplay-hud .side-panel .player-roster::before,
+.app-shell--gameplay-hud .chat-panel-dock::before,
+.app-shell--gameplay-hud .right-col .supply-dock--board::before {
   background:
     linear-gradient(135deg, rgba(232, 220, 194, 0.08), transparent 28%),
     radial-gradient(circle at 18% 0%, rgba(183, 155, 97, 0.12), transparent 30%);
@@ -790,7 +1413,8 @@
 }
 
 .app-shell--gameplay-hud .hand-color-slot,
-.app-shell--gameplay-hud .inspector-dock .market-color-slot {
+.app-shell--gameplay-hud .inspector-dock .market-color-slot,
+.app-shell--gameplay-hud .right-col .supply-dock--board .market-color-slot {
   isolation: isolate;
   overflow: hidden;
   border-width: 1px;
@@ -807,7 +1431,8 @@
     0 5px 0 rgba(0, 0, 0, 0.2);
 }
 
-.app-shell--gameplay-hud .hand-color-slot::before {
+.app-shell--gameplay-hud .hand-color-slot::before,
+.app-shell--gameplay-hud .right-col .supply-dock--board .market-color-slot::before {
   content: "";
   position: absolute;
   inset: 7px 7px 6px 16px;
@@ -819,8 +1444,9 @@
     linear-gradient(180deg, rgba(232, 220, 194, 0.045), transparent);
 }
 
-.app-shell--gameplay-hud .market-color-slot::before,
-.app-shell--gameplay-hud .market-color-slot::after {
+/* Old inspector-dock market still uses display:none for ::before/::after */
+.app-shell--gameplay-hud .inspector-dock .market-color-slot::before,
+.app-shell--gameplay-hud .inspector-dock .market-color-slot::after {
   display: none !important;
   content: none !important;
 }
@@ -992,7 +1618,8 @@
     linear-gradient(180deg, #211b14, #100d09);
 }
 
-/* Angular tabletop correction: avoid the repeated rounded-card silhouette. */
+/* (Old angular clip-path removed for visual consistency across panels.)
+   Disabled by overriding with `none` below. */
 .app-shell--gameplay-hud .private-hand-rail,
 .app-shell--gameplay-hud .ticket-dock,
 .app-shell--gameplay-hud .inspector-dock,
@@ -1000,7 +1627,12 @@
 .app-shell--gameplay-hud .game-over-layer,
 .app-shell--gameplay-hud .leave-confirm-card,
 .app-shell--gameplay-hud .ticket-choice-sheet__panel {
-  border-radius: var(--radius-map-tile);
+  border-radius: var(--radius-sm) !important;
+  clip-path: none !important;
+}
+
+/* Original angular clip-path retained as reference but neutralised */
+.disabled-angular-panel {
   clip-path: polygon(
     10px 0,
     calc(100% - 10px) 0,
@@ -1013,11 +1645,13 @@
   );
 }
 
+/* Inner-border decoration disabled — pseudo-element neutralised */
 .app-shell--gameplay-hud .private-hand-rail::after,
 .app-shell--gameplay-hud .ticket-dock::after,
 .app-shell--gameplay-hud .inspector-dock::after,
 .app-shell--gameplay-hud .player-roster--top::after {
-  content: "";
+  content: none !important;
+  display: none !important;
   pointer-events: none;
   position: absolute;
   inset: 7px;
@@ -1284,11 +1918,6 @@
     linear-gradient(180deg, #29302d, #111613);
 }
 
-.app-shell--gameplay-hud .topbar .system-button,
-.app-shell--gameplay-hud .score-guide__trigger.system-button {
-  min-height: 48px;
-  font-size: var(--type-sm);
-}
 
 .app-shell--gameplay-hud .game-over-layer,
 .app-shell--gameplay-hud .leave-confirm-card,
@@ -1459,9 +2088,8 @@
   stroke-width: 30px;
 }
 
-/* Gameplay HUD correction pass: translucent map, tighter right rail, equal cards, and calmer type. */
+/* Gameplay HUD correction pass: translucent map, equal cards, and calmer type. */
 .app-shell--gameplay-hud {
-  --game-right-rail: clamp(342px, 23.5vw, 378px);
   --hud-type-label: 0.67rem;
   --hud-type-small: 0.76rem;
   --hud-type-body: 0.9rem;
@@ -1493,23 +2121,6 @@
   line-height: 1.26;
 }
 
-.app-shell--gameplay-hud .topbar-actions {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.app-shell--gameplay-hud .topbar-actions .score-guide {
-  width: 100%;
-}
-
-.app-shell--gameplay-hud .topbar-actions .system-button,
-.app-shell--gameplay-hud .topbar-actions .score-guide__trigger.system-button {
-  inline-size: 100%;
-  block-size: 52px;
-  min-block-size: 52px;
-  padding: 6px 7px;
-  font-size: var(--type-xs);
-  font-weight: 830;
-}
 
 .app-shell--gameplay-hud .score-guide {
   z-index: 600;
@@ -1653,12 +2264,6 @@
   padding-inline: 0;
 }
 
-.app-shell--gameplay-hud .private-hand-rail__slots,
-.app-shell--gameplay-hud .inspector-dock .supply-dock__market {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-}
-
 .app-shell--gameplay-hud .hand-color-slot,
 .app-shell--gameplay-hud .inspector-dock .market-color-slot {
   min-height: 78px;
@@ -1776,36 +2381,55 @@ border-color: rgba(232, 220, 194, 0.72);
   font-size: var(--type-xs) !important;
 }
 
-/* Chat panel: serif font, tighter corners */
+/* Chat panel — tight one-liner messages, scrollable list */
 .app-shell--gameplay-hud .chat-panel {
-  font-family: var(--font-serif);
-  gap: 8px;
+  font-family: var(--font-body);
+  gap: 6px;
 }
 
 .app-shell--gameplay-hud .chat-panel__messages {
   border-radius: var(--radius-xs);
-  border-color: rgba(183, 155, 97, 0.12);
-  background: rgba(255, 247, 231, 0.03);
-  padding: 10px;
+  border: none;
+  background: transparent;
+  padding: 4px 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .app-shell--gameplay-hud .chat-panel__message {
-  border-radius: var(--radius-map-tile);
-  background: rgba(255, 247, 231, 0.05);
-  color: rgba(255, 248, 232, 0.72);
-  font-family: var(--font-serif);
-  font-size: var(--hud-type-sm);
-  line-height: var(--lh-relaxed);
-  padding: 6px 8px;
+  border-radius: 0;
+  background: transparent;
+  color: rgba(var(--hud-paper-rgb), 0.82);
+  font-family: var(--font-body);
+  font-size: var(--type-xs);
+  line-height: 1.4;
+  padding: 2px 4px;
+  margin: 0;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+.app-shell--gameplay-hud .chat-panel__message strong,
+.app-shell--gameplay-hud .chat-panel__message span {
+  display: inline !important;
 }
 
 .app-shell--gameplay-hud .chat-panel__message strong {
-  font-family: var(--font-sans);
-  font-size: var(--hud-type-label);
-  font-weight: var(--weight-bold);
-  letter-spacing: var(--ls-wide);
-  text-transform: uppercase;
-  color: rgba(255, 248, 232, 0.88);
+  font-family: var(--font-body);
+  font-size: var(--type-xs);
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--hud-paper-bright, #fff8ea);
+  margin: 0 4px 0 0;
+}
+
+.app-shell--gameplay-hud .chat-panel__message--system {
+  color: rgba(var(--hud-paper-rgb), 0.4);
+  font-style: italic;
+  text-align: center;
+  padding: 8px 4px;
 }
 
 .app-shell--gameplay-hud .chat-panel__composer {
@@ -2094,21 +2718,8 @@ border-color: rgba(232, 220, 194, 0.72);
   position: relative;
   z-index: 1;
 }
-.app-shell--gameplay-hud .topbar {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: stretch;
-  gap: 14px;
-  margin-bottom: 12px;
-}
 
-.app-shell--gameplay-hud .board-column {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 292px);
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: 14px;
-  min-width: 0;
-}
+/* (Old hardcoded board-column override removed — width comes from --game-right-rail) */
 
 .app-shell--gameplay-hud .board-stage {
   grid-column: 1;
@@ -2130,42 +2741,11 @@ border-color: rgba(232, 220, 194, 0.72);
   max-height: calc(100vh - 92px);
 }
 .app-shell--gameplay-hud .topbar--gameplay-actions {
-  min-height: 0;
-  justify-content: stretch;
+  min-height: 56px;
 }
 
-.app-shell--gameplay-hud .topbar-actions {
-  width: auto;
-  min-width: 0;
-  padding: 6px;
-  border: 1px solid rgba(var(--hud-brass-light-rgb), 0.18);
-  border-radius: var(--card-radius);
-  background: rgba(11, 17, 22, 0.64);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 14px 40px rgba(0, 0, 0, 0.24);
-}
 
-.app-shell--gameplay-hud .topbar-actions .system-button,
-.app-shell--gameplay-hud .score-guide__trigger.system-button {
-  width: 108px;
-  min-width: 108px;
-  min-height: 50px;
-  padding-inline: 10px;
-}
-
-.app-shell--gameplay-hud .player-roster,
-.app-shell--gameplay-hud .private-hand-rail,
-.app-shell--gameplay-hud .ticket-dock,
-.app-shell--gameplay-hud .inspector-dock {
-  border-color: rgba(var(--hud-brass-light-rgb), 0.2);
-  background:
-    linear-gradient(180deg, rgba(24, 34, 43, 0.82), rgba(12, 18, 24, 0.76));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 18px 48px rgba(0, 0, 0, 0.28);
-  color: var(--hud-paper-bright);
-}
+/* (Older translucent-blue panel rule removed — unified brass treatment applied above) */
 
 .app-shell--gameplay-hud .board-stage {
   border-color: rgba(var(--hud-brass-light-rgb), 0.22);
@@ -2505,19 +3085,8 @@ border-color: rgba(232, 220, 194, 0.72);
   font-size: var(--type-map);
 }
 
-.app-shell--gameplay-hud {
-  height: 100vh;
-  min-height: 0;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: 10px;
-  overflow: hidden;
-  font-size: var(--type-body);
-}
+/* Layout definition lives at the top of this file (flex column with 0 gap). */
 
-.app-shell--gameplay-hud .topbar {
-  margin-bottom: 0;
-}
 
 .gameplay-brand {
   min-height: 50px;
@@ -2648,6 +3217,8 @@ border-color: rgba(232, 220, 194, 0.72);
   grid-template-rows: auto minmax(0, 1fr);
 }
 
+/* Preserve 4-row footprint even though only 3 tickets render per page —
+   creates extra breathing room between the 3rd ticket and the Draw Tickets button. */
 .app-shell--gameplay-hud .ticket-dock__scroll {
   min-height: 0;
   grid-template-rows: repeat(4, minmax(0, 1fr));
@@ -2945,3 +3516,239 @@ border-color: rgba(232, 220, 194, 0.72);
   color: rgba(255, 248, 232, 0.7);
 }
 
+
+/* ─── Final unified panel treatment ───────────────────────────────────────
+   All in-game container panels — roster, ticket dock, hand rail, chat,
+   market, plus the privacy "hidden" panel during handoff — render with the
+   same dark brass envelope so they read as one set. */
+.app-shell--gameplay-hud .side-panel .player-roster,
+.app-shell--gameplay-hud .ticket-dock,
+.app-shell--gameplay-hud .private-hand-rail,
+.app-shell--gameplay-hud .chat-panel-dock,
+.app-shell--gameplay-hud .right-col .supply-dock--board,
+.app-shell--gameplay-hud .hidden-panel,
+.app-shell--gameplay-hud .side-panel .panel--danger {
+  border: 1px solid color-mix(in srgb, var(--hud-brass) 42%, rgba(0, 0, 0, 0.34));
+  border-radius: var(--radius-sm);
+  background:
+    var(--hud-grain),
+    linear-gradient(180deg, rgba(37, 31, 23, 0.94), rgba(12, 10, 8, 0.94));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 235, 194, 0.08),
+    inset 0 10px 18px rgba(255, 235, 194, 0.035),
+    0 18px 36px var(--hud-shadow);
+  color: var(--hud-paper-bright);
+  backdrop-filter: none;
+}
+
+.app-shell--gameplay-hud .hidden-panel p,
+.app-shell--gameplay-hud .hidden-panel .section-header__title {
+  color: rgba(var(--hud-paper-rgb), 0.82);
+}
+
+.app-shell--gameplay-hud .hidden-panel .section-header__eyebrow {
+  color: rgba(var(--hud-brass-light-rgb), 0.82);
+}
+
+/* ─── Unify outer padding on the 3 bottom panels so their bottom edges land
+   at the same Y when columns are equal height. */
+.app-shell--gameplay-hud .ticket-dock,
+.app-shell--gameplay-hud .private-hand-rail,
+.app-shell--gameplay-hud .right-col .supply-dock--board {
+  padding: 10px 12px !important;
+  box-sizing: border-box;
+}
+
+/* Right-col SupplyDock — vertical stack: header / 3+2 market grid / draw button
+   Overrides the base `.supply-dock--board` horizontal grid layout from ui.css */
+.app-shell--gameplay-hud .right-col .supply-dock--board {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: auto minmax(0, 1fr) auto !important;
+  gap: 6px;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board > .section-header {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  min-width: 0 !important;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board > .supply-dock__market {
+  grid-column: 1 !important;
+  grid-row: 2 !important;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board > .system-button {
+  grid-column: 1 !important;
+  grid-row: 3 !important;
+  min-width: 0 !important;
+}
+
+/* Market inner grid: 2 columns × 3 rows (2 + 2 + 1). 5th card centered alone in row 3.
+   Rows are auto so each card stays at its natural 72px hand-slot height. */
+.app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(3, auto) !important;
+  gap: 12px;
+  min-height: 0;
+  align-content: start;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market > :nth-child(1) {
+  grid-row: 1 !important;
+  grid-column: 1 !important;
+}
+.app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market > :nth-child(2) {
+  grid-row: 1 !important;
+  grid-column: 2 !important;
+}
+.app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market > :nth-child(3) {
+  grid-row: 2 !important;
+  grid-column: 1 !important;
+}
+.app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market > :nth-child(4) {
+  grid-row: 2 !important;
+  grid-column: 2 !important;
+}
+.app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market > :nth-child(5) {
+  grid-row: 3 !important;
+  grid-column: 1 !important;
+}
+
+.app-shell--gameplay-hud .ticket-dock {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: auto minmax(0, 1fr) auto !important;
+  gap: 6px;
+}
+
+/* Chat input: dark, compact, consistent with HUD panels */
+.app-shell--gameplay-hud .chat-panel-dock .chat-panel__composer {
+  display: block;
+  padding: 0;
+  margin: 0;
+}
+
+.app-shell--gameplay-hud .chat-panel-dock .chat-panel__composer input {
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(255, 247, 231, 0.04) !important;
+  border: 1px solid rgba(var(--hud-brass-light-rgb), 0.22) !important;
+  border-radius: var(--radius-control) !important;
+  color: var(--hud-paper-bright, #fff8ea) !important;
+  font-family: var(--font-body);
+  font-size: var(--type-xs);
+  font-style: normal;
+  padding: 6px 10px !important;
+  height: auto !important;
+  min-height: 0 !important;
+  box-shadow: none !important;
+}
+
+.app-shell--gameplay-hud .chat-panel-dock .chat-panel__composer input::placeholder {
+  color: rgba(var(--hud-paper-rgb), 0.4);
+  font-style: normal;
+}
+
+.app-shell--gameplay-hud .chat-panel-dock .chat-panel__composer input:focus-visible {
+  outline: none;
+  border-color: rgba(var(--hud-brass-light-rgb), 0.5) !important;
+}
+
+/* Game-over board: high-contrast text on dark backdrop, single-column breakdown rows */
+.app-shell--gameplay-hud .game-over-layer .endgame-card,
+body:has(.app-shell--gameplay-hud) .game-over-layer .endgame-card {
+  background:
+    var(--hud-grain),
+    linear-gradient(180deg, rgba(37, 31, 23, 0.94), rgba(12, 10, 8, 0.94)) !important;
+  border: 1px solid color-mix(in srgb, var(--hud-brass) 42%, rgba(0, 0, 0, 0.34)) !important;
+  color: var(--hud-paper-bright, #fff8ea) !important;
+}
+
+.app-shell--gameplay-hud .game-over-layer .surface-card__title,
+.app-shell--gameplay-hud .game-over-layer .surface-card__eyebrow,
+.app-shell--gameplay-hud .game-over-layer .endgame-score,
+.app-shell--gameplay-hud .game-over-layer .endgame-score__label,
+body:has(.app-shell--gameplay-hud) .game-over-layer .surface-card__title,
+body:has(.app-shell--gameplay-hud) .game-over-layer .surface-card__eyebrow,
+body:has(.app-shell--gameplay-hud) .game-over-layer .endgame-score,
+body:has(.app-shell--gameplay-hud) .game-over-layer .endgame-score__label {
+  color: var(--hud-paper-bright, #fff8ea) !important;
+}
+
+/* Single-column breakdown rows: label stacked above value */
+.app-shell--gameplay-hud .game-over-layer .endgame-breakdown__row,
+body:has(.app-shell--gameplay-hud) .game-over-layer .endgame-breakdown__row {
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 4px !important;
+}
+
+.app-shell--gameplay-hud .game-over-layer .endgame-breakdown__label,
+body:has(.app-shell--gameplay-hud) .game-over-layer .endgame-breakdown__label {
+  color: rgba(var(--hud-brass-light-rgb), 0.78) !important;
+  font-size: var(--type-2xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.app-shell--gameplay-hud .game-over-layer .endgame-breakdown__value,
+body:has(.app-shell--gameplay-hud) .game-over-layer .endgame-breakdown__value {
+  color: var(--hud-paper-bright, #fff8ea) !important;
+  text-align: left !important;
+}
+
+.app-shell--gameplay-hud .game-over-layer .endgame-breakdown__list,
+body:has(.app-shell--gameplay-hud) .game-over-layer .endgame-breakdown__list {
+  padding-left: 0 !important;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.app-shell--gameplay-hud .game-over-layer .endgame-breakdown__list-item,
+body:has(.app-shell--gameplay-hud) .game-over-layer .endgame-breakdown__list-item {
+  color: var(--hud-paper-bright, #fff8ea) !important;
+  font-weight: 600;
+  font-size: var(--type-xs);
+  padding-left: 8px;
+  border-left: 2px solid rgba(var(--hud-brass-light-rgb), 0.5);
+}
+
+/* ─── Final aggressive reset for floating-build-panel internals ───────────
+   Strip every chrome layer applied by base/HUD rules so the popup is one
+   clean dark card with no nested boxes. */
+.floating-build-panel .detail-card,
+.floating-build-panel .surface-card,
+.app-shell--gameplay-hud .floating-build-panel .detail-card,
+.app-shell--gameplay-hud .floating-build-panel .surface-card {
+  all: unset;
+  display: block;
+  color: var(--hud-paper-bright, #fff8ea);
+}
+
+.floating-build-panel .detail-card__decision-shelf,
+.app-shell--gameplay-hud .floating-build-panel .detail-card__decision-shelf {
+  all: unset;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.floating-build-panel .detail-card__decision-shelf::before,
+.floating-build-panel .detail-card__decision-shelf::after,
+.app-shell--gameplay-hud .floating-build-panel .detail-card__decision-shelf::before,
+.app-shell--gameplay-hud .floating-build-panel .detail-card__decision-shelf::after {
+  content: none !important;
+  display: none !important;
+  border: none !important;
+  background: none !important;
+}

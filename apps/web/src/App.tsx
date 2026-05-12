@@ -35,11 +35,12 @@ import {
 import {
   BoardMap,
   BoardStage,
+  ChatPanel,
   EndgameBreakdown,
-  FloatingPlayerRoster,
+  FloatingBuildPanel,
   GameOverLayer,
-  InspectorDock,
   NotificationPipe,
+  PlayerRoster,
   PrivateHandRail,
   ScoreGuide,
   SupplyDock,
@@ -201,6 +202,7 @@ export default function App(): JSX.Element {
   const [realtimeStatus, setRealtimeStatus] = useState<RealtimeStatus>("idle");
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
+  const [buildAnchor, setBuildAnchor] = useState<{ x: number; y: number } | null>(null);
   const [selectedTicketIds, setSelectedTicketIds] = useState<string[]>([]);
   const [focusedTicket, setFocusedTicket] = useState<TicketDef | null>(null);
   const [pinnedTicket, setPinnedTicket] = useState<TicketDef | null>(null);
@@ -216,6 +218,7 @@ export default function App(): JSX.Element {
   const notificationIdRef = useRef(0);
   const lastAnnouncedLogRef = useRef<string | null>(null);
   const lastAnnouncedLogLengthRef = useRef(0);
+  const pendingDrawsRef = useRef<{ player: string; cards: string[] } | null>(null);
   const timerWarningRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -304,7 +307,8 @@ export default function App(): JSX.Element {
     });
 
     socket.on("game:update:public", (game) => {
-      announceGameLog(game);
+      // Notification firing handled by the useEffect on snapshot.game.log.length
+      // (calling announceGameLog here would race with the state update).
       setSnapshot((current) => (current ? { ...current, game } : current));
     });
 
@@ -494,52 +498,78 @@ export default function App(): JSX.Element {
   function pushNotification(message: string, tone: GameplayNotification["tone"] = "neutral") {
     notificationIdRef.current += 1;
     const id = `multi-${Date.now()}-${notificationIdRef.current}`;
-    setNotifications((current) => [...current.slice(-3), { id, message, tone }]);
+    setNotifications((current) => [...current, { id, message, tone }]);
     window.setTimeout(() => {
       setNotifications((current) => current.filter((notification) => notification.id !== id));
-    }, 4200);
-  }
-
-  function announceGameLog(game: PublicGameState) {
-    const latestLog = game.log.at(-1);
-    if (!latestLog) {
-      return;
-    }
-
-    if (!lastAnnouncedLogRef.current) {
-      lastAnnouncedLogRef.current = latestLog;
-      lastAnnouncedLogLengthRef.current = game.log.length;
-      return;
-    }
-
-    if (game.log.length <= lastAnnouncedLogLengthRef.current) {
-      return;
-    }
-
-    lastAnnouncedLogRef.current = latestLog;
-    lastAnnouncedLogLengthRef.current = game.log.length;
-    pushNotification(latestLog, game.phase === "gameOver" ? "success" : "neutral");
+    }, 2000);
   }
 
   useEffect(() => {
-    const latestLog = snapshot?.game?.log.at(-1);
-    if (!snapshot?.game || !latestLog) {
+    const log = snapshot?.game?.log;
+    if (!snapshot?.game || !log || log.length === 0) {
       return;
     }
 
-    if (!lastAnnouncedLogRef.current) {
-      lastAnnouncedLogRef.current = latestLog;
-      lastAnnouncedLogLengthRef.current = snapshot.game.log.length;
+    // First time we see this game — initialise without firing notifications
+    if (lastAnnouncedLogLengthRef.current === 0) {
+      lastAnnouncedLogLengthRef.current = log.length;
+      lastAnnouncedLogRef.current = log[log.length - 1];
       return;
     }
 
-    if (snapshot.game.log.length <= lastAnnouncedLogLengthRef.current) {
+    // If log somehow shrank (game reset / reconnect), resync without notifying
+    if (log.length < lastAnnouncedLogLengthRef.current) {
+      lastAnnouncedLogLengthRef.current = log.length;
+      lastAnnouncedLogRef.current = log[log.length - 1] ?? null;
       return;
     }
 
-    lastAnnouncedLogRef.current = latestLog;
-    lastAnnouncedLogLengthRef.current = snapshot.game.log.length;
-    pushNotification(latestLog, snapshot.game.phase === "gameOver" ? "success" : "neutral");
+    // Push notable log entries (draw/claim/station). Draws within one turn are
+    // batched into a single notification flushed when the turn ends or another
+    // action type appears.
+    const newEntries = log.slice(lastAnnouncedLogLengthRef.current);
+    const tone = snapshot.game.phase === "gameOver" ? "success" : "neutral";
+
+    function flushDraws() {
+      const pending = pendingDrawsRef.current;
+      if (pending && pending.cards.length > 0) {
+        const cardList = pending.cards.join(", ");
+        pushNotification(`${pending.player} drew ${cardList}.`, tone);
+      }
+      pendingDrawsRef.current = null;
+    }
+
+    for (const entry of newEntries) {
+      // "X drew a Y card."
+      const drawMatch = entry.match(/^(.+) drew a (.+) card\.$/);
+      if (drawMatch) {
+        const [, player, card] = drawMatch;
+        if (pendingDrawsRef.current && pendingDrawsRef.current.player !== player) {
+          flushDraws();
+        }
+        if (!pendingDrawsRef.current) {
+          pendingDrawsRef.current = { player, cards: [] };
+        }
+        pendingDrawsRef.current.cards.push(card);
+        continue;
+      }
+      // Other notable actions — flush pending draws first, then announce
+      if (entry.includes("claimed") || entry.includes("built a station")) {
+        flushDraws();
+        pushNotification(entry, tone);
+        continue;
+      }
+      // Turn started — flush pending draws so they're announced at end of turn
+      if (entry.includes("turn started")) {
+        flushDraws();
+      }
+    }
+
+    // Do NOT flush here — let pending draws batch until the next "turn started"
+    // log arrives (which marks end of this player's draw phase).
+
+    lastAnnouncedLogLengthRef.current = log.length;
+    lastAnnouncedLogRef.current = log[log.length - 1];
   }, [snapshot?.game?.log.length, snapshot?.game?.phase]);
 
   const liveTimerSecondsRemaining =
@@ -924,21 +954,23 @@ export default function App(): JSX.Element {
           secondsRemaining={liveTimerSecondsRemaining}
         />
         <div className="topbar-actions">
-          <Button onClick={() => setGuideOpen(true)}>Guide</Button>
-          <ScoreGuide className="score-guide--subtle" label="Score" />
-          <Button className="topbar-actions__leave" onClick={() => setShowLeaveConfirm(true)}>
-            Leave room
-          </Button>
+          <Button className="topbar-icon-btn" aria-label="Guide" onClick={() => setGuideOpen(true)} data-label="Guide">?</Button>
+          <ScoreGuide className="score-guide--subtle topbar-icon-btn" label="★" tooltipLabel="Score" />
+          <Button className="topbar-icon-btn topbar-icon-btn--leave" aria-label="Leave room" onClick={() => setShowLeaveConfirm(true)} data-label="Leave">✕</Button>
         </div>
       </header>
 
       <div className="game-layout">
-        <aside className="side-panel">
-          <div className="side-panel__private-stack">
-            <div data-tour-target="hand">
-              <PrivateHandRail hand={localPlayer.hand} cardPalette={visuals.palettes.cards} paymentPreview={paymentPreview} />
-            </div>
-            <div data-tour-target="tickets">
+        {/* Left column: 50/50 split — roster (top), tickets + draw button (bottom) */}
+        <aside className="side-panel" data-tour-target="roster">
+          <div className="side-panel__top">
+            <PlayerRoster
+              players={rosterPlayers}
+              activePlayerIndex={snapshot.game.activePlayerIndex}
+              playerPalette={visuals.palettes.players}
+            />
+          </div>
+          <div className="side-panel__bottom" data-tour-target="tickets">
             <TicketDock
               ticketProgress={ticketProgress}
               config={mapConfig}
@@ -946,171 +978,186 @@ export default function App(): JSX.Element {
               pinnedTicketId={pinnedTicket?.id ?? null}
               onFocusTicket={setFocusedTicket}
               onTogglePinnedTicket={(ticket) => setPinnedTicket((current) => current?.id === ticket.id ? null : ticket)}
+              onDrawTickets={() => sendGameAction({ type: "draw_tickets" })}
+              drawTicketsDisabled={!canTakeTurnAction}
             />
-            </div>
           </div>
         </aside>
 
         <main className="board-column">
-          <BoardStage className="board-panel" isMyTurn={localIsActive && publicGame.phase === "main"}>
-            <BoardMap
-              config={mapConfig}
-              backdrop={visuals.backdrop}
-              backdropMode={visuals.backdropMode}
-              boardLabelMode={visuals.boardLabelMode}
+          {/* Center: map + hand strip */}
+          <div className="map-col">
+            <BoardStage className="board-panel" isMyTurn={localIsActive && publicGame.phase === "main"}>
+              <BoardMap
+                config={mapConfig}
+                backdrop={visuals.backdrop}
+                backdropMode={visuals.backdropMode}
+                boardLabelMode={visuals.boardLabelMode}
+                cardPalette={visuals.palettes.cards}
+                playerPalette={visuals.palettes.players}
+                viewerPlayerId={snapshot.privateState?.playerId ?? null}
+                game={{
+                  players: projectedGame.players.map((player) => ({
+                    id: player.id,
+                    name: player.name,
+                    color: player.color
+                  })),
+                  activePlayerIndex: projectedGame.activePlayerIndex,
+                  routeClaims: projectedGame.routeClaims,
+                  stations: projectedGame.stations
+                }}
+                selectedRouteId={selectedRouteId}
+                selectedCityId={selectedCityId}
+                highlightedCityIds={highlightedCityIds}
+                onSelectRoute={(routeId, position) => {
+                  setSelectedRouteId(routeId);
+                  setSelectedCityId(null);
+                  setPaymentPreview(null);
+                  setBuildAnchor(position ?? null);
+                }}
+                onSelectCity={(cityId, position) => {
+                  setSelectedCityId(cityId);
+                  setSelectedRouteId(null);
+                  setPaymentPreview(null);
+                  setBuildAnchor(position ?? null);
+                }}
+              />
+              {/* Floating build popup */}
+              {(currentRoute || currentCity) && publicGame.phase === "main" ? (
+                <FloatingBuildPanel
+                  anchor={buildAnchor}
+                  onClose={() => { setSelectedRouteId(null); setSelectedCityId(null); setPaymentPreview(null); setBuildAnchor(null); }}
+                >
+                  {currentRoute ? (
+                    <SurfaceCard
+                      variant="detail"
+                      className="detail-card"
+                      data-detail-kind="route"
+                      title={`${getCityName(mapConfig, currentRoute.from)} → ${getCityName(mapConfig, currentRoute.to)}`}
+                    >
+                      <div className="detail-card__summary">
+                        <div className="detail-card__facts">
+                          <span className="detail-card__fact">{currentRoute.length} train{currentRoute.length === 1 ? "" : "s"}</span>
+                          <span className="detail-card__fact">{currentRoute.type}</span>
+                          <span className="detail-card__fact">{currentRoute.color === "gray" ? "gray route" : currentRoute.color}</span>
+                          {currentRoute.locomotiveCost ? (
+                            <span className="detail-card__fact">{currentRoute.locomotiveCost} locomotive{currentRoute.locomotiveCost === 1 ? "" : "s"}</span>
+                          ) : null}
+                        </div>
+                        <p className="detail-card__prompt">
+                          {currentRouteOwner ? `Claimed by ${currentRouteOwner.name}.` : "Choose a payment color."}
+                        </p>
+                      </div>
+                      <div className="detail-card__decision-shelf chip-row">
+                        {routeOptions.length > 0 ? (
+                          routeOptions.map((color, index) => (
+                            <ChoiceChipButton
+                              key={color}
+                              className={index === 0 && canTakeTurnAction ? "choice-chip-button--primary" : undefined}
+                              style={{ ["--choice-chip-accent" as string]: visuals.palettes.cards[color] }}
+                              disabled={!canTakeTurnAction}
+                              onMouseEnter={() => setPaymentPreview({ color, totalCost: currentRoute.length, minimumLocomotives: currentRoute.locomotiveCost ?? 0 })}
+                              onMouseLeave={() => setPaymentPreview(null)}
+                              onFocus={() => setPaymentPreview({ color, totalCost: currentRoute.length, minimumLocomotives: currentRoute.locomotiveCost ?? 0 })}
+                              onBlur={() => setPaymentPreview(null)}
+                              onClick={() => sendGameAction({ type: "claim_route", routeId: currentRoute.id, color })}
+                            >
+                              Claim {formatCardLabel(color)}
+                            </ChoiceChipButton>
+                          ))
+                        ) : (
+                          <span className="muted-copy">{currentRouteUnavailableReason}</span>
+                        )}
+                      </div>
+                    </SurfaceCard>
+                  ) : currentCity ? (
+                    <SurfaceCard variant="detail" className="detail-card" title={currentCity.name}>
+                      <div className="detail-card__summary">
+                        <div className="detail-card__facts">
+                          <span className="detail-card__fact">Station</span>
+                        </div>
+                        <p className="detail-card__prompt">Choose a payment color.</p>
+                      </div>
+                      <div className="detail-card__decision-shelf chip-row">
+                        {currentCityOccupied ? (
+                          <span className="muted-copy">A station already exists in this city.</span>
+                        ) : stationOptions.length > 0 ? (
+                          stationOptions.map((color, index) => (
+                            <ChoiceChipButton
+                              key={color}
+                              className={index === 0 && canTakeTurnAction ? "choice-chip-button--primary" : undefined}
+                              style={{ ["--choice-chip-accent" as string]: visuals.palettes.cards[color] }}
+                              disabled={!canTakeTurnAction}
+                              onMouseEnter={() => setPaymentPreview({ color, totalCost: currentStationCost })}
+                              onMouseLeave={() => setPaymentPreview(null)}
+                              onFocus={() => setPaymentPreview({ color, totalCost: currentStationCost })}
+                              onBlur={() => setPaymentPreview(null)}
+                              onClick={() => sendGameAction({ type: "build_station", cityId: currentCity.id, color })}
+                            >
+                              Build {formatCardLabel(color)}
+                            </ChoiceChipButton>
+                          ))
+                        ) : (
+                          <span className="muted-copy">
+                            {localIsActive ? "No affordable station payment colors right now." : "Wait for your turn to build a station."}
+                          </span>
+                        )}
+                      </div>
+                    </SurfaceCard>
+                  ) : null}
+                </FloatingBuildPanel>
+              ) : null}
+            </BoardStage>
+
+            <div data-tour-target="hand">
+              <PrivateHandRail hand={localPlayer.hand} cardPalette={visuals.palettes.cards} paymentPreview={paymentPreview} />
+            </div>
+          </div>
+
+          {/* Right column: chat + market — overlaid by ticket picker when active */}
+          <div className="right-col" data-tour-target="market">
+            <ChatPanel
+              messages={chatMessages}
+              onSendMessage={sendChatMessage}
+            />
+            <SupplyDock
+              market={publicGame.market}
+              deckCount={publicGame.trainDeckCount}
               cardPalette={visuals.palettes.cards}
-              playerPalette={visuals.palettes.players}
-              viewerPlayerId={snapshot.privateState?.playerId ?? null}
-              game={{
-                players: projectedGame.players.map((player) => ({
-                  id: player.id,
-                  name: player.name,
-                  color: player.color
-                })),
-                activePlayerIndex: projectedGame.activePlayerIndex,
-                routeClaims: projectedGame.routeClaims,
-                stations: projectedGame.stations
-              }}
-              selectedRouteId={selectedRouteId}
-              selectedCityId={selectedCityId}
-              highlightedCityIds={highlightedCityIds}
-              onSelectRoute={(routeId) => {
-                setSelectedRouteId(routeId);
-                setSelectedCityId(null);
-                setPaymentPreview(null);
-              }}
-              onSelectCity={(cityId) => {
-                setSelectedCityId(cityId);
-                setSelectedRouteId(null);
-                setPaymentPreview(null);
-              }}
+              disabled={!canContinueDrawing}
+              isMarketCardDisabled={(card) => publicGame.turn.drawsTaken === 1 && card.color === "locomotive"}
+              onDrawFromMarket={(marketIndex) => sendGameAction({ type: "draw_card", source: "market", marketIndex })}
+              onDrawFromDeck={() => sendGameAction({ type: "draw_card", source: "deck" })}
+              className="supply-dock--board"
             />
-            <FloatingPlayerRoster
-              players={rosterPlayers}
-              activePlayerIndex={snapshot.game.activePlayerIndex}
-              playerPalette={visuals.palettes.players}
-              viewerPlayerId={snapshot.privateState?.playerId ?? null}
-            />
-          </BoardStage>
-
-          <div data-tour-target="actions" style={{ display: "contents" }}>
-          <InspectorDock
-            summary={publicGame.turn.summary}
-            className="action-panel"
-            activeBuildKey={selectedRouteId ?? selectedCityId}
-            chatMessages={chatMessages}
-            onSendChat={sendChatMessage}
-            marketContent={
-              <div data-tour-target="market">
-                <SupplyDock
-                  market={publicGame.market}
-                  deckCount={publicGame.trainDeckCount}
-                  cardPalette={visuals.palettes.cards}
-                  disabled={!canContinueDrawing}
-                  isMarketCardDisabled={(card) => publicGame.turn.drawsTaken === 1 && card.color === "locomotive"}
-                  onDrawFromMarket={(marketIndex) => sendGameAction({ type: "draw_card", source: "market", marketIndex })}
-                  onDrawFromDeck={() => sendGameAction({ type: "draw_card", source: "deck" })}
-                  onDrawTickets={() => sendGameAction({ type: "draw_tickets" })}
-                  drawTicketsDisabled={!canTakeTurnAction}
-                  className="supply-dock--board"
-                />
-              </div>
-            }
-            buildContent={
-              <>
-                {publicGame.phase === "main" && !currentRoute && !currentCity ? (
-              <div className="action-empty-prompt" data-testid="action-empty-state">
-                <span className="action-empty-prompt__title">Select a route or station.</span>
-                <span className="action-empty-prompt__copy">Build options appear here.</span>
-              </div>
-                ) : null}
-
-                {currentRoute && publicGame.phase === "main" ? (
-              <SurfaceCard
-                variant="detail"
-                className="detail-card"
-                data-detail-kind="route"
-                title={`${getCityName(mapConfig, currentRoute.from)} → ${getCityName(mapConfig, currentRoute.to)}`}
-              >
-                <div className="detail-card__summary">
-                  <div className="detail-card__facts">
-                    <span className="detail-card__fact">{currentRoute.length} train{currentRoute.length === 1 ? "" : "s"}</span>
-                    <span className="detail-card__fact">{currentRoute.type}</span>
-                    <span className="detail-card__fact">{currentRoute.color === "gray" ? "gray route" : currentRoute.color}</span>
-                    {currentRoute.locomotiveCost ? (
-                      <span className="detail-card__fact">{currentRoute.locomotiveCost} locomotive{currentRoute.locomotiveCost === 1 ? "" : "s"}</span>
-                    ) : null}
-                  </div>
-                  <p className="detail-card__prompt">
-                    {currentRouteOwner ? `Claimed by ${currentRouteOwner.name}.` : "Choose a payment color."}
-                  </p>
-                </div>
-                <div className="detail-card__decision-shelf chip-row">
-                  {routeOptions.length > 0 ? (
-                    routeOptions.map((color, index) => (
-                      <ChoiceChipButton
-                        key={color}
-                        className={index === 0 && canTakeTurnAction ? "choice-chip-button--primary" : undefined}
-                        style={{ ["--choice-chip-accent" as string]: visuals.palettes.cards[color] }}
-                        disabled={!canTakeTurnAction}
-                        onMouseEnter={() =>
-                          setPaymentPreview({ color, totalCost: currentRoute.length, minimumLocomotives: currentRoute.locomotiveCost ?? 0 })
-                        }
-                        onMouseLeave={() => setPaymentPreview(null)}
-                        onFocus={() =>
-                          setPaymentPreview({ color, totalCost: currentRoute.length, minimumLocomotives: currentRoute.locomotiveCost ?? 0 })
-                        }
-                        onBlur={() => setPaymentPreview(null)}
-                        onClick={() => sendGameAction({ type: "claim_route", routeId: currentRoute.id, color })}
-                      >
-                        Claim {formatCardLabel(color)}
-                      </ChoiceChipButton>
-                    ))
-                  ) : (
-                    <span className="muted-copy">{currentRouteUnavailableReason}</span>
-                  )}
-                </div>
-              </SurfaceCard>
-                ) : null}
-
-                {currentCity && publicGame.phase === "main" ? (
-              <SurfaceCard variant="detail" className="detail-card" title={currentCity.name}>
-                <div className="detail-card__summary">
-                  <div className="detail-card__facts">
-                    <span className="detail-card__fact">Station</span>
-                  </div>
-                  <p className="detail-card__prompt">Choose a payment color.</p>
-                </div>
-                <div className="detail-card__decision-shelf chip-row">
-                  {currentCityOccupied ? (
-                    <span className="muted-copy">A station already exists in this city.</span>
-                  ) : stationOptions.length > 0 ? (
-                    stationOptions.map((color, index) => (
-                      <ChoiceChipButton
-                        key={color}
-                        className={index === 0 && canTakeTurnAction ? "choice-chip-button--primary" : undefined}
-                        style={{ ["--choice-chip-accent" as string]: visuals.palettes.cards[color] }}
-                        disabled={!canTakeTurnAction}
-                        onMouseEnter={() => setPaymentPreview({ color, totalCost: currentStationCost })}
-                        onMouseLeave={() => setPaymentPreview(null)}
-                        onFocus={() => setPaymentPreview({ color, totalCost: currentStationCost })}
-                        onBlur={() => setPaymentPreview(null)}
-                        onClick={() => sendGameAction({ type: "build_station", cityId: currentCity.id, color })}
-                      >
-                        Build {formatCardLabel(color)}
-                      </ChoiceChipButton>
-                    ))
-                  ) : (
-                    <span className="muted-copy">
-                      {localIsActive ? "No affordable station payment colors right now." : "Wait for your turn to build a station."}
-                    </span>
-                  )}
-                </div>
-              </SurfaceCard>
-                ) : null}
-              </>
-            }
-          />
+            {localPendingTickets.length > 0 ? (
+              <TicketChoiceSheet
+                title={publicGame.phase === "initialTickets" ? "Choose starting tickets" : "Keep new tickets"}
+                subtitle={
+                  publicGame.phase === "initialTickets"
+                    ? "Keep at least two. Ticket choice does not auto-time out in MVP2."
+                    : "Keep at least one. This consumes your turn."
+                }
+                tickets={localPendingTickets}
+                config={mapConfig}
+                minimumKeep={publicGame.phase === "initialTickets" ? 2 : 1}
+                selectedIds={selectedTicketIds}
+                focusedTicketId={focusedTicket?.id ?? null}
+                onFocusTicket={setFocusedTicket}
+                onToggle={(ticketId) =>
+                  setSelectedTicketIds((current) =>
+                    current.includes(ticketId) ? current.filter((id) => id !== ticketId) : [...current, ticketId]
+                  )
+                }
+                onConfirm={() =>
+                  sendGameAction(
+                    publicGame.phase === "initialTickets"
+                      ? { type: "select_initial_tickets", keptTicketIds: selectedTicketIds }
+                      : { type: "keep_drawn_tickets", keptTicketIds: selectedTicketIds }
+                  )
+                }
+              />
+            ) : null}
           </div>
         </main>
       </div>
@@ -1153,35 +1200,6 @@ export default function App(): JSX.Element {
             })}
           </div>
         </GameOverLayer>
-      ) : null}
-
-      {localPendingTickets.length > 0 ? (
-        <TicketChoiceSheet
-          title={publicGame.phase === "initialTickets" ? "Choose starting tickets" : "Keep new tickets"}
-          subtitle={
-            publicGame.phase === "initialTickets"
-              ? "Keep at least two. Ticket choice does not auto-time out in MVP2."
-              : "Keep at least one. This consumes your turn."
-          }
-          tickets={localPendingTickets}
-          config={mapConfig}
-          minimumKeep={publicGame.phase === "initialTickets" ? 2 : 1}
-          selectedIds={selectedTicketIds}
-          focusedTicketId={focusedTicket?.id ?? null}
-          onFocusTicket={setFocusedTicket}
-          onToggle={(ticketId) =>
-            setSelectedTicketIds((current) =>
-              current.includes(ticketId) ? current.filter((id) => id !== ticketId) : [...current, ticketId]
-            )
-          }
-          onConfirm={() =>
-            sendGameAction(
-              publicGame.phase === "initialTickets"
-                ? { type: "select_initial_tickets", keptTicketIds: selectedTicketIds }
-                : { type: "keep_drawn_tickets", keptTicketIds: selectedTicketIds }
-            )
-          }
-        />
       ) : null}
 
       {showLeaveConfirm ? (

@@ -1205,19 +1205,8 @@
   gap: 10px;
 }
 
-@media (max-width: 1200px) {
-  .app-shell--gameplay-hud .game-layout {
-    grid-template-columns: minmax(240px, 260px) minmax(0, 1fr);
-  }
-
-  .app-shell--gameplay-hud {
-    --game-right-rail: clamp(300px, 22vw, 340px);
-  }
-
-  .app-shell--gameplay-hud .board-column {
-    grid-template-columns: minmax(0, 1fr) minmax(260px, 280px);
-  }
-}
+/* Rail widths come from layout.css .game-layout (single --game-rail token).
+   No responsive overrides needed — clamp() handles viewport scaling. */
 
 @media (max-width: 1120px) {
   .setup-board,

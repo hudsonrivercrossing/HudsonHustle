@@ -3049,14 +3049,23 @@ h3 {
 
 .overlay,
 .modal-shell {
-  position: fixed;
-  inset: 0;
-  z-index: var(--z-modal);
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9999 !important;
   display: grid;
   place-items: center;
   padding: 24px;
-  background: rgba(57, 42, 27, 0.52);
+  background: rgba(15, 11, 6, 0.72);
   animation: shell-fade-in var(--duration-slow) var(--easing-standard);
+}
+
+.modal-shell > * {
+  pointer-events: auto;
 }
 
 .overlay--tutorial,
@@ -3626,6 +3635,7 @@ h3 {
 .notification-pipe__item {
   justify-self: center;
   max-width: 100%;
+  pointer-events: auto;
   padding: 10px 16px;
   border: 1px solid rgba(221, 199, 159, 0.28);
   border-radius: 999px;
@@ -3659,9 +3669,9 @@ h3 {
 }
 
 .game-over-layer {
-  position: fixed;
-  inset: max(22px, var(--space-page-y)) max(22px, var(--space-page-x));
-  z-index: 42;
+  position: fixed !important;
+  inset: max(22px, var(--space-page-y)) max(22px, var(--space-page-x)) !important;
+  z-index: 9500 !important;
   display: grid;
   grid-template-columns: minmax(260px, 0.34fr) minmax(0, 1fr);
   gap: 20px;

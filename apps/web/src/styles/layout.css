@@ -11,33 +11,84 @@
 
 /* Game layout — 3-column visual structure via nested grids:
    .game-layout = left-rail | board-column
-   .board-column = board-stage | inspector-dock (right-rail) */
+   .board-column = map-col | right-col
+   Height is dictated by flex parent so topbar shrinkage flows down. */
 .game-layout {
-  --game-left-rail: clamp(286px, 21vw, 312px);
-  --game-right-rail: clamp(324px, 24vw, 356px);
+  --game-rail: clamp(233px, 17vw, 267px);
+  --game-left-rail: var(--game-rail);
+  --game-right-rail: var(--game-rail);
   display: grid;
   grid-template-columns: var(--game-left-rail) minmax(0, 1fr);
-  gap: var(--space-stack-md);
-  align-items: start;
+  gap: var(--space-stack-sm);
+  align-items: stretch;
+  min-height: 0;
 }
 
+/* Left column: 40/60 split — roster (40% top), tickets + draw button (60% bottom) */
 .side-panel {
   display: grid;
-  gap: var(--space-stack-md);
-  align-content: start;
+  grid-template-rows: 40fr 60fr;
+  gap: var(--space-stack-sm);
+  height: 100%;
+  min-height: 0;
+  align-self: stretch;
+}
+
+.side-panel__top,
+.side-panel__bottom {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.side-panel__bottom > .ticket-dock {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .board-column {
   display: grid;
   grid-template-columns: minmax(0, 1fr) var(--game-right-rail);
-  grid-template-rows: minmax(0, 1fr);
-  gap: var(--space-stack-md);
-  align-content: start;
+  gap: var(--space-stack-sm);
+  align-items: stretch;
+  align-self: stretch;
+  height: 100%;
+  min-height: 0;
 }
 
-.side-panel__private-stack {
+/* map-col: map fills the top (1fr), hand strip locked at the bottom (auto). */
+.map-col {
   display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
   gap: var(--space-stack-sm);
+  min-width: 0;
+  min-height: 0;
+}
+
+.map-col > .board-stage {
+  grid-row: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.map-col > .private-hand-rail {
+  grid-row: 2;
+  align-self: end;
+}
+
+/* Right column: 50/50 split — chat top (50%), market bottom (50%) */
+.right-col {
+  display: grid;
+  grid-template-rows: 50fr 50fr;
+  gap: var(--space-stack-sm);
+  height: 100%;
+  min-height: 0;
+  align-self: stretch;
+}
+
+.side-panel__draw-ticket {
+  width: 100%;
 }
 
 /* Setup flows */

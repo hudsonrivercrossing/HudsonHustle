@@ -4,6 +4,7 @@ import { Button } from "../primitives/Button";
 interface ScoreGuideProps {
   className?: string;
   label?: string;
+  tooltipLabel?: string;
 }
 
 const routePointRows = [
@@ -15,13 +16,13 @@ const routePointRows = [
   "6 trains = 15 points"
 ];
 
-export function ScoreGuide({ className, label = "Scoring" }: ScoreGuideProps): JSX.Element {
+export function ScoreGuide({ className, label = "Scoring", tooltipLabel }: ScoreGuideProps): JSX.Element {
   const panelId = useId();
   const classes = ["score-guide", className].filter(Boolean).join(" ");
 
   return (
     <div className={classes}>
-      <Button className="score-guide__trigger" aria-describedby={panelId}>
+      <Button className="score-guide__trigger" aria-describedby={panelId} aria-label={tooltipLabel ?? label} data-label={tooltipLabel}>
         {label}
       </Button>
       <div id={panelId} className="score-guide__panel" role="note">

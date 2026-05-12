@@ -23,9 +23,10 @@ import {
 import {
   BoardMap,
   BoardStage,
-  FloatingPlayerRoster,
+  ChatPanel,
+  FloatingBuildPanel,
+  PlayerRoster,
   GameOverLayer,
-  InspectorDock,
   NotificationPipe,
   PrivateHandRail,
   SupplyDock,
@@ -70,6 +71,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   const [visibility, setVisibility] = useState<VisibilityMode>("visible");
   const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
   const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
+  const [buildAnchor, setBuildAnchor] = useState<{ x: number; y: number } | null>(null);
   const [selectedTicketIds, setSelectedTicketIds] = useState<string[]>([]);
   const [focusedTicket, setFocusedTicket] = useState<TicketDef | null>(null);
   const [pinnedTicket, setPinnedTicket] = useState<TicketDef | null>(null);
@@ -84,6 +86,11 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [notifications, setNotifications] = useState<GameplayNotification[]>([]);
   const notificationIdRef = useRef(0);
+  const pendingDrawsRef = useRef<{ player: string; cards: string[] } | null>(null);
+  const [localChat, setLocalChat] = useState<Array<{ id: string; playerName: string; message: string }>>([]);
+  const chatIdRef = useRef(0);
+  const [turnStartedAt, setTurnStartedAt] = useState<number>(() => Date.now());
+  const [nowMs, setNowMs] = useState<number>(() => Date.now());
   const localMap = useMemo(() => getHudsonHustleMapByConfigId(localConfigId), [localConfigId]);
   const localVisuals = useMemo(() => getHudsonHustleVisualsByConfigId(localConfigId), [localConfigId]);
 
@@ -93,28 +100,78 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
     setHasSavedGame(true);
   }, [game]);
 
+  // Reset turn timer when active player changes
+  useEffect(() => {
+    setTurnStartedAt(Date.now());
+  }, [game?.activePlayerIndex, game?.phase]);
+
+  // Tick once per second to drive timer display
+  useEffect(() => {
+    if (!game || localTurnTimeLimitSeconds <= 0) return;
+    const interval = window.setInterval(() => setNowMs(Date.now()), 1000);
+    return () => window.clearInterval(interval);
+  }, [game, localTurnTimeLimitSeconds]);
+
+  const liveTimerSecondsRemaining = localTurnTimeLimitSeconds > 0
+    ? Math.max(0, Math.ceil(localTurnTimeLimitSeconds - (nowMs - turnStartedAt) / 1000))
+    : null;
+
   function pushNotification(message: string, tone: GameplayNotification["tone"] = "neutral") {
     notificationIdRef.current += 1;
     const id = `local-${Date.now()}-${notificationIdRef.current}`;
-    setNotifications((current) => [...current.slice(-3), { id, message, tone }]);
+    setNotifications((current) => [...current, { id, message, tone }]);
     window.setTimeout(() => {
       setNotifications((current) => current.filter((n) => n.id !== id));
-    }, 4200);
+    }, 2000);
+  }
+
+  function flushPendingDraws() {
+    const pending = pendingDrawsRef.current;
+    if (pending && pending.cards.length > 0) {
+      const cardList = pending.cards.join(", ");
+      pushNotification(`${pending.player} drew ${cardList}.`);
+    }
+    pendingDrawsRef.current = null;
   }
 
   function announceGameChange(previous: GameState, nextGame: GameState) {
-    const nextLog = nextGame.log.at(-1);
     if (nextGame.phase === "gameOver" && previous.phase !== "gameOver") {
+      flushPendingDraws();
       pushNotification("Final scores are in.", "success");
       return;
     }
     if (nextGame.finalRoundTriggeredBy && previous.finalRoundTriggeredBy !== nextGame.finalRoundTriggeredBy) {
+      flushPendingDraws();
       const triggerPlayer = nextGame.players.find((p) => p.id === nextGame.finalRoundTriggeredBy);
       pushNotification(`${triggerPlayer?.name ?? "A player"} triggered the final round.`, "warning");
       return;
     }
-    if (nextLog && nextGame.log.length > previous.log.length && nextLog !== "Game setup complete.") {
-      pushNotification(nextLog);
+
+    // Walk every new log entry; batch consecutive draws per player into one notification
+    const newEntries = nextGame.log.slice(previous.log.length);
+    for (const entry of newEntries) {
+      if (entry === "Game setup complete.") continue;
+
+      const drawMatch = entry.match(/^(.+) drew a (.+) card\.$/);
+      if (drawMatch) {
+        const [, player, card] = drawMatch;
+        if (pendingDrawsRef.current && pendingDrawsRef.current.player !== player) {
+          flushPendingDraws();
+        }
+        if (!pendingDrawsRef.current) {
+          pendingDrawsRef.current = { player, cards: [] };
+        }
+        pendingDrawsRef.current.cards.push(card);
+        continue;
+      }
+      if (entry.includes("claimed") || entry.includes("built a station")) {
+        flushPendingDraws();
+        pushNotification(entry);
+        continue;
+      }
+      if (entry.includes("turn started")) {
+        flushPendingDraws();
+      }
     }
   }
 
@@ -359,34 +416,40 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
     <div className="app-shell app-shell--gameplay-hud" data-config-theme={localVisuals.theme}>
       <header className="topbar topbar--gameplay-actions">
         <div className="topbar-private-spacer" aria-hidden="true" />
-        <TurnIndicator playerName={game.players[game.activePlayerIndex]?.name ?? ""} />
+        <TurnIndicator playerName={game.players[game.activePlayerIndex]?.name ?? ""} secondsRemaining={liveTimerSecondsRemaining} />
         <div className="topbar-actions">
-          <Button onClick={() => setGuideOpen(true)}>Guide</Button>
-          <ScoreGuide className="score-guide--subtle" label="Score" />
-          <Button onClick={() => setShowLeaveConfirm(true)}>Leave room</Button>
+          <Button className="topbar-icon-btn" aria-label="Guide" onClick={() => setGuideOpen(true)} data-label="Guide">?</Button>
+          <ScoreGuide className="score-guide--subtle topbar-icon-btn" label="★" tooltipLabel="Score" />
+          <Button className="topbar-icon-btn topbar-icon-btn--leave" aria-label="Leave room" onClick={() => setShowLeaveConfirm(true)} data-label="Leave">✕</Button>
         </div>
       </header>
 
       <div className={`game-layout ${visibility !== "visible" ? "game-layout--obscured" : ""} ${tutorialTarget ? "game-layout--tutorial" : ""}`}>
-        <aside className="side-panel">
+        {/* Left column: 50/50 split — roster (top), tickets + draw button (bottom) */}
+        <aside className="side-panel" data-tour-target="roster">
           {visibility === "visible" ? (
-            <div className="side-panel__private-stack">
-              <PrivateHandRail
-                hand={activePlayer.hand}
-                cardPalette={cardColorPalette}
-                paymentPreview={paymentPreview}
-                className={tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}
-              />
-              <TicketDock
-                ticketProgress={ticketProgress}
-                config={localMap}
-                focusedTicketId={focusedTicket?.id ?? null}
-                pinnedTicketId={pinnedTicket?.id ?? null}
-                onFocusTicket={setFocusedTicket}
-                onTogglePinnedTicket={(ticket) => setPinnedTicket((current) => current?.id === ticket.id ? null : ticket)}
-                className={tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}
-              />
-            </div>
+            <>
+              <div className="side-panel__top">
+                <PlayerRoster
+                  players={rosterPlayers}
+                  activePlayerIndex={game.activePlayerIndex}
+                  playerPalette={playerColorPalette}
+                />
+              </div>
+              <div className="side-panel__bottom">
+                <TicketDock
+                  ticketProgress={ticketProgress}
+                  config={localMap}
+                  focusedTicketId={focusedTicket?.id ?? null}
+                  pinnedTicketId={pinnedTicket?.id ?? null}
+                  onFocusTicket={setFocusedTicket}
+                  onTogglePinnedTicket={(ticket) => setPinnedTicket((current) => current?.id === ticket.id ? null : ticket)}
+                  onDrawTickets={() => applyAction({ type: "draw_tickets" })}
+                  drawTicketsDisabled={!canTakeTurnAction}
+                  className={tutorialTarget === "tickets" ? "panel--tutorial-focus" : ""}
+                />
+              </div>
+            </>
           ) : (
             <Panel variant="danger" className="hidden-panel">
               <SectionHeader eyebrow="Privacy shield" title="Private info hidden" variant="standard" />
@@ -395,111 +458,142 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
           )}
         </aside>
 
+        {/* Center + right: board-column grid */}
         <main className="board-column">
-          <BoardStage
-            className={`board-panel ${tutorialTarget === "board" ? "panel--tutorial-focus" : ""}`}
-            isMyTurn={visibility === "visible" && game.phase === "main"}
-          >
-            <BoardMap
-              config={localMap}
-              backdrop={localVisuals.backdrop}
-              backdropMode={localVisuals.backdropMode}
-              boardLabelMode={localVisuals.boardLabelMode}
-              cardPalette={cardColorPalette}
-              playerPalette={playerColorPalette}
-              viewerPlayerId={game.players[game.activePlayerIndex]?.id}
-              game={{
-                players: game.players.map((p) => ({ id: p.id, name: p.name, color: p.color })),
-                activePlayerIndex: game.activePlayerIndex,
-                routeClaims: game.routeClaims,
-                stations: game.stations
-              }}
-              selectedRouteId={selectedRouteId}
-              selectedCityId={selectedCityId}
-              highlightedCityIds={highlightedCityIds}
-              onSelectRoute={(routeId) => { setSelectedRouteId(routeId); setSelectedCityId(null); setPaymentPreview(null); }}
-              onSelectCity={(cityId) => { setSelectedCityId(cityId); setSelectedRouteId(null); setPaymentPreview(null); }}
-            />
-            <FloatingPlayerRoster
-              players={rosterPlayers}
-              activePlayerIndex={game.activePlayerIndex}
-              playerPalette={playerColorPalette}
-              viewerPlayerId={game.players[game.activePlayerIndex]?.id ?? null}
-            />
-          </BoardStage>
-
-          <InspectorDock
-            summary={game.turn.summary}
-            className={`action-panel ${tutorialTarget === "action" ? "panel--tutorial-focus" : ""}`}
-            activeBuildKey={selectedRouteId ?? selectedCityId}
-            currentPlayerName={game.players[game.activePlayerIndex]?.name}
-            deckCount={game.trainDeck.length}
-            ticketDeckCount={game.regularTickets.length + game.longTickets.length}
-            marketContent={
-              <SupplyDock
-                market={game.market}
-                deckCount={game.trainDeck.length}
+          {/* Center: map + hand strip */}
+          <div className="map-col">
+            <BoardStage
+              className={`board-panel ${tutorialTarget === "board" ? "panel--tutorial-focus" : ""}`}
+              isMyTurn={visibility === "visible" && game.phase === "main"}
+            >
+              <BoardMap
+                config={localMap}
+                backdrop={localVisuals.backdrop}
+                backdropMode={localVisuals.backdropMode}
+                boardLabelMode={localVisuals.boardLabelMode}
                 cardPalette={cardColorPalette}
-                disabled={marketDisabled}
-                onDrawFromMarket={(marketIndex) => applyAction({ type: "draw_card", source: "market", marketIndex })}
-                onDrawFromDeck={() => applyAction({ type: "draw_card", source: "deck" })}
-                onDrawTickets={() => applyAction({ type: "draw_tickets" })}
-                drawTicketsDisabled={!canTakeTurnAction}
-                className={`supply-dock--board ${tutorialTarget === "market" ? "panel--tutorial-focus" : ""}`}
+                playerPalette={playerColorPalette}
+                viewerPlayerId={game.players[game.activePlayerIndex]?.id}
+                game={{
+                  players: game.players.map((p) => ({ id: p.id, name: p.name, color: p.color })),
+                  activePlayerIndex: game.activePlayerIndex,
+                  routeClaims: game.routeClaims,
+                  stations: game.stations
+                }}
+                selectedRouteId={selectedRouteId}
+                selectedCityId={selectedCityId}
+                highlightedCityIds={highlightedCityIds}
+                onSelectRoute={(routeId, position) => { setSelectedRouteId(routeId); setSelectedCityId(null); setPaymentPreview(null); setBuildAnchor(position ?? null); }}
+                onSelectCity={(cityId, position) => { setSelectedCityId(cityId); setSelectedRouteId(null); setPaymentPreview(null); setBuildAnchor(position ?? null); }}
               />
-            }
-            buildContent={
-              <>
-                {game.phase === "main" && visibility === "visible" && !currentRoute && !currentCity ? (
-                  <div className="action-empty-prompt" data-testid="action-empty-state">
-                    <span className="action-empty-prompt__title">Select a route or station.</span>
-                    <span className="action-empty-prompt__copy">Build options appear here.</span>
-                  </div>
-                ) : null}
 
-                {currentRoute && game.phase === "main" && visibility === "visible" ? (
-                  <RouteBuildPanel
-                    route={currentRoute}
-                    config={localMap}
-                    options={routeOptions}
-                    unavailableReason={currentRouteUnavailableReason}
-                    cardPalette={cardColorPalette}
-                    disabled={!canTakeTurnAction}
-                    claimedByName={currentRouteOwner?.name ?? null}
-                    onClaim={(color) => applyAction({ type: "claim_route", routeId: currentRoute.id, color })}
-                    onPaymentPreviewEnter={(preview) => setPaymentPreview(preview)}
-                    onPaymentPreviewLeave={() => setPaymentPreview(null)}
-                  />
-                ) : null}
+              {/* Floating build popup — appears on map when route/city selected */}
+              {(currentRoute || currentCity) && game.phase === "main" && visibility === "visible" ? (
+                <FloatingBuildPanel
+                  anchor={buildAnchor}
+                  onClose={() => { setSelectedRouteId(null); setSelectedCityId(null); setPaymentPreview(null); setBuildAnchor(null); }}
+                >
+                  {currentRoute ? (
+                    <RouteBuildPanel
+                      route={currentRoute}
+                      config={localMap}
+                      options={routeOptions}
+                      unavailableReason={currentRouteUnavailableReason}
+                      cardPalette={cardColorPalette}
+                      disabled={!canTakeTurnAction}
+                      claimedByName={currentRouteOwner?.name ?? null}
+                      onClaim={(color) => applyAction({ type: "claim_route", routeId: currentRoute.id, color })}
+                      onPaymentPreviewEnter={(preview) => setPaymentPreview(preview)}
+                      onPaymentPreviewLeave={() => setPaymentPreview(null)}
+                    />
+                  ) : currentCity ? (
+                    <StationBuildPanel
+                      city={currentCity}
+                      config={localMap}
+                      options={stationOptions}
+                      cityOccupied={currentCityOccupied}
+                      stationCost={currentStationCost}
+                      cardPalette={cardColorPalette}
+                      disabled={!canTakeTurnAction}
+                      turnStage={game.turn.stage}
+                      onBuild={(color) => applyAction({ type: "build_station", cityId: currentCity.id, color })}
+                      onPaymentPreviewEnter={(preview) => setPaymentPreview(preview)}
+                      onPaymentPreviewLeave={() => setPaymentPreview(null)}
+                    />
+                  ) : null}
+                  {game.turn.latestTunnelReveal.length > 0 ? (
+                    <SurfaceCard variant="detail" className="detail-card detail-card--tunnel" eyebrow="Tunnel check" title="Tunnel reveal">
+                      <p>{game.turn.latestTunnelReveal.join(", ")}</p>
+                    </SurfaceCard>
+                  ) : null}
+                  {error ? (
+                    <StatusBanner tone="warning" eyebrow="Action error" headline={error} />
+                  ) : null}
+                </FloatingBuildPanel>
+              ) : null}
+            </BoardStage>
 
-                {currentCity && game.phase === "main" && visibility === "visible" ? (
-                  <StationBuildPanel
-                    city={currentCity}
-                    config={localMap}
-                    options={stationOptions}
-                    cityOccupied={currentCityOccupied}
-                    stationCost={currentStationCost}
-                    cardPalette={cardColorPalette}
-                    disabled={!canTakeTurnAction}
-                    turnStage={game.turn.stage}
-                    onBuild={(color) => applyAction({ type: "build_station", cityId: currentCity.id, color })}
-                    onPaymentPreviewEnter={(preview) => setPaymentPreview(preview)}
-                    onPaymentPreviewLeave={() => setPaymentPreview(null)}
-                  />
-                ) : null}
+            {visibility === "visible" ? (
+              <PrivateHandRail
+                hand={activePlayer.hand}
+                cardPalette={cardColorPalette}
+                paymentPreview={paymentPreview}
+                className={tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}
+              />
+            ) : null}
+          </div>
 
-                {game.turn.latestTunnelReveal.length > 0 && visibility === "visible" ? (
-                  <SurfaceCard variant="detail" className="detail-card detail-card--tunnel" eyebrow="Tunnel check" title="Tunnel reveal">
-                    <p>{game.turn.latestTunnelReveal.join(", ")}</p>
-                  </SurfaceCard>
-                ) : null}
-
-                {error && visibility === "visible" ? (
-                  <StatusBanner tone="warning" eyebrow="Action error" headline={error} />
-                ) : null}
-              </>
-            }
-          />
+          {/* Right column: chat + market — overlaid by ticket picker when active */}
+          <div className="right-col" data-tour-target="market">
+            <ChatPanel
+              messages={localChat}
+              onSendMessage={(message) => {
+                chatIdRef.current += 1;
+                setLocalChat((current) => [
+                  ...current,
+                  { id: `local-chat-${chatIdRef.current}`, playerName: activePlayer.name, message }
+                ]);
+              }}
+              className={tutorialTarget === "action" ? "panel--tutorial-focus" : ""}
+            />
+            <SupplyDock
+              market={game.market}
+              deckCount={game.trainDeck.length}
+              cardPalette={cardColorPalette}
+              disabled={marketDisabled}
+              onDrawFromMarket={(marketIndex) => applyAction({ type: "draw_card", source: "market", marketIndex })}
+              onDrawFromDeck={() => applyAction({ type: "draw_card", source: "deck" })}
+              className={`supply-dock--board ${tutorialTarget === "market" ? "panel--tutorial-focus" : ""}`}
+            />
+            {pendingTickets.length > 0 && visibility === "visible" && !isCurrentPlayerLocalBot ? (
+              <TicketChoiceSheet
+                title={game.phase === "initialTickets" ? `${activePlayer.name}, choose starting tickets` : `${activePlayer.name}, keep new tickets`}
+                subtitle={
+                  game.phase === "initialTickets"
+                    ? "Keep at least two. Anything you return is gone for this game."
+                    : "Keep at least one. This counts as your full turn."
+                }
+                tickets={pendingTickets}
+                config={localMap}
+                minimumKeep={game.phase === "initialTickets" ? 2 : 1}
+                selectedIds={selectedTicketIds}
+                focusedTicketId={focusedTicket?.id ?? null}
+                onFocusTicket={setFocusedTicket}
+                onToggle={(ticketId) =>
+                  setSelectedTicketIds((current) =>
+                    current.includes(ticketId) ? current.filter((id) => id !== ticketId) : [...current, ticketId]
+                  )
+                }
+                onConfirm={() =>
+                  applyAction(
+                    game.phase === "initialTickets"
+                      ? { type: "select_initial_tickets", keptTicketIds: selectedTicketIds }
+                      : { type: "keep_drawn_tickets", keptTicketIds: selectedTicketIds }
+                  )
+                }
+              />
+            ) : null}
+          </div>
         </main>
       </div>
 
@@ -534,35 +628,6 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
           playerName={activePlayer.name}
           onAdvance={() => applyAction({ type: "advance_turn" })}
           onReady={() => setVisibility("visible")}
-        />
-      ) : null}
-
-      {pendingTickets.length > 0 && visibility === "visible" && !isCurrentPlayerLocalBot ? (
-        <TicketChoiceSheet
-          title={game.phase === "initialTickets" ? `${activePlayer.name}, choose starting tickets` : `${activePlayer.name}, keep new tickets`}
-          subtitle={
-            game.phase === "initialTickets"
-              ? "Keep at least two. Anything you return is gone for this game."
-              : "Keep at least one. This counts as your full turn."
-          }
-          tickets={pendingTickets}
-          config={localMap}
-          minimumKeep={game.phase === "initialTickets" ? 2 : 1}
-          selectedIds={selectedTicketIds}
-          focusedTicketId={focusedTicket?.id ?? null}
-          onFocusTicket={setFocusedTicket}
-          onToggle={(ticketId) =>
-            setSelectedTicketIds((current) =>
-              current.includes(ticketId) ? current.filter((id) => id !== ticketId) : [...current, ticketId]
-            )
-          }
-          onConfirm={() =>
-            applyAction(
-              game.phase === "initialTickets"
-                ? { type: "select_initial_tickets", keptTicketIds: selectedTicketIds }
-                : { type: "keep_drawn_tickets", keptTicketIds: selectedTicketIds }
-            )
-          }
         />
       ) : null}
 
