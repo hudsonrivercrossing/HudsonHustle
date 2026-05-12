@@ -3350,13 +3350,16 @@ border-color: rgba(232, 220, 194, 0.72);
 
 
 /* ─── Final unified panel treatment ───────────────────────────────────────
-   All five in-game container panels — roster, ticket dock, hand rail, chat,
-   market — render with the same dark brass envelope so they read as one set. */
+   All in-game container panels — roster, ticket dock, hand rail, chat,
+   market, plus the privacy "hidden" panel during handoff — render with the
+   same dark brass envelope so they read as one set. */
 .app-shell--gameplay-hud .side-panel .player-roster,
 .app-shell--gameplay-hud .ticket-dock,
 .app-shell--gameplay-hud .private-hand-rail,
 .app-shell--gameplay-hud .chat-panel-dock,
-.app-shell--gameplay-hud .right-col .supply-dock--board {
+.app-shell--gameplay-hud .right-col .supply-dock--board,
+.app-shell--gameplay-hud .hidden-panel,
+.app-shell--gameplay-hud .side-panel .panel--danger {
   border: 1px solid color-mix(in srgb, var(--hud-brass) 42%, rgba(0, 0, 0, 0.34));
   border-radius: var(--radius-sm);
   background:
@@ -3368,4 +3371,13 @@ border-color: rgba(232, 220, 194, 0.72);
     0 18px 36px var(--hud-shadow);
   color: var(--hud-paper-bright);
   backdrop-filter: none;
+}
+
+.app-shell--gameplay-hud .hidden-panel p,
+.app-shell--gameplay-hud .hidden-panel .section-header__title {
+  color: rgba(var(--hud-paper-rgb), 0.82);
+}
+
+.app-shell--gameplay-hud .hidden-panel .section-header__eyebrow {
+  color: rgba(var(--hud-brass-light-rgb), 0.82);
 }
