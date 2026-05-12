@@ -17,7 +17,7 @@ function formatStatus(status: TicketSlipStatus): string {
     case "keep":
       return "Kept";
     case "review":
-      return "Hold";
+      return "";
     case "open":
     default:
       return "Open";

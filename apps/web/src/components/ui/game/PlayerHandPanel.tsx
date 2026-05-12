@@ -101,7 +101,7 @@ export function TicketDock({
   drawTicketsDisabled = false,
   className = ""
 }: TicketDockProps): JSX.Element {
-  const pageSize = 4;
+  const pageSize = 3;
   const [pageIndex, setPageIndex] = useState(0);
   const sortedTickets = useMemo(
     () => [...ticketProgress].sort((left, right) => Number(left.completed) - Number(right.completed)),

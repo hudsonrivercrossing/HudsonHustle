@@ -3202,7 +3202,7 @@ border-color: rgba(232, 220, 194, 0.72);
 
 .app-shell--gameplay-hud .ticket-dock__scroll {
   min-height: 0;
-  grid-template-rows: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
 }
 
 .app-shell--gameplay-hud .ticket-row {
