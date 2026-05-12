@@ -3,6 +3,11 @@
   padding: 0 14px 8px;
   gap: 4px;
   font-size: var(--type-body);
+  /* Lock to viewport so floating overlays (notifications, modals) never trigger page scroll */
+  height: 100vh;
+  min-height: 0;
+  max-height: 100vh;
+  overflow: hidden;
 }
 
 /* Topbar layout: 3-column grid — empty spacer | centered turn indicator | icon actions

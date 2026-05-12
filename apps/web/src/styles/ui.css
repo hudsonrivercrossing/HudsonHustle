@@ -3051,7 +3051,7 @@ h3 {
 .modal-shell {
   position: fixed;
   inset: 0;
-  z-index: var(--z-modal);
+  z-index: 250;
   display: grid;
   place-items: center;
   padding: 24px;
