@@ -38,7 +38,6 @@ import {
   ChatPanel,
   EndgameBreakdown,
   FloatingBuildPanel,
-  FloatingPlayerRoster,
   GameOverLayer,
   NotificationPipe,
   PlayerRoster,
@@ -994,12 +993,6 @@ export default function App(): JSX.Element {
                   setSelectedRouteId(null);
                   setPaymentPreview(null);
                 }}
-              />
-              <FloatingPlayerRoster
-                players={rosterPlayers}
-                activePlayerIndex={snapshot.game.activePlayerIndex}
-                playerPalette={visuals.palettes.players}
-                viewerPlayerId={snapshot.privateState?.playerId ?? null}
               />
               {/* Floating build popup */}
               {(currentRoute || currentCity) && publicGame.phase === "main" ? (
