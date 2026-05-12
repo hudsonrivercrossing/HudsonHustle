@@ -501,7 +501,7 @@ export default function App(): JSX.Element {
     setNotifications((current) => [...current, { id, message, tone }]);
     window.setTimeout(() => {
       setNotifications((current) => current.filter((notification) => notification.id !== id));
-    }, 6000);
+    }, 3000);
   }
 
   useEffect(() => {
