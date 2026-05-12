@@ -3488,11 +3488,11 @@ border-color: rgba(232, 220, 194, 0.72);
   min-width: 0 !important;
 }
 
-/* Market inner grid: 3 columns × 2 rows. Cards 4-5 right-aligned (cols 2-3) */
+/* Market inner grid: 2 columns × 3 rows (2 + 2 + 1). 5th card centered alone in row 3. */
 .app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market {
   display: grid !important;
-  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  grid-template-rows: 1fr 1fr !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-template-rows: repeat(3, 1fr) !important;
   gap: 6px;
   min-height: 0;
 }
@@ -3506,16 +3506,18 @@ border-color: rgba(232, 220, 194, 0.72);
   grid-column: 2 !important;
 }
 .app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market > :nth-child(3) {
-  grid-row: 1 !important;
-  grid-column: 3 !important;
+  grid-row: 2 !important;
+  grid-column: 1 !important;
 }
 .app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market > :nth-child(4) {
   grid-row: 2 !important;
   grid-column: 2 !important;
 }
 .app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market > :nth-child(5) {
-  grid-row: 2 !important;
-  grid-column: 3 !important;
+  grid-row: 3 !important;
+  grid-column: 1 / span 2 !important;
+  max-width: 50%;
+  justify-self: center;
 }
 
 .app-shell--gameplay-hud .ticket-dock {
