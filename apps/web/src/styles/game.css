@@ -888,10 +888,29 @@
   overflow: hidden;
 }
 
-/* Market grid grows to fill panel; deck button stays at bottom */
+/* Market grid: 6-col base, each card spans 2 cols, second row (items 4-5) is centered.
+   This gives a tidy 3+2 layout where the 2 bottom cards align under the 1st/2nd of top row. */
 .app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: 1fr 1fr;
+  gap: 6px;
   flex: 1 1 auto;
   min-height: 0;
+  align-content: stretch;
+  margin: 0;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market > * {
+  grid-column: span 2;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market > :nth-child(4) {
+  grid-column: 2 / span 2;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market > :nth-child(5) {
+  grid-column: 4 / span 2;
 }
 
 .app-shell--gameplay-hud .right-col .supply-dock--board .section-header {
@@ -906,9 +925,9 @@
 }
 
 .app-shell--gameplay-hud .right-col .supply-dock--board .market-color-slot {
-  min-height: 70px;
-  height: 70px;
-  padding: 8px 6px;
+  min-height: 0;
+  height: 100%;
+  padding: 6px 4px;
 }
 
 .app-shell--gameplay-hud .right-col .supply-dock--board .system-button {
