@@ -2582,13 +2582,7 @@ border-color: rgba(232, 220, 194, 0.72);
   z-index: 1;
 }
 
-.app-shell--gameplay-hud .board-column {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 292px);
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: 14px;
-  min-width: 0;
-}
+/* (Old hardcoded board-column override removed — width comes from --game-right-rail) */
 
 .app-shell--gameplay-hud .board-stage {
   grid-column: 1;
