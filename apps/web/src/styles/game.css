@@ -1036,11 +1036,11 @@ body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .system-butto
 /* Market slots styled identically to gameplay-hud hand slots: dark ticket card
    with brass color stripe on the left edge, count and label centered. */
 /* Right-col market slot uses the unified hand-slot styling defined below.
-   Only layout-specific tweaks here. */
+   Sized identical to hand slots (72px tall, same padding and fonts). */
 .app-shell--gameplay-hud .right-col .supply-dock--board .market-color-slot {
-  min-height: 0;
-  height: 100%;
-  padding: 8px 6px 8px 16px;
+  min-height: 72px;
+  height: 72px;
+  padding: 8px 6px;
   display: grid;
   place-items: center;
   gap: 4px;
@@ -1048,6 +1048,17 @@ body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .system-butto
   position: relative;
   text-align: center;
   cursor: pointer;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .market-color-slot__count {
+  font-size: var(--type-lg);
+  font-weight: 900;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .market-color-slot__label {
+  font-size: var(--type-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
 }
 
 .app-shell--gameplay-hud .right-col .supply-dock--board .section-header {
@@ -3457,13 +3468,15 @@ border-color: rgba(232, 220, 194, 0.72);
   min-width: 0 !important;
 }
 
-/* Market inner grid: 2 columns × 3 rows (2 + 2 + 1). 5th card centered alone in row 3. */
+/* Market inner grid: 2 columns × 3 rows (2 + 2 + 1). 5th card centered alone in row 3.
+   Rows are auto so each card stays at its natural 72px hand-slot height. */
 .app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market {
   display: grid !important;
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  grid-template-rows: repeat(3, 1fr) !important;
+  grid-template-rows: repeat(3, auto) !important;
   gap: 6px;
   min-height: 0;
+  align-content: start;
 }
 
 .app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market > :nth-child(1) {
