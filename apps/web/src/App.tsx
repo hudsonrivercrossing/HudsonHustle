@@ -952,6 +952,7 @@ export default function App(): JSX.Element {
         <TurnIndicator
           playerName={projectedGame.players[snapshot.game.activePlayerIndex]?.name ?? ""}
           secondsRemaining={liveTimerSecondsRemaining}
+          data-tour-target="turn"
         />
         <div className="topbar-actions">
           <Button className="topbar-icon-btn" aria-label="Guide" onClick={() => setGuideOpen(true)} data-label="Guide">?</Button>

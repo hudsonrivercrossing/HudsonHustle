@@ -19,34 +19,52 @@ interface TourStep {
 
 const tourSteps: TourStep[] = [
   {
-    eyebrow: "Hand",
-    title: "Draw transit cards",
-    body: "Each turn draw 2 transit cards from the market or deck. Locomotives are wild. Build up matching sets to claim routes on your tickets.",
-    target: "hand",
-  },
-  {
     eyebrow: "Tickets",
-    title: "Follow your secret plan",
-    body: "Tickets are goals — connect two cities to score the printed points. Unfinished tickets subtract points. At setup keep at least 2 of your 4.",
+    title: "Your hidden route plan",
+    body: "Every ticket is a private destination contract — wire two stations together to bank the printed points. Skip the connection and those points subtract from your final tally.",
     target: "tickets",
   },
   {
+    eyebrow: "Hand",
+    title: "Stack matching transit cards",
+    body: "Your hand is the fare you'll pay for routes. Collect cards in the colors your tickets need; locomotives ride any line as wild cards.",
+    target: "hand",
+  },
+  {
     eyebrow: "Market",
-    title: "Spend cards to claim routes",
-    body: "Draw from the face-up market or the deck. When you're ready, tap a route on the board and pick a payment color. Longer routes cost more but score more.",
+    title: "Pull from the platform",
+    body: "Two face-up cards per turn from the market, or grab one locomotive (it costs your whole turn). Empty seat? Draw blind from the deck and hope for a useful color.",
     target: "market",
   },
   {
+    eyebrow: "Board",
+    title: "Claim a route",
+    body: "Tap any line on the map, pick a payment color in the popup, and pay the fare. Longer routes cost more cards but pay back far more in points.",
+    target: "board",
+  },
+  {
+    eyebrow: "Stations",
+    title: "Drop your emergency stop",
+    body: "Click a city instead of a route to plant a station. You only get a few stations all game — they let you borrow one of another player's claimed routes when you're boxed out.",
+    target: "board",
+  },
+  {
+    eyebrow: "Turn",
+    title: "One move, then pass",
+    body: "Each turn picks exactly one action: draw transit cards, claim a route, build a station, or draw new tickets. Watch the clock — when it runs out, your turn ends.",
+    target: "turn",
+  },
+  {
     eyebrow: "Roster",
-    title: "Watch what others do",
-    body: "The roster shows every player's trains, stations, and ticket count. When someone drops to 2 or fewer trains, the final round begins.",
+    title: "Track the table",
+    body: "The roster shows every rider's trains, stations, ticket count, and score. Glance here often to read what your opponents are planning.",
     target: "roster",
   },
   {
-    eyebrow: "Board",
-    title: "Click a route or city",
-    body: "Tap any route on the map to open a build popup, then choose a payment color to claim it. Click a city instead to drop a station for one rescue connection per game.",
-    target: "board",
+    eyebrow: "Endgame",
+    title: "Last stop coming",
+    body: "When any player drops to two trains or fewer, every other rider gets one more turn — then final scoring locks in completed tickets, route points, and station leftovers.",
+    target: "roster",
   },
 ];
 

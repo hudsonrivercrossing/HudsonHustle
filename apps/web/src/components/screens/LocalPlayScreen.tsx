@@ -427,7 +427,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
     <div className="app-shell app-shell--gameplay-hud" data-config-theme={localVisuals.theme}>
       <header className="topbar topbar--gameplay-actions">
         <div className="topbar-private-spacer" aria-hidden="true" />
-        <TurnIndicator playerName={game.players[game.activePlayerIndex]?.name ?? ""} secondsRemaining={liveTimerSecondsRemaining} />
+        <TurnIndicator playerName={game.players[game.activePlayerIndex]?.name ?? ""} secondsRemaining={liveTimerSecondsRemaining} data-tour-target="turn" />
         <div className="topbar-actions">
           <Button className="topbar-icon-btn" aria-label="Guide" onClick={() => setGuideOpen(true)} data-label="Guide">?</Button>
           <ScoreGuide className="score-guide--subtle topbar-icon-btn" label="★" tooltipLabel="Score" />
