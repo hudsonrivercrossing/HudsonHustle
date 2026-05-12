@@ -495,7 +495,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
             ) : null}
           </div>
 
-          {/* Right column: chat + market */}
+          {/* Right column: chat + market — overlaid by ticket picker when active */}
           <div className="right-col" data-tour-target="market">
             <ChatPanel className={tutorialTarget === "action" ? "panel--tutorial-focus" : ""} />
             <SupplyDock
@@ -507,6 +507,34 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
               onDrawFromDeck={() => applyAction({ type: "draw_card", source: "deck" })}
               className={`supply-dock--board ${tutorialTarget === "market" ? "panel--tutorial-focus" : ""}`}
             />
+            {pendingTickets.length > 0 && visibility === "visible" && !isCurrentPlayerLocalBot ? (
+              <TicketChoiceSheet
+                title={game.phase === "initialTickets" ? `${activePlayer.name}, choose starting tickets` : `${activePlayer.name}, keep new tickets`}
+                subtitle={
+                  game.phase === "initialTickets"
+                    ? "Keep at least two. Anything you return is gone for this game."
+                    : "Keep at least one. This counts as your full turn."
+                }
+                tickets={pendingTickets}
+                config={localMap}
+                minimumKeep={game.phase === "initialTickets" ? 2 : 1}
+                selectedIds={selectedTicketIds}
+                focusedTicketId={focusedTicket?.id ?? null}
+                onFocusTicket={setFocusedTicket}
+                onToggle={(ticketId) =>
+                  setSelectedTicketIds((current) =>
+                    current.includes(ticketId) ? current.filter((id) => id !== ticketId) : [...current, ticketId]
+                  )
+                }
+                onConfirm={() =>
+                  applyAction(
+                    game.phase === "initialTickets"
+                      ? { type: "select_initial_tickets", keptTicketIds: selectedTicketIds }
+                      : { type: "keep_drawn_tickets", keptTicketIds: selectedTicketIds }
+                  )
+                }
+              />
+            ) : null}
           </div>
         </main>
       </div>
@@ -542,35 +570,6 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
           playerName={activePlayer.name}
           onAdvance={() => applyAction({ type: "advance_turn" })}
           onReady={() => setVisibility("visible")}
-        />
-      ) : null}
-
-      {pendingTickets.length > 0 && visibility === "visible" && !isCurrentPlayerLocalBot ? (
-        <TicketChoiceSheet
-          title={game.phase === "initialTickets" ? `${activePlayer.name}, choose starting tickets` : `${activePlayer.name}, keep new tickets`}
-          subtitle={
-            game.phase === "initialTickets"
-              ? "Keep at least two. Anything you return is gone for this game."
-              : "Keep at least one. This counts as your full turn."
-          }
-          tickets={pendingTickets}
-          config={localMap}
-          minimumKeep={game.phase === "initialTickets" ? 2 : 1}
-          selectedIds={selectedTicketIds}
-          focusedTicketId={focusedTicket?.id ?? null}
-          onFocusTicket={setFocusedTicket}
-          onToggle={(ticketId) =>
-            setSelectedTicketIds((current) =>
-              current.includes(ticketId) ? current.filter((id) => id !== ticketId) : [...current, ticketId]
-            )
-          }
-          onConfirm={() =>
-            applyAction(
-              game.phase === "initialTickets"
-                ? { type: "select_initial_tickets", keptTicketIds: selectedTicketIds }
-                : { type: "keep_drawn_tickets", keptTicketIds: selectedTicketIds }
-            )
-          }
         />
       ) : null}
 

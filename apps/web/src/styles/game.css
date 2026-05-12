@@ -433,13 +433,16 @@
   white-space: normal;
 }
 
-/* TicketChoiceSheet: exact same size as inspector dock, solid background */
+/* Right-col is the positioning anchor for the ticket choice overlay */
+.app-shell--gameplay-hud .right-col {
+  position: relative;
+}
+
+/* TicketChoiceSheet: covers the right column (chat + market) when shown */
 .app-shell--gameplay-hud .ticket-choice-sheet {
   position: absolute !important;
-  top: 86px !important;
-  right: 18px !important;
-  bottom: 18px !important;
-  width: var(--game-right-rail) !important;
+  inset: 0 !important;
+  width: auto !important;
   max-height: none !important;
   pointer-events: auto !important;
   z-index: 35;
