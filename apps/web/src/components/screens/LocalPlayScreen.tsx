@@ -135,7 +135,12 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
       pushNotification(`${triggerPlayer?.name ?? "A player"} triggered the final round.`, "warning");
       return;
     }
-    if (nextLog && nextGame.log.length > previous.log.length && nextLog !== "Game setup complete.") {
+    if (
+      nextLog
+      && nextGame.log.length > previous.log.length
+      && nextLog !== "Game setup complete."
+      && (nextLog.includes("drew") || nextLog.includes("claimed") || nextLog.includes("built a station"))
+    ) {
       pushNotification(nextLog);
     }
   }

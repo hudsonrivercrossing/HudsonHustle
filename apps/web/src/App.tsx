@@ -523,10 +523,12 @@ export default function App(): JSX.Element {
       return;
     }
 
-    // Push every new log entry since last fire
+    // Push every new log entry — but only draw/claim actions, skip turn changes
     const newEntries = log.slice(lastAnnouncedLogLengthRef.current);
     for (const entry of newEntries) {
-      pushNotification(entry, snapshot.game.phase === "gameOver" ? "success" : "neutral");
+      if (entry.includes("drew") || entry.includes("claimed") || entry.includes("built a station")) {
+        pushNotification(entry, snapshot.game.phase === "gameOver" ? "success" : "neutral");
+      }
     }
     lastAnnouncedLogLengthRef.current = log.length;
     lastAnnouncedLogRef.current = log[log.length - 1];
