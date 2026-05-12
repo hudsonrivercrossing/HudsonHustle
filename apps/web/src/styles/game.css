@@ -1,7 +1,7 @@
 /* Gameplay HUD type/layout convergence pass. Keep map labels untouched. */
 .app-shell--gameplay-hud {
-  padding: var(--space-stack-sm) 14px var(--space-stack-sm);
-  gap: var(--space-stack-sm);
+  padding: 4px 14px var(--space-stack-sm);
+  gap: var(--space-stack-xs, 4px);
   font-size: var(--type-body);
 }
 
@@ -12,7 +12,8 @@
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 12px;
-  min-height: 40px;
+  min-height: 32px;
+  margin: 0;
   position: relative;
   z-index: var(--z-modal);
 }
@@ -626,12 +627,12 @@
 .app-shell--gameplay-hud .topbar-icon-btn.system-button,
 .app-shell--gameplay-hud .topbar-icon-btn .score-guide__trigger.system-button {
   position: relative;
-  width: 36px;
-  min-width: 36px;
-  height: 36px;
-  min-height: 36px;
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  min-height: 28px;
   padding: 0;
-  font-size: var(--type-sm);
+  font-size: var(--type-xs);
   display: flex;
   align-items: center;
   justify-content: center;
