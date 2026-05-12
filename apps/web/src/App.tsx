@@ -504,24 +504,32 @@ export default function App(): JSX.Element {
   }
 
   useEffect(() => {
-    const latestLog = snapshot?.game?.log.at(-1);
-    if (!snapshot?.game || !latestLog) {
+    const log = snapshot?.game?.log;
+    if (!snapshot?.game || !log || log.length === 0) {
       return;
     }
 
-    if (!lastAnnouncedLogRef.current) {
-      lastAnnouncedLogRef.current = latestLog;
-      lastAnnouncedLogLengthRef.current = snapshot.game.log.length;
+    // First time we see this game — initialise without firing notifications
+    if (lastAnnouncedLogLengthRef.current === 0) {
+      lastAnnouncedLogLengthRef.current = log.length;
+      lastAnnouncedLogRef.current = log[log.length - 1];
       return;
     }
 
-    if (snapshot.game.log.length <= lastAnnouncedLogLengthRef.current) {
+    // If log somehow shrank (game reset / reconnect), resync without notifying
+    if (log.length < lastAnnouncedLogLengthRef.current) {
+      lastAnnouncedLogLengthRef.current = log.length;
+      lastAnnouncedLogRef.current = log[log.length - 1] ?? null;
       return;
     }
 
-    lastAnnouncedLogRef.current = latestLog;
-    lastAnnouncedLogLengthRef.current = snapshot.game.log.length;
-    pushNotification(latestLog, snapshot.game.phase === "gameOver" ? "success" : "neutral");
+    // Push every new log entry since last fire
+    const newEntries = log.slice(lastAnnouncedLogLengthRef.current);
+    for (const entry of newEntries) {
+      pushNotification(entry, snapshot.game.phase === "gameOver" ? "success" : "neutral");
+    }
+    lastAnnouncedLogLengthRef.current = log.length;
+    lastAnnouncedLogRef.current = log[log.length - 1];
   }, [snapshot?.game?.log.length, snapshot?.game?.phase]);
 
   const liveTimerSecondsRemaining =
