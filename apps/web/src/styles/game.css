@@ -879,15 +879,15 @@
 }
 
 .notification-pipe {
-  position: fixed;
-  bottom: var(--space-stack-lg, 24px);
-  left: 50%;
-  transform: translateX(-50%);
+  position: fixed !important;
+  bottom: var(--space-stack-lg, 24px) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-stack-xs, 4px);
-  z-index: 160;
+  z-index: 9000 !important;
   pointer-events: none;
 }
 
