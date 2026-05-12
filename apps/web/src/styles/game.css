@@ -885,6 +885,45 @@
   border-color: #d45a3f !important;
 }
 
+/* All in-game modals (handoff, leave, draw-reveal): dark HUD treatment for contrast */
+.app-shell--gameplay-hud ~ .modal-shell .modal-shell__card,
+.app-shell--gameplay-hud .modal-shell .modal-shell__card,
+body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card {
+  background:
+    var(--hud-grain),
+    linear-gradient(180deg, rgba(37, 31, 23, 0.97), rgba(12, 10, 8, 0.97)) !important;
+  border: 1px solid color-mix(in srgb, var(--hud-brass) 48%, rgba(0, 0, 0, 0.4)) !important;
+  border-radius: var(--radius-sm) !important;
+  color: var(--hud-paper-bright, #fff8ea) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 235, 194, 0.08),
+    0 24px 48px rgba(0, 0, 0, 0.55) !important;
+}
+
+.app-shell--gameplay-hud .modal-shell .modal-shell__card p,
+body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card p {
+  color: rgba(var(--hud-paper-rgb), 0.78) !important;
+}
+
+.app-shell--gameplay-hud .modal-shell .modal-shell__card .section-header__eyebrow,
+body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .section-header__eyebrow {
+  color: rgba(var(--hud-brass-light-rgb), 0.82) !important;
+}
+
+.app-shell--gameplay-hud .modal-shell .modal-shell__card .section-header__title,
+body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .section-header__title {
+  color: var(--hud-paper-bright, #fff8ea) !important;
+}
+
+/* Primary action button in modals */
+.app-shell--gameplay-hud .modal-shell .modal-shell__card .system-button.primary-button,
+body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .system-button.primary-button {
+  background: linear-gradient(180deg, #d6c391, #8c713b) !important;
+  border-color: #8c713b !important;
+  color: #1a150e !important;
+  font-weight: 800;
+}
+
 .notification-pipe {
   position: fixed !important;
   bottom: var(--space-stack-lg, 24px) !important;
