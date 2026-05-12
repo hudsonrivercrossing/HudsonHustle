@@ -44,6 +44,18 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-stack-sm);
+  min-width: 0;
+}
+
+/* Board panel fills the available height of map-col (viewport-driven) */
+.map-col > .board-stage {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Hand strip is a fixed bottom row, no flex grow */
+.map-col > .private-hand-rail {
+  flex: 0 0 auto;
 }
 
 .right-col {
