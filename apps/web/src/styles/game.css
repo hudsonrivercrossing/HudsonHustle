@@ -3716,3 +3716,39 @@ body:has(.app-shell--gameplay-hud) .game-over-layer .endgame-breakdown__list-ite
   padding-left: 8px;
   border-left: 2px solid rgba(var(--hud-brass-light-rgb), 0.5);
 }
+
+/* ─── Final aggressive reset for floating-build-panel internals ───────────
+   Strip every chrome layer applied by base/HUD rules so the popup is one
+   clean dark card with no nested boxes. */
+.floating-build-panel .detail-card,
+.floating-build-panel .surface-card,
+.app-shell--gameplay-hud .floating-build-panel .detail-card,
+.app-shell--gameplay-hud .floating-build-panel .surface-card {
+  all: unset;
+  display: block;
+  color: var(--hud-paper-bright, #fff8ea);
+}
+
+.floating-build-panel .detail-card__decision-shelf,
+.app-shell--gameplay-hud .floating-build-panel .detail-card__decision-shelf {
+  all: unset;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.floating-build-panel .detail-card__decision-shelf::before,
+.floating-build-panel .detail-card__decision-shelf::after,
+.app-shell--gameplay-hud .floating-build-panel .detail-card__decision-shelf::before,
+.app-shell--gameplay-hud .floating-build-panel .detail-card__decision-shelf::after {
+  content: none !important;
+  display: none !important;
+  border: none !important;
+  background: none !important;
+}
