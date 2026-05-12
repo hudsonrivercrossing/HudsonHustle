@@ -1011,7 +1011,7 @@ body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .system-butto
   grid-column: 3;
 }
 
-/* Make market slots look IDENTICAL to hand slots */
+/* Make market slots look IDENTICAL to hand slots — with color-tinted border + radial wash */
 .app-shell--gameplay-hud .right-col .supply-dock--board .market-color-slot {
   min-height: 0;
   height: 100%;
@@ -1022,20 +1022,21 @@ body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .system-butto
   position: relative;
   grid-template-rows: 28px 1fr;
   border-radius: var(--radius-panel);
-  border: 1px solid color-mix(in srgb, var(--hand-slot-color) 42%, rgba(var(--border-warm-rgb), 0.24));
+  border: 2px solid color-mix(in srgb, var(--hand-slot-color) 70%, rgba(var(--border-warm-rgb), 0.24)) !important;
   background:
-    radial-gradient(circle at top left, color-mix(in srgb, var(--hand-slot-color) 24%, transparent), transparent 52%),
-    linear-gradient(180deg, rgba(255, 252, 246, 0.92), rgba(239, 228, 207, 0.82));
+    radial-gradient(circle at top left, color-mix(in srgb, var(--hand-slot-color) 38%, transparent), transparent 56%),
+    linear-gradient(180deg, rgba(255, 252, 246, 0.96), rgba(239, 228, 207, 0.88)) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    0 5px 10px rgba(var(--shadow-warm-rgb), 0.06);
+    0 5px 10px rgba(var(--shadow-warm-rgb), 0.08) !important;
   text-align: center;
   color: var(--ink, #241d15);
   cursor: pointer;
 }
 
 .app-shell--gameplay-hud .right-col .supply-dock--board .market-color-slot:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--hand-slot-color) 60%, rgba(var(--accent-base-rgb), 0.34));
+  border-color: color-mix(in srgb, var(--hand-slot-color) 90%, rgba(var(--accent-base-rgb), 0.34)) !important;
+  transform: translateY(-1px);
 }
 
 .app-shell--gameplay-hud .right-col .supply-dock--board .market-color-slot__count {
@@ -1043,9 +1044,10 @@ body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .system-butto
   place-items: center;
   min-width: 28px;
   min-height: 28px;
-  background: transparent;
+  background: color-mix(in srgb, var(--hand-slot-color) 24%, rgba(255, 252, 246, 0.6)) !important;
+  border: 1px solid color-mix(in srgb, var(--hand-slot-color) 42%, transparent) !important;
   border-radius: var(--radius-control);
-  color: var(--ink, #241d15);
+  color: var(--ink, #241d15) !important;
   font-family: var(--font-display, var(--font-body));
   font-size: var(--type-md);
   font-weight: 900;
