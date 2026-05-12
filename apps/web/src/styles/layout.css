@@ -26,10 +26,10 @@
   min-height: 0;
 }
 
-/* Left column: 50/50 split — roster top half, tickets+button bottom half */
+/* Left column: 40/60 split — roster (40% top), tickets + draw button (60% bottom) */
 .side-panel {
   display: grid;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: 40fr 60fr;
   gap: var(--space-stack-sm);
   height: 100%;
   min-height: 0;
@@ -78,10 +78,10 @@
   align-self: end;
 }
 
-/* Right column: 50/50 split — chat top half, market bottom half */
+/* Right column: 40/60 split — chat top (40%), market bottom (60%) */
 .right-col {
   display: grid;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: 40fr 60fr;
   gap: var(--space-stack-sm);
   height: 100%;
   min-height: 0;
