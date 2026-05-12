@@ -14,7 +14,7 @@
    .board-column = map-col | right-col
    Height is dictated by flex parent so topbar shrinkage flows down. */
 .game-layout {
-  --game-rail: clamp(280px, 20vw, 320px);
+  --game-rail: clamp(233px, 17vw, 267px);
   --game-left-rail: var(--game-rail);
   --game-right-rail: var(--game-rail);
   display: grid;
