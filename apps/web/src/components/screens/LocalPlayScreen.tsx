@@ -364,7 +364,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
         <TurnIndicator playerName={game.players[game.activePlayerIndex]?.name ?? ""} />
         <div className="topbar-actions">
           <Button className="topbar-icon-btn" aria-label="Guide" onClick={() => setGuideOpen(true)} data-label="Guide">?</Button>
-          <ScoreGuide className="score-guide--subtle topbar-icon-btn" label="★" />
+          <ScoreGuide className="score-guide--subtle topbar-icon-btn" label="★" tooltipLabel="Score" />
           <Button className="topbar-icon-btn topbar-icon-btn--leave" aria-label="Leave room" onClick={() => setShowLeaveConfirm(true)} data-label="Leave">✕</Button>
         </div>
       </header>

@@ -538,28 +538,36 @@
   position: relative;
 }
 
-.app-shell--gameplay-hud .topbar-icon-btn.system-button::after {
+/* Hover tooltip rendered as ::after pseudo on the button itself.
+   Positioned BELOW the button (top: calc(100% + 6px)) so it doesn't get clipped
+   by the viewport top edge. */
+.app-shell--gameplay-hud .topbar-icon-btn.system-button::after,
+.app-shell--gameplay-hud .topbar-icon-btn .score-guide__trigger.system-button::after {
   content: attr(data-label);
   position: absolute;
-  bottom: calc(100% + 6px);
+  top: calc(100% + 6px);
   left: 50%;
   transform: translateX(-50%);
   white-space: nowrap;
   font-size: var(--type-xs);
   font-family: var(--font-body);
   font-weight: 600;
-  color: var(--color-ink-strong);
-  background: var(--color-canvas-base);
-  border: 1px solid var(--color-border-subtle);
+  letter-spacing: 0.02em;
+  color: var(--hud-paper-bright, #fff8ea);
+  background: rgba(11, 17, 22, 0.94);
+  border: 1px solid rgba(var(--hud-brass-light-rgb), 0.24);
   border-radius: var(--radius-control);
-  padding: 3px 8px;
+  padding: 4px 10px;
   pointer-events: none;
   opacity: 0;
+  z-index: 200;
   transition: opacity var(--duration-fast, 100ms) ease;
 }
 
 .app-shell--gameplay-hud .topbar-icon-btn.system-button:hover::after,
-.app-shell--gameplay-hud .topbar-icon-btn.system-button:focus-visible::after {
+.app-shell--gameplay-hud .topbar-icon-btn.system-button:focus-visible::after,
+.app-shell--gameplay-hud .topbar-icon-btn .score-guide__trigger.system-button:hover::after,
+.app-shell--gameplay-hud .topbar-icon-btn .score-guide__trigger.system-button:focus-visible::after {
   opacity: 1;
 }
 
