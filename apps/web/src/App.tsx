@@ -1085,7 +1085,7 @@ export default function App(): JSX.Element {
             </div>
           </div>
 
-          {/* Right column: chat + market */}
+          {/* Right column: chat + market — overlaid by ticket picker when active */}
           <div className="right-col" data-tour-target="market">
             <ChatPanel
               messages={chatMessages}
@@ -1101,6 +1101,34 @@ export default function App(): JSX.Element {
               onDrawFromDeck={() => sendGameAction({ type: "draw_card", source: "deck" })}
               className="supply-dock--board"
             />
+            {localPendingTickets.length > 0 ? (
+              <TicketChoiceSheet
+                title={publicGame.phase === "initialTickets" ? "Choose starting tickets" : "Keep new tickets"}
+                subtitle={
+                  publicGame.phase === "initialTickets"
+                    ? "Keep at least two. Ticket choice does not auto-time out in MVP2."
+                    : "Keep at least one. This consumes your turn."
+                }
+                tickets={localPendingTickets}
+                config={mapConfig}
+                minimumKeep={publicGame.phase === "initialTickets" ? 2 : 1}
+                selectedIds={selectedTicketIds}
+                focusedTicketId={focusedTicket?.id ?? null}
+                onFocusTicket={setFocusedTicket}
+                onToggle={(ticketId) =>
+                  setSelectedTicketIds((current) =>
+                    current.includes(ticketId) ? current.filter((id) => id !== ticketId) : [...current, ticketId]
+                  )
+                }
+                onConfirm={() =>
+                  sendGameAction(
+                    publicGame.phase === "initialTickets"
+                      ? { type: "select_initial_tickets", keptTicketIds: selectedTicketIds }
+                      : { type: "keep_drawn_tickets", keptTicketIds: selectedTicketIds }
+                  )
+                }
+              />
+            ) : null}
           </div>
         </main>
       </div>
@@ -1143,35 +1171,6 @@ export default function App(): JSX.Element {
             })}
           </div>
         </GameOverLayer>
-      ) : null}
-
-      {localPendingTickets.length > 0 ? (
-        <TicketChoiceSheet
-          title={publicGame.phase === "initialTickets" ? "Choose starting tickets" : "Keep new tickets"}
-          subtitle={
-            publicGame.phase === "initialTickets"
-              ? "Keep at least two. Ticket choice does not auto-time out in MVP2."
-              : "Keep at least one. This consumes your turn."
-          }
-          tickets={localPendingTickets}
-          config={mapConfig}
-          minimumKeep={publicGame.phase === "initialTickets" ? 2 : 1}
-          selectedIds={selectedTicketIds}
-          focusedTicketId={focusedTicket?.id ?? null}
-          onFocusTicket={setFocusedTicket}
-          onToggle={(ticketId) =>
-            setSelectedTicketIds((current) =>
-              current.includes(ticketId) ? current.filter((id) => id !== ticketId) : [...current, ticketId]
-            )
-          }
-          onConfirm={() =>
-            sendGameAction(
-              publicGame.phase === "initialTickets"
-                ? { type: "select_initial_tickets", keptTicketIds: selectedTicketIds }
-                : { type: "keep_drawn_tickets", keptTicketIds: selectedTicketIds }
-            )
-          }
-        />
       ) : null}
 
       {showLeaveConfirm ? (
