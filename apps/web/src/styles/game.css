@@ -2546,18 +2546,7 @@ border-color: rgba(232, 220, 194, 0.72);
 }
 
 
-.app-shell--gameplay-hud .player-roster,
-.app-shell--gameplay-hud .private-hand-rail,
-.app-shell--gameplay-hud .ticket-dock,
-.app-shell--gameplay-hud .inspector-dock {
-  border-color: rgba(var(--hud-brass-light-rgb), 0.2);
-  background:
-    linear-gradient(180deg, rgba(24, 34, 43, 0.82), rgba(12, 18, 24, 0.76));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 18px 48px rgba(0, 0, 0, 0.28);
-  color: var(--hud-paper-bright);
-}
+/* (Older translucent-blue panel rule removed — unified brass treatment applied above) */
 
 .app-shell--gameplay-hud .board-stage {
   border-color: rgba(var(--hud-brass-light-rgb), 0.22);
@@ -3334,3 +3323,24 @@ border-color: rgba(232, 220, 194, 0.72);
   color: rgba(255, 248, 232, 0.7);
 }
 
+
+/* ─── Final unified panel treatment ───────────────────────────────────────
+   All five in-game container panels — roster, ticket dock, hand rail, chat,
+   market — render with the same dark brass envelope so they read as one set. */
+.app-shell--gameplay-hud .side-panel .player-roster,
+.app-shell--gameplay-hud .ticket-dock,
+.app-shell--gameplay-hud .private-hand-rail,
+.app-shell--gameplay-hud .chat-panel-dock,
+.app-shell--gameplay-hud .right-col .supply-dock--board {
+  border: 1px solid color-mix(in srgb, var(--hud-brass) 42%, rgba(0, 0, 0, 0.34));
+  border-radius: var(--radius-sm);
+  background:
+    var(--hud-grain),
+    linear-gradient(180deg, rgba(37, 31, 23, 0.94), rgba(12, 10, 8, 0.94));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 235, 194, 0.08),
+    inset 0 10px 18px rgba(255, 235, 194, 0.035),
+    0 18px 36px var(--hud-shadow);
+  color: var(--hud-paper-bright);
+  backdrop-filter: none;
+}
