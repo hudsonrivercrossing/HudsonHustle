@@ -746,8 +746,8 @@
 }
 
 .app-shell--gameplay-hud .ticket-dock {
-  height: min(360px, 44vh);
-  max-height: min(360px, 44vh);
+  height: var(--ticket-dock-height);
+  max-height: var(--ticket-dock-height);
 }
 
 .app-shell--gameplay-hud .game-over-layer {
@@ -858,9 +858,12 @@
 }
 
 /* right-col is a transparent column container; ChatPanel and SupplyDock
-   each render their own dark panel — they should not visually merge. */
+   each render their own dark panel — both children fill the full column width
+   and should not visually merge. */
 .app-shell--gameplay-hud .right-col > * {
   flex: 0 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Right-column SupplyDock layout: vertical stack with market as 2×3 grid */
@@ -874,6 +877,15 @@
     radial-gradient(circle at top left, rgba(142, 169, 188, 0.12), transparent 34%),
     linear-gradient(180deg, rgba(30, 42, 51, 0.88), rgba(9, 15, 20, 0.9));
   border: 1px solid rgba(var(--hud-brass-light-rgb), 0.18);
+  height: var(--ticket-dock-height);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Market grid grows to fill panel; deck button stays at bottom */
+.app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .app-shell--gameplay-hud .right-col .supply-dock--board .section-header {
