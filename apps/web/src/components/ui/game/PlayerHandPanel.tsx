@@ -85,6 +85,8 @@ interface TicketDockProps {
   pinnedTicketId?: string | null;
   onFocusTicket?: (ticket: TicketDef | null) => void;
   onTogglePinnedTicket?: (ticket: TicketDef) => void;
+  onDrawTickets?: () => void;
+  drawTicketsDisabled?: boolean;
   className?: string;
 }
 
@@ -95,6 +97,8 @@ export function TicketDock({
   pinnedTicketId = null,
   onFocusTicket,
   onTogglePinnedTicket,
+  onDrawTickets,
+  drawTicketsDisabled = false,
   className = ""
 }: TicketDockProps): JSX.Element {
   const pageSize = 4;
@@ -153,6 +157,15 @@ export function TicketDock({
           <div key={`ticket-placeholder-${index}`} className="ticket-row ticket-row--placeholder" aria-hidden="true" />
         ))}
       </div>
+      {onDrawTickets ? (
+        <Button
+          className="ticket-dock__draw"
+          disabled={drawTicketsDisabled}
+          onClick={onDrawTickets}
+        >
+          Draw tickets
+        </Button>
+      ) : null}
     </Panel>
   );
 }

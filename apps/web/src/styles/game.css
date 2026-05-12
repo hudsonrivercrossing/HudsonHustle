@@ -774,11 +774,25 @@
   min-width: 0;
 }
 
+/* TicketDock fills the bottom half; layout: header / scroll / draw button */
 .app-shell--gameplay-hud .side-panel__bottom .ticket-dock {
   height: 100%;
   max-height: none;
   min-height: 0;
   overflow: hidden;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: var(--space-stack-xs, 4px);
+}
+
+.app-shell--gameplay-hud .ticket-dock .ticket-dock__scroll {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.app-shell--gameplay-hud .ticket-dock__draw {
+  width: 100%;
+  margin-top: 4px;
 }
 
 .app-shell--gameplay-hud .game-over-layer {

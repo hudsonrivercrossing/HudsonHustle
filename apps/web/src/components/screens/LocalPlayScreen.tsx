@@ -406,15 +406,10 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
                   pinnedTicketId={pinnedTicket?.id ?? null}
                   onFocusTicket={setFocusedTicket}
                   onTogglePinnedTicket={(ticket) => setPinnedTicket((current) => current?.id === ticket.id ? null : ticket)}
+                  onDrawTickets={() => applyAction({ type: "draw_tickets" })}
+                  drawTicketsDisabled={!canTakeTurnAction}
                   className={tutorialTarget === "tickets" ? "panel--tutorial-focus" : ""}
                 />
-                <Button
-                  className="side-panel__draw-ticket"
-                  disabled={!canTakeTurnAction}
-                  onClick={() => applyAction({ type: "draw_tickets" })}
-                >
-                  Draw tickets
-                </Button>
               </div>
             </>
           ) : (
