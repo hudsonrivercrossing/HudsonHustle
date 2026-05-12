@@ -861,6 +861,28 @@
 
 .app-shell--gameplay-hud .game-over-layer__actions .system-button {
   width: 100%;
+  background: rgba(var(--hud-brass-light-rgb), 0.14) !important;
+  border: 1px solid rgba(var(--hud-brass-light-rgb), 0.4) !important;
+  color: var(--hud-paper-bright, #fff8ea) !important;
+  font-weight: 700;
+  font-size: var(--type-sm);
+}
+
+.app-shell--gameplay-hud .game-over-layer__actions .system-button:hover:not(:disabled) {
+  background: rgba(var(--hud-brass-light-rgb), 0.26) !important;
+  border-color: rgba(var(--hud-brass-light-rgb), 0.6) !important;
+}
+
+.app-shell--gameplay-hud .game-over-layer__actions .system-button[variant="primary"],
+.app-shell--gameplay-hud .game-over-layer__actions .system-button.primary-button {
+  background: linear-gradient(180deg, #d6c391, #8c713b) !important;
+  border-color: #8c713b !important;
+  color: #1a150e !important;
+}
+
+.app-shell--gameplay-hud .game-over-layer__actions .system-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .app-shell--gameplay-hud .game-over-layer .endgame-card {
