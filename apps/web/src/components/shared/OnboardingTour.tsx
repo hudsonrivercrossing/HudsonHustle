@@ -43,10 +43,10 @@ const tourSteps: TourStep[] = [
     target: "roster",
   },
   {
-    eyebrow: "Actions",
-    title: "One move per turn",
-    body: "Each turn pick exactly one action: draw cards, claim a route, draw new tickets, or build a station. Then play passes to the next seat.",
-    target: "actions",
+    eyebrow: "Board",
+    title: "Click a route or city",
+    body: "Tap any route on the map to open a build popup, then choose a payment color to claim it. Click a city instead to drop a station for one rescue connection per game.",
+    target: "board",
   },
 ];
 

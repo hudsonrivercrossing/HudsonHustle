@@ -36,6 +36,7 @@ import {
   type GameplayNotification
 } from "../ui/game";
 import { GuidebookScreen } from "./GuidebookScreen";
+import OnboardingTour, { shouldShowTour } from "../shared/OnboardingTour";
 import {
   EndgameGrid,
   HandoffModal,
@@ -91,6 +92,8 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   const chatIdRef = useRef(0);
   const [turnStartedAt, setTurnStartedAt] = useState<number>(() => Date.now());
   const [nowMs, setNowMs] = useState<number>(() => Date.now());
+  const [tourOpen, setTourOpen] = useState(false);
+  const tourInitRef = useRef(false);
   const localMap = useMemo(() => getHudsonHustleMapByConfigId(localConfigId), [localConfigId]);
   const localVisuals = useMemo(() => getHudsonHustleVisualsByConfigId(localConfigId), [localConfigId]);
 
@@ -111,6 +114,14 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
     const interval = window.setInterval(() => setNowMs(Date.now()), 1000);
     return () => window.clearInterval(interval);
   }, [game, localTurnTimeLimitSeconds]);
+
+  // Show onboarding tour the first time the player reaches a playable game
+  useEffect(() => {
+    if (game && game.phase === "main" && visibility === "visible" && !tourInitRef.current) {
+      tourInitRef.current = true;
+      setTourOpen(shouldShowTour());
+    }
+  }, [game?.phase, visibility]);
 
   const liveTimerSecondsRemaining = localTurnTimeLimitSeconds > 0
     ? Math.max(0, Math.ceil(localTurnTimeLimitSeconds - (nowMs - turnStartedAt) / 1000))
@@ -436,7 +447,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
                   playerPalette={playerColorPalette}
                 />
               </div>
-              <div className="side-panel__bottom">
+              <div className="side-panel__bottom" data-tour-target="tickets">
                 <TicketDock
                   ticketProgress={ticketProgress}
                   config={localMap}
@@ -465,6 +476,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
             <BoardStage
               className={`board-panel ${tutorialTarget === "board" ? "panel--tutorial-focus" : ""}`}
               isMyTurn={visibility === "visible" && game.phase === "main"}
+              data-tour-target="board"
             >
               <BoardMap
                 config={localMap}
@@ -534,12 +546,14 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
             </BoardStage>
 
             {visibility === "visible" ? (
-              <PrivateHandRail
-                hand={activePlayer.hand}
-                cardPalette={cardColorPalette}
-                paymentPreview={paymentPreview}
-                className={tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}
-              />
+              <div data-tour-target="hand" style={{ display: "contents" }}>
+                <PrivateHandRail
+                  hand={activePlayer.hand}
+                  cardPalette={cardColorPalette}
+                  paymentPreview={paymentPreview}
+                  className={tutorialTarget === "hand" ? "panel--tutorial-focus" : ""}
+                />
+              </div>
             ) : null}
           </div>
 
@@ -651,6 +665,10 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
       ) : null}
 
       <NotificationPipe notifications={notifications} />
+
+      {tourOpen && (
+        <OnboardingTour onDismiss={() => setTourOpen(false)} />
+      )}
     </div>
   );
 }
