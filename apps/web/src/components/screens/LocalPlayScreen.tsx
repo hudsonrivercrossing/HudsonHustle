@@ -86,6 +86,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [notifications, setNotifications] = useState<GameplayNotification[]>([]);
   const notificationIdRef = useRef(0);
+  const pendingDrawsRef = useRef<{ player: string; cards: string[] } | null>(null);
   const [localChat, setLocalChat] = useState<Array<{ id: string; playerName: string; message: string }>>([]);
   const chatIdRef = useRef(0);
   const [turnStartedAt, setTurnStartedAt] = useState<number>(() => Date.now());
@@ -124,24 +125,53 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
     }, 6000);
   }
 
+  function flushPendingDraws() {
+    const pending = pendingDrawsRef.current;
+    if (pending && pending.cards.length > 0) {
+      const cardList = pending.cards.join(", ");
+      pushNotification(`${pending.player} drew ${cardList}.`);
+    }
+    pendingDrawsRef.current = null;
+  }
+
   function announceGameChange(previous: GameState, nextGame: GameState) {
-    const nextLog = nextGame.log.at(-1);
     if (nextGame.phase === "gameOver" && previous.phase !== "gameOver") {
+      flushPendingDraws();
       pushNotification("Final scores are in.", "success");
       return;
     }
     if (nextGame.finalRoundTriggeredBy && previous.finalRoundTriggeredBy !== nextGame.finalRoundTriggeredBy) {
+      flushPendingDraws();
       const triggerPlayer = nextGame.players.find((p) => p.id === nextGame.finalRoundTriggeredBy);
       pushNotification(`${triggerPlayer?.name ?? "A player"} triggered the final round.`, "warning");
       return;
     }
-    if (
-      nextLog
-      && nextGame.log.length > previous.log.length
-      && nextLog !== "Game setup complete."
-      && (nextLog.includes("drew") || nextLog.includes("claimed") || nextLog.includes("built a station"))
-    ) {
-      pushNotification(nextLog);
+
+    // Walk every new log entry; batch consecutive draws per player into one notification
+    const newEntries = nextGame.log.slice(previous.log.length);
+    for (const entry of newEntries) {
+      if (entry === "Game setup complete.") continue;
+
+      const drawMatch = entry.match(/^(.+) drew a (.+) card\.$/);
+      if (drawMatch) {
+        const [, player, card] = drawMatch;
+        if (pendingDrawsRef.current && pendingDrawsRef.current.player !== player) {
+          flushPendingDraws();
+        }
+        if (!pendingDrawsRef.current) {
+          pendingDrawsRef.current = { player, cards: [] };
+        }
+        pendingDrawsRef.current.cards.push(card);
+        continue;
+      }
+      if (entry.includes("claimed") || entry.includes("built a station")) {
+        flushPendingDraws();
+        pushNotification(entry);
+        continue;
+      }
+      if (entry.includes("turn started")) {
+        flushPendingDraws();
+      }
     }
   }
 

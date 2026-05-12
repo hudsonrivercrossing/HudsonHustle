@@ -218,6 +218,7 @@ export default function App(): JSX.Element {
   const notificationIdRef = useRef(0);
   const lastAnnouncedLogRef = useRef<string | null>(null);
   const lastAnnouncedLogLengthRef = useRef(0);
+  const pendingDrawsRef = useRef<{ player: string; cards: string[] } | null>(null);
   const timerWarningRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -523,13 +524,50 @@ export default function App(): JSX.Element {
       return;
     }
 
-    // Push every new log entry — but only draw/claim actions, skip turn changes
+    // Push notable log entries (draw/claim/station). Draws within one turn are
+    // batched into a single notification flushed when the turn ends or another
+    // action type appears.
     const newEntries = log.slice(lastAnnouncedLogLengthRef.current);
+    const tone = snapshot.game.phase === "gameOver" ? "success" : "neutral";
+
+    function flushDraws() {
+      const pending = pendingDrawsRef.current;
+      if (pending && pending.cards.length > 0) {
+        const cardList = pending.cards.join(", ");
+        pushNotification(`${pending.player} drew ${cardList}.`, tone);
+      }
+      pendingDrawsRef.current = null;
+    }
+
     for (const entry of newEntries) {
-      if (entry.includes("drew") || entry.includes("claimed") || entry.includes("built a station")) {
-        pushNotification(entry, snapshot.game.phase === "gameOver" ? "success" : "neutral");
+      // "X drew a Y card."
+      const drawMatch = entry.match(/^(.+) drew a (.+) card\.$/);
+      if (drawMatch) {
+        const [, player, card] = drawMatch;
+        if (pendingDrawsRef.current && pendingDrawsRef.current.player !== player) {
+          flushDraws();
+        }
+        if (!pendingDrawsRef.current) {
+          pendingDrawsRef.current = { player, cards: [] };
+        }
+        pendingDrawsRef.current.cards.push(card);
+        continue;
+      }
+      // Other notable actions — flush pending draws first, then announce
+      if (entry.includes("claimed") || entry.includes("built a station")) {
+        flushDraws();
+        pushNotification(entry, tone);
+        continue;
+      }
+      // Turn started — flush pending draws so they're announced at end of turn
+      if (entry.includes("turn started")) {
+        flushDraws();
       }
     }
+
+    // Do NOT flush here — let pending draws batch until the next "turn started"
+    // log arrives (which marks end of this player's draw phase).
+
     lastAnnouncedLogLengthRef.current = log.length;
     lastAnnouncedLogRef.current = log[log.length - 1];
   }, [snapshot?.game?.log.length, snapshot?.game?.phase]);
