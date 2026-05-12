@@ -17,7 +17,7 @@
   --game-rail: clamp(280px, 20vw, 320px);
   --game-left-rail: var(--game-rail);
   --game-right-rail: var(--game-rail);
-  --topbar-allowance: 36px;
+  --topbar-allowance: 30px;
   display: grid;
   grid-template-columns: var(--game-left-rail) minmax(0, 1fr);
   gap: var(--space-stack-md);

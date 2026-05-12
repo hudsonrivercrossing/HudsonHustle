@@ -1,6 +1,6 @@
 /* Gameplay HUD type/layout convergence pass. Keep map labels untouched. */
 .app-shell--gameplay-hud {
-  padding: 0 14px 8px;
+  padding: 0 12px 6px;
   gap: 4px;
   font-size: var(--type-body);
   /* Lock to viewport so floating overlays (notifications, modals) never trigger page scroll */
@@ -17,7 +17,9 @@
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 12px;
-  min-height: 28px;
+  height: 24px;
+  min-height: 24px;
+  max-height: 24px;
   margin: 0;
   padding: 0;
   position: relative;
@@ -639,31 +641,34 @@
 
 .app-shell--gameplay-hud .turn-indicator__name {
   font-family: var(--font-sans);
-  font-size: var(--type-body);
+  font-size: var(--type-sm);
   font-weight: 700;
   color: #fff8ea;
   letter-spacing: 0.02em;
+  line-height: 1;
 }
 
 .app-shell--gameplay-hud .turn-indicator__label {
   font-family: var(--font-body);
-  font-size: var(--type-xs);
+  font-size: 11px;
   color: rgba(var(--hud-paper-rgb), 0.6);
   text-transform: lowercase;
   letter-spacing: 0.04em;
+  line-height: 1;
 }
 
 .app-shell--gameplay-hud .turn-indicator__timer {
   font-family: var(--font-body);
-  font-size: var(--type-xs);
+  font-size: 11px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
   color: rgba(var(--hud-paper-rgb), 0.92);
-  padding: 2px 8px;
+  padding: 1px 6px;
   border-radius: var(--radius-control);
   background: rgba(212, 79, 76, 0.15);
   border: 1px solid rgba(212, 79, 76, 0.3);
+  line-height: 1;
 }
 
 /* Per-seat timer in the scoreboard row */
@@ -686,16 +691,18 @@
 .app-shell--gameplay-hud .topbar-icon-btn.system-button,
 .app-shell--gameplay-hud .topbar-icon-btn .score-guide__trigger.system-button {
   position: relative;
-  width: 28px;
-  min-width: 28px;
-  height: 28px;
-  min-height: 28px;
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+  min-height: 22px;
   padding: 0;
-  font-size: var(--type-xs);
+  font-size: 11px;
+  line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: visible;
+  border-radius: var(--radius-control);
 }
 
 .app-shell--gameplay-hud .score-guide.topbar-icon-btn {
