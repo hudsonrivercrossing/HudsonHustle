@@ -5,19 +5,24 @@
   font-size: var(--type-body);
 }
 
-/* Topbar layout: 3-column grid — left spacer | turn indicator | action buttons */
+/* Topbar layout: 3-column grid — empty spacer | centered turn indicator | icon actions
+   Symmetric layout so turn indicator stays in the middle of the viewport. */
 .app-shell--gameplay-hud .topbar {
   display: grid;
-  grid-template-columns: var(--game-left-rail) minmax(0, 1fr) auto;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 12px;
-  min-height: 56px;
-  justify-items: stretch;
+  min-height: 40px;
   position: relative;
   z-index: var(--z-modal);
 }
 
+.app-shell--gameplay-hud .topbar-private-spacer {
+  grid-column: 1;
+}
+
 .app-shell--gameplay-hud .topbar-actions {
+  grid-column: 3;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -443,7 +448,8 @@
 
 /* Gameplay HUD visual refinement. Rail widths defined in layout.css on .game-layout. */
 .app-shell--gameplay-hud {
-  padding-top: 6px;
+  padding-top: 4px;
+  gap: var(--space-stack-xs, 4px);
 }
 
 .app-shell--gameplay-hud .topbar-private-spacer {
