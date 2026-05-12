@@ -943,6 +943,22 @@
   font-size: var(--type-xs);
 }
 
+/* Board map scales fluidly inside the gameplay HUD column;
+   override the base 780px min-width so it can shrink with the viewport. */
+.app-shell--gameplay-hud .board-map {
+  min-width: 0;
+  max-width: 100%;
+  height: 100%;
+  width: 100%;
+}
+
+.app-shell--gameplay-hud .board-stage__map {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Floating build popup on the map */
 .floating-build-panel {
   position: absolute;
