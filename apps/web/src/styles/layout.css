@@ -77,10 +77,10 @@
   align-self: end;
 }
 
-/* Right column: 60/40 split — chat top (60%), market bottom (40%) */
+/* Right column: 50/50 split — chat top (50%), market bottom (50%) */
 .right-col {
   display: grid;
-  grid-template-rows: 60fr 40fr;
+  grid-template-rows: 50fr 50fr;
   gap: var(--space-stack-sm);
   height: 100%;
   min-height: 0;
