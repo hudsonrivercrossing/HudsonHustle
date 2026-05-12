@@ -100,6 +100,23 @@
   border-color: rgba(var(--hud-brass-light-rgb), 0.18);
 }
 
+/* Side-panel player roster: fixed sizing to fit exactly 4 seat tiles */
+.app-shell--gameplay-hud .side-panel .player-roster {
+  flex-shrink: 0;
+  gap: var(--space-stack-xs, 4px);
+}
+
+.app-shell--gameplay-hud .side-panel .player-roster__list,
+.app-shell--gameplay-hud .side-panel .player-roster .scoreboard {
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-stack-xs, 4px);
+}
+
+.app-shell--gameplay-hud .side-panel .player-roster .player-strip {
+  min-height: 44px;
+  padding: 6px 8px;
+}
+
 /* Side-panel player roster: dark seat tiles matching TicketDock */
 .app-shell--gameplay-hud .side-panel .player-roster .player-strip {
   background:
