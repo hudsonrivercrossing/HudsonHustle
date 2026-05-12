@@ -91,11 +91,45 @@
 
 .app-shell--gameplay-hud .private-hand-rail,
 .app-shell--gameplay-hud .ticket-dock,
-.app-shell--gameplay-hud .inspector-dock {
+.app-shell--gameplay-hud .inspector-dock,
+.app-shell--gameplay-hud .side-panel .player-roster,
+.app-shell--gameplay-hud .chat-panel-dock {
   background:
     radial-gradient(circle at top left, rgba(142, 169, 188, 0.12), transparent 34%),
     linear-gradient(180deg, rgba(30, 42, 51, 0.88), rgba(9, 15, 20, 0.9));
   border-color: rgba(var(--hud-brass-light-rgb), 0.18);
+}
+
+/* Side-panel player roster: dark seat tiles matching TicketDock */
+.app-shell--gameplay-hud .side-panel .player-roster .player-strip {
+  background:
+    linear-gradient(180deg, rgba(255, 247, 231, 0.055), rgba(255, 247, 231, 0.025));
+  border-color: rgba(var(--hud-brass-light-rgb), 0.18);
+  color: var(--hud-paper-bright, #fff8ea);
+  box-shadow: none;
+}
+
+.app-shell--gameplay-hud .side-panel .player-roster .player-strip--active {
+  border-color: rgba(var(--hud-brass-light-rgb), 0.48);
+  background:
+    linear-gradient(180deg, rgba(var(--hud-brass-light-rgb), 0.16), rgba(var(--hud-brass-light-rgb), 0.06));
+}
+
+.app-shell--gameplay-hud .side-panel .player-roster .row-object__title {
+  color: var(--hud-paper-bright, #fff8ea);
+}
+
+.app-shell--gameplay-hud .side-panel .player-roster .row-object__meta,
+.app-shell--gameplay-hud .side-panel .player-roster .row-object__stat {
+  color: rgba(var(--hud-paper-rgb), 0.66);
+}
+
+.app-shell--gameplay-hud .side-panel .player-roster__row--placeholder {
+  opacity: 0.42;
+}
+
+.app-shell--gameplay-hud .side-panel .player-roster__active-label {
+  display: none;
 }
 
 .app-shell--gameplay-hud .section-header__title {
