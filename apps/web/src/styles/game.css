@@ -829,6 +829,42 @@
   flex: 0 0 auto;
 }
 
+/* Right-column SupplyDock layout: vertical stack with market as 2×3 grid */
+.app-shell--gameplay-hud .right-col .supply-dock--board {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-stack-sm, 8px);
+  padding: var(--space-stack-sm) var(--space-stack-md);
+  border-radius: var(--radius-panel);
+  background:
+    radial-gradient(circle at top left, rgba(142, 169, 188, 0.12), transparent 34%),
+    linear-gradient(180deg, rgba(30, 42, 51, 0.88), rgba(9, 15, 20, 0.9));
+  border: 1px solid rgba(var(--hud-brass-light-rgb), 0.18);
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .section-header {
+  min-width: 0;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .market-color-slot {
+  min-height: 70px;
+  height: 70px;
+  padding: 8px 6px;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .system-button {
+  width: 100%;
+  min-height: 44px;
+  min-width: 0;
+}
+
 .app-shell--gameplay-hud .side-panel__draw-ticket.system-button {
   background: rgba(var(--hud-brass-light-rgb), 0.12);
   border-color: rgba(var(--hud-brass-light-rgb), 0.28);
