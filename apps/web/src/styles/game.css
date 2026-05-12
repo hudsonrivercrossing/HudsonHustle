@@ -3497,9 +3497,7 @@ border-color: rgba(232, 220, 194, 0.72);
 }
 .app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market > :nth-child(5) {
   grid-row: 3 !important;
-  grid-column: 1 / span 2 !important;
-  max-width: 50%;
-  justify-self: center;
+  grid-column: 1 !important;
 }
 
 .app-shell--gameplay-hud .ticket-dock {
