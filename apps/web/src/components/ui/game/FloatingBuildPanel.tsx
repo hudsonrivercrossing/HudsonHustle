@@ -7,7 +7,7 @@ interface FloatingBuildPanelProps {
   className?: string;
 }
 
-const PANEL_WIDTH = 280;
+const PANEL_WIDTH = 340;
 const PANEL_OFFSET = 16;
 const VIEWPORT_PAD = 12;
 

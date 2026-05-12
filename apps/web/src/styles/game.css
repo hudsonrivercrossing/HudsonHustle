@@ -1146,7 +1146,7 @@ body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .system-butto
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 280px;
+  width: 340px;
   background:
     var(--hud-grain),
     linear-gradient(180deg, rgba(37, 31, 23, 0.97), rgba(12, 10, 8, 0.97));
@@ -3572,7 +3572,7 @@ border-color: rgba(232, 220, 194, 0.72);
   display: grid !important;
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   grid-template-rows: repeat(3, auto) !important;
-  gap: 6px;
+  gap: 12px;
   min-height: 0;
   align-content: start;
 }
