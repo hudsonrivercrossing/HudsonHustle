@@ -1536,7 +1536,8 @@ body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .system-butto
     linear-gradient(180deg, #211b14, #100d09);
 }
 
-/* Angular tabletop correction: avoid the repeated rounded-card silhouette. */
+/* (Old angular clip-path removed for visual consistency across panels.)
+   Disabled by overriding with `none` below. */
 .app-shell--gameplay-hud .private-hand-rail,
 .app-shell--gameplay-hud .ticket-dock,
 .app-shell--gameplay-hud .inspector-dock,
@@ -1544,7 +1545,12 @@ body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .system-butto
 .app-shell--gameplay-hud .game-over-layer,
 .app-shell--gameplay-hud .leave-confirm-card,
 .app-shell--gameplay-hud .ticket-choice-sheet__panel {
-  border-radius: var(--radius-map-tile);
+  border-radius: var(--radius-sm) !important;
+  clip-path: none !important;
+}
+
+/* Original angular clip-path retained as reference but neutralised */
+.disabled-angular-panel {
   clip-path: polygon(
     10px 0,
     calc(100% - 10px) 0,
@@ -1557,11 +1563,13 @@ body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .system-butto
   );
 }
 
+/* Inner-border decoration disabled — pseudo-element neutralised */
 .app-shell--gameplay-hud .private-hand-rail::after,
 .app-shell--gameplay-hud .ticket-dock::after,
 .app-shell--gameplay-hud .inspector-dock::after,
 .app-shell--gameplay-hud .player-roster--top::after {
-  content: "";
+  content: none !important;
+  display: none !important;
   pointer-events: none;
   position: absolute;
   inset: 7px;
