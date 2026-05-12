@@ -16,7 +16,7 @@
 .game-layout {
   --game-left-rail: clamp(260px, 19vw, 300px);
   --game-right-rail: clamp(288px, 22vw, 340px);
-  --topbar-allowance: 48px;
+  --topbar-allowance: 36px;
   display: grid;
   grid-template-columns: var(--game-left-rail) minmax(0, 1fr);
   gap: var(--space-stack-md);
