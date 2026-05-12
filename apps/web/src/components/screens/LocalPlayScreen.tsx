@@ -118,10 +118,10 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   function pushNotification(message: string, tone: GameplayNotification["tone"] = "neutral") {
     notificationIdRef.current += 1;
     const id = `local-${Date.now()}-${notificationIdRef.current}`;
-    setNotifications((current) => [...current.slice(-3), { id, message, tone }]);
+    setNotifications((current) => [...current.slice(-5), { id, message, tone }]);
     window.setTimeout(() => {
       setNotifications((current) => current.filter((n) => n.id !== id));
-    }, 4200);
+    }, 6000);
   }
 
   function announceGameChange(previous: GameState, nextGame: GameState) {

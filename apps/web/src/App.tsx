@@ -497,10 +497,10 @@ export default function App(): JSX.Element {
   function pushNotification(message: string, tone: GameplayNotification["tone"] = "neutral") {
     notificationIdRef.current += 1;
     const id = `multi-${Date.now()}-${notificationIdRef.current}`;
-    setNotifications((current) => [...current.slice(-3), { id, message, tone }]);
+    setNotifications((current) => [...current.slice(-5), { id, message, tone }]);
     window.setTimeout(() => {
       setNotifications((current) => current.filter((notification) => notification.id !== id));
-    }, 4200);
+    }, 6000);
   }
 
   useEffect(() => {
