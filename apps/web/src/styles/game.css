@@ -1184,6 +1184,77 @@ body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .system-butto
   gap: var(--space-stack-sm, 8px);
 }
 
+/* Build popup typography overrides — smaller and tighter for the compact 280px card */
+.floating-build-panel .surface-card,
+.floating-build-panel .detail-card {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.floating-build-panel .surface-card__title,
+.floating-build-panel .detail-card__title {
+  font-family: var(--font-display, var(--font-body));
+  font-size: var(--type-md) !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  color: var(--hud-paper-bright, #fff8ea) !important;
+  margin: 0 0 8px !important;
+  letter-spacing: 0;
+}
+
+.floating-build-panel .detail-card__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.floating-build-panel .detail-card__facts {
+  gap: 4px !important;
+}
+
+.floating-build-panel .detail-card__fact {
+  font-size: var(--type-2xs) !important;
+  padding: 3px 8px !important;
+  min-height: 22px !important;
+  border-radius: var(--radius-control) !important;
+  background: rgba(var(--hud-brass-light-rgb), 0.12) !important;
+  border-color: rgba(var(--hud-brass-light-rgb), 0.24) !important;
+  color: rgba(var(--hud-paper-rgb), 0.82) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700 !important;
+}
+
+.floating-build-panel .detail-card__prompt {
+  font-size: var(--type-xs) !important;
+  line-height: 1.3 !important;
+  font-weight: 500 !important;
+  color: rgba(var(--hud-paper-rgb), 0.82) !important;
+  margin: 4px 0 8px !important;
+  white-space: nowrap;
+}
+
+.floating-build-panel .detail-card__decision-shelf {
+  gap: 6px !important;
+  margin-top: 4px;
+}
+
+.floating-build-panel .choice-chip-button {
+  font-size: var(--type-xs) !important;
+  padding: 6px 12px !important;
+  min-height: 32px !important;
+}
+
+.floating-build-panel .muted-copy {
+  font-size: var(--type-xs);
+  color: rgba(var(--hud-paper-rgb), 0.5);
+  font-style: italic;
+}
+
 /* Board stage must be position:relative for the floating panel to anchor */
 .board-stage {
   position: relative;
