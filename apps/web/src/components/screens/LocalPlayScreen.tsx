@@ -25,7 +25,6 @@ import {
   BoardStage,
   ChatPanel,
   FloatingBuildPanel,
-  FloatingPlayerRoster,
   PlayerRoster,
   GameOverLayer,
   NotificationPipe,
@@ -431,13 +430,6 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
                 highlightedCityIds={highlightedCityIds}
                 onSelectRoute={(routeId) => { setSelectedRouteId(routeId); setSelectedCityId(null); setPaymentPreview(null); }}
                 onSelectCity={(cityId) => { setSelectedCityId(cityId); setSelectedRouteId(null); setPaymentPreview(null); }}
-              />
-
-              <FloatingPlayerRoster
-                players={rosterPlayers}
-                activePlayerIndex={game.activePlayerIndex}
-                playerPalette={playerColorPalette}
-                viewerPlayerId={game.players[game.activePlayerIndex]?.id ?? null}
               />
 
               {/* Floating build popup — appears on map when route/city selected */}
