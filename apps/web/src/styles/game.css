@@ -96,16 +96,8 @@
   text-transform: uppercase;
 }
 
-.app-shell--gameplay-hud .private-hand-rail,
-.app-shell--gameplay-hud .ticket-dock,
-.app-shell--gameplay-hud .inspector-dock,
-.app-shell--gameplay-hud .side-panel .player-roster,
-.app-shell--gameplay-hud .chat-panel-dock {
-  background:
-    radial-gradient(circle at top left, rgba(142, 169, 188, 0.12), transparent 34%),
-    linear-gradient(180deg, rgba(30, 42, 51, 0.88), rgba(9, 15, 20, 0.9));
-  border-color: rgba(var(--hud-brass-light-rgb), 0.18);
-}
+/* Panel base styling (gradient + border + shadow) is defined later
+   in the unified rule that covers all dark panels. */
 
 /* Roster + chat heights are both bound to --roster-height so they always match.
    4 seat tiles × 40px + 3 gaps × 4px + panel padding (16px) ≈ 188px. */
@@ -901,16 +893,12 @@
 }
 
 /* Right-column SupplyDock layout: vertical stack with market as 2×3 grid */
+/* Layout-only — visual treatment (gradient/border/shadow) comes from the unified panel rule */
 .app-shell--gameplay-hud .right-col .supply-dock--board {
   display: flex;
   flex-direction: column;
   gap: var(--space-stack-sm, 8px);
   padding: var(--space-stack-sm) var(--space-stack-md);
-  border-radius: var(--radius-panel);
-  background:
-    radial-gradient(circle at top left, rgba(142, 169, 188, 0.12), transparent 34%),
-    linear-gradient(180deg, rgba(30, 42, 51, 0.88), rgba(9, 15, 20, 0.9));
-  border: 1px solid rgba(var(--hud-brass-light-rgb), 0.18);
   height: 100%;
   min-height: 0;
   width: 100%;
@@ -1119,8 +1107,11 @@
 .app-shell--gameplay-hud .private-hand-rail,
 .app-shell--gameplay-hud .ticket-dock,
 .app-shell--gameplay-hud .inspector-dock,
-.app-shell--gameplay-hud .player-roster--top {
-  border-color: color-mix(in srgb, var(--hud-brass) 42%, rgba(0, 0, 0, 0.34));
+.app-shell--gameplay-hud .player-roster--top,
+.app-shell--gameplay-hud .side-panel .player-roster,
+.app-shell--gameplay-hud .chat-panel-dock,
+.app-shell--gameplay-hud .right-col .supply-dock--board {
+  border: 1px solid color-mix(in srgb, var(--hud-brass) 42%, rgba(0, 0, 0, 0.34));
   border-radius: var(--radius-sm);
   background:
     var(--hud-grain),
@@ -1135,7 +1126,10 @@
 .app-shell--gameplay-hud .private-hand-rail::before,
 .app-shell--gameplay-hud .ticket-dock::before,
 .app-shell--gameplay-hud .inspector-dock::before,
-.app-shell--gameplay-hud .player-roster--top::before {
+.app-shell--gameplay-hud .player-roster--top::before,
+.app-shell--gameplay-hud .side-panel .player-roster::before,
+.app-shell--gameplay-hud .chat-panel-dock::before,
+.app-shell--gameplay-hud .right-col .supply-dock--board::before {
   background:
     linear-gradient(135deg, rgba(232, 220, 194, 0.08), transparent 28%),
     radial-gradient(circle at 18% 0%, rgba(183, 155, 97, 0.12), transparent 30%);
