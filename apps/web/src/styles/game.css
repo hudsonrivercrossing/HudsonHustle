@@ -156,33 +156,58 @@
   gap: var(--space-stack-xs, 4px);
 }
 
+/* Side-panel SeatTile: avatar | name+meta | stats (timer is hidden if no value) */
 .app-shell--gameplay-hud .side-panel .player-roster .player-strip {
-  min-height: 40px;
-  height: 40px;
+  height: 100%;
+  min-height: 0;
   padding: 4px 8px;
   grid-template-columns: 28px minmax(0, 1fr) auto;
-  gap: 6px 8px;
+  grid-template-rows: 1fr;
+  gap: 4px 8px;
+  align-items: center;
 }
 
-/* Tighter typography to fit 4 rows */
+/* Hide the empty timer slot so the stats column lands next to the info */
+.app-shell--gameplay-hud .side-panel .player-roster .player-roster__timer:empty {
+  display: none;
+}
+
+/* Info column: name above one-line meta */
+.app-shell--gameplay-hud .side-panel .player-roster .row-object__main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  min-width: 0;
+}
+
 .app-shell--gameplay-hud .side-panel .player-roster .row-object__title {
   font-size: var(--type-xs);
   font-weight: 800;
   line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .app-shell--gameplay-hud .side-panel .player-roster .row-object__meta {
   font-size: var(--type-2xs);
   line-height: 1.1;
+  white-space: nowrap;
+}
+
+/* Stats column: single line, comma-separated style */
+.app-shell--gameplay-hud .side-panel .player-roster .row-object__stats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0;
+  white-space: nowrap;
 }
 
 .app-shell--gameplay-hud .side-panel .player-roster .row-object__stat {
   font-size: var(--type-2xs);
   line-height: 1.1;
-}
-
-.app-shell--gameplay-hud .side-panel .player-roster .row-object__stats {
-  gap: 1px;
 }
 
 .app-shell--gameplay-hud .side-panel .player-roster .seat-avatar--tiny {
