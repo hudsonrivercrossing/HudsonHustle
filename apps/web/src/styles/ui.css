@@ -3626,6 +3626,7 @@ h3 {
 .notification-pipe__item {
   justify-self: center;
   max-width: 100%;
+  pointer-events: auto;
   padding: 10px 16px;
   border: 1px solid rgba(221, 199, 159, 0.28);
   border-radius: 999px;
