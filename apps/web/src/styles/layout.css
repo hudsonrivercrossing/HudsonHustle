@@ -58,8 +58,7 @@
   min-height: 0;
 }
 
-/* map-col is the dominant vertical: board stage fills remaining space,
-   hand strip locks to the bottom. */
+/* map-col: map fills the top (1fr), hand strip locked at the bottom (auto). */
 .map-col {
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
@@ -69,11 +68,13 @@
 }
 
 .map-col > .board-stage {
+  grid-row: 1;
   min-height: 0;
   overflow: hidden;
 }
 
 .map-col > .private-hand-rail {
+  grid-row: 2;
   align-self: end;
 }
 
