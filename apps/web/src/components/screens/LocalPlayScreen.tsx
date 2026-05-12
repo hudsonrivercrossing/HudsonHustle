@@ -85,6 +85,8 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [notifications, setNotifications] = useState<GameplayNotification[]>([]);
   const notificationIdRef = useRef(0);
+  const [turnStartedAt, setTurnStartedAt] = useState<number>(() => Date.now());
+  const [nowMs, setNowMs] = useState<number>(() => Date.now());
   const localMap = useMemo(() => getHudsonHustleMapByConfigId(localConfigId), [localConfigId]);
   const localVisuals = useMemo(() => getHudsonHustleVisualsByConfigId(localConfigId), [localConfigId]);
 
@@ -93,6 +95,22 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
     window.localStorage.setItem(LOCAL_SAVE_KEY, JSON.stringify(game));
     setHasSavedGame(true);
   }, [game]);
+
+  // Reset turn timer when active player changes
+  useEffect(() => {
+    setTurnStartedAt(Date.now());
+  }, [game?.activePlayerIndex, game?.phase]);
+
+  // Tick once per second to drive timer display
+  useEffect(() => {
+    if (!game || localTurnTimeLimitSeconds <= 0) return;
+    const interval = window.setInterval(() => setNowMs(Date.now()), 1000);
+    return () => window.clearInterval(interval);
+  }, [game, localTurnTimeLimitSeconds]);
+
+  const liveTimerSecondsRemaining = localTurnTimeLimitSeconds > 0
+    ? Math.max(0, Math.ceil(localTurnTimeLimitSeconds - (nowMs - turnStartedAt) / 1000))
+    : null;
 
   function pushNotification(message: string, tone: GameplayNotification["tone"] = "neutral") {
     notificationIdRef.current += 1;
@@ -360,7 +378,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
     <div className="app-shell app-shell--gameplay-hud" data-config-theme={localVisuals.theme}>
       <header className="topbar topbar--gameplay-actions">
         <div className="topbar-private-spacer" aria-hidden="true" />
-        <TurnIndicator playerName={game.players[game.activePlayerIndex]?.name ?? ""} />
+        <TurnIndicator playerName={game.players[game.activePlayerIndex]?.name ?? ""} secondsRemaining={liveTimerSecondsRemaining} />
         <div className="topbar-actions">
           <Button className="topbar-icon-btn" aria-label="Guide" onClick={() => setGuideOpen(true)} data-label="Guide">?</Button>
           <ScoreGuide className="score-guide--subtle topbar-icon-btn" label="★" tooltipLabel="Score" />
