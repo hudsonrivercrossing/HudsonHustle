@@ -625,11 +625,6 @@
 }
 
 /* Gameplay HUD visual refinement. Rail widths defined in layout.css on .game-layout. */
-.app-shell--gameplay-hud {
-  padding-top: 4px;
-  gap: var(--space-stack-xs, 4px);
-}
-
 .app-shell--gameplay-hud .topbar-private-spacer {
   min-width: 0;
 }
@@ -2911,15 +2906,7 @@ border-color: rgba(232, 220, 194, 0.72);
   font-size: var(--type-map);
 }
 
-.app-shell--gameplay-hud {
-  height: 100vh;
-  min-height: 0;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: 10px;
-  overflow: hidden;
-  font-size: var(--type-body);
-}
+/* Layout definition lives at the top of this file (flex column with 0 gap). */
 
 
 .gameplay-brand {
