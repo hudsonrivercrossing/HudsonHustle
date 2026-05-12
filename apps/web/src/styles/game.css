@@ -1182,6 +1182,8 @@ body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .system-butto
   display: flex;
   flex-direction: column;
   gap: var(--space-stack-sm, 8px);
+  min-width: 0;
+  overflow: hidden;
 }
 
 /* Build popup typography overrides — smaller and tighter for the compact 280px card */
@@ -1197,12 +1199,15 @@ body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .system-butto
 .floating-build-panel .surface-card__title,
 .floating-build-panel .detail-card__title {
   font-family: var(--font-display, var(--font-body));
-  font-size: var(--type-md) !important;
+  font-size: var(--type-sm) !important;
   font-weight: 800 !important;
   line-height: 1.2 !important;
   color: var(--hud-paper-bright, #fff8ea) !important;
   margin: 0 0 8px !important;
   letter-spacing: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  padding-right: 28px;
 }
 
 .floating-build-panel .detail-card__summary {
