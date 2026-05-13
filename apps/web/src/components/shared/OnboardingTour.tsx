@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "../ui/primitives/Button";
 
-const TOUR_SEEN_KEY = "hh-tour-seen";
+const TOUR_SEEN_KEY = "hh-tour-seen-v2";
 const CALLOUT_WIDTH = 320;
 const CALLOUT_GAP = 14;
 const SPOTLIGHT_PADDING = 8;
@@ -19,34 +19,58 @@ interface TourStep {
 
 const tourSteps: TourStep[] = [
   {
-    eyebrow: "Hand",
-    title: "Draw transit cards",
-    body: "Each turn draw 2 transit cards from the market or deck. Locomotives are wild. Build up matching sets to claim routes on your tickets.",
-    target: "hand",
-  },
-  {
     eyebrow: "Tickets",
-    title: "Follow your secret plan",
-    body: "Tickets are goals — connect two cities to score the printed points. Unfinished tickets subtract points. At setup keep at least 2 of your 4.",
+    title: "Your hidden route plan",
+    body: "Every ticket is a private destination contract — connect the two listed stations with your claimed routes to bank the printed points. Fail to finish, and those points subtract from your score at the end.",
     target: "tickets",
   },
   {
+    eyebrow: "Hand",
+    title: "Stack matching transit cards",
+    body: "Your hand is the fare you'll pay for routes. Collect cards in the colors your tickets need; locomotives ride any line as wild cards.",
+    target: "hand",
+  },
+  {
     eyebrow: "Market",
-    title: "Spend cards to claim routes",
-    body: "Draw from the face-up market or the deck. When you're ready, tap a route on the board and pick a payment color. Longer routes cost more but score more.",
+    title: "Pull from the platform",
+    body: "Two face-up cards per turn from the market, or grab a single locomotive (it costs your whole turn). Empty platform? Draw blind from the deck and hope for a useful color.",
     target: "market",
   },
   {
-    eyebrow: "Roster",
-    title: "Watch what others do",
-    body: "The roster shows every player's trains, stations, and ticket count. When someone drops to 2 or fewer trains, the final round begins.",
-    target: "roster",
+    eyebrow: "Board",
+    title: "Claim a route",
+    body: "Tap any line on the map, pick a payment color in the popup, and pay the fare in cards. Longer routes cost more but pay back far more in points.",
+    target: "board",
   },
   {
-    eyebrow: "Actions",
-    title: "One move per turn",
-    body: "Each turn pick exactly one action: draw cards, claim a route, draw new tickets, or build a station. Then play passes to the next seat.",
-    target: "actions",
+    eyebrow: "Stations",
+    title: "Drop a station as your backup",
+    body: "Click a city instead of a route to plant a station there. Stations are scarce: each one lets you borrow ONE route that another player has already claimed, so you can still complete a ticket when you're boxed out. Unused stations at the end of the game score bonus points.",
+    target: "board",
+  },
+  {
+    eyebrow: "More tickets",
+    title: "Take on extra contracts",
+    body: "Need more goals mid-game? Use a whole turn to draw 3 new tickets — but you must keep at least one. Any unkept tickets you take and don't finish still subtract from your score, so pick carefully.",
+    target: "tickets",
+  },
+  {
+    eyebrow: "Turn",
+    title: "One move, then pass",
+    body: "Each turn picks exactly ONE action: draw transit cards, claim a route, build a station, or draw new tickets. Watch the clock — when it runs out, your turn ends.",
+    target: "turn",
+  },
+  {
+    eyebrow: "Chat",
+    title: "Trash-talk encouraged",
+    body: "Use the chat to call your shots, bluff your tickets, or congratulate a brilliant claim. Local play uses one shared chat box; online sends messages to the whole table in real time.",
+    target: "market",
+  },
+  {
+    eyebrow: "Endgame",
+    title: "Last stop coming",
+    body: "When any player drops to two trains or fewer, every other rider gets one more turn — then final scoring locks in completed tickets, route points, and station bonuses. Track the roster to spot the trigger early.",
+    target: "roster",
   },
 ];
 
@@ -65,6 +89,8 @@ interface CalloutPlacement {
   arrowSide: "left" | "right" | "top" | "bottom" | null;
 }
 
+const CALLOUT_HEIGHT_ESTIMATE = 260;
+
 function computeCallout(spot: SpotlightRect): CalloutPlacement {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
@@ -72,12 +98,14 @@ function computeCallout(spot: SpotlightRect): CalloutPlacement {
 
   const spaceRight = vw - (spot.left + spot.width + SPOTLIGHT_PADDING);
   const spaceLeft = spot.left - SPOTLIGHT_PADDING;
+  const spaceBelow = vh - (spot.top + spot.height + SPOTLIGHT_PADDING);
+  const spaceAbove = spot.top - SPOTLIGHT_PADDING;
 
-  // Prefer horizontal placement
+  // Prefer horizontal placement when there's room
   if (spaceRight >= CALLOUT_WIDTH + CALLOUT_GAP) {
     const idealTop = spot.top + spot.height / 2 - 120;
     return {
-      top: Math.max(margin, Math.min(idealTop, vh - 260 - margin)),
+      top: Math.max(margin, Math.min(idealTop, vh - CALLOUT_HEIGHT_ESTIMATE - margin)),
       left: spot.left + spot.width + SPOTLIGHT_PADDING + CALLOUT_GAP,
       arrowSide: "left",
     };
@@ -85,17 +113,36 @@ function computeCallout(spot: SpotlightRect): CalloutPlacement {
   if (spaceLeft >= CALLOUT_WIDTH + CALLOUT_GAP) {
     const idealTop = spot.top + spot.height / 2 - 120;
     return {
-      top: Math.max(margin, Math.min(idealTop, vh - 260 - margin)),
+      top: Math.max(margin, Math.min(idealTop, vh - CALLOUT_HEIGHT_ESTIMATE - margin)),
       right: vw - (spot.left - SPOTLIGHT_PADDING - CALLOUT_GAP),
       arrowSide: "right",
     };
   }
-  // Fall back to above the target
+
+  // Vertical placement — prefer whichever side has more room
   const idealLeft = spot.left + spot.width / 2 - CALLOUT_WIDTH / 2;
+  const clampedLeft = Math.max(margin, Math.min(idealLeft, vw - CALLOUT_WIDTH - margin));
+
+  if (spaceBelow >= spaceAbove && spaceBelow >= CALLOUT_HEIGHT_ESTIMATE + CALLOUT_GAP) {
+    return {
+      top: spot.top + spot.height + SPOTLIGHT_PADDING + CALLOUT_GAP,
+      left: clampedLeft,
+      arrowSide: "top",
+    };
+  }
+  if (spaceAbove >= CALLOUT_HEIGHT_ESTIMATE + CALLOUT_GAP) {
+    return {
+      bottom: vh - (spot.top - SPOTLIGHT_PADDING - CALLOUT_GAP),
+      left: clampedLeft,
+      arrowSide: "bottom",
+    };
+  }
+
+  // Nothing fits comfortably — pin to viewport bottom edge
   return {
-    bottom: vh - (spot.top - SPOTLIGHT_PADDING - CALLOUT_GAP),
-    left: Math.max(margin, Math.min(idealLeft, vw - CALLOUT_WIDTH - margin)),
-    arrowSide: "bottom",
+    bottom: margin,
+    left: clampedLeft,
+    arrowSide: null,
   };
 }
 
