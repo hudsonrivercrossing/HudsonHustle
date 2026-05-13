@@ -140,7 +140,53 @@
       { "id": "manhattan", "text": "Manhattan", "point": { "x": 596, "y": 320 }, "vertical": true },
       { "id": "queens", "text": "Queens", "point": { "x": 920, "y": 126 } },
       { "id": "brooklyn", "text": "Brooklyn", "point": { "x": 838, "y": 722 } }
-    ]
+    ],
+    "landmarks": [
+      {
+        "id": "liberty-ellis-harbor-memory",
+        "kind": "harbor-island",
+        "bounds": { "x": 344, "y": 742, "width": 70, "height": 34 },
+        "label": "Harbor",
+        "opacity": 0.22,
+        "priority": "low"
+      },
+      {
+        "id": "battery-harbor-edge",
+        "kind": "waterfront",
+        "bounds": { "x": 612, "y": 640, "width": 72, "height": 26 },
+        "opacity": 0.18,
+        "priority": "low"
+      },
+      {
+        "id": "queens-waterfront-memory",
+        "kind": "waterfront",
+        "bounds": { "x": 812, "y": 338, "width": 86, "height": 30 },
+        "opacity": 0.16,
+        "priority": "low"
+      }
+    ],
+    "themeLines": [
+      {
+        "id": "battery-liberty-ferry-memory",
+        "kind": "ferry",
+        "points": [
+          { "x": 646, "y": 640 },
+          { "x": 560, "y": 704 },
+          { "x": 410, "y": 760 }
+        ],
+        "opacity": 0.22,
+        "priority": "low"
+      }
+    ],
+    "generatedBy": {
+      "recipeId": "nyc-harbor-memory-v1",
+      "generatorVersion": "manual-pilot-2026-05-13",
+      "acceptedAt": "2026-05-13",
+      "notes": [
+        "Manual pilot for the AI-assisted vector basemap pipeline.",
+        "Features are intentionally low contrast and placed outside core route/label corridors."
+      ]
+    }
   },
   "palettes": {
     "cards": {

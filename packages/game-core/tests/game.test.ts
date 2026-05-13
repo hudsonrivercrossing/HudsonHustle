@@ -544,6 +544,24 @@ describe("game-core", () => {
     }
   });
 
+  it("keeps NYC basemap memory features quiet and board-local", () => {
+    const landmarks = hudsonHustleBackdrop.landmarks ?? [];
+    const themeLines = hudsonHustleBackdrop.themeLines ?? [];
+
+    expect(landmarks.some((landmark) => landmark.id === "liberty-ellis-harbor-memory")).toBe(true);
+    expect(themeLines.some((line) => line.id === "battery-liberty-ferry-memory")).toBe(true);
+
+    for (const landmark of landmarks) {
+      expect(["low", "medium"]).toContain(landmark.priority ?? "low");
+      expect(landmark.opacity ?? 1).toBeLessThanOrEqual(0.35);
+    }
+
+    for (const line of themeLines) {
+      expect(["low", "medium"]).toContain(line.priority ?? "low");
+      expect(line.opacity ?? 1).toBeLessThanOrEqual(0.32);
+    }
+  });
+
   it("builds protected zones for routes, stations, and labels", () => {
     const zones = buildBasemapProtectedZones(hudsonHustleMap, hudsonHustleBoardFrame);
 
