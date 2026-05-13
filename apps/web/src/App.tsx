@@ -1131,7 +1131,7 @@ export default function App(): JSX.Element {
               onDrawFromDeck={() => sendGameAction({ type: "draw_card", source: "deck" })}
               className="supply-dock--board"
             />
-            {localPendingTickets.length > 0 ? (
+            {localPendingTickets.length > 0 && !tourOpen ? (
               <TicketChoiceSheet
                 title={publicGame.phase === "initialTickets" ? "Choose starting tickets" : "Keep new tickets"}
                 subtitle={

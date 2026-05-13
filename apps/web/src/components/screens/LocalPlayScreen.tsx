@@ -579,7 +579,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
               onDrawFromDeck={() => applyAction({ type: "draw_card", source: "deck" })}
               className={`supply-dock--board ${tutorialTarget === "market" ? "panel--tutorial-focus" : ""}`}
             />
-            {pendingTickets.length > 0 && visibility === "visible" && !isCurrentPlayerLocalBot ? (
+            {pendingTickets.length > 0 && visibility === "visible" && !isCurrentPlayerLocalBot && !tourOpen ? (
               <TicketChoiceSheet
                 title={game.phase === "initialTickets" ? `${activePlayer.name}, choose starting tickets` : `${activePlayer.name}, keep new tickets`}
                 subtitle={
