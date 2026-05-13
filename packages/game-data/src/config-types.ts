@@ -19,7 +19,14 @@ export interface BoardBackdropLabel {
   vertical?: boolean;
 }
 
-export interface BoardBackdropLandmark {
+export interface BoardBackdropLandmarkBounds {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+interface BoardBackdropLandmarkBase {
   id: string;
   kind:
     | "harbor-island"
@@ -28,17 +35,20 @@ export interface BoardBackdropLandmark {
     | "waterfront"
     | "civic"
     | "theme-marker";
-  point?: BoardPoint;
-  bounds?: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  };
   label?: string;
   opacity?: number;
   priority?: "low" | "medium";
 }
+
+export type BoardBackdropLandmark =
+  | (BoardBackdropLandmarkBase & {
+      point: BoardPoint;
+      bounds?: never;
+    })
+  | (BoardBackdropLandmarkBase & {
+      point?: never;
+      bounds: BoardBackdropLandmarkBounds;
+    });
 
 export interface BoardBackdropThemeLine {
   id: string;
