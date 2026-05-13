@@ -191,7 +191,14 @@ export function resolveRouteDisplayState(
 }
 
 export { createGeoProjector, projectGeoDiagramCities } from "./cartography.js";
+export { buildBasemapProtectedZones } from "./basemap-protection.js";
 export { activeHudsonHustleConfig, hudsonHustleConfigRegistry, hudsonHustleCurrentPointer } from "./config-registry.js";
+export type {
+  BasemapBoardFrame,
+  BasemapBounds,
+  BasemapProtectedZone,
+  BasemapProtectedZones
+} from "./basemap-protection.js";
 export type {
   BoardBackdrop,
   BoardBackdropArea,

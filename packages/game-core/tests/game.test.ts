@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { getTicketProgress, startGame, reduceGame } from "../src/game";
 import type { CityDef, GameState, MapConfig, RouteDef } from "../src/types";
 import {
+  buildBasemapProtectedZones,
   hudsonHustleAnchorWaveCityIds,
   hudsonHustleBackdrop,
   hudsonHustleBoardFrame,
@@ -517,6 +518,33 @@ describe("game-core", () => {
         expect(point.y).toBeLessThanOrEqual(hudsonHustleBoardFrame.height);
       }
     }
+  });
+
+  it("builds protected zones for routes, stations, and labels", () => {
+    const zones = buildBasemapProtectedZones(hudsonHustleMap, hudsonHustleBoardFrame);
+
+    expect(zones.routes.length).toBe(hudsonHustleMap.routes.length);
+    expect(zones.stations.length).toBe(hudsonHustleMap.cities.length);
+    expect(zones.labels.length).toBe(hudsonHustleMap.cities.length);
+
+    for (const zone of [...zones.routes, ...zones.stations, ...zones.labels]) {
+      expect(zone.bounds.left).toBeGreaterThanOrEqual(0);
+      expect(zone.bounds.top).toBeGreaterThanOrEqual(0);
+      expect(zone.bounds.right).toBeLessThanOrEqual(hudsonHustleBoardFrame.width);
+      expect(zone.bounds.bottom).toBeLessThanOrEqual(hudsonHustleBoardFrame.height);
+      expect(zone.bounds.right).toBeGreaterThan(zone.bounds.left);
+      expect(zone.bounds.bottom).toBeGreaterThan(zone.bounds.top);
+    }
+  });
+
+  it("protects the Exchange Place to World Trade Hudson crossing corridor", () => {
+    const zones = buildBasemapProtectedZones(hudsonHustleMap, hudsonHustleBoardFrame);
+    const crossing = zones.routes.find((zone) => zone.id === "route:exchange-place-world-trade-a");
+
+    expect(crossing).toBeDefined();
+    expect(crossing?.routeId).toBe("exchange-place-world-trade-a");
+    expect(crossing?.bounds.left).toBeLessThan(getCity("world-trade").x);
+    expect(crossing?.bounds.right).toBeGreaterThan(getCity("exchange-place").x);
   });
 
   it("keeps the main board graph distributed across the board", () => {
