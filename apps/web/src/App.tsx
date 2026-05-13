@@ -952,6 +952,7 @@ export default function App(): JSX.Element {
         <TurnIndicator
           playerName={projectedGame.players[snapshot.game.activePlayerIndex]?.name ?? ""}
           secondsRemaining={liveTimerSecondsRemaining}
+          data-tour-target="turn"
         />
         <div className="topbar-actions">
           <Button className="topbar-icon-btn" aria-label="Guide" onClick={() => setGuideOpen(true)} data-label="Guide">?</Button>
@@ -1130,7 +1131,7 @@ export default function App(): JSX.Element {
               onDrawFromDeck={() => sendGameAction({ type: "draw_card", source: "deck" })}
               className="supply-dock--board"
             />
-            {localPendingTickets.length > 0 ? (
+            {localPendingTickets.length > 0 && !tourOpen ? (
               <TicketChoiceSheet
                 title={publicGame.phase === "initialTickets" ? "Choose starting tickets" : "Keep new tickets"}
                 subtitle={
