@@ -195,8 +195,11 @@ export { activeHudsonHustleConfig, hudsonHustleConfigRegistry, hudsonHustleCurre
 export type {
   BoardBackdrop,
   BoardBackdropArea,
+  BoardBackdropGenerationMetadata,
   BoardBackdropLabel,
+  BoardBackdropLandmark,
   BoardBackdropLine,
+  BoardBackdropThemeLine,
   CurrentConfigPointer,
   RegisteredConfigBundle,
   SnapshotMap,

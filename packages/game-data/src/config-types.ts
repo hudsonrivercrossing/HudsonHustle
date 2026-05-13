@@ -19,11 +19,50 @@ export interface BoardBackdropLabel {
   vertical?: boolean;
 }
 
+export interface BoardBackdropLandmark {
+  id: string;
+  kind:
+    | "harbor-island"
+    | "park"
+    | "terminal"
+    | "waterfront"
+    | "civic"
+    | "theme-marker";
+  point?: BoardPoint;
+  bounds?: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+  label?: string;
+  opacity?: number;
+  priority?: "low" | "medium";
+}
+
+export interface BoardBackdropThemeLine {
+  id: string;
+  kind: "ferry" | "historic-border" | "shore-memory" | "theme-trace";
+  points: BoardPoint[];
+  opacity?: number;
+  priority?: "low" | "medium";
+}
+
+export interface BoardBackdropGenerationMetadata {
+  recipeId: string;
+  generatorVersion: string;
+  acceptedAt: string;
+  notes?: string[];
+}
+
 export interface BoardBackdrop {
   landAreas: BoardBackdropArea[];
   waterAreas: BoardBackdropArea[];
   shorelines: BoardBackdropLine[];
   regionLabels: BoardBackdropLabel[];
+  landmarks?: BoardBackdropLandmark[];
+  themeLines?: BoardBackdropThemeLine[];
+  generatedBy?: BoardBackdropGenerationMetadata;
 }
 
 export interface StationAuthorityRef {
