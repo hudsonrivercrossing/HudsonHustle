@@ -210,17 +210,7 @@ export function BoardMap({
         role="img"
         aria-label="Hudson Hustle board map"
       >
-        <defs>
-          <pattern id="transit-grid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-            <circle cx="10" cy="10" r="1.8" fill="rgba(74, 55, 36, 0.30)" />
-          </pattern>
-        </defs>
-
         <rect x="0" y="0" width={boardWidth} height={boardHeight} rx="12" fill="#d9c8a6" />
-
-        {backdropOpacityScale > 0 ? (
-          <rect x="0" y="0" width={boardWidth} height={boardHeight} fill="url(#transit-grid)" rx="12" style={{ pointerEvents: "none" }} />
-        ) : null}
 
         {backdropOpacityScale > 0
           ? backdrop.waterAreas.map((area) => (
@@ -451,18 +441,6 @@ export function BoardMap({
             </g>
           );
         })}
-
-        {backdropOpacityScale > 0 ? (
-          <rect
-            x="0"
-            y="0"
-            width={boardWidth}
-            height={boardHeight}
-            fill="url(#transit-grid)"
-            rx="12"
-            style={{ pointerEvents: "none", mixBlendMode: "multiply" }}
-          />
-        ) : null}
       </svg>
     </div>
   );
