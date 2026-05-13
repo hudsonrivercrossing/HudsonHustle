@@ -245,6 +245,56 @@ export function BoardMap({
             ))
           : null}
 
+        {shorelineOpacityScale > 0
+          ? backdrop.themeLines?.map((line) => (
+              <path
+                key={line.id}
+                d={buildPathD(line.points)}
+                className={`theme-line theme-line--${line.kind}`}
+                style={{ opacity: (line.opacity ?? 1) * shorelineOpacityScale }}
+              />
+            ))
+          : null}
+
+        {backdropOpacityScale > 0
+          ? backdrop.landmarks?.map((landmark) => {
+              const opacity = (landmark.opacity ?? 1) * backdropOpacityScale;
+              if ("bounds" in landmark && landmark.bounds) {
+                const { bounds } = landmark;
+                return (
+                  <rect
+                    key={landmark.id}
+                    x={bounds.x}
+                    y={bounds.y}
+                    width={bounds.width}
+                    height={bounds.height}
+                    rx="10"
+                    className={`basemap-landmark basemap-landmark--${landmark.kind}`}
+                    style={{ opacity }}
+                  />
+                );
+              }
+              if ("point" in landmark && landmark.point) {
+                const { point } = landmark;
+                return (
+                  <g
+                    key={landmark.id}
+                    className={`basemap-landmark basemap-landmark--${landmark.kind}`}
+                    style={{ opacity }}
+                  >
+                    <circle cx={point.x} cy={point.y} r="10" />
+                    {landmark.label ? (
+                      <text x={point.x + 14} y={point.y + 4} className="basemap-landmark__label">
+                        {landmark.label}
+                      </text>
+                    ) : null}
+                  </g>
+                );
+              }
+              return null;
+            })
+          : null}
+
         {regionLabels.map((label) => (
           <text
             key={label.id}

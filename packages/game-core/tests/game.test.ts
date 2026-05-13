@@ -518,6 +518,30 @@ describe("game-core", () => {
         expect(point.y).toBeLessThanOrEqual(hudsonHustleBoardFrame.height);
       }
     }
+
+    for (const landmark of hudsonHustleBackdrop.landmarks ?? []) {
+      if (landmark.point) {
+        expect(landmark.point.x).toBeGreaterThanOrEqual(0);
+        expect(landmark.point.x).toBeLessThanOrEqual(hudsonHustleBoardFrame.width);
+        expect(landmark.point.y).toBeGreaterThanOrEqual(0);
+        expect(landmark.point.y).toBeLessThanOrEqual(hudsonHustleBoardFrame.height);
+      }
+      if (landmark.bounds) {
+        expect(landmark.bounds.x).toBeGreaterThanOrEqual(0);
+        expect(landmark.bounds.y).toBeGreaterThanOrEqual(0);
+        expect(landmark.bounds.x + landmark.bounds.width).toBeLessThanOrEqual(hudsonHustleBoardFrame.width);
+        expect(landmark.bounds.y + landmark.bounds.height).toBeLessThanOrEqual(hudsonHustleBoardFrame.height);
+      }
+    }
+
+    for (const line of hudsonHustleBackdrop.themeLines ?? []) {
+      for (const point of line.points) {
+        expect(point.x).toBeGreaterThanOrEqual(0);
+        expect(point.x).toBeLessThanOrEqual(hudsonHustleBoardFrame.width);
+        expect(point.y).toBeGreaterThanOrEqual(0);
+        expect(point.y).toBeLessThanOrEqual(hudsonHustleBoardFrame.height);
+      }
+    }
   });
 
   it("builds protected zones for routes, stations, and labels", () => {
