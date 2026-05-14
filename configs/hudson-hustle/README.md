@@ -37,7 +37,11 @@ This directory holds versioned game-design snapshots for Hudson Hustle.
 - `tickets.json`
 - `rules.json`
 - `visuals.json`
-  - theme, backdrop mode, board label mode, backdrop art, and palettes
+  - theme, backdrop mode, board label mode, palettes, and config-backed vector basemap data
+  - long-term board rendering uses three visible layers:
+    1. board surface
+    2. config-backed backdrop geometry
+    3. gameplay routes, stations, labels, claims, hit targets, and highlights
 - `notes.md`
 
 ## Naming
