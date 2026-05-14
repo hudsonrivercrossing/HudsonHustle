@@ -92,6 +92,7 @@ const exhaustedDoubleRouteMap: MapConfig = {
 };
 
 const backdropPointRadius = 6;
+const backdropLineSegmentClearance = 10;
 
 function boundsIntersect(first: BasemapBounds, second: BasemapBounds): boolean {
   return first.left < second.right && first.right > second.left && first.top < second.bottom && first.bottom > second.top;
@@ -103,6 +104,19 @@ function pointBounds(point: { x: number; y: number }, radius = backdropPointRadi
     top: point.y - radius,
     right: point.x + radius,
     bottom: point.y + radius
+  };
+}
+
+function segmentBounds(
+  start: { x: number; y: number },
+  end: { x: number; y: number },
+  padding = backdropLineSegmentClearance
+): BasemapBounds {
+  return {
+    left: Math.min(start.x, end.x) - padding,
+    top: Math.min(start.y, end.y) - padding,
+    right: Math.max(start.x, end.x) + padding,
+    bottom: Math.max(start.y, end.y) + padding
   };
 }
 
@@ -608,14 +622,14 @@ describe("game-core", () => {
     }
 
     for (const line of hudsonHustleBackdrop.themeLines ?? []) {
-      line.points.forEach((point, index) => {
-        const bounds = pointBounds(point);
+      for (let index = 1; index < line.points.length; index += 1) {
+        const bounds = segmentBounds(line.points[index - 1], line.points[index]);
         for (const zone of protectedZones) {
           if (boundsIntersect(bounds, zone.bounds)) {
-            overlaps.push(`${line.id}:${index} intersects ${zone.id}`);
+            overlaps.push(`${line.id}:${index - 1}-${index} intersects ${zone.id}`);
           }
         }
-      });
+      }
     }
 
     expect(overlaps).toEqual([]);
