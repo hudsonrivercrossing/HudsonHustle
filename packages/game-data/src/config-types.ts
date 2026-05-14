@@ -65,7 +65,14 @@ export interface BoardBackdropGenerationMetadata {
   notes?: string[];
 }
 
+export interface BoardBackdropImage {
+  href: string;
+  opacity?: number;
+  preserveAspectRatio?: "none" | "xMidYMid meet" | "xMidYMid slice";
+}
+
 export interface BoardBackdrop {
+  image?: BoardBackdropImage;
   landAreas: BoardBackdropArea[];
   waterAreas: BoardBackdropArea[];
   shorelines: BoardBackdropLine[];

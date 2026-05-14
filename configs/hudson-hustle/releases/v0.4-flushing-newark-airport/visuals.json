@@ -6,6 +6,11 @@
   "backdropMode": "muted",
   "boardLabelMode": "station-only",
   "backdrop": {
+    "image": {
+      "href": "/basemaps/nyc-hudson-ai-reference-v1.png",
+      "opacity": 0.72,
+      "preserveAspectRatio": "none"
+    },
     "landAreas": [
       {
         "id": "manhattan-island",

@@ -203,6 +203,7 @@ export type {
   BoardBackdrop,
   BoardBackdropArea,
   BoardBackdropGenerationMetadata,
+  BoardBackdropImage,
   BoardBackdropLabel,
   BoardBackdropLandmark,
   BoardBackdropLine,

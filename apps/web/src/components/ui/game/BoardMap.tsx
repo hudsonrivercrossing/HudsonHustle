@@ -212,6 +212,19 @@ export function BoardMap({
       >
         <rect x="0" y="0" width={boardWidth} height={boardHeight} rx="12" fill="#d9c8a6" />
 
+        {backdropOpacityScale > 0 && backdrop.image ? (
+          <image
+            href={backdrop.image.href}
+            x="0"
+            y="0"
+            width={boardWidth}
+            height={boardHeight}
+            preserveAspectRatio={backdrop.image.preserveAspectRatio ?? "none"}
+            opacity={(backdrop.image.opacity ?? 1) * backdropOpacityScale}
+            className="basemap-image"
+          />
+        ) : null}
+
         {backdropOpacityScale > 0
           ? backdrop.waterAreas.map((area) => (
               <path

@@ -2730,6 +2730,10 @@ h3 {
   stroke-width: 0.8;
 }
 
+.basemap-image {
+  pointer-events: none;
+}
+
 /* map city label — display font for transit map station signage */
 .board-label {
   font-size: var(--type-sm);

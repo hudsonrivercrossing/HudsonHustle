@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { getTicketProgress, startGame, reduceGame } from "../src/game";
 import type { CityDef, GameState, MapConfig, RouteDef } from "../src/types";
@@ -591,6 +593,10 @@ describe("game-core", () => {
     const landmarks = hudsonHustleBackdrop.landmarks ?? [];
     const themeLines = hudsonHustleBackdrop.themeLines ?? [];
 
+    expect(hudsonHustleBackdrop.image?.href).toBe("/basemaps/nyc-hudson-ai-reference-v1.png");
+    expect(hudsonHustleBackdrop.image?.opacity ?? 1).toBeLessThanOrEqual(0.75);
+    expect(hudsonHustleBackdrop.image?.preserveAspectRatio).toBe("none");
+    expect(existsSync(path.resolve("../../apps/web/public", hudsonHustleBackdrop.image!.href.slice(1)))).toBe(true);
     expect(landmarks.some((landmark) => landmark.id === "liberty-ellis-harbor-memory")).toBe(true);
     expect(themeLines.some((line) => line.id === "battery-liberty-ferry-memory")).toBe(true);
 
