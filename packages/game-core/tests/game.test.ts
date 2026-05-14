@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { getTicketProgress, startGame, reduceGame } from "../src/game";
 import type { CityDef, GameState, MapConfig, RouteDef } from "../src/types";
 import {
+  type BasemapBounds,
   buildBasemapProtectedZones,
   hudsonHustleAnchorWaveCityIds,
   hudsonHustleBackdrop,
@@ -89,6 +90,34 @@ const exhaustedDoubleRouteMap: MapConfig = {
     stationValue: 4
   }
 };
+
+const backdropPointRadius = 6;
+
+function boundsIntersect(first: BasemapBounds, second: BasemapBounds): boolean {
+  return first.left < second.right && first.right > second.left && first.top < second.bottom && first.bottom > second.top;
+}
+
+function pointBounds(point: { x: number; y: number }, radius = backdropPointRadius): BasemapBounds {
+  return {
+    left: point.x - radius,
+    top: point.y - radius,
+    right: point.x + radius,
+    bottom: point.y + radius
+  };
+}
+
+function landmarkBounds(landmark: NonNullable<typeof hudsonHustleBackdrop.landmarks>[number]): BasemapBounds | undefined {
+  if (landmark.bounds) {
+    return {
+      left: landmark.bounds.x,
+      top: landmark.bounds.y,
+      right: landmark.bounds.x + landmark.bounds.width,
+      bottom: landmark.bounds.y + landmark.bounds.height
+    };
+  }
+
+  return landmark.point ? pointBounds(landmark.point) : undefined;
+}
 
 function connectedCityCount(): number {
   const visited = new Set<string>();
@@ -560,6 +589,36 @@ describe("game-core", () => {
       expect(["low", "medium"]).toContain(line.priority ?? "low");
       expect(line.opacity ?? 1).toBeLessThanOrEqual(0.32);
     }
+  });
+
+  it("keeps backdrop memory features clear of protected gameplay zones", () => {
+    const zones = buildBasemapProtectedZones(hudsonHustleMap, hudsonHustleBoardFrame);
+    const protectedZones = [...zones.routes, ...zones.stations, ...zones.labels];
+    const overlaps: string[] = [];
+
+    for (const landmark of hudsonHustleBackdrop.landmarks ?? []) {
+      const bounds = landmarkBounds(landmark);
+      if (!bounds) continue;
+
+      for (const zone of protectedZones) {
+        if (boundsIntersect(bounds, zone.bounds)) {
+          overlaps.push(`${landmark.id} intersects ${zone.id}`);
+        }
+      }
+    }
+
+    for (const line of hudsonHustleBackdrop.themeLines ?? []) {
+      line.points.forEach((point, index) => {
+        const bounds = pointBounds(point);
+        for (const zone of protectedZones) {
+          if (boundsIntersect(bounds, zone.bounds)) {
+            overlaps.push(`${line.id}:${index} intersects ${zone.id}`);
+          }
+        }
+      });
+    }
+
+    expect(overlaps).toEqual([]);
   });
 
   it("builds protected zones for routes, stations, and labels", () => {
