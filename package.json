@@ -18,6 +18,7 @@
     "config:switch": "node scripts/config/config-switch.mjs",
     "config:preview": "node scripts/config/config-preview.mjs",
     "config:release": "node scripts/config/config-release.mjs",
+    "config:basemap-candidate": "node scripts/config/generate-basemap-candidate.mjs",
     "config:export": "pnpm --filter @hudson-hustle/game-data build && node scripts/config/export-current-config.mjs && node scripts/config/generate-config-registry.mjs"
   }
 }

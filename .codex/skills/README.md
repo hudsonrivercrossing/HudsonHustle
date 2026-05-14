@@ -21,6 +21,7 @@ Do not customize these lightly. If Hudson Hustle needs project-specific guidance
 These encode project-specific workflow, planning, balance, or design context.
 
 - `config-snapshot-manager`
+- `basemap-candidate-generation`
 - `game-balance`
 - `how-to-win-hudson-hustle`
 - `hudson-hustle-brief`

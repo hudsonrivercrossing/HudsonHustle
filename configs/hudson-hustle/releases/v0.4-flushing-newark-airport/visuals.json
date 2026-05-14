@@ -8,18 +8,12 @@
   "backdrop": {
     "image": {
       "href": "/basemaps/nyc-hudson-ai-reference-v1.png",
-      "opacity": 10,
+      "opacity": 1,
       "preserveAspectRatio": "none"
     },
-    "landAreas": [
-      
-    ],
-    "waterAreas": [
-      
-    ],
-    "shorelines": [
-      
-    ],
+    "landAreas": [],
+    "waterAreas": [],
+    "shorelines": [],
     "regionLabels": [
       { "id": "new-jersey", "text": "New Jersey", "point": { "x": 252, "y": 140 } },
       { "id": "manhattan", "text": "Manhattan", "point": { "x": 596, "y": 320 }, "vertical": true },
