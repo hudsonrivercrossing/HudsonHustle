@@ -19,11 +19,67 @@ export interface BoardBackdropLabel {
   vertical?: boolean;
 }
 
+export interface BoardBackdropLandmarkBounds {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+interface BoardBackdropLandmarkBase {
+  id: string;
+  kind:
+    | "harbor-island"
+    | "park"
+    | "terminal"
+    | "waterfront"
+    | "civic"
+    | "theme-marker";
+  label?: string;
+  opacity?: number;
+  priority?: "low" | "medium";
+}
+
+export type BoardBackdropLandmark =
+  | (BoardBackdropLandmarkBase & {
+      point: BoardPoint;
+      bounds?: never;
+    })
+  | (BoardBackdropLandmarkBase & {
+      point?: never;
+      bounds: BoardBackdropLandmarkBounds;
+    });
+
+export interface BoardBackdropThemeLine {
+  id: string;
+  kind: "ferry" | "historic-border" | "shore-memory" | "theme-trace";
+  points: BoardPoint[];
+  opacity?: number;
+  priority?: "low" | "medium";
+}
+
+export interface BoardBackdropGenerationMetadata {
+  recipeId: string;
+  generatorVersion: string;
+  acceptedAt: string;
+  notes?: string[];
+}
+
+export interface BoardBackdropImage {
+  href: string;
+  opacity?: number;
+  preserveAspectRatio?: "none" | "xMidYMid meet" | "xMidYMid slice";
+}
+
 export interface BoardBackdrop {
+  image?: BoardBackdropImage;
   landAreas: BoardBackdropArea[];
   waterAreas: BoardBackdropArea[];
   shorelines: BoardBackdropLine[];
   regionLabels: BoardBackdropLabel[];
+  landmarks?: BoardBackdropLandmark[];
+  themeLines?: BoardBackdropThemeLine[];
+  generatedBy?: BoardBackdropGenerationMetadata;
 }
 
 export interface StationAuthorityRef {

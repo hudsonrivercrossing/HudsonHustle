@@ -210,16 +210,19 @@ export function BoardMap({
         role="img"
         aria-label="Hudson Hustle board map"
       >
-        <defs>
-          <pattern id="transit-grid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-            <circle cx="10" cy="10" r="1.8" fill="rgba(74, 55, 36, 0.30)" />
-          </pattern>
-        </defs>
-
         <rect x="0" y="0" width={boardWidth} height={boardHeight} rx="12" fill="#d9c8a6" />
 
-        {backdropOpacityScale > 0 ? (
-          <rect x="0" y="0" width={boardWidth} height={boardHeight} fill="url(#transit-grid)" rx="12" style={{ pointerEvents: "none" }} />
+        {backdropOpacityScale > 0 && backdrop.image ? (
+          <image
+            href={backdrop.image.href}
+            x="0"
+            y="0"
+            width={boardWidth}
+            height={boardHeight}
+            preserveAspectRatio={backdrop.image.preserveAspectRatio ?? "none"}
+            opacity={backdrop.image.opacity ?? 1}
+            className="basemap-image"
+          />
         ) : null}
 
         {backdropOpacityScale > 0
@@ -253,6 +256,56 @@ export function BoardMap({
                 style={{ opacity: shorelineOpacityScale }}
               />
             ))
+          : null}
+
+        {shorelineOpacityScale > 0
+          ? backdrop.themeLines?.map((line) => (
+              <path
+                key={line.id}
+                d={buildPathD(line.points)}
+                className={`theme-line theme-line--${line.kind}`}
+                style={{ opacity: (line.opacity ?? 1) * shorelineOpacityScale }}
+              />
+            ))
+          : null}
+
+        {backdropOpacityScale > 0
+          ? backdrop.landmarks?.map((landmark) => {
+              const opacity = (landmark.opacity ?? 1) * backdropOpacityScale;
+              if ("bounds" in landmark && landmark.bounds) {
+                const { bounds } = landmark;
+                return (
+                  <rect
+                    key={landmark.id}
+                    x={bounds.x}
+                    y={bounds.y}
+                    width={bounds.width}
+                    height={bounds.height}
+                    rx="10"
+                    className={`basemap-landmark basemap-landmark--${landmark.kind}`}
+                    style={{ opacity }}
+                  />
+                );
+              }
+              if ("point" in landmark && landmark.point) {
+                const { point } = landmark;
+                return (
+                  <g
+                    key={landmark.id}
+                    className={`basemap-landmark basemap-landmark--${landmark.kind}`}
+                    style={{ opacity }}
+                  >
+                    <circle cx={point.x} cy={point.y} r="10" />
+                    {landmark.label ? (
+                      <text x={point.x + 14} y={point.y + 4} className="basemap-landmark__label">
+                        {landmark.label}
+                      </text>
+                    ) : null}
+                  </g>
+                );
+              }
+              return null;
+            })
           : null}
 
         {regionLabels.map((label) => (
@@ -451,18 +504,6 @@ export function BoardMap({
             </g>
           );
         })}
-
-        {backdropOpacityScale > 0 ? (
-          <rect
-            x="0"
-            y="0"
-            width={boardWidth}
-            height={boardHeight}
-            fill="url(#transit-grid)"
-            rx="12"
-            style={{ pointerEvents: "none", mixBlendMode: "multiply" }}
-          />
-        ) : null}
       </svg>
     </div>
   );
