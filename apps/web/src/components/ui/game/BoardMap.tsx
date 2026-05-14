@@ -220,7 +220,7 @@ export function BoardMap({
             width={boardWidth}
             height={boardHeight}
             preserveAspectRatio={backdrop.image.preserveAspectRatio ?? "none"}
-            opacity={(backdrop.image.opacity ?? 1) * backdropOpacityScale}
+            opacity={backdrop.image.opacity ?? 1}
             className="basemap-image"
           />
         ) : null}
