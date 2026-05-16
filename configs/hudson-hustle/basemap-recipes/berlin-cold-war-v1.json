@@ -6,7 +6,8 @@
   "notes": [
     "Board-first Berlin Cold War basemap recipe. Wall is the centerpiece theme line.",
     "Shape language is 神似: Wall path is historically anchored but waypoints are board-fitted so all 8 Border Crossing routes are visibly bisected.",
-    "Concrete-grey palette is scoped to the Wall theme line and Checkpoint Charlie landmark only. All other features inherit the warm-transit-nostalgia palette."
+    "Concrete-grey palette is scoped to the Wall theme line and Checkpoint Charlie landmark only. All other features inherit the warm-transit-nostalgia palette.",
+    "avoidProtectedZones is false for the Wall and 4 station-adjacent landmarks because their meaning requires sitting at specific historic locations inside Berlin's dense graph. Same documented exception pattern as NYC's liberty-ellis-harbor-memory. All affected features are low-opacity (0.14-0.32) and visually quiet."
   ],
   "landAreas": [],
   "waterAreas": [
@@ -59,7 +60,8 @@
       "kind": "civic",
       "bounds": [0.557, 0.52, 0.023, 0.027],
       "opacity": 0.22,
-      "priority": "low"
+      "priority": "low",
+      "avoidProtectedZones": false
     },
     {
       "id": "checkpoint-charlie-memory",
@@ -76,7 +78,8 @@
       "bounds": [0.51, 0.778, 0.08, 0.04],
       "label": "Tempelhofer Feld",
       "opacity": 0.16,
-      "priority": "low"
+      "priority": "low",
+      "avoidProtectedZones": false
     },
     {
       "id": "humboldt-uni-memory",
@@ -84,7 +87,8 @@
       "bounds": [0.667, 0.398, 0.037, 0.022],
       "label": "Humboldt",
       "opacity": 0.18,
-      "priority": "low"
+      "priority": "low",
+      "avoidProtectedZones": false
     },
     {
       "id": "museumsinsel-memory",
@@ -92,7 +96,8 @@
       "bounds": [0.685, 0.453, 0.047, 0.024],
       "label": "Museumsinsel",
       "opacity": 0.2,
-      "priority": "low"
+      "priority": "low",
+      "avoidProtectedZones": false
     }
   ],
   "themeLines": [
@@ -101,7 +106,7 @@
       "kind": "historic-border",
       "opacity": 0.32,
       "priority": "medium",
-      "avoidProtectedZones": true,
+      "avoidProtectedZones": false,
       "points": [
         [0.74, 0.18],
         [0.833, 0.25],
