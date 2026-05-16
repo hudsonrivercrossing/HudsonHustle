@@ -1,0 +1,122 @@
+{
+  "schemaVersion": 1,
+  "recipeId": "berlin-cold-war-v1",
+  "cityId": "berlin",
+  "coordinates": "normalized",
+  "notes": [
+    "Board-first Berlin Cold War basemap recipe. Wall is the centerpiece theme line.",
+    "Shape language is 神似: Wall path is historically anchored but waypoints are board-fitted so all 8 Border Crossing routes are visibly bisected.",
+    "Concrete-grey palette is scoped to the Wall theme line and Checkpoint Charlie landmark only. All other features inherit the warm-transit-nostalgia palette."
+  ],
+  "landAreas": [],
+  "waterAreas": [
+    {
+      "id": "spree-memory",
+      "opacity": 0.14,
+      "points": [
+        [0.45, 0.467],
+        [0.6, 0.444],
+        [0.683, 0.444],
+        [0.75, 0.444],
+        [0.9, 0.556],
+        [0.9, 0.578],
+        [0.75, 0.489],
+        [0.683, 0.489],
+        [0.6, 0.489],
+        [0.45, 0.511]
+      ]
+    }
+  ],
+  "shorelines": [
+    {
+      "id": "spree-north-shore-memory",
+      "points": [
+        [0.45, 0.467],
+        [0.6, 0.444],
+        [0.683, 0.444],
+        [0.75, 0.444],
+        [0.9, 0.556]
+      ]
+    },
+    {
+      "id": "spree-south-shore-memory",
+      "points": [
+        [0.45, 0.511],
+        [0.6, 0.489],
+        [0.683, 0.489],
+        [0.75, 0.489],
+        [0.9, 0.578]
+      ]
+    }
+  ],
+  "regionLabels": [
+    { "id": "west-berlin", "text": "West Berlin", "point": [0.1, 0.133] },
+    { "id": "east-berlin", "text": "East Berlin", "point": [0.65, 0.133] }
+  ],
+  "landmarks": [
+    {
+      "id": "brandenburger-tor-memory",
+      "kind": "civic",
+      "bounds": [0.557, 0.52, 0.023, 0.027],
+      "opacity": 0.22,
+      "priority": "low"
+    },
+    {
+      "id": "checkpoint-charlie-memory",
+      "kind": "theme-marker",
+      "bounds": [0.462, 0.68, 0.03, 0.02],
+      "label": "Checkpoint C.",
+      "opacity": 0.26,
+      "priority": "medium",
+      "avoidProtectedZones": false
+    },
+    {
+      "id": "tempelhofer-feld-memory",
+      "kind": "park",
+      "bounds": [0.51, 0.778, 0.08, 0.04],
+      "label": "Tempelhofer Feld",
+      "opacity": 0.16,
+      "priority": "low"
+    },
+    {
+      "id": "humboldt-uni-memory",
+      "kind": "civic",
+      "bounds": [0.667, 0.398, 0.037, 0.022],
+      "label": "Humboldt",
+      "opacity": 0.18,
+      "priority": "low"
+    },
+    {
+      "id": "museumsinsel-memory",
+      "kind": "civic",
+      "bounds": [0.685, 0.453, 0.047, 0.024],
+      "label": "Museumsinsel",
+      "opacity": 0.2,
+      "priority": "low"
+    }
+  ],
+  "themeLines": [
+    {
+      "id": "berlin-wall-trace",
+      "kind": "historic-border",
+      "opacity": 0.32,
+      "priority": "medium",
+      "avoidProtectedZones": true,
+      "points": [
+        [0.74, 0.18],
+        [0.833, 0.25],
+        [0.817, 0.322],
+        [0.725, 0.333],
+        [0.583, 0.328],
+        [0.463, 0.35],
+        [0.463, 0.556],
+        [0.463, 0.711],
+        [0.579, 0.783],
+        [0.579, 0.911],
+        [0.746, 0.911],
+        [0.846, 0.8],
+        [0.821, 0.644]
+      ]
+    }
+  ]
+}
