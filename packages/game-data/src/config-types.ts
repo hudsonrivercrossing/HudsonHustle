@@ -108,7 +108,7 @@ export interface SnapshotMeta {
   id: string;
   gameId: string;
   version: string;
-  status: "draft" | "playtest" | "released" | "deprecated";
+  status: "draft" | "playtest" | "released" | "deprecated" | "archived";
   basedOn: string | null;
   createdAt: string;
   updatedAt: string;
