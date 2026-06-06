@@ -148,7 +148,7 @@ export function CreateRoomFlow({
                 <select value={configId} onChange={(e) => onChangeConfigId(e.target.value)}>
                   {releasedConfigs.map((config) => (
                     <option key={config.configId} value={config.configId}>
-                      {config.version} · {config.mapName}
+                      {config.mapName}
                     </option>
                   ))}
                 </select>

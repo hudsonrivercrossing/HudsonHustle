@@ -213,7 +213,7 @@ export function SetupScreen({
                   <select value={configId} onChange={(event) => setConfigId(event.target.value)}>
                     {releasedConfigs.map((config) => (
                       <option key={config.configId} value={config.configId}>
-                        {config.version} · {config.mapName}
+                        {config.mapName}
                       </option>
                     ))}
                   </select>

@@ -16,6 +16,23 @@ That means:
 - rivers, shorelines, and islands support orientation, but do not get veto power over playability
 - the background should reinforce the network, not compete with it
 
+## Basemap Principle
+Basemap work should be **神似，不追求形似**.
+
+Use real references to preserve place meaning, not to copy literal map geometry. The basemap should trigger recognition through broad geography, water relationships, terrain, and a few quiet landmarks while staying subordinate to the gameplay graph.
+
+Before adding landmarks, theme lines, or terrain details, reserve protected zones around:
+
+- route corridors
+- station rings
+- station labels
+- route claim badge positions
+- selected and highlighted station states
+
+The background may explain a route crossing, such as Exchange Place to World Trade crossing the Hudson River, but it must never make that route harder to inspect.
+
+Shared pipeline concepts should stay generic across NYC, Berlin, and future maps. City-specific behavior belongs in local recipes. If the workflow stabilizes, promote it into a repo-local skill/plugin so agents can generate basemaps consistently.
+
 ## Data Layers
 Keep these layers separate:
 - `lat/lon`: authority-backed reference truth for each node

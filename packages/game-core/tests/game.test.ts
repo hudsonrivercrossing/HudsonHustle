@@ -1,7 +1,11 @@
+import { existsSync } from "node:fs";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { getTicketProgress, startGame, reduceGame } from "../src/game";
 import type { CityDef, GameState, MapConfig, RouteDef } from "../src/types";
 import {
+  type BasemapBounds,
+  buildBasemapProtectedZones,
   hudsonHustleAnchorWaveCityIds,
   hudsonHustleBackdrop,
   hudsonHustleBoardFrame,
@@ -88,6 +92,48 @@ const exhaustedDoubleRouteMap: MapConfig = {
     stationValue: 4
   }
 };
+
+const backdropPointRadius = 6;
+const backdropLineSegmentClearance = 10;
+
+function boundsIntersect(first: BasemapBounds, second: BasemapBounds): boolean {
+  return first.left < second.right && first.right > second.left && first.top < second.bottom && first.bottom > second.top;
+}
+
+function pointBounds(point: { x: number; y: number }, radius = backdropPointRadius): BasemapBounds {
+  return {
+    left: point.x - radius,
+    top: point.y - radius,
+    right: point.x + radius,
+    bottom: point.y + radius
+  };
+}
+
+function segmentBounds(
+  start: { x: number; y: number },
+  end: { x: number; y: number },
+  padding = backdropLineSegmentClearance
+): BasemapBounds {
+  return {
+    left: Math.min(start.x, end.x) - padding,
+    top: Math.min(start.y, end.y) - padding,
+    right: Math.max(start.x, end.x) + padding,
+    bottom: Math.max(start.y, end.y) + padding
+  };
+}
+
+function landmarkBounds(landmark: NonNullable<typeof hudsonHustleBackdrop.landmarks>[number]): BasemapBounds | undefined {
+  if (landmark.bounds) {
+    return {
+      left: landmark.bounds.x,
+      top: landmark.bounds.y,
+      right: landmark.bounds.x + landmark.bounds.width,
+      bottom: landmark.bounds.y + landmark.bounds.height
+    };
+  }
+
+  return landmark.point ? pointBounds(landmark.point) : undefined;
+}
 
 function connectedCityCount(): number {
   const visited = new Set<string>();
@@ -517,6 +563,109 @@ describe("game-core", () => {
         expect(point.y).toBeLessThanOrEqual(hudsonHustleBoardFrame.height);
       }
     }
+
+    for (const landmark of hudsonHustleBackdrop.landmarks ?? []) {
+      if (landmark.point) {
+        expect(landmark.point.x).toBeGreaterThanOrEqual(0);
+        expect(landmark.point.x).toBeLessThanOrEqual(hudsonHustleBoardFrame.width);
+        expect(landmark.point.y).toBeGreaterThanOrEqual(0);
+        expect(landmark.point.y).toBeLessThanOrEqual(hudsonHustleBoardFrame.height);
+      }
+      if (landmark.bounds) {
+        expect(landmark.bounds.x).toBeGreaterThanOrEqual(0);
+        expect(landmark.bounds.y).toBeGreaterThanOrEqual(0);
+        expect(landmark.bounds.x + landmark.bounds.width).toBeLessThanOrEqual(hudsonHustleBoardFrame.width);
+        expect(landmark.bounds.y + landmark.bounds.height).toBeLessThanOrEqual(hudsonHustleBoardFrame.height);
+      }
+    }
+
+    for (const line of hudsonHustleBackdrop.themeLines ?? []) {
+      for (const point of line.points) {
+        expect(point.x).toBeGreaterThanOrEqual(0);
+        expect(point.x).toBeLessThanOrEqual(hudsonHustleBoardFrame.width);
+        expect(point.y).toBeGreaterThanOrEqual(0);
+        expect(point.y).toBeLessThanOrEqual(hudsonHustleBoardFrame.height);
+      }
+    }
+  });
+
+  it("keeps NYC basemap memory features quiet and board-local", () => {
+    const landmarks = hudsonHustleBackdrop.landmarks ?? [];
+    const themeLines = hudsonHustleBackdrop.themeLines ?? [];
+
+    expect(hudsonHustleBackdrop.image?.href).toBe("/basemaps/nyc-hudson-ai-reference-v1.png");
+    expect(hudsonHustleBackdrop.image?.opacity ?? 1).toBeLessThanOrEqual(1);
+    expect(hudsonHustleBackdrop.image?.preserveAspectRatio).toBe("none");
+    expect(existsSync(path.resolve("../../apps/web/public", hudsonHustleBackdrop.image!.href.slice(1)))).toBe(true);
+    expect(landmarks.some((landmark) => landmark.id === "liberty-ellis-harbor-memory")).toBe(true);
+    expect(themeLines.some((line) => line.id === "battery-liberty-ferry-memory")).toBe(true);
+
+    for (const landmark of landmarks) {
+      expect(["low", "medium"]).toContain(landmark.priority ?? "low");
+      expect(landmark.opacity ?? 1).toBeLessThanOrEqual(0.35);
+    }
+
+    for (const line of themeLines) {
+      expect(["low", "medium"]).toContain(line.priority ?? "low");
+      expect(line.opacity ?? 1).toBeLessThanOrEqual(0.32);
+    }
+  });
+
+  it("keeps backdrop memory features clear of protected gameplay zones", () => {
+    const zones = buildBasemapProtectedZones(hudsonHustleMap, hudsonHustleBoardFrame);
+    const protectedZones = [...zones.routes, ...zones.stations, ...zones.labels];
+    const overlaps: string[] = [];
+
+    for (const landmark of hudsonHustleBackdrop.landmarks ?? []) {
+      const bounds = landmarkBounds(landmark);
+      if (!bounds) continue;
+
+      for (const zone of protectedZones) {
+        if (boundsIntersect(bounds, zone.bounds)) {
+          overlaps.push(`${landmark.id} intersects ${zone.id}`);
+        }
+      }
+    }
+
+    for (const line of hudsonHustleBackdrop.themeLines ?? []) {
+      for (let index = 1; index < line.points.length; index += 1) {
+        const bounds = segmentBounds(line.points[index - 1], line.points[index]);
+        for (const zone of protectedZones) {
+          if (boundsIntersect(bounds, zone.bounds)) {
+            overlaps.push(`${line.id}:${index - 1}-${index} intersects ${zone.id}`);
+          }
+        }
+      }
+    }
+
+    expect(overlaps).toEqual([]);
+  });
+
+  it("builds protected zones for routes, stations, and labels", () => {
+    const zones = buildBasemapProtectedZones(hudsonHustleMap, hudsonHustleBoardFrame);
+
+    expect(zones.routes.length).toBe(hudsonHustleMap.routes.length);
+    expect(zones.stations.length).toBe(hudsonHustleMap.cities.length);
+    expect(zones.labels.length).toBe(hudsonHustleMap.cities.length);
+
+    for (const zone of [...zones.routes, ...zones.stations, ...zones.labels]) {
+      expect(zone.bounds.left).toBeGreaterThanOrEqual(0);
+      expect(zone.bounds.top).toBeGreaterThanOrEqual(0);
+      expect(zone.bounds.right).toBeLessThanOrEqual(hudsonHustleBoardFrame.width);
+      expect(zone.bounds.bottom).toBeLessThanOrEqual(hudsonHustleBoardFrame.height);
+      expect(zone.bounds.right).toBeGreaterThan(zone.bounds.left);
+      expect(zone.bounds.bottom).toBeGreaterThan(zone.bounds.top);
+    }
+  });
+
+  it("protects the Exchange Place to World Trade Hudson crossing corridor", () => {
+    const zones = buildBasemapProtectedZones(hudsonHustleMap, hudsonHustleBoardFrame);
+    const crossing = zones.routes.find((zone) => zone.id === "route:exchange-place-world-trade-a");
+
+    expect(crossing).toBeDefined();
+    expect(crossing?.routeId).toBe("exchange-place-world-trade-a");
+    expect(crossing?.bounds.left).toBeLessThan(getCity("world-trade").x);
+    expect(crossing?.bounds.right).toBeGreaterThan(getCity("exchange-place").x);
   });
 
   it("keeps the main board graph distributed across the board", () => {

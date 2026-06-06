@@ -2730,6 +2730,10 @@ h3 {
   stroke-width: 0.8;
 }
 
+.basemap-image {
+  pointer-events: none;
+}
+
 /* map city label — display font for transit map station signage */
 .board-label {
   font-size: var(--type-sm);
@@ -2876,6 +2880,42 @@ h3 {
 .board-map--minimal .shoreline {
   stroke-width: 1.4;
   stroke-dasharray: none;
+}
+
+.theme-line {
+  fill: none;
+  stroke: rgba(72, 54, 34, 0.16);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 3 8;
+  pointer-events: none;
+}
+
+.theme-line--ferry {
+  stroke: rgba(80, 130, 160, 0.22);
+  stroke-dasharray: 2 10;
+}
+
+.basemap-landmark {
+  fill: rgba(85, 103, 82, 0.14);
+  stroke: rgba(72, 54, 34, 0.12);
+  stroke-width: 1.2;
+  pointer-events: none;
+}
+
+.basemap-landmark--harbor-island {
+  fill: rgba(235, 222, 184, 0.32);
+  stroke: rgba(72, 54, 34, 0.16);
+}
+
+.basemap-landmark__label {
+  fill: rgba(72, 54, 34, 0.2);
+  font-family: var(--font-display);
+  font-size: var(--type-xs);
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  pointer-events: none;
 }
 
 /* map region watermark — display font for geographic area signage */
@@ -3719,4 +3759,3 @@ h3 {
 .game-over-layer .endgame-grid {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
-

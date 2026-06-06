@@ -32,6 +32,7 @@ Main parts:
   - active experiments and work-in-progress versions
 - `releases/`
   - frozen named versions for review, playtest, or rollback
+  - snapshots with `status: "archived"` remain available by id but are hidden from released-map pickers
 
 ## What Lives In One Snapshot
 Each snapshot folder contains:

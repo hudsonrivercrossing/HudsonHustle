@@ -2188,10 +2188,6 @@ body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .system-butto
   fill: #d9c8a6 !important;
 }
 
-.app-shell--gameplay-hud .board-map > rect:nth-of-type(2) {
-  opacity: 0.8;
-}
-
 .app-shell--gameplay-hud .board-map--full .landform,
 .app-shell--gameplay-hud .board-map--muted .landform,
 .app-shell--gameplay-hud .landform {
@@ -2834,10 +2830,6 @@ border-color: rgba(232, 220, 194, 0.72);
 
 .app-shell--gameplay-hud .board-map > rect:first-child {
   fill: #d9c8a6 !important;
-}
-
-.app-shell--gameplay-hud .board-map > rect:nth-of-type(2) {
-  opacity: 0.8;
 }
 
 .app-shell--gameplay-hud .board-map--full .landform,

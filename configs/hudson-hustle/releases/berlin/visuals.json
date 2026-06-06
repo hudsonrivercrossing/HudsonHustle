@@ -1,15 +1,276 @@
 {
   "schemaVersion": 1,
-  "visualSetId": "berlin-draft-01-visuals",
+  "visualSetId": "berlin-cold-war-v1-visuals",
   "boardStyle": "graph-first-transit-nostalgia",
   "theme": "warm-transit-nostalgia",
-  "backdropMode": "none",
+  "backdropMode": "muted",
   "boardLabelMode": "station-only",
   "backdrop": {
+    "image": {
+      "href": "/basemaps/berlin-cold-war-reference-v4.png",
+      "opacity": 1,
+      "preserveAspectRatio": "none"
+    },
     "landAreas": [],
-    "waterAreas": [],
-    "shorelines": [],
-    "regionLabels": []
+    "waterAreas": [
+      {
+        "id": "spree-memory",
+        "points": [
+          {
+            "x": 540,
+            "y": 420
+          },
+          {
+            "x": 720,
+            "y": 400
+          },
+          {
+            "x": 820,
+            "y": 400
+          },
+          {
+            "x": 900,
+            "y": 400
+          },
+          {
+            "x": 1080,
+            "y": 500
+          },
+          {
+            "x": 1080,
+            "y": 520
+          },
+          {
+            "x": 900,
+            "y": 440
+          },
+          {
+            "x": 820,
+            "y": 440
+          },
+          {
+            "x": 720,
+            "y": 440
+          },
+          {
+            "x": 540,
+            "y": 460
+          }
+        ],
+        "opacity": 0.14
+      }
+    ],
+    "shorelines": [
+      {
+        "id": "spree-north-shore-memory",
+        "points": [
+          {
+            "x": 540,
+            "y": 420
+          },
+          {
+            "x": 720,
+            "y": 400
+          },
+          {
+            "x": 820,
+            "y": 400
+          },
+          {
+            "x": 900,
+            "y": 400
+          },
+          {
+            "x": 1080,
+            "y": 500
+          }
+        ]
+      },
+      {
+        "id": "spree-south-shore-memory",
+        "points": [
+          {
+            "x": 540,
+            "y": 460
+          },
+          {
+            "x": 720,
+            "y": 440
+          },
+          {
+            "x": 820,
+            "y": 440
+          },
+          {
+            "x": 900,
+            "y": 440
+          },
+          {
+            "x": 1080,
+            "y": 520
+          }
+        ]
+      }
+    ],
+    "regionLabels": [
+      {
+        "id": "west-berlin",
+        "text": "West Berlin",
+        "point": {
+          "x": 120,
+          "y": 120
+        }
+      },
+      {
+        "id": "east-berlin",
+        "text": "East Berlin",
+        "point": {
+          "x": 780,
+          "y": 120
+        }
+      }
+    ],
+    "landmarks": [
+      {
+        "id": "brandenburger-tor-memory",
+        "kind": "civic",
+        "opacity": 0.22,
+        "priority": "low",
+        "bounds": {
+          "x": 668,
+          "y": 468,
+          "width": 28,
+          "height": 24
+        }
+      },
+      {
+        "id": "checkpoint-charlie-memory",
+        "kind": "theme-marker",
+        "label": "Checkpoint C.",
+        "opacity": 0.26,
+        "priority": "medium",
+        "bounds": {
+          "x": 554,
+          "y": 612,
+          "width": 36,
+          "height": 18
+        }
+      },
+      {
+        "id": "tempelhofer-feld-memory",
+        "kind": "park",
+        "label": "Tempelhofer Feld",
+        "opacity": 0.16,
+        "priority": "low",
+        "bounds": {
+          "x": 612,
+          "y": 700,
+          "width": 96,
+          "height": 36
+        }
+      },
+      {
+        "id": "humboldt-uni-memory",
+        "kind": "civic",
+        "label": "Humboldt",
+        "opacity": 0.18,
+        "priority": "low",
+        "bounds": {
+          "x": 800,
+          "y": 358,
+          "width": 44,
+          "height": 20
+        }
+      },
+      {
+        "id": "museumsinsel-memory",
+        "kind": "civic",
+        "label": "Museumsinsel",
+        "opacity": 0.2,
+        "priority": "low",
+        "bounds": {
+          "x": 822,
+          "y": 408,
+          "width": 56,
+          "height": 22
+        }
+      }
+    ],
+    "themeLines": [
+      {
+        "id": "berlin-wall-trace",
+        "kind": "historic-border",
+        "points": [
+          {
+            "x": 888,
+            "y": 162
+          },
+          {
+            "x": 1000,
+            "y": 225
+          },
+          {
+            "x": 980,
+            "y": 290
+          },
+          {
+            "x": 870,
+            "y": 300
+          },
+          {
+            "x": 700,
+            "y": 295
+          },
+          {
+            "x": 556,
+            "y": 315
+          },
+          {
+            "x": 556,
+            "y": 500
+          },
+          {
+            "x": 556,
+            "y": 640
+          },
+          {
+            "x": 695,
+            "y": 705
+          },
+          {
+            "x": 695,
+            "y": 820
+          },
+          {
+            "x": 895,
+            "y": 820
+          },
+          {
+            "x": 1015,
+            "y": 720
+          },
+          {
+            "x": 985,
+            "y": 580
+          }
+        ],
+        "opacity": 0.32,
+        "priority": "medium"
+      }
+    ],
+    "generatedBy": {
+      "recipeId": "berlin-cold-war-v1",
+      "generatorVersion": "basemap-candidate-script-v1",
+      "acceptedAt": "2026-05-16",
+      "notes": [
+        "Candidate generated from berlin.",
+        "Protected zones: 38 routes, 25 stations, 25 labels.",
+        "Board-first Berlin Cold War basemap recipe. Wall is the centerpiece theme line.",
+        "Shape language is 神似: Wall path is historically anchored but waypoints are board-fitted so all 8 Border Crossing routes are visibly bisected.",
+        "Concrete-grey palette is scoped to the Wall theme line and Checkpoint Charlie landmark only. All other features inherit the warm-transit-nostalgia palette.",
+        "avoidProtectedZones is false for the Wall and 4 station-adjacent landmarks because their meaning requires sitting at specific historic locations inside Berlin's dense graph. Same documented exception pattern as NYC's liberty-ellis-harbor-memory. All affected features are low-opacity (0.14-0.32) and visually quiet."
+      ]
+    }
   },
   "palettes": {
     "cards": {
@@ -31,7 +292,8 @@
     }
   },
   "notes": [
-    "Berlin draft one inherits the current Hudson Hustle visual token system.",
-    "No Berlin-specific backdrop art is included in this first pass."
+    "Berlin Cold War basemap pilot uses local vector backdrop data derived from an approved AI concept image.",
+    "The Wall theme line crosses all 8 Border Crossing routes. Concrete-grey palette is scoped to the Wall and Checkpoint Charlie only.",
+    "Backdrop remains secondary to routes, stations, and labels."
   ]
 }

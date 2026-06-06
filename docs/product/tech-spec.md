@@ -89,7 +89,7 @@
   - `id`
   - `version`
   - `basedOn`
-  - `status` such as `draft`, `playtest`, `released`, or `deprecated`
+  - `status` such as `draft`, `playtest`, `released`, `deprecated`, or `archived`
   - `createdAt`
   - `summary`
   - `designGoals`
