@@ -88,7 +88,7 @@ export function getHudsonHustleReleasedConfigBundle(configId: string) {
 }
 
 export const hudsonHustleReleasedConfigs: HudsonHustleReleasedConfigSummary[] = Object.values(hudsonHustleConfigRegistry)
-  .filter((bundle) => bundle.mode === "release")
+  .filter((bundle) => bundle.mode === "release" && bundle.meta.status !== "archived")
   .map((bundle) => ({
     configId: bundle.configId,
     version: bundle.meta.version,

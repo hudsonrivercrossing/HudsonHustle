@@ -7,7 +7,7 @@
   "boardLabelMode": "station-only",
   "backdrop": {
     "image": {
-      "href": "/basemaps/berlin-cold-war-reference-v1.png",
+      "href": "/basemaps/berlin-cold-war-reference-v4.png",
       "opacity": 1,
       "preserveAspectRatio": "none"
     },

@@ -122,12 +122,16 @@ function getPathSlice(points: PathPoint[], startDistance: number, endDistance: n
   });
 }
 
-function getSegments(route: RouteDef, points: PathPoint[]): Array<{ pathD: string }> {
+function getSegments(
+  route: RouteDef,
+  points: PathPoint[],
+): Array<{ pathD: string; jointPoint?: PathPoint }> {
   const totalLength = getPathLength(points);
   const curvature = getPathCurvature(points);
   const outerPadding = Math.min(38, Math.max(24, totalLength * 0.14) + curvature * 8);
   const usableLength = Math.max(36, totalLength - outerPadding * 2);
-  const gap = Math.max(6, Math.min(10, usableLength / Math.max(5, route.length * (3.2 + curvature * 0.4))));
+  // Larger gap so adjacent segments (and their rounded caps) clearly separate — needed for V5 cable look.
+  const gap = Math.max(16, Math.min(22, usableLength / Math.max(4, route.length * 2.4)));
   const segmentLength = Math.max(16, (usableLength - gap * (route.length - 1)) / route.length);
   const start = outerPadding;
 
@@ -135,8 +139,12 @@ function getSegments(route: RouteDef, points: PathPoint[]): Array<{ pathD: strin
     const segmentStart = start + index * (segmentLength + gap);
     const segmentEnd = segmentStart + segmentLength;
     const slicePoints = getPathSlice(points, segmentStart, segmentEnd, curvature);
+    const jointPoint = index < route.length - 1
+      ? getPointAlongPath(points, segmentEnd + gap / 2)
+      : undefined;
     return {
-      pathD: buildPathD(slicePoints)
+      pathD: buildPathD(slicePoints),
+      jointPoint,
     };
   });
 }
@@ -337,9 +345,11 @@ export function BoardMap({
           const direction = getPathDirection(pathPoints, totalLength / 2);
           const markerX = middlePoint.x + direction.nx * 18;
           const markerY = middlePoint.y + direction.ny * 18;
-          const fillOpacity = claim ? 0.96 : 0.82;
+          const fillOpacity = claim ? 0.95 : 0.78;
           const ownerBadge = claimingPlayer?.name.trim().charAt(0).toUpperCase() ?? "";
-          const backplateFill = claim ? (claimedByViewer ? "#f0d78e" : "#493728") : "#fff2d7";
+          // V5 Sector Cable: dark jacket → color core → inner dark hairline → brass rivets between segments
+          const jacketStroke = claim ? (claimedByViewer ? "rgba(40,32,22,0.9)" : "rgba(40,30,22,0.7)") : "rgba(40,30,22,0.55)";
+          const innerHairlineStroke = "rgba(20,15,10,0.4)";
           const claimStitchStroke = claimedByViewer ? "rgba(255, 251, 236, 0.98)" : "rgba(255, 247, 236, 0.22)";
           const claimStitchWidth = claimedByViewer ? 4.6 : 3;
           const claimStitchDasharray = claimedByViewer ? "3.4 5.6" : "2 8.2";
@@ -362,23 +372,32 @@ export function BoardMap({
 
               {segments.map((segment, index) => (
                 <g key={`${route.id}-${index}`}>
+                  {/* Outer dark cable jacket */}
                   <path
                     d={segment.pathD}
                     fill="none"
-                    stroke={backplateFill}
-                    strokeWidth={18}
+                    stroke={jacketStroke}
+                    strokeWidth={14}
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    opacity={0.98}
                   />
+                  {/* Color core */}
                   <path
                     d={segment.pathD}
                     fill="none"
                     stroke={stroke}
-                    strokeWidth={12}
+                    strokeWidth={10}
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     opacity={fillOpacity}
+                  />
+                  {/* Inner dark hairline running down centre */}
+                  <path
+                    d={segment.pathD}
+                    fill="none"
+                    stroke={innerHairlineStroke}
+                    strokeWidth={1.8}
+                    strokeLinecap="butt"
                   />
                   {claim ? (
                     <path
@@ -391,6 +410,25 @@ export function BoardMap({
                       strokeDasharray={claimStitchDasharray}
                       strokeDashoffset={claimStitchDashoffset}
                     />
+                  ) : null}
+                  {/* Brass rivet between this segment and the next */}
+                  {segment.jointPoint ? (
+                    <g>
+                      <circle
+                        cx={segment.jointPoint.x}
+                        cy={segment.jointPoint.y}
+                        r={3.6}
+                        fill="#3a2e22"
+                        stroke="#9a8060"
+                        strokeWidth={1}
+                      />
+                      <circle
+                        cx={segment.jointPoint.x - 0.8}
+                        cy={segment.jointPoint.y - 0.8}
+                        r={1.1}
+                        fill="rgba(220, 200, 160, 0.55)"
+                      />
+                    </g>
                   ) : null}
                 </g>
               ))}
