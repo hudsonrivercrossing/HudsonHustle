@@ -445,7 +445,7 @@
       "id": "hauptbahnhof-friedrichstrasse-a",
       "from": "hauptbahnhof",
       "to": "friedrichstrasse",
-      "length": 1,
+      "length": 2,
       "color": "rose",
       "type": "Border Crossing",
       "locomotiveCost": 1,
@@ -482,7 +482,7 @@
       "id": "friedrichstrasse-brandenburger-tor",
       "from": "friedrichstrasse",
       "to": "brandenburger-tor",
-      "length": 1,
+      "length": 2,
       "color": "amber",
       "type": "Border Crossing",
       "waypoints": []
@@ -618,7 +618,7 @@
       "id": "hauptbahnhof-potsdamer-platz",
       "from": "hauptbahnhof",
       "to": "potsdamer-platz",
-      "length": 1,
+      "length": 2,
       "color": "ivory",
       "type": "Border Crossing",
       "waypoints": []
@@ -627,7 +627,7 @@
       "id": "potsdamer-platz-brandenburger-tor",
       "from": "potsdamer-platz",
       "to": "brandenburger-tor",
-      "length": 1,
+      "length": 2,
       "color": "gray",
       "type": "Border Crossing",
       "waypoints": []
