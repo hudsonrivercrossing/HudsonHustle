@@ -12,7 +12,8 @@ import {
   hudsonHustleFirstRingCityIds,
   hudsonHustleGeoCities,
   hudsonHustleMap,
-  hudsonHustleStationReferences
+  hudsonHustleStationReferences,
+  getHudsonHustleMapByConfigId
 } from "../../game-data/src";
 
 function forcePlayerHand(state: GameState, colors: Array<GameState["players"][number]["hand"][number]["color"]>): GameState {
@@ -327,6 +328,13 @@ describe("game-core", () => {
     expect(hudsonHustleMap.routes.length).toBeGreaterThanOrEqual(22);
     expect(hudsonHustleMap.routes.length).toBeLessThanOrEqual(38);
     expect(connectedCityCount()).toBe(hudsonHustleMap.cities.length);
+  });
+
+  it("keeps every Berlin release route at least two segments long", () => {
+    const berlinMap = getHudsonHustleMapByConfigId("berlin");
+    const shortRoutes = berlinMap.routes.filter((route) => route.length < 2);
+
+    expect(shortRoutes).toEqual([]);
   });
 
   it("keeps reference coordinates attached to each city and stores every city inside the board frame", () => {
