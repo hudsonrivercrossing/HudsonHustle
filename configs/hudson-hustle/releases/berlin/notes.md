@@ -93,3 +93,4 @@
 - Every route typed `Border Crossing` now crosses the wall on the board. Two did not and are typed `normal`: `friedrichstrasse-brandenburger-tor` and `potsdamer-platz-brandenburger-tor` (neither had a locomotive cost).
 - Hauptbahnhof, Friedrichstrasse, Alexanderplatz and Frankfurter Allee moved a little so the core routes no longer stack; `frankfurter-allee-ostkreuz` bends east so it no longer covers the sector lettering.
 - Station names are written in full with umlauts on both the board and the tickets.
+- Basemap `berlin-cold-war-reference-v5.png`: the same picture as v4 with the dark vignette at the edges mostly lifted and the whole sheet a little lighter, so it sits closer to the New York board.

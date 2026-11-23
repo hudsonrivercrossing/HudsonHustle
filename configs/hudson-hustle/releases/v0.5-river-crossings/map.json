@@ -378,7 +378,7 @@
       "boardX": 856,
       "boardY": 752,
       "labelDx": -18,
-      "labelDy": 22,
+      "labelDy": 18,
       "labelAnchor": "end",
       "authorityRef": {
         "source": "mta-subway-complexes",
@@ -417,9 +417,9 @@
       "lon": -74.0126,
       "boardX": 748,
       "boardY": 838,
-      "labelDx": 0,
-      "labelDy": -16,
-      "labelAnchor": "middle",
+      "labelDx": 10,
+      "labelDy": -24,
+      "labelAnchor": "start",
       "authorityRef": {
         "source": "mta-subway-complexes",
         "reference": "Smith-9 Sts",
@@ -651,8 +651,8 @@
       "locomotiveCost": 1,
       "waypoints": [
         {
-          "x": 586,
-          "y": 724
+          "x": 568,
+          "y": 762
         }
       ]
     },
