@@ -1,0 +1,322 @@
+.board-shell {
+  width: 100%;
+  overflow: auto;
+  border-radius: var(--radius-md);
+  box-shadow: inset 0 0 0 1px oklch(39.04% 0.0499 67.82 / 0.12);
+}
+
+.board-map {
+  width: 100%;
+  max-width: 1180px;
+  min-width: 780px;
+  margin-inline: auto;
+  border-radius: var(--radius-md);
+  display: block;
+}
+
+.landform {
+  fill: oklch(95.41% 0.0229 84.59 / 0.35);
+  stroke: oklch(50.43% 0.0613 72.91 / 0.12);
+  stroke-width: 1.5;
+}
+
+.board-map--full .landform {
+  fill: oklch(95.41% 0.0229 84.59 / 0.45);
+}
+
+.board-map--muted .landform {
+  fill: oklch(95.41% 0.0229 84.59 / 0.35);
+}
+
+.board-map--minimal .landform {
+  fill: oklch(95.41% 0.0229 84.59 / 0.12);
+}
+
+.water-body {
+  fill: oklch(71.77% 0.0567 236.03 / 0.18);
+  stroke: oklch(71.77% 0.0567 236.03 / 0.28);
+  stroke-width: 1;
+  opacity: 1;
+}
+
+.board-map--full .water-body {
+  fill: oklch(71.77% 0.0567 236.03 / 0.28);
+  stroke: oklch(71.77% 0.0567 236.03 / 0.38);
+  stroke-width: 1.4;
+}
+
+.board-map--muted .water-body {
+  fill: oklch(71.77% 0.0567 236.03 / 0.18);
+  stroke: oklch(71.77% 0.0567 236.03 / 0.28);
+  stroke-width: 1.2;
+}
+
+.board-map--minimal .water-body {
+  fill: oklch(71.77% 0.0567 236.03 / 0.12);
+  stroke-width: 0.8;
+}
+
+.basemap-image {
+  pointer-events: none;
+}
+
+/* map city label — display font for transit map station signage */
+.board-label {
+  font-size: var(--type-sm);
+  fill: oklch(28.6% 0.0252 66.54);
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.01em;
+  stroke: oklch(96.25% 0.0171 84.59 / 0.92);
+  stroke-width: 5px;
+  paint-order: stroke;
+  pointer-events: none;
+}
+
+.board-label--highlighted {
+  fill: oklch(42.31% 0.1024 253.28);
+  font-weight: var(--weight-bold);
+}
+
+.city-highlight-ring {
+  fill: color-mix(in oklch, var(--accent-base-solid) 12%, transparent);
+  stroke: color-mix(in oklch, var(--accent-base-solid) 58%, transparent);
+  stroke-width: 4;
+  stroke-dasharray: 7 7;
+  pointer-events: none;
+}
+
+.city-node--highlighted .city-hitbox {
+  stroke: color-mix(in oklch, var(--accent-base-solid) 82%, transparent);
+  stroke-width: 4;
+}
+
+.route-hitbox,
+.city-hitbox {
+  cursor: pointer;
+}
+
+.route-railbed {
+  stroke: oklch(35.29% 0.0407 65.86 / 0.12);
+  stroke-width: 26;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.route-cross-tie {
+  stroke: oklch(100% 0 0 / 0.45);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.route-tunnel-marker rect {
+  stroke: oklch(44.63% 0.0409 66.46 / 0.25);
+}
+
+.route-ferry-marker path {
+  stroke: oklch(58.33% 0.071 236.12 / 0.35);
+}
+
+.route-selection {
+  stroke: color-mix(in oklch, var(--accent-base-solid) 28%, transparent);
+  stroke-width: 28;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.claim-badge {
+  stroke: oklch(98.1% 0.0187 83.06 / 0.92);
+  stroke-width: 2;
+}
+
+.claim-badge__label {
+  font-size: var(--type-2xs);
+  font-weight: var(--weight-bold);
+  fill: oklch(98.32% 0.0183 86.15);
+  letter-spacing: 0.04em;
+  pointer-events: none;
+  paint-order: stroke;
+  stroke: oklch(0% 0 0 / 0.35);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.shoreline {
+  fill: none;
+  stroke: oklch(34.76% 0.0409 68.76 / 0.15);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 6 4;
+}
+
+.board-map--full .shoreline {
+  stroke: oklch(34.76% 0.0409 68.76 / 0.22);
+  stroke-width: 2.4;
+}
+
+.board-map--muted .shoreline {
+  stroke: oklch(34.76% 0.0409 68.76 / 0.15);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+}
+
+.board-map--minimal .shoreline {
+  stroke-width: 1.4;
+  stroke-dasharray: none;
+}
+
+.basemap-landmark {
+  fill: oklch(49.25% 0.0394 141.1 / 0.14);
+  stroke: oklch(34.76% 0.0409 68.76 / 0.12);
+  stroke-width: 1.2;
+  pointer-events: none;
+}
+
+.basemap-landmark--harbor-island {
+  fill: oklch(90.14% 0.0519 91.38 / 0.32);
+  stroke: oklch(34.76% 0.0409 68.76 / 0.16);
+}
+
+.basemap-landmark__label {
+  fill: oklch(34.76% 0.0409 68.76 / 0.2);
+  font-family: var(--font-display);
+  font-size: var(--type-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.06em;
+  pointer-events: none;
+}
+
+/* map region watermark — display font for geographic area signage */
+.region-label {
+  display: block;
+  fill: oklch(39.15% 0.0517 67.57 / 0.12);
+  font-family: var(--font-display);
+  font-size: var(--type-xl);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.region-label--muted {
+  fill: oklch(39.15% 0.0517 67.57 / 0.1);
+  font-size: var(--type-lg);
+}
+
+.region-label--minimal {
+  fill: oklch(39.15% 0.0517 67.57 / 0.08);
+  font-size: var(--type-md);
+  letter-spacing: 0.14em;
+}
+
+.region-label--vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+.app-shell--gameplay-hud .region-label {
+  fill: oklch(31.22% 0.0375 65.73 / 0.18);
+}
+
+.app-shell--gameplay-hud .board-label--highlighted {
+  fill: oklch(41% 0.0828 241.6);
+  stroke: oklch(94.31% 0.0368 91.7 / 0.98);
+}
+
+.app-shell--gameplay-hud .city-node > circle:nth-of-type(2) {
+  fill: oklch(34.97% 0.0377 61.22);
+  opacity: 0.92;
+}
+
+.app-shell--gameplay-hud .city-highlight-ring {
+  fill: oklch(41% 0.0828 241.6 / 0.14);
+  stroke: oklch(41% 0.0828 241.6 / 0.76);
+}
+
+.app-shell--gameplay-hud .route-selection {
+  stroke: oklch(41% 0.0828 241.6 / 0.32);
+  stroke-width: 30px;
+}
+
+.app-shell--gameplay-hud .board-label {
+  fill: oklch(22.73% 0.0228 63.27);
+  stroke: oklch(95.64% 0.0305 88.37 / 0.96);
+  stroke-width: 5.2px;
+}
+
+.app-shell--gameplay-hud .city-hitbox {
+  stroke-width: 3.2px;
+  fill: oklch(96.04% 0.0297 85.56);
+  stroke: oklch(27.21% 0.0322 57.77);
+}
+
+.app-shell--gameplay-hud .route-railbed {
+  stroke: oklch(35.29% 0.0407 65.86 / 0.1);
+}
+
+.app-shell--gameplay-hud .route-cross-tie {
+  stroke: oklch(100% 0 0 / 0.4);
+}
+
+.app-shell--gameplay-hud .board-map > rect:first-child {
+  fill: oklch(83.81% 0.0493 84.53);
+}
+
+.app-shell--gameplay-hud .board-map--full .landform,
+.app-shell--gameplay-hud .board-map--muted .landform,
+.app-shell--gameplay-hud .landform {
+  stroke: oklch(35.1% 0.0458 66.7 / 0.1);
+  fill: oklch(100% 0 0 / 0.22);
+}
+
+.app-shell--gameplay-hud .water-body {
+  fill: oklch(71.77% 0.0567 236.03 / 0.22);
+  stroke: oklch(71.77% 0.0567 236.03 / 0.32);
+}
+
+.app-shell--gameplay-hud .shoreline {
+  opacity: 1;
+  stroke: oklch(34.76% 0.0409 68.76 / 0.18);
+  stroke-dasharray: 6 4;
+}
+
+.app-shell--gameplay-hud .board-shell {
+  border-radius: 0;
+  border: 0;
+  backdrop-filter: none;
+  background: radial-gradient(circle at 26% 18%, oklch(100% 0 0 / 0.72), transparent 32%), linear-gradient(180deg, oklch(100% 0 0 / 0.62), oklch(100% 0 0 / 0.32));
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px oklch(100% 0 0 / 0.52), 0 22px 60px oklch(0% 0 0 / 0.3);
+  height: 100%;
+  min-height: 0;
+}
+
+/* Board map scales fluidly inside the gameplay HUD column;
+   override the base 780px min-width so it can shrink with the viewport. */
+.app-shell--gameplay-hud .board-map {
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+  max-width: none;
+}
+
+/* Keyboard focus on the board: the route's own shape lights up; stations get a ring */
+.route-hitbox:focus {
+  outline: none;
+}
+
+/* Keyboard focus on the board: the route's own shape lights up; stations get a ring */
+.city-hitbox:focus {
+  outline: none;
+}
+
+.route-hitbox:focus-visible {
+  stroke: color-mix(in srgb, var(--color-accent-base) 55%, transparent);
+}
+
+.city-hitbox:focus-visible {
+  stroke: var(--color-accent-base);
+  stroke-width: 6;
+}

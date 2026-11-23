@@ -7,12 +7,17 @@ export {
   LOCAL_SAVE_KEY,
   botPlayerIdsFromSavedGame,
   botPlayerIdsFromSeatIds,
-  buildLocalPrivateState,
-  buildLocalPublicGameState,
   configIdForSavedMap,
-  formatFaceLabel,
   readSavedGame,
   shuffleAvatars,
   type LocalStartSetup,
   type VisibilityMode
 } from "./localGame.utils";
+export {
+  readLastLocalSetup,
+  readLocalSaveMeta,
+  saveLastLocalSetup,
+  saveLocalSaveMeta,
+  type LastLocalSetup,
+  type LocalSaveMeta
+} from "./localSetupStorage";

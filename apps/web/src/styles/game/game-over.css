@@ -1,0 +1,320 @@
+.endgame-card {
+  padding: var(--space-panel-md);
+  background: radial-gradient(circle at top right, oklch(53.53% 0.0953 252.23 / 0.08), transparent 24%), linear-gradient(180deg, oklch(99.42% 0.0069 88.64 / 0.98), oklch(94.18% 0.0241 85.79 / 0.94));
+  border: 1px solid color-mix(in oklch, var(--border-warm-solid) 18%, transparent);
+  border-radius: calc(var(--radius-md) + 1px);
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.56), 0 16px 30px oklch(30.15% 0.0397 65.34 / 0.1);
+}
+
+.endgame-card--winner {
+  border-color: oklch(66.15% 0.1215 81.47 / 0.54);
+  background: radial-gradient(circle at top right, oklch(81.44% 0.12 82.95 / 0.14), transparent 40%), linear-gradient(180deg, oklch(99.42% 0.0069 88.64 / 0.99), oklch(95.88% 0.0422 90.77 / 0.96));
+  box-shadow: inset 0 1px 0 oklch(92.63% 0.1134 94.36 / 0.5), 0 0 0 1px oklch(66.15% 0.1215 81.47 / 0.22), 0 20px 40px oklch(41.7% 0.0816 78.72 / 0.14);
+}
+
+.endgame-card--winner .endgame-score {
+  font-size: clamp(2.7rem, 5vw, 3.6rem);
+  color: oklch(44.28% 0.0887 77.79);
+}
+
+.endgame-card--winner .endgame-score__label {
+  color: oklch(56.02% 0.1125 78.37 / 0.78);
+}
+
+.endgame-card .surface-card__header {
+  min-height: 64px;
+  align-content: start;
+}
+
+.endgame-card .surface-card__body {
+  grid-template-rows: minmax(104px, auto) 1fr;
+  align-content: start;
+}
+
+.endgame-card__hero {
+  display: grid;
+  justify-items: start;
+  align-content: start;
+  gap: 2px;
+  padding: 0 0 8px;
+  min-height: 104px;
+  border-bottom: 1px solid color-mix(in oklch, var(--border-warm-solid) 12%, transparent);
+}
+
+.endgame-score__label {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: var(--type-utility-xs);
+  font-weight: var(--weight-bold);
+  color: color-mix(in srgb, var(--accent-strong) 26%, var(--ink-soft) 74%);
+}
+
+.endgame-breakdown {
+  display: grid;
+  gap: 4px;
+  padding-top: 0;
+}
+
+.endgame-breakdown__row {
+  display: grid;
+  grid-template-columns: minmax(118px, 132px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  padding: 7px 0;
+  border-bottom: 1px dashed color-mix(in oklch, var(--border-warm-solid) 12%, transparent);
+}
+
+.endgame-breakdown__row:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.endgame-breakdown__label {
+  color: var(--ink-soft);
+  font-size: var(--type-xs);
+  line-height: 1.2;
+}
+
+.endgame-breakdown__value {
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-align: right;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.endgame-breakdown__value--empty {
+  text-transform: none;
+}
+
+.endgame-breakdown__list {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.endgame-breakdown__list-item {
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+/* printed ticket card route — display font for ticket-as-artifact aesthetic */
+.endgame-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+/* endgame score — display font for ceremonial final-score reveal */
+.endgame-score {
+  font-family: var(--font-display);
+  line-height: 0.94;
+  letter-spacing: -0.05em;
+  color: var(--ink);
+  font-size: var(--type-display);
+  margin: 8px 0 14px;
+}
+
+.game-over-layer {
+  position: fixed;
+  inset: max(22px, var(--space-page-y)) max(22px, var(--space-page-x));
+  z-index: var(--z-overlay);
+  display: grid;
+  grid-template-columns: minmax(260px, 0.34fr) minmax(0, 1fr);
+  gap: 20px;
+  overflow: hidden;
+  padding: 22px;
+  border: 1px solid oklch(83.88% 0.0602 81.93 / 0.24);
+  border-radius: var(--radius-lg);
+  background: radial-gradient(circle at 72% 20%, oklch(63.52% 0.0816 241.57 / 0.2), transparent 34%), linear-gradient(135deg, oklch(22.15% 0.0205 245.73 / 0.92), oklch(16.09% 0.0134 248.52 / 0.9));
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.14), 0 30px 90px oklch(0% 0 0 / 0.48);
+  color: oklch(95.22% 0.0261 82.39);
+  backdrop-filter: blur(18px);
+}
+
+.game-over-layer__header {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  padding: 10px;
+}
+
+.game-over-layer__header p {
+  margin: 0;
+  max-width: 34ch;
+  color: oklch(95.22% 0.0261 82.39 / 0.72);
+  font-size: var(--type-body);
+  line-height: 1.45;
+}
+
+.game-over-layer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.game-over-layer__scores {
+  min-height: 0;
+  overflow: auto;
+  padding: 4px;
+}
+
+.game-over-layer .endgame-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.app-shell--gameplay-hud .game-over-layer__header {
+  gap: 14px;
+}
+
+.app-shell--gameplay-hud .game-over-layer__header .section-header__eyebrow {
+  color: color-mix(in oklch, var(--hud-brass-light-solid) 84%, transparent);
+}
+
+.app-shell--gameplay-hud .game-over-layer__header .section-header__title {
+  font-size: var(--type-xl);
+  line-height: 1.02;
+}
+
+.app-shell--gameplay-hud .game-over-layer__header p {
+  color: oklch(98.03% 0.0223 87.15 / 0.78);
+  font-size: var(--type-sm);
+}
+
+.app-shell--gameplay-hud .game-over-layer__actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-content: start;
+}
+
+.app-shell--gameplay-hud .game-over-layer__actions .system-button {
+  width: 100%;
+  background: color-mix(in oklch, var(--hud-brass-light-solid) 14%, transparent);
+  border: 1px solid color-mix(in oklch, var(--hud-brass-light-solid) 40%, transparent);
+  color: var(--hud-paper-bright, oklch(98.08% 0.0199 84.59));
+  font-weight: var(--weight-bold);
+  font-size: var(--type-sm);
+}
+
+.app-shell--gameplay-hud .game-over-layer__actions .system-button:hover:not(:disabled) {
+  background: color-mix(in oklch, var(--hud-brass-light-solid) 26%, transparent);
+  border-color: color-mix(in oklch, var(--hud-brass-light-solid) 60%, transparent);
+}
+
+.app-shell--gameplay-hud .game-over-layer__actions .system-button[variant="primary"],
+.app-shell--gameplay-hud .game-over-layer__actions .system-button.primary-button {
+  background: linear-gradient(180deg, oklch(82.1% 0.0692 89.66), oklch(56.29% 0.0797 83.17));
+  border-color: oklch(56.29% 0.0797 83.17);
+  color: oklch(19.94% 0.0155 75.95);
+}
+
+.app-shell--gameplay-hud .game-over-layer__actions .system-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* (Old angular clip-path removed for visual consistency across panels.)
+   Disabled by overriding with `none` below. */
+.app-shell--gameplay-hud .game-over-layer {
+  border-color: oklch(70.15% 0.0832 84.6 / 0.34);
+  background: var(--hud-grain), linear-gradient(180deg, oklch(24.35% 0.0172 74.79 / 0.97), oklch(13.62% 0.0065 71.35 / 0.96));
+  color: var(--hud-paper);
+  backdrop-filter: none;
+  border-radius: var(--radius-sm);
+  clip-path: none;
+  box-shadow: inset 0 0 0 1px oklch(96.88% 0.0372 88.46 / 0.08), inset 0 0 0 7px oklch(70.15% 0.0832 84.6 / 0.055), 0 24px 54px oklch(0% 0 0 / 0.5);
+}
+
+.app-shell--gameplay-hud .endgame-card {
+  border-color: color-mix(in oklch, var(--hud-brass-light-solid) 18%, transparent);
+  background: radial-gradient(circle at top right, oklch(63.46% 0.0823 241.13 / 0.12), transparent 28%), linear-gradient(180deg, oklch(97.81% 0.0227 84.59 / 0.1), oklch(16.09% 0.0134 248.52 / 0.12));
+  color: var(--hud-paper-bright);
+}
+
+/* Game-over board: high-contrast text on dark backdrop, single-column breakdown rows */
+.app-shell--gameplay-hud .game-over-layer .endgame-card {
+  border-color: color-mix(in oklch, var(--hud-brass-light-solid) 18%, transparent);
+  border-radius: var(--radius-map-line);
+  clip-path: polygon( 8px 0, calc(100% - 8px) 0, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 0 calc(100% - 8px), 0 8px );
+  background: var(--hud-grain), linear-gradient(180deg, oklch(24.35% 0.0172 74.79 / 0.94), oklch(14.65% 0.0057 69.2 / 0.94));
+  border: 1px solid color-mix(in srgb, var(--hud-brass) 42%, oklch(0% 0 0 / 0.34));
+  color: var(--hud-paper-bright, oklch(98.08% 0.0199 84.59));
+}
+
+/* Game-over board: high-contrast text on dark backdrop, single-column breakdown rows */
+body:has(.app-shell--gameplay-hud) .game-over-layer .endgame-card {
+  background: var(--hud-grain), linear-gradient(180deg, oklch(24.35% 0.0172 74.79 / 0.94), oklch(14.65% 0.0057 69.2 / 0.94));
+  border: 1px solid color-mix(in srgb, var(--hud-brass) 42%, oklch(0% 0 0 / 0.34));
+  color: var(--hud-paper-bright, oklch(98.08% 0.0199 84.59));
+}
+
+.app-shell--gameplay-hud .game-over-layer .surface-card__title,
+.app-shell--gameplay-hud .game-over-layer .surface-card__eyebrow,
+.app-shell--gameplay-hud .game-over-layer .endgame-score,
+.app-shell--gameplay-hud .game-over-layer .endgame-score__label,
+body:has(.app-shell--gameplay-hud) .game-over-layer .surface-card__title,
+body:has(.app-shell--gameplay-hud) .game-over-layer .surface-card__eyebrow,
+body:has(.app-shell--gameplay-hud) .game-over-layer .endgame-score,
+body:has(.app-shell--gameplay-hud) .game-over-layer .endgame-score__label {
+  color: var(--hud-paper-bright, oklch(98.08% 0.0199 84.59));
+}
+
+/* Single-column breakdown rows: label stacked above value */
+.app-shell--gameplay-hud .game-over-layer .endgame-breakdown__row {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px;
+}
+
+/* Single-column breakdown rows: label stacked above value */
+body:has(.app-shell--gameplay-hud) .game-over-layer .endgame-breakdown__row {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 4px;
+}
+
+.app-shell--gameplay-hud .game-over-layer .endgame-breakdown__label,
+body:has(.app-shell--gameplay-hud) .game-over-layer .endgame-breakdown__label {
+  color: color-mix(in oklch, var(--hud-brass-light-solid) 78%, transparent);
+  font-size: var(--type-2xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.app-shell--gameplay-hud .game-over-layer .endgame-breakdown__value,
+body:has(.app-shell--gameplay-hud) .game-over-layer .endgame-breakdown__value {
+  color: var(--hud-paper-bright, oklch(98.08% 0.0199 84.59));
+  text-align: left;
+}
+
+.app-shell--gameplay-hud .game-over-layer .endgame-breakdown__list,
+body:has(.app-shell--gameplay-hud) .game-over-layer .endgame-breakdown__list {
+  padding-left: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.app-shell--gameplay-hud .game-over-layer .endgame-breakdown__list-item,
+body:has(.app-shell--gameplay-hud) .game-over-layer .endgame-breakdown__list-item {
+  color: var(--hud-paper-bright, oklch(98.08% 0.0199 84.59));
+  font-weight: var(--weight-semibold);
+  font-size: var(--type-xs);
+  padding-left: 8px;
+  border-left: 2px solid color-mix(in oklch, var(--hud-brass-light-solid) 50%, transparent);
+}
+
+@media (max-width: 1040px) {
+  .game-over-layer {
+    grid-template-columns: 1fr;
+    overflow: auto;
+  }
+
+  .game-over-layer__scores {
+    overflow: visible;
+  }
+}

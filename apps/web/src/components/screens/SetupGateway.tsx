@@ -1,5 +1,5 @@
 import { Button } from "../ui/primitives";
-import { DepartureBoardTile, SetupShell, type SetupStep } from "../setup";
+import { DepartureBoardTile, SetupShell } from "../setup";
 
 interface SetupGatewayProps {
   onChooseLocal: () => void;
@@ -9,11 +9,6 @@ interface SetupGatewayProps {
 
 export function SetupGateway({ onChooseLocal, onChooseOnline, onOpenGuide }: SetupGatewayProps): JSX.Element {
   const setupHeroImageUrl = "/setup/landing-bg.png";
-  const gatewaySteps: SetupStep[] = [
-    { label: "Choose table", meta: "Local or online", status: "current" },
-    { label: "Set seats", meta: "Players and bots", status: "upcoming" },
-    { label: "Start route", meta: "Board preflight", status: "upcoming" }
-  ];
 
   return (
     <SetupShell
@@ -21,7 +16,6 @@ export function SetupGateway({ onChooseLocal, onChooseOnline, onOpenGuide }: Set
       title="Hudson Hustle"
       lead="Choose your line"
       backgroundImageUrl={setupHeroImageUrl}
-      steps={gatewaySteps}
       className="setup-board-shell--gateway"
     >
       <div className="setup-entry-grid setup-entry-grid--gateway">

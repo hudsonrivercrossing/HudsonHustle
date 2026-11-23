@@ -1,0 +1,127 @@
+/* Replay of a finished game: the board, a transport row, and running route points */
+.app-shell--gameplay-hud.replay-screen {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: var(--space-stack-sm);
+}
+
+.replay-screen__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-stack-md);
+}
+
+.replay-screen__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--type-xl);
+  font-weight: var(--weight-semibold);
+}
+
+.replay-screen__board {
+  min-height: 0;
+}
+
+/* The replay board is wider than the map, so the shell shows beside it: keep it dark there. */
+.replay-screen .replay-screen__board .board-shell {
+  background: transparent;
+}
+
+.replay-screen__controls {
+  display: grid;
+  gap: var(--space-stack-sm);
+}
+
+.replay-screen__caption {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-stack-md);
+  font-size: var(--type-body);
+  min-height: calc(var(--type-body) * var(--lh-normal));
+}
+
+.replay-screen__points {
+  font-variant-numeric: tabular-nums;
+}
+
+.replay-screen__step {
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in oklch, var(--hud-paper-solid) 60%, transparent);
+  font-size: var(--type-sm);
+}
+
+.replay-screen__transport {
+  display: flex;
+  align-items: center;
+  gap: var(--space-stack-sm);
+}
+
+.replay-screen__transport .system-button {
+  min-width: var(--hit-target-min);
+  min-height: var(--hit-target-min);
+}
+
+.replay-screen__transport .system-button.primary-button {
+  background: var(--hud-brass-light-solid);
+  border-color: var(--hud-brass-light-solid);
+  color: var(--hud-ink);
+}
+
+.replay-screen__slider {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: var(--hit-target-min);
+  accent-color: var(--color-control-accent);
+}
+
+.replay-screen__scores {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-stack-sm) var(--space-stack-lg);
+  font-size: var(--type-sm);
+}
+
+.replay-screen__score {
+  display: flex;
+  align-items: center;
+  gap: var(--space-stack-sm);
+  color: color-mix(in oklch, var(--hud-paper-solid) 76%, transparent);
+}
+
+.replay-screen__score--active {
+  color: var(--hud-paper-bright);
+  font-weight: var(--weight-semibold);
+}
+
+.replay-screen__swatch {
+  inline-size: var(--space-stack-md);
+  block-size: var(--space-stack-md);
+  border-radius: var(--radius-1);
+}
+
+.replay-screen__note {
+  margin: 0;
+  font-size: var(--type-xs);
+  color: color-mix(in oklch, var(--hud-paper-solid) 60%, transparent);
+}
+
+.replay-screen__tally {
+  font-size: var(--type-xs);
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in oklch, var(--hud-paper-solid) 60%, transparent);
+}
+
+.replay-screen__filter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-stack-sm);
+  min-height: var(--hit-target-min);
+  font-size: var(--type-sm);
+  color: var(--hud-paper);
+  cursor: pointer;
+}

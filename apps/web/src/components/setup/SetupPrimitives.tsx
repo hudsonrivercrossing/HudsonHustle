@@ -1,20 +1,11 @@
 import type { ReactNode } from "react";
 import { Button } from "../ui/primitives/Button";
 
-export type SetupStepStatus = "current" | "complete" | "upcoming";
-
-export interface SetupStep {
-  label: string;
-  meta: string;
-  status: SetupStepStatus;
-}
-
 interface SetupShellProps {
   eyebrow: string;
   title: string;
   lead: string;
   backgroundImageUrl: string;
-  steps: SetupStep[];
   modeSwitch?: ReactNode;
   backAction?: ReactNode;
   identitySlot?: ReactNode;
@@ -68,21 +59,16 @@ export function SetupShell({
   );
 }
 
-export function SetupStepper({ steps }: { steps: SetupStep[] }): JSX.Element {
+/** One labelled group of fields inside a setup panel: seats, board, pace. */
+export function SetupSection({ title, meta, children }: { title: string; meta?: string; children: ReactNode }): JSX.Element {
   return (
-    <ol className="setup-stepper" aria-label="Setup progress">
-      {steps.map((step, index) => (
-        <li key={step.label} className={`setup-stepper__item setup-stepper__item--${step.status}`}>
-          <span className="setup-stepper__marker">{step.status === "complete" ? "OK" : `0${index + 1}`}</span>
-          <span className="setup-stepper__line" aria-hidden="true" />
-          <span className="setup-stepper__copy">
-            <strong>{step.label}</strong>
-            <span>{step.meta}</span>
-          </span>
-          <em>{step.status === "current" ? "Now" : step.status === "complete" ? "Done" : "Next"}</em>
-        </li>
-      ))}
-    </ol>
+    <section className="setup-section">
+      <header className="setup-section__header">
+        <h3>{title}</h3>
+        {meta ? <p>{meta}</p> : null}
+      </header>
+      {children}
+    </section>
   );
 }
 

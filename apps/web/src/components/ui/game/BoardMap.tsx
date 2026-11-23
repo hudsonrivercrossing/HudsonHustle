@@ -1,4 +1,5 @@
-import type { MapConfig, RouteDef } from "@hudson-hustle/game-core";
+import type { KeyboardEvent } from "react";
+import { getCityName, type MapConfig, type RouteDef } from "@hudson-hustle/game-core";
 import type { BoardBackdrop, SnapshotVisuals } from "@hudson-hustle/game-data";
 
 interface PathPoint {
@@ -170,6 +171,16 @@ interface BoardMapProps {
   onSelectCity: (cityId: string, position?: { x: number; y: number }) => void;
 }
 
+/** Enter or Space on a route or station opens its panel, anchored to the element's centre. */
+function activateFromKeyboard(event: KeyboardEvent<SVGElement>, activate: (position: { x: number; y: number }) => void): void {
+  if (event.key !== "Enter" && event.key !== " ") {
+    return;
+  }
+  event.preventDefault();
+  const box = event.currentTarget.getBoundingClientRect();
+  activate({ x: box.left + box.width / 2, y: box.top + box.height / 2 });
+}
+
 export function BoardMap({
   config,
   backdrop,
@@ -215,8 +226,8 @@ export function BoardMap({
       <svg
         className={`board-map board-map--${backdropMode}`}
         viewBox={`0 0 ${boardWidth} ${boardHeight}`}
-        role="img"
-        aria-label="Hudson Hustle board map"
+        role="group"
+        aria-label="Board map: routes and stations"
       >
         <rect x="0" y="0" width={boardWidth} height={boardHeight} rx="12" fill="#d9c8a6" />
 
@@ -483,6 +494,19 @@ export function BoardMap({
                 strokeWidth="28"
                 strokeLinecap="round"
                 onClick={(event) => onSelectRoute(route.id, { x: event.clientX, y: event.clientY })}
+                onKeyDown={(event) => activateFromKeyboard(event, (position) => onSelectRoute(route.id, position))}
+                tabIndex={0}
+                role="button"
+                aria-label={[
+                  `${getCityName(config, route.from)} to ${getCityName(config, route.to)}`,
+                  `${route.length} train${route.length === 1 ? "" : "s"}`,
+                  route.color === "gray" ? "any color" : route.color,
+                  route.type === "normal" ? null : route.type,
+                  claimingPlayer ? `claimed by ${claimingPlayer.name}` : "open"
+                ]
+                  .filter(Boolean)
+                  .join(", ")}
+                aria-pressed={selectedRouteId === route.id}
                 className="route-hitbox"
                 data-testid={`route-hitbox-${route.id}`}
                 fill="none"
@@ -516,6 +540,11 @@ export function BoardMap({
                 stroke="#453221"
                 strokeWidth="3"
                 onClick={(event) => onSelectCity(city.id, { x: event.clientX, y: event.clientY })}
+                onKeyDown={(event) => activateFromKeyboard(event, (position) => onSelectCity(city.id, position))}
+                tabIndex={0}
+                role="button"
+                aria-label={`${city.name} station${station ? ", station built" : ""}`}
+                aria-pressed={selected}
                 className="city-hitbox"
               />
               <circle cx={city.x} cy={city.y} r={selected ? 7 : 5} fill="#5b4633" opacity="0.85" />

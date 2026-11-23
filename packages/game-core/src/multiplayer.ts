@@ -1,4 +1,5 @@
-import type { EndgameBreakdown, GameAction, GamePhase, GameState, PlayerColor, RouteClaim, StationPlacement, TicketDef, TrainCard, TurnState } from "./types.js";
+import type { BotDifficulty } from "./bot-policy.js";
+import type { EndgameBreakdown, GameAction, GameEvent, GamePhase, GameState, PlayerColor, RouteClaim, StationPlacement, TicketDef, TrainCard, TurnState, GameMove } from "./types.js";
 
 export type ControllerType = "human" | "bot" | "agent" | "human+agent";
 export type RoomStatus = "lobby" | "active" | "finished";
@@ -61,6 +62,9 @@ export interface PublicGameState {
   finalRoundRemaining: number | null;
   finalRoundTriggeredBy: string | null;
   log: string[];
+  logSequence: number;
+  events?: GameEvent[];
+  moves?: GameMove[];
 }
 
 export interface SeatPrivateState {
@@ -83,6 +87,8 @@ export interface CreateRoomRequest {
   configId: string;
   turnTimeLimitSeconds: number;
   botSeatIds?: string[];
+  /** How well the room's bots play. Defaults to "standard". */
+  botDifficulty?: BotDifficulty;
 }
 
 export interface CreateRoomResponse {
@@ -138,11 +144,21 @@ export interface RoomSubscribePayload {
   playerSecret: string;
 }
 
-export interface ReadyPayload extends RoomSubscribePayload {
+/**
+ * Events after `room:subscribe` act for the seat that connection claimed, so they carry no
+ * credentials. The optional fields are what older clients still send; the server ignores them.
+ */
+interface SeatEventPayload {
+  roomCode?: string;
+  seatId?: string;
+  playerSecret?: string;
+}
+
+export interface ReadyPayload extends SeatEventPayload {
   ready: boolean;
 }
 
-export interface GameActionPayload extends RoomSubscribePayload {
+export interface GameActionPayload extends SeatEventPayload {
   action: GameAction;
 }
 
@@ -154,7 +170,7 @@ export interface ChatMessage {
   createdAt: string;
 }
 
-export interface ChatMessagePayload extends RoomSubscribePayload {
+export interface ChatMessagePayload extends SeatEventPayload {
   message: string;
 }
 

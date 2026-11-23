@@ -98,8 +98,8 @@ Setup material hierarchy:
 ## Implementation Direction
 
 Stable semantic roles should live in:
-- [tokens.ts](/Users/djfan/Workspace/HudsonHustle/apps/web/src/design/tokens.ts)
-- [theme.css](/Users/djfan/Workspace/HudsonHustle/apps/web/src/design/theme.css)
+- [tokens.ts](../../apps/web/src/styles/theme.css)
+- [theme.css](../../apps/web/src/styles/theme.css)
 
 Page components should consume semantic variables such as:
 - `--color-surface-panel`

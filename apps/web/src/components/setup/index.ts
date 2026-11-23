@@ -1,3 +1,4 @@
+export { BotDifficultyField } from "./BotDifficultyField";
 export { SeatPlan } from "./SeatPlan";
 export type { SeatRow } from "./SeatPlan";
 export {
@@ -6,12 +7,11 @@ export {
   ModeSwitch,
   SetupActions,
   SetupBackButton,
+  SetupSection,
   SetupShell,
   SetupStepPanel,
-  SetupStepper,
   SetupSummaryRow,
   SetupTicketSlip,
   StationPlate,
   TokenButton
 } from "./SetupPrimitives";
-export type { SetupStep, SetupStepStatus } from "./SetupPrimitives";

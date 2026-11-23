@@ -1,25 +1,28 @@
 import { useMemo, useState } from "react";
 import {
+  BotDifficultyField,
   MapThumbnail,
   SeatPlan,
   SetupActions,
   SetupBackButton,
+  SetupSection,
   SetupShell,
   SetupStepPanel,
   SetupSummaryRow,
-  SetupTicketSlip,
   TokenButton,
-  type SeatRow,
-  type SetupStep
+  type SeatRow
 } from "../setup";
 import { Button } from "../ui/primitives/Button";
 import { FormField } from "../ui/primitives/FormField";
 import { TimerPicker } from "../ui/primitives/TimerPicker";
+import type { BotDifficulty } from "@hudson-hustle/game-core";
 import type { HudsonHustleReleasedConfigSummary } from "@hudson-hustle/game-data";
+import { readLastLocalSetup, saveLastLocalSetup } from "../local";
 
 interface LocalStartSetup {
   playerNames: string[];
   botSeatIds: string[];
+  botDifficulty: BotDifficulty;
   configId: string;
   turnTimeLimitSeconds: number;
 }
@@ -43,12 +46,14 @@ export function SetupScreen({
   releasedConfigs,
   initialConfigId
 }: SetupScreenProps): JSX.Element {
-  const [playerCount, setPlayerCount] = useState(2);
-  const [names, setNames] = useState(["Player 1", "Player 2", "Player 3", "Player 4"]);
-  const [botSeatIds, setBotSeatIds] = useState<string[]>([]);
-  const [configId, setConfigId] = useState(initialConfigId);
-  const [turnTimeLimitSeconds, setTurnTimeLimitSeconds] = useState(0);
-  const [step, setStep] = useState<0 | 1 | 2>(0);
+  // Start from the last game's choices; a group that plays again should not retype them.
+  const [lastSetup] = useState(() => readLastLocalSetup(releasedConfigs.map((config) => config.configId)));
+  const [playerCount, setPlayerCount] = useState<number>(lastSetup?.playerCount ?? 2);
+  const [names, setNames] = useState<string[]>(lastSetup?.names ?? ["Player 1", "Player 2", "Player 3", "Player 4"]);
+  const [botSeatIds, setBotSeatIds] = useState<string[]>(lastSetup?.botSeatIds ?? []);
+  const [botDifficulty, setBotDifficulty] = useState<BotDifficulty>(lastSetup?.botDifficulty ?? "standard");
+  const [configId, setConfigId] = useState(lastSetup?.configId ?? initialConfigId);
+  const [turnTimeLimitSeconds, setTurnTimeLimitSeconds] = useState(lastSetup?.turnTimeLimitSeconds ?? 0);
 
   const setupSeatIds = useMemo(() => Array.from({ length: playerCount }, (_, index) => `seat-${index + 1}`), [playerCount]);
   const activeNames = useMemo(
@@ -66,35 +71,36 @@ export function SetupScreen({
   const plannedBotCount = botSeatIds.filter((seatId) => setupSeatIds.includes(seatId)).length;
   const plannedHumanCount = Math.max(1, playerCount - plannedBotCount);
   const setupHeroImageUrl = "/setup/landing-bg.png";
-  const localSteps: SetupStep[] = [
-    { label: "Seats", meta: "Players and bots", status: step === 0 ? "current" : "complete" },
-    { label: "Map", meta: "Choose board", status: step === 1 ? "current" : step > 1 ? "complete" : "upcoming" },
-    { label: "Timer", meta: "Pace label", status: step === 2 ? "current" : "upcoming" }
-  ];
   const localPreflight = (
     <div className="setup-preflight-card">
       <span className="setup-preflight-card__eyebrow">Local table</span>
-      {step >= 1 ? (
-        <MapThumbnail configId={selectedConfig?.configId ?? configId} mapName={selectedConfig?.mapName ?? "Hudson Hustle"} version={selectedConfig?.version} />
-      ) : (
-        <SetupTicketSlip
-          className="setup-room-code-plate--table"
-          ariaLabel="Local table seats"
-          label="Seats"
-          value={`${plannedHumanCount} human`}
-          detail={`${plannedBotCount} bot`}
-        />
-      )}
+      <MapThumbnail configId={selectedConfig?.configId ?? configId} mapName={selectedConfig?.mapName ?? "Hudson Hustle"} version={selectedConfig?.version} />
       <div className="setup-summary-stack">
-        {step >= 1 ? <SetupSummaryRow label="Map" value={selectedConfig?.mapName ?? "Map"} /> : null}
+        <SetupSummaryRow label="Map" value={selectedConfig?.mapName ?? "Map"} />
         <SetupSummaryRow label="Seats" value={`${plannedHumanCount} human`} detail={`${plannedBotCount} bot`} />
-        {step >= 2 ? (
-          <SetupSummaryRow label="Timer" value={turnTimeLimitSeconds === 0 ? "Untimed" : `${turnTimeLimitSeconds}s`} />
-        ) : null}
+        <SetupSummaryRow label="Timer" value={turnTimeLimitSeconds === 0 ? "Untimed" : `${turnTimeLimitSeconds}s`} />
         {canResume ? <SetupSummaryRow label="Save" value="Ready" /> : null}
       </div>
     </div>
   );
+
+  function start() {
+    saveLastLocalSetup({
+      playerCount: playerCount as 2 | 3 | 4,
+      names: [names[0], names[1], names[2], names[3]],
+      botSeatIds,
+      botDifficulty,
+      configId,
+      turnTimeLimitSeconds
+    });
+    onStart({
+      playerNames: activeNames.map((name, index) => name.trim() || `Player ${index + 1}`),
+      botSeatIds: botSeatIds.filter((seatId) => setupSeatIds.includes(seatId)),
+      botDifficulty,
+      configId,
+      turnTimeLimitSeconds
+    });
+  }
 
   return (
     <SetupShell
@@ -102,27 +108,26 @@ export function SetupScreen({
       title="Pass-and-play"
       lead="Seat the rivals, pass the laptop, and keep every private hand off-screen."
       backgroundImageUrl={setupHeroImageUrl}
-      steps={localSteps}
       backAction={onBack ? <SetupBackButton onClick={onBack}>Back</SetupBackButton> : undefined}
       preflight={localPreflight}
       className="setup-board-shell--local"
     >
       <div className="setup-flow-grid setup-flow-grid--local" data-testid="local-setup-panel">
-        {step === 0 ? (
-          <SetupStepPanel
-            eyebrow="Now"
-            title="Seats"
-            meta={`${plannedBotCount} bot · ${Math.max(0, plannedHumanCount - 1)} human open`}
-            actions={
-              <SetupActions>
-                <Button onClick={onOpenGuide}>Guide</Button>
-                {canResume ? <Button onClick={onResume}>Resume saved game</Button> : null}
-                <Button variant="primary" onClick={() => setStep(1)}>
-                  Pick board
-                </Button>
-              </SetupActions>
-            }
-          >
+        <SetupStepPanel
+          eyebrow="Table"
+          title="Set the table"
+          meta={`${plannedHumanCount} human · ${plannedBotCount} bot · ${selectedConfig?.mapName ?? "Map"}`}
+          actions={
+            <SetupActions>
+              <Button onClick={onOpenGuide}>Guide</Button>
+              {canResume ? <Button onClick={onResume}>Resume saved game</Button> : null}
+              <Button variant="primary" onClick={start}>
+                Start local game
+              </Button>
+            </SetupActions>
+          }
+        >
+          <SetupSection title="Seats" meta="Seat 1 is always a person. Turn any other seat into a bot.">
             <div className="setup-field-grid">
               <FormField label="Players">
                 <select
@@ -189,77 +194,35 @@ export function SetupScreen({
                 };
               })}
             />
-          </SetupStepPanel>
-        ) : null}
+            {plannedBotCount > 0 ? <BotDifficultyField value={botDifficulty} onChange={setBotDifficulty} /> : null}
+          </SetupSection>
 
-        {step === 1 ? (
-          <SetupStepPanel
-            eyebrow="Now"
-            title="Map"
-            meta="Choose the local board"
-            actions={
-              <SetupActions>
-                <Button onClick={() => setStep(0)}>Back</Button>
-                <Button variant="primary" onClick={() => setStep(2)}>
-                  Set timer
-                </Button>
-              </SetupActions>
+          <SetupSection
+            title="Board"
+            meta={
+              selectedConfig
+                ? // ~0.6 min per route + 20 min base from playtesting
+                  `${selectedConfig.cityCount} stations · ${selectedConfig.routeCount} routes · about ${Math.round(selectedConfig.routeCount * 0.6 + 20)} min`
+                : undefined
             }
           >
-            <div className="setup-board-preflight">
-              <MapThumbnail configId={selectedConfig?.configId ?? configId} mapName={selectedConfig?.mapName ?? "Hudson Hustle"} version={selectedConfig?.version} />
-              <div className="setup-board-preflight__controls">
-                <FormField label="Map">
-                  <select value={configId} onChange={(event) => setConfigId(event.target.value)}>
-                    {releasedConfigs.map((config) => (
-                      <option key={config.configId} value={config.configId}>
-                        {config.mapName}
-                      </option>
-                    ))}
-                  </select>
-                </FormField>
-                {selectedConfig ? (
-                  <p className="map-picker-meta">
-                    {/* ~0.6 min per route + 20 min base from playtesting */}
-                    {selectedConfig.cityCount} stations · {selectedConfig.routeCount} routes · ~{Math.round(selectedConfig.routeCount * 0.6 + 20)} min
-                  </p>
-                ) : null}
-              </div>
-            </div>
-          </SetupStepPanel>
-        ) : null}
+            <FormField label="Map">
+              <select value={configId} onChange={(event) => setConfigId(event.target.value)}>
+                {releasedConfigs.map((config) => (
+                  <option key={config.configId} value={config.configId}>
+                    {config.mapName}
+                  </option>
+                ))}
+              </select>
+            </FormField>
+          </SetupSection>
 
-        {step === 2 ? (
-          <SetupStepPanel
-            eyebrow="Now"
-            title="Timer"
-            meta="Set the table pace"
-            actions={
-              <SetupActions>
-                <Button onClick={() => setStep(1)}>Back</Button>
-                <Button
-                  variant="primary"
-                  onClick={() =>
-                    onStart({
-                      playerNames: activeNames.map((name, index) => name.trim() || `Player ${index + 1}`),
-                      botSeatIds: botSeatIds.filter((seatId) => setupSeatIds.includes(seatId)),
-                      configId,
-                      turnTimeLimitSeconds
-                    })
-                  }
-                >
-                  Start local game
-                </Button>
-              </SetupActions>
-            }
-          >
-            <div className="setup-timer-preflight">
-              <FormField as="div" label="Timer" className="form-field--timer" helper="Enter seconds. 0 = untimed · 30 = 30 s · 60 = 1 min.">
-                <TimerPicker value={turnTimeLimitSeconds} onChange={setTurnTimeLimitSeconds} />
-              </FormField>
-            </div>
-          </SetupStepPanel>
-        ) : null}
+          <SetupSection title="Pace" meta="Seconds per turn. Leave at 0 for an untimed game.">
+            <FormField as="div" label="Timer" className="form-field--timer">
+              <TimerPicker value={turnTimeLimitSeconds} onChange={setTurnTimeLimitSeconds} />
+            </FormField>
+          </SetupSection>
+        </SetupStepPanel>
       </div>
     </SetupShell>
   );

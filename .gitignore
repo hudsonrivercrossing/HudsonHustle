@@ -13,6 +13,6 @@ packages/*/src/*.d.ts.map
 .vercel
 .railway
 tmp/
-storybook-static
-apps/web/storybook-static
 .superpowers/*
+.claude/worktrees/
+.claude/launch.json

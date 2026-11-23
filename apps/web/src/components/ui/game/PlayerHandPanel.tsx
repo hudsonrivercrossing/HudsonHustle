@@ -12,7 +12,7 @@ import {
 import { Button } from "../primitives/Button";
 import { Panel } from "../primitives/Panel";
 import { SectionHeader } from "../primitives/SectionHeader";
-import { CardSlot } from "./CardSlot";
+import { CardSlot, formatCardLabel } from "./CardSlot";
 import { TicketSlip } from "./TicketSlip";
 
 function countHandByFace(hand: TrainCard[]): Record<TrainCardFace, number> {
@@ -31,6 +31,8 @@ interface PrivateHandRailProps {
     totalCost: number;
     minimumLocomotives?: number;
   } | null;
+  /** A face to call attention to, e.g. the card just drawn. */
+  highlightedFace?: TrainCardFace | null;
   className?: string;
 }
 
@@ -48,14 +50,14 @@ function buildPaymentSpend(
   return spend;
 }
 
-export function PrivateHandRail({ hand, cardPalette, paymentPreview = null, className = "" }: PrivateHandRailProps): JSX.Element {
+export function PrivateHandRail({ hand, cardPalette, paymentPreview = null, highlightedFace = null, className = "" }: PrivateHandRailProps): JSX.Element {
   const counts = countHandByFace(hand);
   const faces: TrainCardFace[] = [...trainCardColors, "locomotive"];
   const spend = paymentPreview ? buildPaymentSpend(counts, paymentPreview) : {};
 
   return (
     <Panel variant="private" className={["private-hand-rail", className].filter(Boolean).join(" ")}>
-      <SectionHeader title="Hand" meta="Color counts" variant="compact" />
+      <SectionHeader title="Hand" meta={highlightedFace ? `Drew ${formatCardLabel(highlightedFace)}` : "Color counts"} variant="compact" />
       <div className="private-hand-rail__slots">
         {faces.map((face) => {
           const count = counts[face];
@@ -70,6 +72,7 @@ export function PrivateHandRail({ hand, cardPalette, paymentPreview = null, clas
               accentColor={slotColor}
               count={paymentPreview && spendCount > 0 ? afterCount + spendCount : count}
               spendDelta={spendCount}
+              className={face === highlightedFace ? "hand-color-slot--just-drawn" : undefined}
             />
           );
         })}

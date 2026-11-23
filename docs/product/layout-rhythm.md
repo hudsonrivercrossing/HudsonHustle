@@ -90,8 +90,8 @@ Use medium padding for operational panels and secondary shell surfaces.
 ## Implementation Direction
 
 Stable layout rhythm should live in:
-- [tokens.ts](/Users/djfan/Workspace/HudsonHustle/apps/web/src/design/tokens.ts)
-- [theme.css](/Users/djfan/Workspace/HudsonHustle/apps/web/src/design/theme.css)
+- [tokens.ts](../../apps/web/src/styles/theme.css)
+- [theme.css](../../apps/web/src/styles/theme.css)
 
 Page components should rely on semantic variables such as:
 - `--layout-content-max-width`

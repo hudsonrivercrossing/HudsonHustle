@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import type { HudsonHustleReleasedConfigSummary } from "@hudson-hustle/game-data";
-import type { ReconnectState, RoomSummary } from "@hudson-hustle/game-core";
+import type { BotDifficulty, ReconnectState, RoomSummary } from "@hudson-hustle/game-core";
 import { StateSurface } from "../ui/primitives/StateSurface";
 import {
   ModeSwitch,
   SetupBackButton,
-  SetupShell,
-  type SetupStep
+  SetupShell
 } from "../setup";
 import {
   CreateRoomFlow,
@@ -14,7 +13,6 @@ import {
   JoinRoomFlow,
   JoinRoomPreflight,
   OnlineGateway,
-  getStepStatus,
   type CreateRoomForm,
   type OnlineSetupStage,
   type SetupFlowStep
@@ -26,6 +24,8 @@ interface OnlineSetupScreenProps {
   roomPreview: RoomSummary | null;
   error: string | null;
   isCreatingRoom?: boolean;
+  /** Room code from a shared link; opens the join flow with it filled in. */
+  initialJoinRoomCode?: string;
   onOpenLocal?: () => void;
   onBack?: () => void;
   onClearRoomPreview?: () => void;
@@ -40,6 +40,7 @@ export function OnlineSetupScreen({
   roomPreview,
   error,
   isCreatingRoom = false,
+  initialJoinRoomCode,
   onBack,
   onClearRoomPreview,
   onPreviewRoom,
@@ -55,17 +56,17 @@ export function OnlineSetupScreen({
   const [configId, setConfigId] = useState(latestConfigId);
   const [turnTimeLimitSeconds, setTurnTimeLimitSeconds] = useState(0);
   const [botSeatIds, setBotSeatIds] = useState<string[]>([]);
+  const [botDifficulty, setBotDifficulty] = useState<BotDifficulty>("standard");
 
   // Join form state
-  const [joinRoomCode, setJoinRoomCode] = useState("");
+  const [joinRoomCode, setJoinRoomCode] = useState(initialJoinRoomCode ?? "");
   const [joinPlayerName, setJoinPlayerName] = useState("Player");
   const [preferredSeatId, setPreferredSeatId] = useState<string | undefined>(undefined);
 
   // Navigation state
   const [stage, setStage] = useState<OnlineSetupStage>(() =>
-    reconnectState === "attempting-reconnect" || reconnectState === "reconnect-failed" ? "join" : "gateway"
+    initialJoinRoomCode || reconnectState === "attempting-reconnect" || reconnectState === "reconnect-failed" ? "join" : "gateway"
   );
-  const [createStep, setCreateStep] = useState<SetupFlowStep>(0);
   const [joinStep, setJoinStep] = useState<SetupFlowStep>(0);
 
   const openSeats = useMemo(
@@ -96,14 +97,13 @@ export function OnlineSetupScreen({
 
   function returnToGateway() {
     setStage("gateway");
-    setCreateStep(0);
     setJoinStep(0);
     setPreferredSeatId(undefined);
     onClearRoomPreview?.();
   }
 
   function chooseStage(nextStage: OnlineSetupStage) {
-    if (nextStage === "create") { onClearRoomPreview?.(); setCreateStep(0); setStage("create"); return; }
+    if (nextStage === "create") { onClearRoomPreview?.(); setStage("create"); return; }
     if (nextStage === "join") { setStage("join"); setJoinStep(roomPreview ? 1 : 0); }
   }
 
@@ -131,33 +131,12 @@ export function OnlineSetupScreen({
     stage === "create" ? "Seat the crew, pick the board, and send the room code." :
     "Punch in the code, claim a seat, and board before departure.";
 
-  const railSteps: SetupStep[] =
-    stage === "gateway"
-      ? [
-          { label: "Choose line", meta: "Host or guest", status: "current" },
-          { label: "Start game", meta: "Build the room", status: "upcoming" },
-          { label: "Join room", meta: "Enter by code", status: "upcoming" }
-        ]
-      : stage === "create"
-        ? [
-            { label: "Host", meta: "Who is starting", status: getStepStatus(0, createStep) },
-            { label: "Seats", meta: "Players and bots", status: getStepStatus(1, createStep) },
-            { label: "Map", meta: "Choose board", status: getStepStatus(2, createStep) },
-            { label: "Timer", meta: "Launch check", status: getStepStatus(3, createStep) }
-          ]
-        : [
-            { label: "Room code", meta: "Preview first", status: getStepStatus(0, joinStep) },
-            { label: "Seat", meta: "Open human seat", status: getStepStatus(1, joinStep) },
-            { label: "Enter room", meta: "Name and join", status: getStepStatus(2, joinStep) }
-          ];
-
   return (
     <SetupShell
       eyebrow="Station counter"
       title={title}
       lead={subtitle}
       backgroundImageUrl={setupHeroImageUrl}
-      steps={railSteps}
       modeSwitch={
         stage === "gateway" ? null : (
           <ModeSwitch
@@ -178,7 +157,6 @@ export function OnlineSetupScreen({
       preflight={
         stage === "create" ? (
           <CreateRoomPreflight
-            step={createStep}
             hostName={hostName}
             playerCount={playerCount}
             plannedBotCount={plannedBotCount}
@@ -212,7 +190,6 @@ export function OnlineSetupScreen({
 
       {stage === "create" ? (
         <CreateRoomFlow
-          step={createStep}
           releasedConfigs={releasedConfigs}
           isCreatingRoom={isCreatingRoom}
           hostName={hostName}
@@ -220,11 +197,12 @@ export function OnlineSetupScreen({
           configId={configId}
           turnTimeLimitSeconds={turnTimeLimitSeconds}
           botSeatIds={botSeatIds}
+          botDifficulty={botDifficulty}
+          onChangeBotDifficulty={setBotDifficulty}
           setupSeatIds={setupSeatIds}
           plannedBotCount={plannedBotCount}
           plannedHumanOpenSeats={plannedHumanOpenSeats}
           selectedConfig={selectedConfig}
-          onChangeStep={setCreateStep}
           onChangeHostName={setHostName}
           onChangePlayerCount={setPlayerCount}
           onChangeConfigId={setConfigId}

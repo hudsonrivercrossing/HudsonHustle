@@ -1,0 +1,235 @@
+.chip-button:hover {
+  transform: translateY(0);
+}
+
+.choice-chip-button:active,
+.chip-button:active {
+  transform: translateY(1px);
+  box-shadow: var(--control-shadow-pressed);
+}
+
+.chip-button--selected {
+  border-color: color-mix(in oklch, var(--accent-base-solid) 34%, transparent);
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.58), 0 0 0 2px color-mix(in oklch, var(--accent-base-solid) 14%, transparent), 0 10px 18px color-mix(in oklch, var(--accent-strong-solid) 9%, transparent);
+}
+
+.system-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  padding: 4px 9px;
+  border-radius: calc(var(--control-radius) - 1px);
+  border: 1px solid var(--chip-border, color-mix(in oklch, var(--control-ink-solid) 16%, transparent));
+  background: var(--chip-bg, linear-gradient(180deg, oklch(31.91% 0.0163 237.23 / 0.94), oklch(26.31% 0.0183 241.79 / 0.94)));
+  color: color-mix(in oklch, var(--control-surface-solid) 84%, transparent);
+  font-size: var(--type-2xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--control-surface-solid) 7%, transparent), 0 2px 0 color-mix(in oklch, var(--control-shadow-solid) 16%, transparent);
+}
+
+.system-chip::before {
+  content: "";
+  position: absolute;
+  inset: auto 6px 4px;
+  height: 2px;
+  background: var(--chip-accent, color-mix(in oklch, var(--border-warm-solid) 12%, transparent));
+  opacity: 0.9;
+}
+
+.system-chip > * {
+  position: relative;
+  z-index: var(--z-raised);
+}
+
+.system-chip--neutral {
+  --chip-accent: color-mix(in oklch, var(--control-ink-solid) 18%, transparent);
+  --chip-border: color-mix(in oklch, var(--control-ink-solid) 16%, transparent);
+  --chip-bg: linear-gradient(180deg, oklch(32.34% 0.0141 235.33 / 0.92), oklch(26.35% 0.016 240.64 / 0.94));
+  color: color-mix(in oklch, var(--control-ink-solid) 78%, transparent);
+}
+
+.system-chip--info {
+  --chip-accent: oklch(71.34% 0.0738 248.28 / 0.58);
+  --chip-border: oklch(71.34% 0.0738 248.28 / 0.26);
+  --chip-bg: linear-gradient(180deg, oklch(35.04% 0.0386 235.02 / 0.94), oklch(29.85% 0.033 237.11 / 0.96));
+  color: oklch(94.76% 0.0201 238.67 / 0.92);
+}
+
+.system-chip--success {
+  --chip-accent: oklch(73.38% 0.0847 148.17 / 0.58);
+  --chip-border: oklch(73.38% 0.0847 148.17 / 0.26);
+  --chip-bg: linear-gradient(180deg, oklch(33.27% 0.045 155.44 / 0.94), oklch(28.19% 0.0369 160.01 / 0.96));
+  color: oklch(95.17% 0.0292 150.1 / 0.92);
+}
+
+.system-chip--warning {
+  --chip-accent: oklch(83.23% 0.0894 82.33 / 0.62);
+  --chip-border: oklch(83.23% 0.0894 82.33 / 0.3);
+  --chip-bg: linear-gradient(180deg, oklch(35.78% 0.0473 75.45 / 0.94), oklch(29.51% 0.0341 73.32 / 0.96));
+  color: oklch(95.67% 0.0452 84.57 / 0.94);
+}
+
+.system-chip--danger {
+  --chip-accent: oklch(63.98% 0.1366 29.13 / 0.62);
+  --chip-border: oklch(63.98% 0.1366 29.13 / 0.3);
+  --chip-bg: linear-gradient(180deg, oklch(32.34% 0.0624 26.85 / 0.94), oklch(27.25% 0.0442 24.72 / 0.96));
+  color: oklch(94.19% 0.0292 28.12 / 0.94);
+}
+
+.chip-button {
+  font: inherit;
+  --choice-chip-accent: var(--control-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--control-height-base);
+  padding: 10px 14px;
+  color: color-mix(in oklch, var(--control-surface-solid) 90%, transparent);
+  border: 1px solid color-mix(in srgb, var(--choice-chip-accent) 34%, color-mix(in oklch, var(--control-ink-solid) 18%, transparent));
+  border-radius: var(--control-radius);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--choice-chip-accent) 12%, var(--control-face) 88%), var(--control-face-strong));
+  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--control-surface-solid) 8%, transparent), 0 3px 0 color-mix(in oklch, var(--control-shadow-solid) 20%, transparent);
+  transition: transform var(--duration-fast) var(--easing-standard), box-shadow var(--duration-fast) var(--easing-standard), border-color var(--duration-fast) var(--easing-standard), background-color var(--duration-fast) var(--easing-standard);
+  position: relative;
+  overflow: hidden;
+}
+
+.chip-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, color-mix(in oklch, var(--control-surface-solid) 3.5%, transparent) 1px, transparent 1px) 0 0 / 16px 16px, linear-gradient(180deg, color-mix(in oklch, var(--control-surface-solid) 6%, transparent), transparent 42%);
+  pointer-events: none;
+}
+
+.choice-chip-button {
+  font: inherit;
+  --choice-chip-accent: var(--control-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--control-height-base);
+  padding: 10px 14px;
+  border: 1px solid color-mix(in srgb, var(--choice-chip-accent) 34%, color-mix(in oklch, var(--control-ink-solid) 18%, transparent));
+  border-radius: var(--control-radius);
+  transition: transform var(--duration-fast) var(--easing-standard), box-shadow var(--duration-fast) var(--easing-standard), border-color var(--duration-fast) var(--easing-standard), background-color var(--duration-fast) var(--easing-standard);
+  position: relative;
+  overflow: hidden;
+  color: color-mix(in oklch, var(--control-surface-solid) 94%, transparent);
+  border-color: color-mix(in srgb, var(--choice-chip-accent) 48%, color-mix(in oklch, var(--control-ink-solid) 16%, transparent));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--choice-chip-accent) 18%, var(--control-face) 82%), var(--control-face-strong));
+  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--control-surface-solid) 9%, transparent), 0 3px 0 color-mix(in oklch, var(--control-shadow-solid) 22%, transparent);
+}
+
+.choice-chip-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(90deg, color-mix(in oklch, var(--control-surface-solid) 4%, transparent) 1px, transparent 1px) 0 0 / 16px 16px, linear-gradient(180deg, color-mix(in oklch, var(--control-surface-solid) 8%, transparent), transparent 44%);
+}
+
+.choice-chip-button > *,
+.chip-button > * {
+  position: relative;
+  z-index: var(--z-raised-2);
+}
+
+.choice-chip-button__content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1em;
+  font-family: var(--font-body);
+  font-size: var(--type-sm);
+  line-height: 1.15;
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.01em;
+}
+
+.chip-button:hover {
+  transform: translateY(0);
+  border-color: color-mix(in srgb, var(--choice-chip-accent) 58%, color-mix(in oklch, var(--control-ink-solid) 18%, transparent));
+  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--control-surface-solid) 10%, transparent), 0 4px 0 color-mix(in oklch, var(--control-shadow-solid) 24%, transparent);
+}
+
+.chip-button:focus-visible {
+  outline: var(--border-medium) solid oklch(53.46% 0.1192 253.15 / 0.42);
+  outline-offset: 2px;
+  transform: translateY(0);
+  border-color: color-mix(in srgb, var(--choice-chip-accent) 58%, color-mix(in oklch, var(--control-ink-solid) 18%, transparent));
+  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--control-surface-solid) 10%, transparent), 0 4px 0 color-mix(in oklch, var(--control-shadow-solid) 24%, transparent);
+}
+
+.choice-chip-button:hover {
+  transform: translateY(0);
+  border-color: color-mix(in srgb, var(--choice-chip-accent) 58%, color-mix(in oklch, var(--control-ink-solid) 18%, transparent));
+  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--control-surface-solid) 11%, transparent), 0 4px 0 color-mix(in oklch, var(--control-shadow-solid) 26%, transparent);
+}
+
+.choice-chip-button:focus-visible {
+  outline: var(--border-medium) solid oklch(53.46% 0.1192 253.15 / 0.42);
+  outline-offset: 2px;
+  transform: translateY(0);
+  border-color: color-mix(in srgb, var(--choice-chip-accent) 58%, color-mix(in oklch, var(--control-ink-solid) 18%, transparent));
+  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--control-surface-solid) 11%, transparent), 0 4px 0 color-mix(in oklch, var(--control-shadow-solid) 26%, transparent);
+}
+
+.choice-chip-button:disabled,
+.chip-button:disabled {
+  opacity: 0.58;
+  transform: none;
+  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--control-surface-solid) 4%, transparent), 0 2px 0 color-mix(in oklch, var(--control-shadow-solid) 12%, transparent);
+}
+
+.app-shell--gameplay-hud .choice-chip-button__content {
+  font-size: var(--type-xs);
+  font-weight: var(--weight-bold);
+  line-height: 1.05;
+  white-space: normal;
+}
+
+.app-shell--gameplay-hud .choice-chip-button {
+  width: 100%;
+  min-width: 0;
+  min-height: 34px;
+  padding: 7px 8px;
+  border-color: oklch(70.15% 0.0832 84.6 / 0.38);
+  color: var(--hud-paper);
+  box-shadow: inset 0 0 0 1px oklch(96.88% 0.0372 88.46 / 0.07), 0 4px 0 oklch(0% 0 0 / 0.24);
+  text-shadow: 0 1px 0 oklch(0% 0 0 / 0.48);
+  border-width: 1px;
+  text-transform: none;
+  letter-spacing: 0;
+  background: linear-gradient(90deg, oklch(70.15% 0.0832 84.6 / 0.18), transparent 22%, transparent 78%, oklch(70.15% 0.0832 84.6 / 0.12)), var(--hud-grain), linear-gradient(180deg, oklch(30.13% 0.0111 167.93), oklch(19.37% 0.0097 159.03));
+  border-radius: var(--radius-xs);
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+}
+
+.detail-card__decision-shelf {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  padding: 14px;
+  margin-top: 0;
+  border: 1px solid color-mix(in oklch, var(--border-warm-solid) 10%, transparent);
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, oklch(98.92% 0.0102 81.8 / 0.76), oklch(95.43% 0.0217 83.26 / 0.56));
+  position: relative;
+}
+
+/* Field grid
+Action rows */
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-stack-sm);
+}

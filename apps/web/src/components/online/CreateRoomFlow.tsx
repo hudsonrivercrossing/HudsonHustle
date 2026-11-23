@@ -1,19 +1,20 @@
+import type { BotDifficulty } from "@hudson-hustle/game-core";
 import type { HudsonHustleReleasedConfigSummary } from "@hudson-hustle/game-data";
 import { FormField } from "../ui/primitives/FormField";
 import { Button } from "../ui/primitives/Button";
 import { TimerPicker } from "../ui/primitives/TimerPicker";
 import {
-  MapThumbnail,
+  BotDifficultyField,
   SeatPlan,
   SetupActions,
+  SetupSection,
   SetupStepPanel,
   TokenButton,
   type SeatRow
 } from "../setup";
-import type { CreateRoomForm, SetupFlowStep } from "./multiplayerSetup.types";
+import type { CreateRoomForm } from "./multiplayerSetup.types";
 
 interface CreateRoomFlowProps {
-  step: SetupFlowStep;
   releasedConfigs: HudsonHustleReleasedConfigSummary[];
   isCreatingRoom: boolean;
   hostName: string;
@@ -21,21 +22,21 @@ interface CreateRoomFlowProps {
   configId: string;
   turnTimeLimitSeconds: number;
   botSeatIds: string[];
+  botDifficulty: BotDifficulty;
   setupSeatIds: string[];
   plannedBotCount: number;
   plannedHumanOpenSeats: number;
   selectedConfig: HudsonHustleReleasedConfigSummary | undefined;
-  onChangeStep: (step: SetupFlowStep) => void;
   onChangeHostName: (v: string) => void;
   onChangePlayerCount: (v: 2 | 3 | 4) => void;
   onChangeConfigId: (v: string) => void;
   onChangeTurnTimeLimit: (v: number) => void;
   onToggleBotSeat: (seatId: string) => void;
+  onChangeBotDifficulty: (difficulty: BotDifficulty) => void;
   onCreateRoom: (form: CreateRoomForm) => void;
 }
 
 export function CreateRoomFlow({
-  step,
   releasedConfigs,
   isCreatingRoom,
   hostName,
@@ -43,51 +44,53 @@ export function CreateRoomFlow({
   configId,
   turnTimeLimitSeconds,
   botSeatIds,
+  botDifficulty,
   setupSeatIds,
   plannedBotCount,
   plannedHumanOpenSeats,
   selectedConfig,
-  onChangeStep,
   onChangeHostName,
   onChangePlayerCount,
   onChangeConfigId,
   onChangeTurnTimeLimit,
   onToggleBotSeat,
+  onChangeBotDifficulty,
   onCreateRoom
 }: CreateRoomFlowProps): JSX.Element {
   return (
     <div className="setup-flow-grid setup-flow-grid--create" data-testid="create-room-panel">
-      {step === 0 ? (
-        <SetupStepPanel
-          eyebrow="Now"
-          title="Host"
-          meta="Name the room captain"
-          actions={
-            <SetupActions>
-              <Button variant="primary" onClick={() => onChangeStep(1)}>Seat table</Button>
-            </SetupActions>
-          }
-        >
-          <div className="setup-field-grid">
-            <FormField label="Your name">
-              <input value={hostName} maxLength={24} onChange={(e) => onChangeHostName(e.target.value)} />
-            </FormField>
-          </div>
-        </SetupStepPanel>
-      ) : null}
+      <SetupStepPanel
+        eyebrow="Table"
+        title="Set the table"
+        meta={`${plannedBotCount} bot · ${plannedHumanOpenSeats} human open · ${selectedConfig?.mapName ?? "Map"}`}
+        actions={
+          <SetupActions>
+            <Button
+              variant="primary"
+              disabled={isCreatingRoom}
+              onClick={() =>
+                onCreateRoom({
+                  hostName: hostName.trim() || "Host",
+                  playerCount,
+                  configId,
+                  turnTimeLimitSeconds,
+                  botSeatIds: botSeatIds.filter((seatId) => setupSeatIds.includes(seatId)),
+                  botDifficulty
+                })
+              }
+            >
+              {isCreatingRoom ? "Creating room..." : "Create room"}
+            </Button>
+          </SetupActions>
+        }
+      >
+        <SetupSection title="Host" meta="You take seat 1 and start the game when everyone is ready.">
+          <FormField label="Your name">
+            <input value={hostName} maxLength={24} onChange={(e) => onChangeHostName(e.target.value)} />
+          </FormField>
+        </SetupSection>
 
-      {step === 1 ? (
-        <SetupStepPanel
-          eyebrow="Now"
-          title="Seats"
-          meta={`${plannedBotCount} bot · ${plannedHumanOpenSeats} human open`}
-          actions={
-            <SetupActions>
-              <Button onClick={() => onChangeStep(0)}>Back</Button>
-              <Button variant="primary" onClick={() => onChangeStep(2)}>Pick board</Button>
-            </SetupActions>
-          }
-        >
+        <SetupSection title="Seats" meta="Leave a seat open for a friend to join by code, or fill it with a bot.">
           <div className="setup-field-grid">
             <FormField label="Players">
               <select value={playerCount} onChange={(e) => onChangePlayerCount(Number(e.target.value) as 2 | 3 | 4)}>
@@ -122,81 +125,35 @@ export function CreateRoomFlow({
               };
             })}
           />
-        </SetupStepPanel>
-      ) : null}
+          {plannedBotCount > 0 ? <BotDifficultyField value={botDifficulty} onChange={onChangeBotDifficulty} /> : null}
+        </SetupSection>
 
-      {step === 2 ? (
-        <SetupStepPanel
-          eyebrow="Now"
-          title="Map"
-          meta="Choose the board"
-          actions={
-            <SetupActions>
-              <Button onClick={() => onChangeStep(1)}>Back</Button>
-              <Button variant="primary" onClick={() => onChangeStep(3)}>Set timer</Button>
-            </SetupActions>
+        <SetupSection
+          title="Board"
+          meta={
+            selectedConfig
+              ? // ~0.6 min per route + 20 min base from playtesting
+                `${selectedConfig.cityCount} stations · ${selectedConfig.routeCount} routes · about ${Math.round(selectedConfig.routeCount * 0.6 + 20)} min`
+              : undefined
           }
         >
-          <div className="setup-board-preflight">
-            <MapThumbnail
-              configId={selectedConfig?.configId ?? configId}
-              mapName={selectedConfig?.mapName ?? "Hudson Hustle"}
-              version={selectedConfig?.version}
-            />
-            <div className="setup-board-preflight__controls">
-              <FormField label="Map">
-                <select value={configId} onChange={(e) => onChangeConfigId(e.target.value)}>
-                  {releasedConfigs.map((config) => (
-                    <option key={config.configId} value={config.configId}>
-                      {config.mapName}
-                    </option>
-                  ))}
-                </select>
-              </FormField>
-              {selectedConfig ? (
-                <p className="map-picker-meta">
-                  {/* ~0.6 min per route + 20 min base from playtesting */}
-                  {selectedConfig.cityCount} stations · {selectedConfig.routeCount} routes · ~{Math.round(selectedConfig.routeCount * 0.6 + 20)} min
-                </p>
-              ) : null}
-            </div>
-          </div>
-        </SetupStepPanel>
-      ) : null}
+          <FormField label="Map">
+            <select value={configId} onChange={(e) => onChangeConfigId(e.target.value)}>
+              {releasedConfigs.map((config) => (
+                <option key={config.configId} value={config.configId}>
+                  {config.mapName}
+                </option>
+              ))}
+            </select>
+          </FormField>
+        </SetupSection>
 
-      {step === 3 ? (
-        <SetupStepPanel
-          eyebrow="Now"
-          title="Timer"
-          meta="Set the pace and launch"
-          actions={
-            <SetupActions>
-              <Button onClick={() => onChangeStep(2)}>Back</Button>
-              <Button
-                variant="primary"
-                disabled={isCreatingRoom}
-                onClick={() =>
-                  onCreateRoom({
-                    hostName: hostName.trim() || "Host",
-                    playerCount,
-                    configId,
-                    turnTimeLimitSeconds,
-                    botSeatIds: botSeatIds.filter((seatId) => setupSeatIds.includes(seatId))
-                  })
-                }
-              >
-                {isCreatingRoom ? "Creating room..." : "Create room"}
-              </Button>
-            </SetupActions>
-          }
-        >
-          <div className="setup-timer-preflight">
-            <FormField as="div" label="Timer" className="form-field--timer" helper="Enter seconds. 0 = untimed · 30 = 30 s · 60 = 1 min.">
-              <TimerPicker value={turnTimeLimitSeconds} onChange={onChangeTurnTimeLimit} />
-            </FormField>
-          </div>
-        </SetupStepPanel>
-      ) : null}
+        <SetupSection title="Pace" meta="Seconds per turn. Leave at 0 for an untimed game.">
+          <FormField as="div" label="Timer" className="form-field--timer">
+            <TimerPicker value={turnTimeLimitSeconds} onChange={onChangeTurnTimeLimit} />
+          </FormField>
+        </SetupSection>
+      </SetupStepPanel>
     </div>
   );
 }

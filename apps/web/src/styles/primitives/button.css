@@ -1,0 +1,240 @@
+.system-button {
+  border: 0;
+  transition: transform var(--duration-fast) var(--easing-standard), box-shadow var(--duration-fast) var(--easing-standard), opacity var(--duration-fast) var(--easing-standard), border-color var(--duration-fast) var(--easing-standard), background-color var(--duration-fast) var(--easing-standard);
+  font: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--control-height-base);
+  min-width: 132px;
+  padding: 10px 17px;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: var(--control-radius);
+  text-align: center;
+  letter-spacing: 0;
+  line-height: 1.02;
+  font-size: var(--type-body);
+  font-family: var(--font-body);
+  font-weight: var(--weight-bold);
+  color: color-mix(in oklch, var(--control-surface-solid) 94%, transparent);
+}
+
+.system-button::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  border-radius: inherit;
+  inset: 1px;
+  border: 1px solid color-mix(in oklch, var(--control-surface-solid) 7%, transparent);
+  opacity: 1;
+}
+
+.system-button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(90deg, color-mix(in oklch, var(--control-surface-solid) 3.5%, transparent) 1px, transparent 1px) 0 0 / 16px 16px, linear-gradient(180deg, color-mix(in oklch, var(--control-surface-solid) 8%, transparent), transparent 42%);
+  z-index: var(--z-base);
+}
+
+.system-button__content {
+  position: relative;
+  z-index: var(--z-raised);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1em;
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.012em;
+}
+
+.system-button--loading {
+  cursor: wait;
+  pointer-events: none;
+}
+
+.system-button--loading .system-button__content {
+  opacity: 0.55;
+}
+
+.system-button__spinner {
+  position: relative;
+  z-index: var(--z-raised);
+  width: 13px;
+  height: 13px;
+  border: 2px solid color-mix(in oklch, var(--control-surface-solid) 18%, transparent);
+  border-top-color: color-mix(in oklch, var(--control-surface-solid) 88%, transparent);
+  border-radius: 50%;
+  animation: button-spin var(--duration-slow) linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes button-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .system-button__spinner {
+    animation: none;
+    opacity: 0.5;
+  }
+}
+
+.primary-button {
+  color: oklch(96.58% 0.0119 79.78);
+  background: linear-gradient(180deg, var(--control-face), var(--control-face-strong));
+  border: 1px solid oklch(65.91% 0.1012 73.74 / 0.34);
+  box-shadow: var(--control-shadow);
+  text-shadow: 0 1px 0 oklch(23.88% 0.0241 248.87 / 0.22);
+}
+
+.secondary-button {
+  background: linear-gradient(180deg, oklch(35.17% 0.0096 229.13 / 0.74), oklch(28.08% 0.0113 237.05 / 0.78));
+  border: 1px solid color-mix(in srgb, var(--control-border) 62%, color-mix(in oklch, var(--border-warm-solid) 22%, transparent) 38%);
+  color: color-mix(in oklch, var(--control-surface-solid) 90%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--control-surface-solid) 9%, transparent), 0 3px 0 color-mix(in oklch, var(--control-shadow-solid) 18%, transparent);
+}
+
+.system-button:hover {
+  transform: translateY(0);
+  border-color: oklch(65.91% 0.1012 73.74 / 0.42);
+}
+
+.primary-button:hover {
+  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--control-surface-solid) 12%, transparent), 0 4px 0 color-mix(in oklch, var(--control-shadow-solid) 24%, transparent);
+}
+
+.secondary-button:hover {
+  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--control-surface-solid) 11%, transparent), 0 4px 0 color-mix(in oklch, var(--control-shadow-solid) 20%, transparent);
+}
+
+.system-button:focus-visible {
+  outline: var(--border-medium) solid oklch(53.46% 0.1192 253.15 / 0.42);
+  outline-offset: 2px;
+}
+
+.system-button:active {
+  transform: translateY(1px);
+  box-shadow: var(--control-shadow-pressed);
+}
+
+.primary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+  filter: saturate(0.4);
+  user-select: none;
+  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--control-surface-solid) 5%, transparent), 0 2px 0 color-mix(in oklch, var(--control-shadow-solid) 12%, transparent);
+  background: linear-gradient(180deg, oklch(46.19% 0.0298 241.24 / 0.74), oklch(37.85% 0.0283 242.64 / 0.74));
+}
+
+.secondary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+  filter: saturate(0.4);
+  user-select: none;
+  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--control-surface-solid) 5%, transparent), 0 2px 0 color-mix(in oklch, var(--control-shadow-solid) 12%, transparent);
+  background: linear-gradient(180deg, oklch(39.92% 0.0043 219.59 / 0.48), oklch(31.4% 0.0066 229.04 / 0.54));
+}
+
+.ghost-button {
+  background: transparent;
+  border: 1px solid color-mix(in oklch, var(--control-ink-solid) 12%, transparent);
+  color: color-mix(in oklch, var(--control-ink-solid) 68%, transparent);
+  box-shadow: none;
+}
+
+.ghost-button:hover {
+  background: color-mix(in oklch, var(--control-ink-solid) 6%, transparent);
+  border-color: color-mix(in oklch, var(--control-ink-solid) 22%, transparent);
+  box-shadow: none;
+}
+
+.ghost-button:active {
+  background: color-mix(in oklch, var(--control-ink-solid) 10%, transparent);
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+.ghost-button:disabled {
+  background: transparent;
+  opacity: 0.38;
+  transform: none;
+}
+
+.link-button {
+  background: transparent;
+  border: none;
+  min-width: 0;
+  min-height: 0;
+  padding: 4px 0;
+  color: color-mix(in oklch, var(--control-ink-solid) 52%, transparent);
+  font-size: var(--type-xs);
+  letter-spacing: 0.04em;
+  font-weight: var(--weight-medium);
+  box-shadow: none;
+  text-decoration: none;
+}
+
+.link-button:hover {
+  color: color-mix(in oklch, var(--control-ink-solid) 88%, transparent);
+  box-shadow: none;
+}
+
+.link-button:active {
+  color: color-mix(in oklch, var(--control-ink-solid) 100%, transparent);
+  transform: none;
+  box-shadow: none;
+}
+
+.link-button:disabled {
+  opacity: 0.38;
+  transform: none;
+}
+
+.app-shell--gameplay-hud .system-button {
+  border-radius: var(--radius-control);
+  border-color: oklch(70.15% 0.0832 84.6 / 0.38);
+  background: var(--hud-grain), linear-gradient(180deg, oklch(30.66% 0.009 173.7), oklch(19.76% 0.01 173.03));
+  color: var(--hud-paper);
+  box-shadow: inset 0 0 0 1px oklch(96.88% 0.0372 88.46 / 0.07), 0 4px 0 oklch(0% 0 0 / 0.24);
+  text-shadow: 0 1px 0 oklch(0% 0 0 / 0.48);
+}
+
+.app-shell--gameplay-hud .primary-button {
+  background: linear-gradient(180deg, oklch(82.1% 0.0692 89.66), oklch(56.29% 0.0797 83.17));
+  color: var(--hud-ink);
+  text-shadow: 0 1px 0 oklch(98.03% 0.0223 87.15 / 0.34);
+}
+
+.ticket-dock__pager-button.system-button {
+  min-width: 28px;
+  width: 28px;
+  min-height: 28px;
+  padding: 0;
+  border-radius: var(--radius-control);
+  font-size: var(--type-body);
+}
+
+.app-shell--gameplay-hud .system-button {
+  border-radius: var(--radius-map-line);
+  clip-path: polygon( 7px 0, calc(100% - 7px) 0, 100% 7px, 100% calc(100% - 7px), calc(100% - 7px) 100%, 7px 100%, 0 calc(100% - 7px), 0 7px );
+}
+
+.app-shell--gameplay-hud .system-button {
+  border-width: 1px;
+  text-transform: none;
+  letter-spacing: 0;
+  background: linear-gradient(90deg, oklch(70.15% 0.0832 84.6 / 0.18), transparent 22%, transparent 78%, oklch(70.15% 0.0832 84.6 / 0.12)), var(--hud-grain), linear-gradient(180deg, oklch(30.13% 0.0111 167.93), oklch(19.37% 0.0097 159.03));
+}
+
+.app-shell--gameplay-hud .system-button {
+  border-radius: var(--radius-xs);
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+}

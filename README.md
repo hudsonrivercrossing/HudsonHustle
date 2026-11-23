@@ -1,6 +1,6 @@
 # Hudson Hustle
 
-![Hudson Hustle Cover 1](docs/assets/readme-cover.png)
+![Hudson Hustle Cover 1](docs/assets/readme-cover.jpg)
 
 Hudson Hustle is an original NYC/NJ transit strategy game for laptop play.
 
@@ -10,14 +10,14 @@ Hudson Hustle is an original NYC/NJ transit strategy game for laptop play.
 The project is inspired by route-building board games, but the branding, map, copy, and visuals are original to this repo.
 
 ## At A Glance
-![Hudson Hustle Cover 2](docs/assets/readme-cover2.jpeg)
+![Hudson Hustle Cover 2](docs/assets/readme-cover2.jpg)
 - Build a personal network across New Jersey, Manhattan, Brooklyn, and Queens.
 - Collect transit cards, claim routes, complete hidden tickets, and decide when to spend stations.
 - Use a lightweight handoff flow so players can safely share one laptop in `v1`.
 - Keep the rules engine deterministic and reusable so `v2` can add online multiplayer cleanly.
 
 ## Quick Guide
-![Hudson Hustle Cover 3](docs/assets/readme-cover3.png)
+![Hudson Hustle Cover 3](docs/assets/readme-cover3.jpg)
 
 ### Panel 1: Gather Cards
 Draw from the face-up market or the deck. Face-up locomotives are powerful, so taking one ends that draw action immediately.
@@ -128,11 +128,11 @@ docs/
   map/
     cartography-workflow.md
     hudson-map-rubric.md
-    map-balance-notes.md
   config/
     config-snapshot-guide.md
   planning/
-    v1-status.md
+    v2-status.md
+  archive/       finished passes, slices, specs
   playtests/
     v0.4/
     v2.0/
@@ -159,13 +159,13 @@ scripts/
 - [V2 MVP Architecture](docs/product/v2/v2-mvp-architecture.md)
 - [V2 Multiplayer Flow](docs/product/v2/v2-multiplayer-flow.md)
 - [V2 Deployment](docs/product/v2/v2-deployment.md)
-- [V1 Status](docs/planning/v1-status.md)
+- [V1 Status](docs/archive/planning/v1-status.md)
 - [V2 Status](docs/planning/v2-status.md)
 - [Player Guide](docs/gameplay/player-guide.md)
 - [Onboarding Script](docs/gameplay/onboarding-script.md)
 - [Config Snapshot Guide](docs/config/config-snapshot-guide.md)
 - [Design System](docs/product/design-system.md)
-- [Map And Balance Notes](docs/map/map-balance-notes.md)
+- [Map And Balance Notes](docs/archive/planning/map-balance-notes-2026-03.md)
 - [V2.0 Staging Smoke Checklist](docs/playtests/v2.0/staging-smoke-checklist.md)
 - [Agent Operating Guide](AGENTS.md)
 
@@ -180,13 +180,10 @@ scripts/
 - `main`
   - stable production branch
   - deploys production frontend and backend through platform-native Git integration
-- `develop`
-  - shared integration branch
-  - deploys preview frontend and staging backend through platform-native Git integration
 - working branches
-  - branch off `develop`
-  - open PRs into `develop`
-  - promote from `develop` to `main` after staging validation
+  - branch off `main`
+  - open PRs into `main`; CI and a Vercel preview run on every PR
+  - merging is the release: there is no staging backend, and PR previews talk to the production API
 
 ## Working In This Repo
 - Keep game rules in shared code, not in React components.
@@ -195,5 +192,5 @@ scripts/
 - Read [AGENTS.md](AGENTS.md) before making larger changes.
 
 ## Design Direction
-![Hudson Hustle Cover 4](docs/assets/readme-cover4.png)
+![Hudson Hustle Cover 4](docs/assets/readme-cover4.jpg)
 Hudson Hustle aims for a transit-nostalgia look: warm paper, tactile route pieces, and readable geography. The UI should feel like an inviting board game, not a generic dashboard.

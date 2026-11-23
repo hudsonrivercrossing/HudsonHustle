@@ -8,9 +8,9 @@ This document captures seeded self-play runs on the active `v0.4-next-wave` draf
 
 Artifacts:
 
-- [Playtest harness](/Users/djfan/Workspace/HudsonHustle/scripts/playtests/v0.4-agent-vs-agent-playtest.mjs)
-- [Raw log, seed 42](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v0.4/raw/seed-42-raw.md)
-- [Raw log, seed 1337](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v0.4/raw/seed-1337-raw.md)
+- [Playtest harness](../../../scripts/playtests/v0.4-agent-vs-agent-playtest.mjs)
+- [Raw log, seed 42](raw/seed-42-raw.md)
+- [Raw log, seed 1337](raw/seed-1337-raw.md)
 
 ## Setup
 
@@ -59,7 +59,7 @@ Artifacts:
 
 ## Log Source
 
-- Full raw log, seed 42: [seed-42-raw.md](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v0.4/raw/seed-42-raw.md)
+- Full raw log, seed 42: [seed-42-raw.md](raw/seed-42-raw.md)
 
 ## Additional Run
 
@@ -77,4 +77,4 @@ Notable differences from seed `42`:
 
 Raw log:
 
-- [seed-1337-raw.md](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v0.4/raw/seed-1337-raw.md)
+- [seed-1337-raw.md](raw/seed-1337-raw.md)

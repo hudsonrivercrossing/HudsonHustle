@@ -12,11 +12,11 @@ Version-specific seeded runs and balance conclusions should live under `docs/pla
 
 ## Default Inputs
 - current player-facing rules:
-  - [player-guide.md](/Users/djfan/Workspace/HudsonHustle/docs/gameplay/player-guide.md)
+  - [player-guide.md](player-guide.md)
 - current active config:
-  - [current.json](/Users/djfan/Workspace/HudsonHustle/configs/hudson-hustle/current.json)
+  - [current.json](../../configs/hudson-hustle/current.json)
 - strategy skill:
-  - [how-to-win-hudson-hustle](/Users/djfan/Workspace/HudsonHustle/.codex/skills/how-to-win-hudson-hustle/SKILL.md)
+  - [how-to-win-hudson-hustle](../../.codex/skills/how-to-win-hudson-hustle/SKILL.md)
 
 ## Recommended Persona Pairings
 - `central optimizer` vs `outer opportunist`
@@ -56,4 +56,4 @@ Record:
 
 ## Current Historical Example
 For the earlier small-map balance cycle, see:
-- [v0.4 agent-vs-agent playtest](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v0.4/agent-vs-agent-playtest.md)
+- [v0.4 agent-vs-agent playtest](../playtests/v0.4/agent-vs-agent-playtest.md)

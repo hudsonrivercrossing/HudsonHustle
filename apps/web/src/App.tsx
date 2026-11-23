@@ -1,1228 +1,133 @@
-import { useEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from "react";
-import { io, type Socket } from "socket.io-client";
-import {
-  type ChatMessage,
-  getAffordableRouteColors,
-  getAffordableStationColors,
-  getCityName,
-  getTicketProgress,
-  type ClientToServerEvents,
-  type CreateRoomRequest,
-  type CreateRoomResponse,
-  type GameAction,
-  type GameState,
-  type JoinRoomRequest,
-  type JoinRoomResponse,
-  type PublicGameState,
-  type ReconnectState,
-  type RejoinRoomRequest,
-  type RejoinRoomResponse,
-  type RestartRoomRequest,
-  type RestartRoomResponse,
-  type RoomSnapshot,
-  type ServerToClientEvents,
-  type StartRoomRequest,
-  type TicketDef,
-  type TimerUpdate,
-  type TrainCardColor
-} from "@hudson-hustle/game-core";
-import {
-  getHudsonHustleMapByConfigId,
-  getHudsonHustleVisualsByConfigId,
-  hudsonHustleReleasedConfigs,
-  type HudsonHustleReleasedConfigSummary
-} from "@hudson-hustle/game-data";
-import {
-  BoardMap,
-  BoardStage,
-  ChatPanel,
-  EndgameBreakdown,
-  FloatingBuildPanel,
-  GameOverLayer,
-  NotificationPipe,
-  PlayerRoster,
-  PrivateHandRail,
-  ScoreGuide,
-  SupplyDock,
-  TicketChoiceSheet,
-  TicketDock,
-  TurnIndicator,
-  formatCardLabel,
-  type GameplayNotification
-} from "./components/ui/game";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useRoute } from "./app/routes";
+import { useOnlineRoom } from "./components/online/useOnlineRoom";
 import { GuidebookScreen } from "./components/screens/GuidebookScreen";
-import OnboardingTour, { shouldShowTour } from "./components/shared/OnboardingTour";
-import { LocalPlayScreen } from "./components/screens/LocalPlayScreen";
 import { LobbyScreen } from "./components/screens/LobbyScreen";
+import { LocalPlayScreen } from "./components/screens/LocalPlayScreen";
+import { OnlineGameScreen } from "./components/screens/OnlineGameScreen";
 import { OnlineSetupScreen } from "./components/screens/OnlineSetupScreen";
 import { SetupGateway } from "./components/screens/SetupGateway";
-import { Button } from "./components/ui/primitives/Button";
-import { ChoiceChipButton } from "./components/ui/primitives/ChoiceChipButton";
-import { ModalShell } from "./components/ui/primitives/ModalShell";
-import { SectionHeader } from "./components/ui/primitives/SectionHeader";
-import { SurfaceCard } from "./components/ui/primitives/SurfaceCard";
-import { encodeReconnectToken, readReconnectCredentials, type ReconnectCredentials } from "./reconnect-token";
+import type { GameplayNotification } from "./components/ui/game";
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8787";
-const wsUrl = import.meta.env.VITE_WS_URL ?? apiBaseUrl;
-const sessionKey = "hudson-hustle-multiplayer-session-v2";
-type RealtimeStatus = "idle" | "connecting" | "subscribed" | "failed";
-type SetupMode = "gateway" | "local" | "multiplayer" | "guide";
+const NOTICE_LIFETIME_MS = 2000;
 
-class ApiError extends Error {
-  constructor(
-    message: string,
-    public readonly status: number
-  ) {
-    super(message);
-    this.name = "ApiError";
-  }
-}
+const realtimeMessages = {
+  connecting: "Realtime connection is still being established. Ready and start stay disabled until the live room link is confirmed.",
+  failed: "Realtime connection failed. Seat presence and ready/start controls are disabled until the live room link recovers.",
+  idle: null,
+  subscribed: null
+} as const;
 
-function readSession(): ReconnectCredentials | null {
-  const raw = window.localStorage.getItem(sessionKey);
-  const credentials = readReconnectCredentials(raw);
-  if (!raw || !credentials || raw.trim().startsWith("hh1.")) {
-    return credentials;
-  }
-
-  window.localStorage.setItem(sessionKey, encodeReconnectToken(credentials));
-  return credentials;
-}
-
-function saveSession(credentials: ReconnectCredentials | null): void {
-  if (!credentials) {
-    window.localStorage.removeItem(sessionKey);
-    return;
-  }
-  window.localStorage.setItem(sessionKey, encodeReconnectToken(credentials));
-}
-
-function clearSessionState(
-  setCredentials: Dispatch<SetStateAction<ReconnectCredentials | null>>,
-  setSnapshot: Dispatch<SetStateAction<RoomSnapshot | null>>,
-  setRoomPreview: Dispatch<SetStateAction<RoomSnapshot["room"] | null>>,
-  setTimer: Dispatch<SetStateAction<TimerUpdate | null>>,
-  setMultiplayerError: Dispatch<SetStateAction<string | null>>,
-  setReconnectState: Dispatch<SetStateAction<ReconnectState>>,
-  setSetupMode: Dispatch<SetStateAction<SetupMode>>
-): void {
-  saveSession(null);
-  setCredentials(null);
-  setSnapshot(null);
-  setRoomPreview(null);
-  setTimer(null);
-  setMultiplayerError(null);
-  setReconnectState("fresh");
-  setSetupMode("gateway");
-}
-
-function placeholderHand(playerId: string, count: number): GameState["players"][number]["hand"] {
-  return Array.from({ length: count }, (_, index) => ({
-    id: `hidden-hand-${playerId}-${index}`,
-    color: "locomotive" as const
-  }));
-}
-
-function placeholderTickets(playerId: string, count: number): TicketDef[] {
-  return Array.from({ length: count }, (_, index) => ({
-    id: `hidden-ticket-${playerId}-${index}`,
-    from: "hidden",
-    to: "hidden",
-    points: 0,
-    bucket: "regular"
-  }));
-}
-
-function buildProjectedGameState(game: PublicGameState, privateState: RoomSnapshot["privateState"]): GameState {
-  return {
-    version: game.version,
-    mapId: game.mapId,
-    players: game.players.map((player) => {
-      const isLocal = privateState?.playerId === player.id;
-      return {
-        id: player.id,
-        name: player.name,
-        color: player.color,
-        hand: isLocal ? privateState?.hand ?? [] : placeholderHand(player.id, player.handCount),
-        tickets: isLocal ? privateState?.tickets ?? [] : placeholderTickets(player.id, player.ticketCount),
-        pendingTickets: isLocal ? privateState?.pendingTickets ?? [] : placeholderTickets(player.id, player.pendingTicketCount),
-        score: player.score,
-        trainsLeft: player.trainsLeft,
-        stationsLeft: player.stationsLeft,
-        endgame: player.endgame
-      };
-    }),
-    activePlayerIndex: game.activePlayerIndex,
-    phase: game.phase,
-    routeClaims: game.routeClaims,
-    stations: game.stations,
-    trainDeck: [],
-    discardPile: [],
-    market: game.market,
-    regularTickets: [],
-    longTickets: [],
-    discardedTickets: [],
-    turn: game.turn,
-    rngState: 0,
-    finalRoundRemaining: game.finalRoundRemaining,
-    finalRoundTriggeredBy: game.finalRoundTriggeredBy,
-    log: game.log
-  };
-}
-
-async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${apiBaseUrl}${path}`, {
-    ...init,
-    headers: {
-      "content-type": "application/json",
-      ...(init?.headers ?? {})
-    }
-  });
-
-  if (!response.ok) {
-    const payload = (await response.json().catch(() => null)) as { message?: string } | null;
-    throw new ApiError(payload?.message ?? `Request failed: ${response.status}`, response.status);
-  }
-
-  return (await response.json()) as T;
-}
-
+/** Chooses the screen for the current address and room state. Screens own everything else. */
 export default function App(): JSX.Element {
-  const [setupMode, setSetupMode] = useState<SetupMode>("gateway");
-  const [releasedConfigs, setReleasedConfigs] = useState<HudsonHustleReleasedConfigSummary[]>(hudsonHustleReleasedConfigs);
-  const [snapshot, setSnapshot] = useState<RoomSnapshot | null>(null);
-  const [credentials, setCredentials] = useState<ReconnectCredentials | null>(null);
-  const [roomPreview, setRoomPreview] = useState<RoomSnapshot["room"] | null>(null);
-  const [reconnectState, setReconnectState] = useState<ReconnectState>("fresh");
-  const [multiplayerError, setMultiplayerError] = useState<string | null>(null);
-  const [isCreatingRoom, setIsCreatingRoom] = useState(false);
-  const [timer, setTimer] = useState<TimerUpdate | null>(null);
-  const [timerNow, setTimerNow] = useState(() => Date.now());
-  const [realtimeStatus, setRealtimeStatus] = useState<RealtimeStatus>("idle");
-  const [selectedRouteId, setSelectedRouteId] = useState<string | null>(null);
-  const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
-  const [buildAnchor, setBuildAnchor] = useState<{ x: number; y: number } | null>(null);
-  const [selectedTicketIds, setSelectedTicketIds] = useState<string[]>([]);
-  const [focusedTicket, setFocusedTicket] = useState<TicketDef | null>(null);
-  const [pinnedTicket, setPinnedTicket] = useState<TicketDef | null>(null);
-  const [paymentPreview, setPaymentPreview] = useState<{ color: TrainCardColor; totalCost: number; minimumLocomotives?: number } | null>(null);
-  const [guideOpen, setGuideOpen] = useState(false);
-  const [tourOpen, setTourOpen] = useState(false);
-  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
-  const [notifications, setNotifications] = useState<GameplayNotification[]>([]);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const socketRef = useRef<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null);
-  const awaitingSocketHandshakeRef = useRef(false);
-  const lastPendingTicketKeyRef = useRef("");
-  const notificationIdRef = useRef(0);
-  const lastAnnouncedLogRef = useRef<string | null>(null);
-  const lastAnnouncedLogLengthRef = useRef(0);
-  const pendingDrawsRef = useRef<{ player: string; cards: string[] } | null>(null);
-  const timerWarningRef = useRef<string | null>(null);
+  const [route, navigate] = useRoute();
+  const [notices, setNotices] = useState<GameplayNotification[]>([]);
+  const noticeIdRef = useRef(0);
 
-  useEffect(() => {
-    void requestJson<HudsonHustleReleasedConfigSummary[]>("/released-configs")
-      .then(setReleasedConfigs)
-      .catch(() => {
-        setReleasedConfigs(hudsonHustleReleasedConfigs);
-      });
+  const showNotice = useCallback((message: string, tone: "warning" | "success") => {
+    noticeIdRef.current += 1;
+    const id = `notice-${noticeIdRef.current}`;
+    setNotices((current) => [...current, { id, message, tone }]);
+    window.setTimeout(() => setNotices((current) => current.filter((notice) => notice.id !== id)), NOTICE_LIFETIME_MS);
   }, []);
 
+  // A saved seat is picked up again unless the address asks for something that is not online play.
+  const room = useOnlineRoom({
+    reconnectOnMount: route.name !== "local" && route.name !== "guide",
+    onNotice: showNotice
+  });
+  const { snapshot, credentials } = room;
+  const roomCode = credentials?.roomCode ?? null;
+
+  // Being seated in a room puts its code in the address, so the link can be shared.
   useEffect(() => {
-    setShowLeaveConfirm(false);
-  }, [credentials?.roomCode, snapshot?.room.status]);
+    if (roomCode) {
+      navigate({ name: "room", roomCode }, { replace: true });
+    }
+  }, [navigate, roomCode]);
 
+  // A reconnect attempt belongs to online setup, where its progress and any failure are shown.
   useEffect(() => {
-    const saved = readSession();
-    if (!saved) {
-      return;
+    if (room.reconnectState === "attempting-reconnect" && route.name === "gateway") {
+      navigate({ name: "online" }, { replace: true });
     }
-    setSetupMode("multiplayer");
-    setReconnectState("attempting-reconnect");
-    awaitingSocketHandshakeRef.current = true;
-    void requestJson<RejoinRoomResponse>(`/rooms/${saved.roomCode}/rejoin`, {
-      method: "POST",
-      body: JSON.stringify({
-        seatId: saved.seatId,
-        playerSecret: saved.playerSecret
-      } satisfies RejoinRoomRequest)
-    })
-      .then((response) => {
-        const nextCredentials = {
-          roomCode: response.roomCode,
-          seatId: response.seatId,
-          playerSecret: response.playerSecret
-        };
-        setCredentials(nextCredentials);
-        saveSession(nextCredentials);
-        setSnapshot(response.snapshot);
-      })
-      .catch((caught) => {
-        if (caught instanceof ApiError && (caught.status === 403 || caught.status === 404)) {
-          saveSession(null);
-        }
-        awaitingSocketHandshakeRef.current = false;
-        setReconnectState("reconnect-failed");
-        setMultiplayerError(caught instanceof Error ? caught.message : "Reconnect failed.");
-      });
-  }, []);
-
-  useEffect(() => {
-    if (!credentials) {
-      socketRef.current?.disconnect();
-      socketRef.current = null;
-      setRealtimeStatus("idle");
-      return;
-    }
-
-    setRealtimeStatus("connecting");
-    const socket = io(wsUrl);
-    socketRef.current = socket;
-    let handshakeResolved = false;
-    const handshakeTimeout = window.setTimeout(() => {
-      if (handshakeResolved) {
-        return;
-      }
-      awaitingSocketHandshakeRef.current = false;
-      setRealtimeStatus("failed");
-      setMultiplayerError("Realtime connection timed out before the room subscription was confirmed.");
-      setReconnectState("reconnect-failed");
-      socket.disconnect();
-    }, 8000);
-
-    const resolveHandshake = () => {
-      handshakeResolved = true;
-      window.clearTimeout(handshakeTimeout);
-    };
-
-    socket.on("connect", () => {
-      socket.emit("room:subscribe", credentials);
-    });
-
-    socket.on("room:update", (room) => {
-      resolveHandshake();
-      setRealtimeStatus("subscribed");
-      setSnapshot((current) => (current ? { ...current, room } : { room, game: null, privateState: null }));
-    });
-
-    socket.on("game:update:public", (game) => {
-      // Notification firing handled by the useEffect on snapshot.game.log.length
-      // (calling announceGameLog here would race with the state update).
-      setSnapshot((current) => (current ? { ...current, game } : current));
-    });
-
-    socket.on("game:update:private", (privateState) => {
-      setSnapshot((current) => (current ? { ...current, privateState } : current));
-    });
-
-    socket.on("game:reconnected", (nextSnapshot) => {
-      resolveHandshake();
-      awaitingSocketHandshakeRef.current = false;
-      setRealtimeStatus("subscribed");
-      setSnapshot(nextSnapshot);
-      setReconnectState("reconnected");
-    });
-
-    socket.on("game:timer", (nextTimer) => {
-      setTimer(nextTimer);
-    });
-
-    socket.on("chat:update", (messages) => {
-      setChatMessages(messages);
-    });
-
-    socket.on("game:error", (payload) => {
-      resolveHandshake();
-      setRealtimeStatus("failed");
-      if (awaitingSocketHandshakeRef.current) {
-        awaitingSocketHandshakeRef.current = false;
-        setReconnectState("reconnect-failed");
-      }
-      setMultiplayerError(payload.message);
-      pushNotification(payload.message, "warning");
-    });
-
-    socket.on("connect_error", (connectError) => {
-      resolveHandshake();
-      awaitingSocketHandshakeRef.current = false;
-      setRealtimeStatus("failed");
-      setMultiplayerError(connectError.message || "Could not connect to the room.");
-      setReconnectState("reconnect-failed");
-    });
-
-    socket.on("disconnect", (reason) => {
-      resolveHandshake();
-      awaitingSocketHandshakeRef.current = false;
-      if (reason === "io client disconnect") {
-        return;
-      }
-      setRealtimeStatus("failed");
-      setMultiplayerError("Connection lost. Reconnect using your saved session details.");
-      setReconnectState("reconnect-failed");
-    });
-
-    return () => {
-      resolveHandshake();
-      socket.disconnect();
-      socketRef.current = null;
-    };
-  }, [credentials]);
-
-  const realtimeMessage =
-    realtimeStatus === "connecting"
-      ? "Realtime connection is still being established. Ready and start stay disabled until the live room link is confirmed."
-      : realtimeStatus === "failed"
-        ? "Realtime connection failed. Seat presence and ready/start controls are disabled until the live room link recovers."
-        : null;
-
-  useEffect(() => {
-    if (!timer?.deadlineAt) {
-      return;
-    }
-
-    setTimerNow(Date.now());
-    const interval = window.setInterval(() => {
-      setTimerNow(Date.now());
-    }, 1000);
-
-    return () => {
-      window.clearInterval(interval);
-    };
-  }, [timer?.deadlineAt]);
-
-  const mapConfig = useMemo(() => {
-    if (!snapshot) {
-      return null;
-    }
-    return getHudsonHustleMapByConfigId(snapshot.room.configId);
-  }, [snapshot]);
-
-  const visuals = useMemo(() => {
-    if (!snapshot) {
-      return null;
-    }
-    return getHudsonHustleVisualsByConfigId(snapshot.room.configId);
-  }, [snapshot]);
-
-  const projectedGame = useMemo(() => {
-    if (!snapshot?.game) {
-      return null;
-    }
-    return buildProjectedGameState(snapshot.game, snapshot.privateState);
-  }, [snapshot]);
-
-  const tourInitRef = useRef(false);
-  useEffect(() => {
-    if (projectedGame && !tourInitRef.current) {
-      tourInitRef.current = true;
-      setTourOpen(shouldShowTour());
-    }
-  }, [projectedGame]);
-
-  const localPlayer = useMemo(() => {
-    if (!projectedGame || !snapshot?.privateState?.playerId) {
-      return null;
-    }
-    return projectedGame.players.find((player) => player.id === snapshot.privateState?.playerId) ?? null;
-  }, [projectedGame, snapshot]);
-
-  const localIsActive = useMemo(() => {
-    if (!snapshot?.game || !snapshot.privateState?.playerId) {
-      return false;
-    }
-    return snapshot.game.players[snapshot.game.activePlayerIndex]?.id === snapshot.privateState.playerId;
-  }, [snapshot]);
-
-  const endgameWinnerScore = useMemo(() => {
-    if (!projectedGame) return 0;
-    return Math.max(...projectedGame.players.map((p) => p.score));
-  }, [projectedGame]);
-
-  const playerAvatars = useMemo(() => {
-    if (!snapshot?.game) return {};
-    const AVATAR_NAMES = [
-      "Conductor", "Milo", "Engineer", "Rosa", "Switchman",
-      "Jack", "Dispatcher", "Lily", "Caboose", "Nellie"
-    ];
-    const seed = snapshot.room.roomCode;
-    let h = 0;
-    for (let i = 0; i < seed.length; i++) h = ((h << 5) - h + seed.charCodeAt(i)) | 0;
-    const rng = () => {
-      h = (h ^ (h >>> 16)) * 0x45d9f3b | 0;
-      h = (h ^ (h >>> 16)) * 0x45d9f3b | 0;
-      h ^= h >>> 16;
-      return (h >>> 0) / 4294967296;
-    };
-    const pool = [...AVATAR_NAMES];
-    for (let i = pool.length - 1; i > 0; i--) {
-      const j = Math.floor(rng() * (i + 1));
-      [pool[i], pool[j]] = [pool[j], pool[i]];
-    }
-    const map: Record<string, string> = {};
-    snapshot.game.players.forEach((p, idx) => { map[p.id] = pool[idx % pool.length]; });
-    return map;
-  }, [snapshot?.game?.players.map((p) => p.id).join("|"), snapshot?.room.roomCode]);
-
-  const rosterPlayers = useMemo(() => {
-    if (!snapshot?.game) return [];
-    return snapshot.game.players.map((p) => ({
-      id: p.id,
-      name: p.name,
-      color: p.color,
-      trainsLeft: p.trainsLeft,
-      stationsLeft: p.stationsLeft,
-      ticketCount: p.ticketCount,
-      score: p.score,
-      routesCount: snapshot.game!.routeClaims.filter((c) => c.playerId === p.id).length,
-      avatarName: playerAvatars[p.id] ?? null
-    }));
-  }, [snapshot?.game, playerAvatars]);
-
-  useEffect(() => {
-    const pending = snapshot?.privateState?.pendingTickets ?? [];
-    const pendingKey = pending.map((ticket) => ticket.id).join("|");
-    if (pending.length === 0) {
-      lastPendingTicketKeyRef.current = "";
-      setSelectedTicketIds([]);
-      return;
-    }
-    if (lastPendingTicketKeyRef.current === pendingKey) {
-      return;
-    }
-    lastPendingTicketKeyRef.current = pendingKey;
-    const minimumKeep = snapshot?.game?.phase === "initialTickets" ? 2 : 1;
-    setSelectedTicketIds(pending.slice(0, minimumKeep).map((ticket) => ticket.id));
-  }, [snapshot?.game?.phase, snapshot?.privateState?.pendingTickets]);
-
-  function pushNotification(message: string, tone: GameplayNotification["tone"] = "neutral") {
-    notificationIdRef.current += 1;
-    const id = `multi-${Date.now()}-${notificationIdRef.current}`;
-    setNotifications((current) => [...current, { id, message, tone }]);
-    window.setTimeout(() => {
-      setNotifications((current) => current.filter((notification) => notification.id !== id));
-    }, 2000);
-  }
-
-  useEffect(() => {
-    const log = snapshot?.game?.log;
-    if (!snapshot?.game || !log || log.length === 0) {
-      return;
-    }
-
-    // First time we see this game — initialise without firing notifications
-    if (lastAnnouncedLogLengthRef.current === 0) {
-      lastAnnouncedLogLengthRef.current = log.length;
-      lastAnnouncedLogRef.current = log[log.length - 1];
-      return;
-    }
-
-    // If log somehow shrank (game reset / reconnect), resync without notifying
-    if (log.length < lastAnnouncedLogLengthRef.current) {
-      lastAnnouncedLogLengthRef.current = log.length;
-      lastAnnouncedLogRef.current = log[log.length - 1] ?? null;
-      return;
-    }
-
-    // Push notable log entries (draw/claim/station). Draws within one turn are
-    // batched into a single notification flushed when the turn ends or another
-    // action type appears.
-    const newEntries = log.slice(lastAnnouncedLogLengthRef.current);
-    const tone = snapshot.game.phase === "gameOver" ? "success" : "neutral";
-
-    function flushDraws() {
-      const pending = pendingDrawsRef.current;
-      if (pending && pending.cards.length > 0) {
-        const cardList = pending.cards.join(", ");
-        pushNotification(`${pending.player} drew ${cardList}.`, tone);
-      }
-      pendingDrawsRef.current = null;
-    }
-
-    for (const entry of newEntries) {
-      // "X drew a Y card."
-      const drawMatch = entry.match(/^(.+) drew a (.+) card\.$/);
-      if (drawMatch) {
-        const [, player, card] = drawMatch;
-        if (pendingDrawsRef.current && pendingDrawsRef.current.player !== player) {
-          flushDraws();
-        }
-        if (!pendingDrawsRef.current) {
-          pendingDrawsRef.current = { player, cards: [] };
-        }
-        pendingDrawsRef.current.cards.push(card);
-        continue;
-      }
-      // Other notable actions — flush pending draws first, then announce
-      if (entry.includes("claimed") || entry.includes("built a station")) {
-        flushDraws();
-        pushNotification(entry, tone);
-        continue;
-      }
-      // Turn started — flush pending draws so they're announced at end of turn
-      if (entry.includes("turn started")) {
-        flushDraws();
-      }
-    }
-
-    // Do NOT flush here — let pending draws batch until the next "turn started"
-    // log arrives (which marks end of this player's draw phase).
-
-    lastAnnouncedLogLengthRef.current = log.length;
-    lastAnnouncedLogRef.current = log[log.length - 1];
-  }, [snapshot?.game?.log.length, snapshot?.game?.phase]);
-
-  const liveTimerSecondsRemaining =
-    timer?.deadlineAt
-      ? Math.max(0, Math.ceil((timer.deadlineAt - timerNow) / 1000))
-      : timer?.secondsRemaining ?? null;
-
-  useEffect(() => {
-    if (!timer || !credentials || timer.activeSeatId !== credentials.seatId || liveTimerSecondsRemaining === null) {
-      timerWarningRef.current = null;
-      return;
-    }
-
-    const deadlineKey = `${timer.deadlineAt ?? "no-deadline"}`;
-    if (liveTimerSecondsRemaining <= 10 && timerWarningRef.current !== deadlineKey) {
-      timerWarningRef.current = deadlineKey;
-      pushNotification("10 seconds left.", "warning");
-    }
-
-    if (liveTimerSecondsRemaining > 10) {
-      timerWarningRef.current = null;
-    }
-  }, [credentials, liveTimerSecondsRemaining, timer]);
-
-  const ticketProgress = useMemo(() => {
-    if (!projectedGame || !mapConfig || !localPlayer) {
-      return [];
-    }
-    return getTicketProgress(projectedGame, mapConfig, localPlayer.id).sort((left, right) => Number(left.completed) - Number(right.completed));
-  }, [localPlayer, mapConfig, projectedGame]);
-
-  const routeOptions = useMemo(() => {
-    if (!localIsActive || !projectedGame || !mapConfig || !selectedRouteId) {
-      return [];
-    }
-    if (!mapConfig.routes.find((route) => route.id === selectedRouteId)) {
-      return [];
-    }
-    return getAffordableRouteColors(projectedGame, mapConfig, selectedRouteId);
-  }, [localIsActive, mapConfig, projectedGame, selectedRouteId]);
-
-  const stationOptions = useMemo(() => {
-    if (!localIsActive || !projectedGame || !mapConfig || !selectedCityId) {
-      return [];
-    }
-    return getAffordableStationColors(projectedGame, mapConfig);
-  }, [localIsActive, mapConfig, projectedGame, selectedCityId]);
-
-  const currentRouteUnavailableReason = useMemo(() => {
-    if (!snapshot?.game || !mapConfig || !selectedRouteId) {
-      return null;
-    }
-
-    const currentRoute = mapConfig.routes.find((route) => route.id === selectedRouteId);
-    if (!currentRoute) {
-      return null;
-    }
-
-    const currentRouteClaim = snapshot.game.routeClaims.find((claim) => claim.routeId === currentRoute.id);
-    const currentRouteOwner = currentRouteClaim ? snapshot.game.players.find((player) => player.id === currentRouteClaim.playerId) : null;
-
-    if (!localIsActive) {
-      return "Wait for your turn to claim a route.";
-    }
-
-    if (currentRouteClaim && currentRouteOwner) {
-      return `This route is already claimed by ${currentRouteOwner.name}.`;
-    }
-
-    if (snapshot.game.phase !== "main") {
-      return "Finish the current ticket choice before claiming a route.";
-    }
-
-    if (snapshot.game.turn.stage !== "idle") {
-      return "Finish the current draw before claiming a route.";
-    }
-
-    if (currentRoute.twinGroup && snapshot.game.players.length <= 3) {
-      const twinIds = mapConfig.routes.filter((route) => route.twinGroup === currentRoute.twinGroup && route.id !== currentRoute.id).map((route) => route.id);
-      const twinClaim = snapshot.game.routeClaims.find((claim) => twinIds.includes(claim.routeId));
-      if (twinClaim) {
-        const twinOwner = snapshot.game.players.find((player) => player.id === twinClaim.playerId);
-        return `This parallel route is unavailable because its twin is already claimed${twinOwner ? ` by ${twinOwner.name}` : ""}.`;
-      }
-    }
-
-    return "No affordable claim options right now.";
-  }, [localIsActive, mapConfig, selectedRouteId, snapshot]);
-
-  async function createRoom(form: CreateRoomRequest) {
-    setIsCreatingRoom(true);
-    setMultiplayerError(null);
-    try {
-      const response = await requestJson<CreateRoomResponse>("/rooms", {
-        method: "POST",
-        body: JSON.stringify(form)
-      });
-      const nextCredentials = {
-        roomCode: response.roomCode,
-        seatId: response.seatId,
-        playerSecret: response.playerSecret
-      };
-      awaitingSocketHandshakeRef.current = true;
-      setSetupMode("multiplayer");
-      setCredentials(nextCredentials);
-      saveSession(nextCredentials);
-      setSnapshot(response.snapshot);
-      setMultiplayerError(null);
-    } catch (caught) {
-      setMultiplayerError(
-        caught instanceof TypeError
-          ? "Could not reach the multiplayer server. Make sure the local backend is running and this web port is allowed."
-          : caught instanceof Error
-            ? caught.message
-            : "Could not create the room."
-      );
-    } finally {
-      setIsCreatingRoom(false);
-    }
-  }
-
-  async function previewRoom(roomCode: string) {
-    try {
-      const room = await requestJson<RoomSnapshot>(`/rooms/${roomCode}`);
-      setRoomPreview(room.room);
-      setMultiplayerError(null);
-    } catch (caught) {
-      setRoomPreview(null);
-      setMultiplayerError(caught instanceof Error ? caught.message : "Could not preview that room.");
-    }
-  }
-
-  async function joinRoom(form: JoinRoomRequest & { roomCode: string }) {
-    try {
-      const response = await requestJson<JoinRoomResponse>(`/rooms/${form.roomCode}/join`, {
-        method: "POST",
-        body: JSON.stringify({
-          playerName: form.playerName,
-          preferredSeatId: form.preferredSeatId
-        } satisfies JoinRoomRequest)
-      });
-      const nextCredentials = {
-        roomCode: response.roomCode,
-        seatId: response.seatId,
-        playerSecret: response.playerSecret
-      };
-      awaitingSocketHandshakeRef.current = true;
-      setSetupMode("multiplayer");
-      setCredentials(nextCredentials);
-      saveSession(nextCredentials);
-      setSnapshot(response.snapshot);
-      setMultiplayerError(null);
-    } catch (caught) {
-      setMultiplayerError(caught instanceof Error ? caught.message : "Could not join that room.");
-    }
-  }
-
-  async function startRoom() {
-    if (!credentials || !snapshot) {
-      return;
-    }
-    try {
-      const response = await requestJson<{ snapshot: RoomSnapshot }>(`/rooms/${snapshot.room.roomCode}/start`, {
-        method: "POST",
-        body: JSON.stringify({
-          playerSecret: credentials.playerSecret
-        } satisfies StartRoomRequest)
-      });
-      setSnapshot(response.snapshot);
-      setMultiplayerError(null);
-    } catch (caught) {
-      setMultiplayerError(caught instanceof Error ? caught.message : "Could not start the room.");
-    }
-  }
-
-  async function restartRoom() {
-    if (!credentials || !snapshot) {
-      return;
-    }
-    try {
-      const response = await requestJson<RestartRoomResponse>(`/rooms/${snapshot.room.roomCode}/restart`, {
-        method: "POST",
-        body: JSON.stringify({
-          playerSecret: credentials.playerSecret
-        } satisfies RestartRoomRequest)
-      });
-      setSnapshot(response.snapshot);
-      setSelectedRouteId(null);
-      setSelectedCityId(null);
-      setFocusedTicket(null);
-      setPinnedTicket(null);
-      setPaymentPreview(null);
-      lastAnnouncedLogRef.current = null;
-      lastAnnouncedLogLengthRef.current = 0;
-      timerWarningRef.current = null;
-      setMultiplayerError(null);
-      pushNotification("New game started with the same room settings.", "success");
-    } catch (caught) {
-      setMultiplayerError(caught instanceof Error ? caught.message : "Could not restart the room.");
-      pushNotification(caught instanceof Error ? caught.message : "Could not restart the room.", "warning");
-    }
-  }
-
-  function sendReady(ready: boolean) {
-    if (!credentials) {
-      return;
-    }
-    socketRef.current?.emit("player:ready", {
-      ...credentials,
-      ready
-    });
-  }
-
-  function sendGameAction(action: GameAction) {
-    if (!credentials) {
-      return;
-    }
-    setPaymentPreview(null);
-    setMultiplayerError(null);
-    socketRef.current?.emit("game:action", {
-      ...credentials,
-      action
-    });
-  }
-
-  function sendChatMessage(message: string) {
-    if (!credentials) {
-      return;
-    }
-    socketRef.current?.emit("chat:message", {
-      ...credentials,
-      message
-    });
-  }
+    // Only a change in reconnect state should move the player; later visits to the gateway are their own choice.
+  }, [room.reconnectState]);
 
   async function leaveRoom() {
-    awaitingSocketHandshakeRef.current = false;
-    if (snapshot?.room.status === "lobby" && credentials) {
-      try {
-        await requestJson<{ ok: true }>(`/rooms/${credentials.roomCode}/leave`, {
-          method: "POST",
-          body: JSON.stringify({
-            seatId: credentials.seatId,
-            playerSecret: credentials.playerSecret
-          })
-        });
-      } catch (caught) {
-        if (caught instanceof ApiError && (caught.status === 403 || caught.status === 404)) {
-          clearSessionState(setCredentials, setSnapshot, setRoomPreview, setTimer, setMultiplayerError, setReconnectState, setSetupMode);
-          return;
-        }
-        setMultiplayerError(caught instanceof Error ? caught.message : "Could not leave the room.");
-        return;
-      }
+    if (await room.leaveRoom()) {
+      navigate({ name: "gateway" });
     }
-
-    clearSessionState(setCredentials, setSnapshot, setRoomPreview, setTimer, setMultiplayerError, setReconnectState, setSetupMode);
   }
 
-  if (!snapshot || !credentials) {
-    if (setupMode === "gateway") {
+  if (snapshot && credentials) {
+    const playerId = snapshot.privateState?.playerId;
+    if (snapshot.room.status === "lobby" || !snapshot.game || !playerId) {
       return (
-        <SetupGateway
-          onChooseLocal={() => setSetupMode("local")}
-          onChooseOnline={() => {
-            setSetupMode("multiplayer");
-            setMultiplayerError(null);
-          }}
-          onOpenGuide={() => setSetupMode("guide")}
+        <LobbyScreen
+          room={snapshot.room}
+          localSeatId={credentials.seatId}
+          onReadyChange={room.sendReady}
+          onStart={() => void room.startRoom()}
+          onLeaveRoom={() => void leaveRoom()}
+          timer={room.timer}
+          realtimeReady={room.realtimeStatus === "subscribed"}
+          realtimeMessage={realtimeMessages[room.realtimeStatus]}
         />
       );
     }
-
-    if (setupMode === "guide") {
-      return (
-        <GuidebookScreen
-          onBack={() => setSetupMode("gateway")}
-          onReplayTour={() => {
-            localStorage.removeItem("hh-tour-seen");
-            setTourOpen(true);
-          }}
-        />
-      );
-    }
-
-    if (setupMode === "local") {
-      return (
-        <LocalPlayScreen
-          onReturnToGateway={() => setSetupMode("gateway")}
-        />
-      );
-    }
-
     return (
-      <OnlineSetupScreen
-        releasedConfigs={releasedConfigs}
-        reconnectState={reconnectState}
-        roomPreview={roomPreview}
-        error={multiplayerError}
-        isCreatingRoom={isCreatingRoom}
-        onOpenLocal={() => {
-          setSetupMode("local");
-          setMultiplayerError(null);
-        }}
-        onBack={() => {
-          setSetupMode("gateway");
-          setMultiplayerError(null);
-        }}
-        onClearRoomPreview={() => {
-          setRoomPreview(null);
-          setMultiplayerError(null);
-        }}
-        onPreviewRoom={(roomCode) => void previewRoom(roomCode)}
-        onCreateRoom={(form) => void createRoom(form)}
-        onJoinRoom={(form) => void joinRoom(form)}
+      <OnlineGameScreen
+        room={room}
+        snapshot={{ ...snapshot, game: snapshot.game }}
+        playerId={playerId}
+        notices={notices}
+        onLeave={() => void leaveRoom()}
       />
     );
   }
 
-  if (guideOpen) {
+  if (route.name === "guide") {
+    return <GuidebookScreen onBack={() => navigate({ name: "gateway" })} />;
+  }
+
+  if (route.name === "local") {
+    return <LocalPlayScreen onReturnToGateway={() => navigate({ name: "gateway" })} />;
+  }
+
+  if (route.name === "gateway") {
     return (
-      <GuidebookScreen
-        onBack={() => setGuideOpen(false)}
-        onReplayTour={() => {
-          localStorage.removeItem("hh-tour-seen");
-          setTourOpen(true);
+      <SetupGateway
+        onChooseLocal={() => navigate({ name: "local" })}
+        onChooseOnline={() => {
+          room.clearError();
+          navigate({ name: "online" });
         }}
+        onOpenGuide={() => navigate({ name: "guide" })}
       />
     );
   }
-
-  if (snapshot.room.status === "lobby" || !snapshot.game || !mapConfig || !visuals || !projectedGame || !localPlayer) {
-    return (
-      <LobbyScreen
-        room={snapshot.room}
-        localSeatId={credentials.seatId}
-        onReadyChange={sendReady}
-        onStart={() => void startRoom()}
-        onLeaveRoom={leaveRoom}
-        timer={timer}
-        realtimeReady={realtimeStatus === "subscribed"}
-        realtimeMessage={realtimeMessage}
-      />
-    );
-  }
-
-  const publicGame = snapshot.game;
-  const currentRoute = selectedRouteId ? mapConfig.routes.find((route) => route.id === selectedRouteId) : null;
-  const currentRouteClaim = currentRoute ? publicGame.routeClaims.find((claim) => claim.routeId === currentRoute.id) : null;
-  const currentRouteOwner = currentRouteClaim ? publicGame.players.find((player) => player.id === currentRouteClaim.playerId) : null;
-  const currentCity = selectedCityId ? mapConfig.cities.find((city) => city.id === selectedCityId) : null;
-  const currentCityOccupied = currentCity ? publicGame.stations.some((station) => station.cityId === currentCity.id) : false;
-  const canTakeTurnAction = localIsActive && publicGame.phase === "main" && publicGame.turn.stage === "idle";
-  const canContinueDrawing =
-    localIsActive &&
-    publicGame.phase === "main" &&
-    (publicGame.turn.stage === "idle" || publicGame.turn.stage === "drawing") &&
-    !publicGame.turn.tookFaceUpLocomotive &&
-    publicGame.turn.drawsTaken < 2;
-  const localPendingTickets = snapshot.privateState?.pendingTickets ?? [];
-  const currentStationCost = mapConfig.settings.stationsPerPlayer - localPlayer.stationsLeft + 1;
-  const highlightedTicket = focusedTicket ?? pinnedTicket;
-  const highlightedCityIds = highlightedTicket ? [highlightedTicket.from, highlightedTicket.to] : [];
-  const activePlayer = publicGame.players[publicGame.activePlayerIndex];
-  const turnStatusLabel = localIsActive ? "Your turn" : "Waiting";
-  const turnStatusCopy = localIsActive
-    ? "Your turn"
-    : `Waiting for ${activePlayer?.name ?? "the active player"} to finish their move.`;
-  const turnTimerBadge =
-    liveTimerSecondsRemaining === null
-      ? snapshot.room.turnTimeLimitSeconds === 0
-        ? "Untimed room"
-        : `Timer ${snapshot.room.turnTimeLimitSeconds}s`
-      : `${liveTimerSecondsRemaining}s left`;
 
   return (
-    <div className="app-shell app-shell--gameplay-hud" data-config-theme={visuals.theme}>
-      <header className="topbar topbar--gameplay-actions">
-        <div className="topbar-private-spacer" aria-hidden="true" />
-        <TurnIndicator
-          playerName={projectedGame.players[snapshot.game.activePlayerIndex]?.name ?? ""}
-          secondsRemaining={liveTimerSecondsRemaining}
-          data-tour-target="turn"
-        />
-        <div className="topbar-actions">
-          <Button className="topbar-icon-btn" aria-label="Guide" onClick={() => setGuideOpen(true)} data-label="Guide">?</Button>
-          <ScoreGuide className="score-guide--subtle topbar-icon-btn" label="★" tooltipLabel="Score" />
-          <Button className="topbar-icon-btn topbar-icon-btn--leave" aria-label="Leave room" onClick={() => setShowLeaveConfirm(true)} data-label="Leave">✕</Button>
-        </div>
-      </header>
-
-      <div className="game-layout">
-        {/* Left column: 50/50 split — roster (top), tickets + draw button (bottom) */}
-        <aside className="side-panel" data-tour-target="roster">
-          <div className="side-panel__top">
-            <PlayerRoster
-              players={rosterPlayers}
-              activePlayerIndex={snapshot.game.activePlayerIndex}
-              playerPalette={visuals.palettes.players}
-            />
-          </div>
-          <div className="side-panel__bottom" data-tour-target="tickets">
-            <TicketDock
-              ticketProgress={ticketProgress}
-              config={mapConfig}
-              focusedTicketId={focusedTicket?.id ?? null}
-              pinnedTicketId={pinnedTicket?.id ?? null}
-              onFocusTicket={setFocusedTicket}
-              onTogglePinnedTicket={(ticket) => setPinnedTicket((current) => current?.id === ticket.id ? null : ticket)}
-              onDrawTickets={() => sendGameAction({ type: "draw_tickets" })}
-              drawTicketsDisabled={!canTakeTurnAction}
-            />
-          </div>
-        </aside>
-
-        <main className="board-column">
-          {/* Center: map + hand strip */}
-          <div className="map-col">
-            <BoardStage className="board-panel" isMyTurn={localIsActive && publicGame.phase === "main"}>
-              <BoardMap
-                config={mapConfig}
-                backdrop={visuals.backdrop}
-                backdropMode={visuals.backdropMode}
-                boardLabelMode={visuals.boardLabelMode}
-                cardPalette={visuals.palettes.cards}
-                playerPalette={visuals.palettes.players}
-                viewerPlayerId={snapshot.privateState?.playerId ?? null}
-                game={{
-                  players: projectedGame.players.map((player) => ({
-                    id: player.id,
-                    name: player.name,
-                    color: player.color
-                  })),
-                  activePlayerIndex: projectedGame.activePlayerIndex,
-                  routeClaims: projectedGame.routeClaims,
-                  stations: projectedGame.stations
-                }}
-                selectedRouteId={selectedRouteId}
-                selectedCityId={selectedCityId}
-                highlightedCityIds={highlightedCityIds}
-                onSelectRoute={(routeId, position) => {
-                  setSelectedRouteId(routeId);
-                  setSelectedCityId(null);
-                  setPaymentPreview(null);
-                  setBuildAnchor(position ?? null);
-                }}
-                onSelectCity={(cityId, position) => {
-                  setSelectedCityId(cityId);
-                  setSelectedRouteId(null);
-                  setPaymentPreview(null);
-                  setBuildAnchor(position ?? null);
-                }}
-              />
-              {/* Floating build popup */}
-              {(currentRoute || currentCity) && publicGame.phase === "main" ? (
-                <FloatingBuildPanel
-                  anchor={buildAnchor}
-                  onClose={() => { setSelectedRouteId(null); setSelectedCityId(null); setPaymentPreview(null); setBuildAnchor(null); }}
-                >
-                  {currentRoute ? (
-                    <SurfaceCard
-                      variant="detail"
-                      className="detail-card"
-                      data-detail-kind="route"
-                      title={`${getCityName(mapConfig, currentRoute.from)} → ${getCityName(mapConfig, currentRoute.to)}`}
-                    >
-                      <div className="detail-card__summary">
-                        <div className="detail-card__facts">
-                          <span className="detail-card__fact">{currentRoute.length} train{currentRoute.length === 1 ? "" : "s"}</span>
-                          <span className="detail-card__fact">{currentRoute.type}</span>
-                          <span className="detail-card__fact">{currentRoute.color === "gray" ? "gray route" : currentRoute.color}</span>
-                          {currentRoute.locomotiveCost ? (
-                            <span className="detail-card__fact">{currentRoute.locomotiveCost} locomotive{currentRoute.locomotiveCost === 1 ? "" : "s"}</span>
-                          ) : null}
-                        </div>
-                        <p className="detail-card__prompt">
-                          {currentRouteOwner ? `Claimed by ${currentRouteOwner.name}.` : "Choose a payment color."}
-                        </p>
-                      </div>
-                      <div className="detail-card__decision-shelf chip-row">
-                        {routeOptions.length > 0 ? (
-                          routeOptions.map((color, index) => (
-                            <ChoiceChipButton
-                              key={color}
-                              className={index === 0 && canTakeTurnAction ? "choice-chip-button--primary" : undefined}
-                              style={{ ["--choice-chip-accent" as string]: visuals.palettes.cards[color] }}
-                              disabled={!canTakeTurnAction}
-                              onMouseEnter={() => setPaymentPreview({ color, totalCost: currentRoute.length, minimumLocomotives: currentRoute.locomotiveCost ?? 0 })}
-                              onMouseLeave={() => setPaymentPreview(null)}
-                              onFocus={() => setPaymentPreview({ color, totalCost: currentRoute.length, minimumLocomotives: currentRoute.locomotiveCost ?? 0 })}
-                              onBlur={() => setPaymentPreview(null)}
-                              onClick={() => sendGameAction({ type: "claim_route", routeId: currentRoute.id, color })}
-                            >
-                              Claim {formatCardLabel(color)}
-                            </ChoiceChipButton>
-                          ))
-                        ) : (
-                          <span className="muted-copy">{currentRouteUnavailableReason}</span>
-                        )}
-                      </div>
-                    </SurfaceCard>
-                  ) : currentCity ? (
-                    <SurfaceCard variant="detail" className="detail-card" title={currentCity.name}>
-                      <div className="detail-card__summary">
-                        <div className="detail-card__facts">
-                          <span className="detail-card__fact">Station</span>
-                        </div>
-                        <p className="detail-card__prompt">Choose a payment color.</p>
-                      </div>
-                      <div className="detail-card__decision-shelf chip-row">
-                        {currentCityOccupied ? (
-                          <span className="muted-copy">A station already exists in this city.</span>
-                        ) : stationOptions.length > 0 ? (
-                          stationOptions.map((color, index) => (
-                            <ChoiceChipButton
-                              key={color}
-                              className={index === 0 && canTakeTurnAction ? "choice-chip-button--primary" : undefined}
-                              style={{ ["--choice-chip-accent" as string]: visuals.palettes.cards[color] }}
-                              disabled={!canTakeTurnAction}
-                              onMouseEnter={() => setPaymentPreview({ color, totalCost: currentStationCost })}
-                              onMouseLeave={() => setPaymentPreview(null)}
-                              onFocus={() => setPaymentPreview({ color, totalCost: currentStationCost })}
-                              onBlur={() => setPaymentPreview(null)}
-                              onClick={() => sendGameAction({ type: "build_station", cityId: currentCity.id, color })}
-                            >
-                              Build {formatCardLabel(color)}
-                            </ChoiceChipButton>
-                          ))
-                        ) : (
-                          <span className="muted-copy">
-                            {localIsActive ? "No affordable station payment colors right now." : "Wait for your turn to build a station."}
-                          </span>
-                        )}
-                      </div>
-                    </SurfaceCard>
-                  ) : null}
-                </FloatingBuildPanel>
-              ) : null}
-            </BoardStage>
-
-            <div data-tour-target="hand">
-              <PrivateHandRail hand={localPlayer.hand} cardPalette={visuals.palettes.cards} paymentPreview={paymentPreview} />
-            </div>
-          </div>
-
-          {/* Right column: chat + market — overlaid by ticket picker when active */}
-          <div className="right-col" data-tour-target="market">
-            <ChatPanel
-              messages={chatMessages}
-              onSendMessage={sendChatMessage}
-            />
-            <SupplyDock
-              market={publicGame.market}
-              deckCount={publicGame.trainDeckCount}
-              cardPalette={visuals.palettes.cards}
-              disabled={!canContinueDrawing}
-              isMarketCardDisabled={(card) => publicGame.turn.drawsTaken === 1 && card.color === "locomotive"}
-              onDrawFromMarket={(marketIndex) => sendGameAction({ type: "draw_card", source: "market", marketIndex })}
-              onDrawFromDeck={() => sendGameAction({ type: "draw_card", source: "deck" })}
-              className="supply-dock--board"
-            />
-            {localPendingTickets.length > 0 && !tourOpen ? (
-              <TicketChoiceSheet
-                title={publicGame.phase === "initialTickets" ? "Choose starting tickets" : "Keep new tickets"}
-                subtitle={
-                  publicGame.phase === "initialTickets"
-                    ? "Keep at least two. Ticket choice does not auto-time out in MVP2."
-                    : "Keep at least one. This consumes your turn."
-                }
-                tickets={localPendingTickets}
-                config={mapConfig}
-                minimumKeep={publicGame.phase === "initialTickets" ? 2 : 1}
-                selectedIds={selectedTicketIds}
-                focusedTicketId={focusedTicket?.id ?? null}
-                onFocusTicket={setFocusedTicket}
-                onToggle={(ticketId) =>
-                  setSelectedTicketIds((current) =>
-                    current.includes(ticketId) ? current.filter((id) => id !== ticketId) : [...current, ticketId]
-                  )
-                }
-                onConfirm={() =>
-                  sendGameAction(
-                    publicGame.phase === "initialTickets"
-                      ? { type: "select_initial_tickets", keptTicketIds: selectedTicketIds }
-                      : { type: "keep_drawn_tickets", keptTicketIds: selectedTicketIds }
-                  )
-                }
-              />
-            ) : null}
-          </div>
-        </main>
-      </div>
-
-      {publicGame.phase === "gameOver" ? (
-        <GameOverLayer
-          title="Final board locked."
-          subtitle="Review the completed routes, station saves, and ticket swings before leaving the room."
-          actions={
-            <>
-              <Button disabled>Share result</Button>
-              <Button variant="primary" onClick={() => void restartRoom()}>
-                Play again
-              </Button>
-              <Button variant="primary" onClick={() => setShowLeaveConfirm(true)}>
-                Leave room
-              </Button>
-            </>
-          }
-        >
-          <div className="endgame-grid">
-            {projectedGame.players.map((player) => {
-              const isWinner = player.score === endgameWinnerScore;
-              return (
-                <SurfaceCard
-                  key={player.id}
-                  as="article"
-                  variant="summary"
-                  eyebrow={isWinner ? "Winner" : "Final score"}
-                  title={player.name}
-                  className={`endgame-card ${isWinner ? "endgame-card--winner" : ""}`}
-                >
-                  <div className="endgame-card__hero">
-                    <p className="endgame-score">{player.score}</p>
-                    <span className="endgame-score__label">points</span>
-                  </div>
-                  <EndgameBreakdown player={player} config={mapConfig} />
-                </SurfaceCard>
-              );
-            })}
-          </div>
-        </GameOverLayer>
-      ) : null}
-
-      {showLeaveConfirm ? (
-        <ModalShell width="md" align="center" cardClassName="leave-confirm-card">
-          <SectionHeader title="Leave this game?" variant="ceremony" />
-          <p>You will return to setup and clear this room from the current browser.</p>
-          <div className="setup-actions">
-            <Button onClick={() => setShowLeaveConfirm(false)}>
-              Cancel
-            </Button>
-            <Button variant="primary" className="leave-button" onClick={leaveRoom}>
-              Leave
-            </Button>
-          </div>
-        </ModalShell>
-      ) : null}
-
-      {tourOpen && (
-        <OnboardingTour onDismiss={() => setTourOpen(false)} />
-      )}
-
-      <NotificationPipe notifications={notifications} />
-    </div>
+    <OnlineSetupScreen
+      releasedConfigs={room.releasedConfigs}
+      reconnectState={room.reconnectState}
+      roomPreview={room.roomPreview}
+      error={room.error}
+      isCreatingRoom={room.isCreatingRoom}
+      initialJoinRoomCode={route.name === "room" ? route.roomCode : undefined}
+      onOpenLocal={() => {
+        room.clearError();
+        navigate({ name: "local" });
+      }}
+      onBack={() => {
+        room.clearError();
+        navigate({ name: "gateway" });
+      }}
+      onClearRoomPreview={room.clearRoomPreview}
+      onPreviewRoom={(code) => void room.previewRoom(code)}
+      onCreateRoom={(form) => void room.createRoom(form)}
+      onJoinRoom={(form) => void room.joinRoom(form)}
+    />
   );
 }

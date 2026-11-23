@@ -3,57 +3,54 @@
 This folder now separates long-lived product docs from versioned playtest artifacts.
 
 ## Product
-- [Design Entry](/Users/djfan/Workspace/HudsonHustle/DESIGN.md)
-- [PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/prd.md)
-- [Tech Spec](/Users/djfan/Workspace/HudsonHustle/docs/product/tech-spec.md)
-- [Design System](/Users/djfan/Workspace/HudsonHustle/docs/product/design-system.md)
-- [Design Principles](/Users/djfan/Workspace/HudsonHustle/docs/product/design-principles.md)
-- [Color System](/Users/djfan/Workspace/HudsonHustle/docs/product/color-system.md)
-- [Typography And Layout](/Users/djfan/Workspace/HudsonHustle/docs/product/typography-and-layout.md)
-- [Layout Rhythm](/Users/djfan/Workspace/HudsonHustle/docs/product/layout-rhythm.md)
-- [Component System](/Users/djfan/Workspace/HudsonHustle/docs/product/component-system.md)
-- [Map Language Boundary](/Users/djfan/Workspace/HudsonHustle/docs/product/map-language-boundary.md)
-- [Design Implementation Backlog](/Users/djfan/Workspace/HudsonHustle/docs/product/design-implementation-backlog.md)
-- [V2 Docs Index](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/README.md)
+- [Design Entry](../DESIGN.md)
+- [PRD](product/prd.md)
+- [Tech Spec](product/tech-spec.md)
+- [Design System](product/design-system.md)
+- [Design Principles](product/design-principles.md)
+- [Color System](product/color-system.md)
+- [Typography And Layout](product/typography-and-layout.md)
+- [Layout Rhythm](product/layout-rhythm.md)
+- [Component System](product/component-system.md)
+- [Map Language Boundary](product/map-language-boundary.md)
+- [V2 Docs Index](product/v2/README.md)
 
 ## Gameplay
-- [Player Guide](/Users/djfan/Workspace/HudsonHustle/docs/gameplay/player-guide.md)
-- [Onboarding Script](/Users/djfan/Workspace/HudsonHustle/docs/gameplay/onboarding-script.md)
-- [Agent-vs-Agent Playtesting Guide](/Users/djfan/Workspace/HudsonHustle/docs/gameplay/agent-vs-agent-playtest.md)
+- [Player Guide](gameplay/player-guide.md)
+- [Onboarding Script](gameplay/onboarding-script.md)
+- [Agent-vs-Agent Playtesting Guide](gameplay/agent-vs-agent-playtest.md)
 
 ## Map
-- [Cartography Workflow](/Users/djfan/Workspace/HudsonHustle/docs/map/cartography-workflow.md)
-- [Hudson Map Rubric](/Users/djfan/Workspace/HudsonHustle/docs/map/hudson-map-rubric.md)
-- [Map Balance Notes](/Users/djfan/Workspace/HudsonHustle/docs/map/map-balance-notes.md)
+- [Cartography Workflow](map/cartography-workflow.md)
+- [Hudson Map Rubric](map/hudson-map-rubric.md)
 
 ## Config
-- [Config Snapshot Guide](/Users/djfan/Workspace/HudsonHustle/docs/config/config-snapshot-guide.md)
+- [Config Snapshot Guide](config/config-snapshot-guide.md)
 
 ## Planning
-- [V1 Status](/Users/djfan/Workspace/HudsonHustle/docs/planning/v1-status.md)
-- [V2 Status](/Users/djfan/Workspace/HudsonHustle/docs/planning/v2-status.md)
+- [V1 Status](archive/planning/v1-status.md)
+- [V2 Status](planning/v2-status.md)
 
 ## Branch Workflow
 - `main`: stable production branch
-- `develop`: shared staging and integration branch
-- working branches: short-lived branches off `develop`
-- deployment details live in [V2 Deployment](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2-deployment.md)
+- working branches: short-lived branches off `main`, merged back by PR
+- deployment details live in [V2 Deployment](product/v2/v2-deployment.md)
 
 ## Playtests
 
 ### v0.4
-- [Balance Review](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v0.4/balance-review.md)
-- [Keep / Tune / Cut](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v0.4/keep-tune-cut.md)
-- [Tuning Candidates](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v0.4/tuning-candidates.md)
-- [2-Player Central Choke Checklist](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v0.4/2p-central-choke-checklist.md)
-- [Agent-vs-Agent Playtest](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v0.4/agent-vs-agent-playtest.md)
+- [Balance Review](playtests/v0.4/balance-review.md)
+- [Keep / Tune / Cut](playtests/v0.4/keep-tune-cut.md)
+- [Tuning Candidates](playtests/v0.4/tuning-candidates.md)
+- [2-Player Central Choke Checklist](playtests/v0.4/2p-central-choke-checklist.md)
+- [Agent-vs-Agent Playtest](playtests/v0.4/agent-vs-agent-playtest.md)
 - Raw logs:
-  - [Seed 42](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v0.4/raw/seed-42-raw.md)
-  - [Seed 1337](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v0.4/raw/seed-1337-raw.md)
+  - [Seed 42](playtests/v0.4/raw/seed-42-raw.md)
+  - [Seed 1337](playtests/v0.4/raw/seed-1337-raw.md)
 
 ### V2.0
-- [V2.0 Playtests Index](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v2.0/README.md)
-- [Staging Smoke Checklist](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v2.0/staging-smoke-checklist.md)
+- [V2.0 Playtests Index](playtests/v2.0/README.md)
+- [Staging Smoke Checklist](playtests/v2.0/staging-smoke-checklist.md)
 
 ## Assets
 - `docs/assets/` stores README and docs illustration assets.
@@ -66,3 +63,4 @@ This folder now separates long-lived product docs from versioned playtest artifa
 - `docs/config/` stores snapshot/versioning workflow docs.
 - `docs/playtests/` stores versioned playtest artifacts and raw logs.
 - `docs/planning/` stores milestone and status tracking docs.
+- `docs/archive/` stores finished design passes, shipped v2 slices, specs for shipped work, and superseded planning notes.

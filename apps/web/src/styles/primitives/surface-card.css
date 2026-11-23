@@ -1,0 +1,286 @@
+.detail-card p {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.surface-card {
+  display: grid;
+  gap: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+.surface-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, oklch(100% 0 0 / 0.18), transparent 34%), linear-gradient(180deg, oklch(53.53% 0.0953 252.23 / 0.04), transparent 52%);
+  pointer-events: none;
+}
+
+.surface-card--detail {
+  background: radial-gradient(circle at top right, oklch(53.53% 0.0953 252.23 / 0.16), transparent 22%), linear-gradient(180deg, oklch(99.67% 0.0054 95.1 / 0.99), oklch(94.81% 0.0229 84.59 / 0.95));
+  border-color: color-mix(in oklch, var(--border-warm-solid) 22%, transparent);
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.62), inset 0 0 0 1px oklch(100% 0 0 / 0.22), 0 18px 30px oklch(30.15% 0.0397 65.34 / 0.11);
+}
+
+.surface-card--summary {
+  background: radial-gradient(circle at top right, oklch(53.46% 0.1192 253.15 / 0.14), transparent 26%), linear-gradient(180deg, oklch(99.42% 0.0069 88.64 / 0.98), oklch(94.15% 0.0254 86.87 / 0.94));
+  border-color: color-mix(in oklch, var(--border-warm-solid) 18%, transparent);
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.58), 0 18px 32px oklch(30.15% 0.0397 65.34 / 0.1);
+}
+
+.surface-card__header {
+  display: grid;
+  gap: 6px;
+  position: relative;
+  z-index: var(--z-raised);
+}
+
+.surface-card__eyebrow {
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: var(--type-utility-xs);
+  font-weight: var(--weight-bold);
+  color: color-mix(in srgb, var(--accent-strong) 34%, var(--ink-soft) 66%);
+}
+
+.surface-card__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.surface-card__title {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--type-body);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.02em;
+  line-height: 1.06;
+}
+
+.detail-card {
+  padding: var(--space-panel-md);
+  background: radial-gradient(circle at top right, oklch(53.53% 0.0953 252.23 / 0.08), transparent 24%), linear-gradient(180deg, oklch(99.42% 0.0069 88.64 / 0.98), oklch(94.18% 0.0241 85.79 / 0.94));
+  border: 1px solid color-mix(in oklch, var(--border-warm-solid) 18%, transparent);
+  border-radius: calc(var(--radius-md) + 1px);
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.56), 0 16px 30px oklch(30.15% 0.0397 65.34 / 0.1);
+}
+
+/* route artifact detail — display font for route name as transit signage */
+.surface-card.detail-card[aria-label="Route detail"] .surface-card__title {
+  font-family: var(--font-display);
+  font-size: var(--type-lg);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+}
+
+/* route artifact detail — display font for route name as transit signage */
+.surface-card.detail-card[data-detail-kind="route"] .surface-card__title {
+  font-family: var(--font-display);
+  font-size: var(--type-lg);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+}
+
+.surface-card__meta {
+  color: var(--ink-soft);
+  font-size: var(--type-xs);
+  line-height: 1.2;
+}
+
+.surface-card__body {
+  display: grid;
+  gap: var(--space-stack-sm);
+  position: relative;
+  z-index: var(--z-raised);
+}
+
+.detail-card__summary {
+  display: grid;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid color-mix(in oklch, var(--border-warm-solid) 9%, transparent);
+}
+
+.detail-card__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.detail-card__fact {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 6px 10px;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(180deg, oklch(99.2% 0.0073 80.72 / 0.98), oklch(93.35% 0.0246 83.42 / 0.88));
+  border: 1px solid color-mix(in oklch, var(--border-warm-solid) 12%, transparent);
+  color: color-mix(in srgb, var(--ink-soft) 80%, var(--accent-strong) 20%);
+  font-size: var(--type-sm);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.01em;
+}
+
+.detail-card__prompt {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--type-body);
+  line-height: 1.35;
+  font-weight: var(--weight-semibold);
+}
+
+.detail-card__decision-shelf::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, oklch(100% 0 0 / 0.3), transparent 34%);
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.34);
+  pointer-events: none;
+}
+
+.detail-card__decision-shelf > * {
+  position: relative;
+  z-index: var(--z-raised);
+}
+
+/* summary/results card — display font for reveal-moment title */
+.surface-card--summary .surface-card__title {
+  font-family: var(--font-display);
+  font-size: var(--type-lg);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.detail-card--tunnel {
+  border-style: dashed;
+}
+
+.app-shell--gameplay-hud .detail-card__summary {
+  gap: 7px;
+  padding-bottom: 8px;
+  border-color: color-mix(in oklch, var(--hud-brass-light-solid) 12%, transparent);
+}
+
+.app-shell--gameplay-hud .detail-card__facts {
+  gap: 6px;
+}
+
+.app-shell--gameplay-hud .detail-card__decision-shelf::before {
+  display: none;
+}
+
+.app-shell--gameplay-hud .detail-card__decision-shelf .muted-copy {
+  grid-column: 1 / -1;
+}
+
+/* endgame player card — display font for post-game ceremony */
+.endgame-card .surface-card__title {
+  font-family: var(--font-display);
+  font-size: var(--type-xl);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+}
+
+.endgame-card--winner .surface-card__eyebrow {
+  color: oklch(56.02% 0.1125 78.37 / 0.9);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.14em;
+}
+
+.floating-build-panel .surface-card__title {
+  font-family: var(--font-display, var(--font-body));
+  font-size: var(--type-sm) !important;
+  font-weight: var(--weight-bold) !important;
+  line-height: 1.2 !important;
+  color: var(--hud-paper-bright, oklch(98.08% 0.0199 84.59)) !important;
+  margin: 0 0 8px;
+  padding: 0 28px 0 0;
+  letter-spacing: 0;
+  text-indent: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* Executed critique checklist: make every HUD family use a different physical shape. */
+.app-shell--gameplay-hud .surface-card__eyebrow {
+  font-variant-caps: all-small-caps;
+  font-size: var(--hud-type-label);
+  letter-spacing: 0.095em;
+  color: oklch(87.97% 0.0509 82.77 / 0.78);
+}
+
+.app-shell--gameplay-hud .surface-card__title {
+  text-shadow: 0 1px 0 oklch(0% 0 0 / 0.34);
+  font-size: var(--hud-type-title);
+  font-weight: var(--weight-bold);
+  line-height: 1.08;
+  letter-spacing: -0.005em;
+  color: var(--hud-paper-bright);
+}
+
+.app-shell--gameplay-hud .detail-card {
+  border-color: color-mix(in oklch, var(--hud-brass-light-solid) 18%, transparent);
+  background: radial-gradient(circle at top right, oklch(63.46% 0.0823 241.13 / 0.12), transparent 28%), linear-gradient(180deg, oklch(97.81% 0.0227 84.59 / 0.1), oklch(16.09% 0.0134 248.52 / 0.12));
+  color: var(--hud-paper-bright);
+}
+
+.app-shell--gameplay-hud .detail-card__prompt {
+  font-size: var(--type-sm);
+  font-weight: var(--weight-bold);
+  color: var(--hud-paper-bright);
+}
+
+.app-shell--gameplay-hud .surface-card__meta {
+  color: color-mix(in oklch, var(--hud-paper-solid) 68%, transparent);
+}
+
+.floating-build-panel .detail-card__fact {
+  font-size: var(--type-2xs) !important;
+  padding: 3px 8px !important;
+  min-height: 22px !important;
+  border-radius: var(--radius-control) !important;
+  background: color-mix(in oklch, var(--hud-brass-light-solid) 12%, transparent) !important;
+  border-color: color-mix(in oklch, var(--hud-brass-light-solid) 24%, transparent) !important;
+  color: color-mix(in oklch, var(--hud-paper-solid) 82%, transparent) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: var(--weight-bold) !important;
+}
+
+/* Draw deck button: box-shadow layers simulate a physical stack of cards
+Active tab: stronger pop + deeper raised shadow for a pressed-tab feel
+detail-card: left brass stripe marks it as a route artifact
+Route fact chips: printed manifest labels — bordered, uppercase, tight */
+.app-shell--gameplay-hud .detail-card__fact {
+  min-height: 24px;
+  padding: 4px 8px;
+  background: linear-gradient(180deg, oklch(89.73% 0.037 86.17 / 0.16), oklch(14.65% 0.0057 69.2 / 0.12));
+  border-radius: var(--radius-map-marker);
+  color: var(--hud-paper-bright);
+  border: 1px solid oklch(70.15% 0.0832 84.6 / 0.22);
+  font-size: var(--type-2xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Decision shelf: dashed separator between facts and payment options */
+.app-shell--gameplay-hud .detail-card__decision-shelf {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  padding: 0;
+  border: 0;
+  border-color: color-mix(in oklch, var(--hud-brass-light-solid) 14%, transparent);
+  background: oklch(97.81% 0.0227 84.59 / 0.06);
+  border-top: 1px dashed oklch(70.15% 0.0832 84.6 / 0.24);
+  padding-top: 10px;
+}

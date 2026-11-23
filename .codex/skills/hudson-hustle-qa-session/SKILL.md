@@ -22,7 +22,6 @@ Do not use this skill for:
 - local
 - staging
 - production
-- Storybook/showcase only
 3. Run the minimum checks that can prove or disprove the suspected behavior.
 4. Log findings in findings-first order.
 5. For each finding, include:

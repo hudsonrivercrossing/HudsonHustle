@@ -139,7 +139,42 @@ export interface GameState {
   finalRoundRemaining: number | null;
   finalRoundTriggeredBy: string | null;
   log: string[];
+  /** Count of every entry ever appended to `log`, which itself keeps only the most recent ones. */
+  logSequence: number;
+  /** The most recent things that happened, oldest first. Absent on states saved before events existed. */
+  events?: GameEvent[];
+  /**
+   * Every change to the board, in order, for the whole game. Unlike `events` this is never
+   * trimmed: it is what a replay steps through, and a full game has at most a few dozen entries.
+   */
+  moves?: GameMove[];
 }
+
+/**
+ * The whole game as a list of public moves, never trimmed, so a finished game can be replayed.
+ * It holds only what every player saw: a card taken from the deck is recorded without its colour.
+ */
+export type GameMove = Extract<
+  GameEventBody,
+  { type: "route_claimed" | "station_built" | "tickets_kept" | "card_drawn" | "tunnel_failed" }
+>;
+
+type GameEventBody =
+  | { type: "tickets_kept"; playerId: string; count: number; initial: boolean }
+  | { type: "tickets_drawn"; playerId: string; count: number }
+  // A face-up card is public knowledge; a card from the deck is known only to the player who drew it.
+  | { type: "card_drawn"; playerId: string; source: "market"; color: TrainCardFace }
+  | { type: "card_drawn"; playerId: string; source: "deck" }
+  | { type: "route_claimed"; playerId: string; routeId: string; points: number }
+  | { type: "tunnel_failed"; playerId: string; routeId: string }
+  | { type: "station_built"; playerId: string; cityId: string }
+  | { type: "turn_started"; playerId: string }
+  | { type: "final_round_triggered"; playerId: string }
+  | { type: "game_over" };
+
+/** `seq` counts every event of the game from 1 and never repeats, so a reader can ask for "everything after seq N". */
+export type GameEvent = GameEventBody & { seq: number };
+export type GameEventInput = GameEventBody;
 
 export interface GameSetup {
   playerNames: string[];

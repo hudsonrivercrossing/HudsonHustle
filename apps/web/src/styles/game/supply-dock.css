@@ -1,0 +1,394 @@
+.supply-dock {
+  gap: 8px;
+}
+
+.supply-dock__market {
+  margin-bottom: 2px;
+}
+
+.supply-dock--board {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  padding: 8px 10px;
+}
+
+.supply-dock--board .section-header {
+  grid-column: 1;
+  min-width: 116px;
+}
+
+.supply-dock--board .supply-dock__market {
+  grid-column: 2;
+  grid-template-columns: repeat(5, minmax(58px, 1fr));
+  gap: 7px;
+}
+
+.supply-dock--board .system-button {
+  grid-column: 3;
+  min-width: 128px;
+  min-height: 52px;
+}
+
+.market-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+  margin-bottom: 10px;
+}
+
+.market-color-slot {
+  min-height: 52px;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 5px;
+  padding: 8px 7px;
+  border: 1px solid color-mix(in srgb, var(--hand-slot-color) 48%, oklch(83.88% 0.0602 81.93 / 0.2));
+  border-radius: var(--radius-panel);
+  background: radial-gradient(circle at top left, color-mix(in srgb, var(--hand-slot-color) 22%, transparent), transparent 52%), linear-gradient(180deg, oklch(97.81% 0.0227 84.59 / 0.11), oklch(15.12% 0.0138 247.19 / 0.18));
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.1), 0 8px 20px oklch(0% 0 0 / 0.18);
+  color: oklch(98.08% 0.0199 84.59);
+  text-align: center;
+}
+
+.market-color-slot__count {
+  display: grid;
+  place-items: center;
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--hand-slot-color) 76%, oklch(99.17% 0.0085 84.57 / 0.72));
+  color: oklch(98.62% 0.0142 84.58);
+  font-size: var(--type-body);
+  font-weight: var(--weight-bold);
+  line-height: 1;
+  text-shadow: 0 1px 2px oklch(26.46% 0.0233 66.53 / 0.32);
+}
+
+.market-color-slot:disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
+.market-color-slot__label {
+  max-width: 100%;
+  overflow: hidden;
+  color: color-mix(in oklch, var(--paper-warm-solid) 84%, transparent);
+  font-size: var(--type-2xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .market-color-slot__count {
+  font-size: var(--type-lg);
+  font-weight: var(--weight-bold);
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .market-color-slot__label {
+  font-size: var(--type-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.06em;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .section-header {
+  min-width: 0;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .system-button {
+  width: 100%;
+  min-height: 44px;
+  min-width: 0;
+}
+
+/* Unified Draw button style for both Ticket Dock and Supply Dock */
+.app-shell--gameplay-hud .supply-dock__draw-deck.system-button {
+  width: 100%;
+  background: color-mix(in oklch, var(--hud-brass-light-solid) 12%, transparent);
+  border: 1px solid color-mix(in oklch, var(--hud-brass-light-solid) 32%, transparent);
+  border-radius: var(--radius-sm);
+  color: var(--hud-paper-bright);
+  font-family: var(--font-body);
+  font-size: var(--type-xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: none;
+  min-height: 36px;
+  padding: 6px 12px;
+  transition: background var(--duration-fast, 100ms) ease, border-color var(--duration-fast, 100ms) ease;
+}
+
+.app-shell--gameplay-hud .supply-dock__draw-deck.system-button:hover:not(:disabled) {
+  background: color-mix(in oklch, var(--hud-brass-light-solid) 22%, transparent);
+  border-color: color-mix(in oklch, var(--hud-brass-light-solid) 50%, transparent);
+}
+
+.app-shell--gameplay-hud .supply-dock__draw-deck.system-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board::before {
+  background: linear-gradient(135deg, oklch(89.73% 0.037 86.17 / 0.08), transparent 28%), radial-gradient(circle at 18% 0%, oklch(70.15% 0.0832 84.6 / 0.12), transparent 30%);
+  opacity: 1;
+}
+
+/* Market slots styled identically to gameplay-hud hand slots: dark ticket card
+   with brass color stripe on the left edge, count and label centered.
+Right-col market slot uses the unified hand-slot styling defined below.
+   Sized identical to hand slots (72px tall, same padding and fonts). */
+.app-shell--gameplay-hud .right-col .supply-dock--board .market-color-slot {
+  min-height: 72px;
+  height: 72px;
+  padding: 8px 6px;
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  grid-template-rows: auto 1fr;
+  position: relative;
+  text-align: center;
+  cursor: pointer;
+  isolation: isolate;
+  overflow: hidden;
+  border-width: 1px;
+  border-radius: var(--radius-ticket);
+  border-color: color-mix(in srgb, var(--hand-slot-color) 46%, var(--hud-brass-dark));
+  background: linear-gradient(90deg, color-mix(in srgb, var(--hand-slot-color) 46%, transparent) 0 10px, transparent 10px), linear-gradient(180deg, oklch(89.73% 0.037 86.17 / 0.18), oklch(18.19% 0.008 211.11 / 0.1)), var(--hud-grain), linear-gradient(180deg, oklch(28.51% 0.0057 196.84), oklch(19.1% 0.0065 178.86));
+  box-shadow: inset 0 0 0 1px oklch(96.88% 0.0372 88.46 / 0.08), inset 0 -10px 18px oklch(0% 0 0 / 0.18), 0 5px 0 oklch(0% 0 0 / 0.2);
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .market-color-slot::before {
+  content: "";
+  position: absolute;
+  inset: 7px 7px 6px 16px;
+  z-index: var(--z-behind);
+  border: 1px solid oklch(89.73% 0.037 86.17 / 0.13);
+  border-radius: var(--radius-control);
+  background: linear-gradient(135deg, oklch(89.73% 0.037 86.17 / 0.08), transparent 38%), linear-gradient(180deg, oklch(89.73% 0.037 86.17 / 0.045), transparent);
+}
+
+.app-shell--gameplay-hud .market-color-slot--ivory {
+  border-color: oklch(86% 0.0543 89.49 / 0.72);
+  background: linear-gradient(90deg, oklch(81.65% 0.07 87.84) 0 9px, oklch(32.09% 0.0366 79.66 / 0.1) 9px 10px, transparent 10px), repeating-linear-gradient(135deg, oklch(98.03% 0.0223 87.15 / 0.05) 0 1px, transparent 1px 8px), linear-gradient(180deg, color-mix(in oklch, var(--hud-ticket-paper-solid) 20%, transparent), oklch(14.65% 0.0057 69.2 / 0.08)), linear-gradient(180deg, oklch(28.7% 0.0106 107.05), oklch(17.98% 0.0062 122.05));
+}
+
+.app-shell--gameplay-hud .market-color-slot__count {
+  border: 1px solid color-mix(in srgb, var(--hand-slot-color) 50%, var(--hud-paper));
+  background: linear-gradient(180deg, color-mix(in srgb, var(--hand-slot-color) 36%, var(--hud-paper) 64%), color-mix(in srgb, var(--hand-slot-color) 28%, var(--hud-paper-deep) 72%));
+  color: var(--hud-ink);
+  font-size: var(--type-body);
+  font-weight: var(--weight-bold);
+  line-height: 1;
+  text-shadow: 0 1px 0 oklch(98.03% 0.0223 87.15 / 0.38);
+  box-shadow: inset 0 1px 0 oklch(98.03% 0.0223 87.15 / 0.42), 0 2px 0 oklch(0% 0 0 / 0.18);
+  border-radius: var(--radius-map-marker);
+  font-variant-numeric: tabular-nums;
+  position: relative;
+  width: 34px;
+  height: 28px;
+  min-width: 34px;
+  min-height: 28px;
+  display: grid;
+  place-items: center;
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+}
+
+.app-shell--gameplay-hud .market-color-slot__count::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 1px solid oklch(23.63% 0.0182 70.5 / 0.18);
+}
+
+.app-shell--gameplay-hud .market-color-slot--locomotive {
+  --hand-slot-color: oklch(75.22% 0.0559 240.13);
+  border-color: oklch(89.73% 0.037 86.17 / 0.72);
+  background: linear-gradient( 180deg, oklch(61.38% 0.1318 12.68) 0 12.5%, oklch(76.97% 0.1225 83.91) 12.5% 25%, oklch(67.51% 0.0793 181.61) 25% 37.5%, oklch(58.73% 0.1311 268.57) 37.5% 50%, oklch(58.97% 0.1461 301.29) 50% 62.5%, oklch(55.01% 0.0217 248.22) 62.5% 75%, oklch(91.43% 0.0481 90.06) 75% 87.5%, oklch(68.23% 0.1149 352.29) 87.5% 100% ) 0 0 / 12px 100% no-repeat, repeating-linear-gradient(135deg, oklch(98.03% 0.0223 87.15 / 0.06) 0 1px, transparent 1px 7px), linear-gradient(180deg, oklch(89.94% 0.0326 87.29 / 0.18), oklch(15.52% 0.0053 173.53 / 0.08)), linear-gradient(180deg, oklch(29.4% 0.006 134.93), oklch(17.87% 0.0068 135.02));
+}
+
+.app-shell--gameplay-hud .market-color-slot--locomotive .market-color-slot__count {
+  border-color: oklch(89.73% 0.037 86.17 / 0.72);
+  background: linear-gradient(180deg, oklch(92.58% 0.0373 90.07), oklch(73.21% 0.0705 93.65));
+  color: oklch(23.63% 0.0182 70.5);
+}
+
+.app-shell--gameplay-hud .supply-dock--board {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: start;
+  height: max-content;
+  padding: 5px 7px;
+  grid-template-columns: 82px minmax(0, 1fr) 108px;
+  gap: 8px;
+}
+
+.app-shell--gameplay-hud .supply-dock--board .section-header {
+  min-width: 0;
+}
+
+.app-shell--gameplay-hud .supply-dock--board .section-header__title {
+  font-size: var(--type-sm);
+}
+
+.app-shell--gameplay-hud .supply-dock--board .supply-dock__market {
+  grid-template-columns: repeat(5, minmax(48px, 1fr));
+  gap: 6px;
+}
+
+.app-shell--gameplay-hud .supply-dock--board .system-button {
+  min-height: var(--control-height-base);
+}
+
+.app-shell--gameplay-hud .market-color-slot {
+  min-height: 78px;
+  padding: 9px 7px;
+  border-radius: var(--radius-panel);
+}
+
+/* Executed critique checklist: make every HUD family use a different physical shape. */
+.app-shell--gameplay-hud .market-color-slot__label {
+  width: 100%;
+  overflow: visible;
+  line-height: 1.08;
+  text-align: center;
+  text-overflow: clip;
+  white-space: nowrap;
+  font-weight: var(--weight-bold);
+  text-shadow: 0 1px 0 oklch(0% 0 0 / 0.52);
+  font-variant-caps: all-small-caps;
+  color: oklch(98.03% 0.0223 87.15 / 0.88);
+  font-size: var(--type-2xs);
+  letter-spacing: 0.06em;
+}
+
+.app-shell--gameplay-hud .supply-dock__draw-tickets.system-button {
+  margin-top: 10px;
+}
+
+/* ── D2: Supply Dock & Inspector — physical material lift ──────────────────
+   Targets: SupplyDock deck label, draw-deck stacked shadow, InspectorDock
+   tab rail active state, detail-card route artifact, chat panel spacing.
+   ───────────────────────────────────────────────────────────────────────
+Deck count: stamped supply label — tabular, uppercase, brass-tinted */
+.app-shell--gameplay-hud .supply-dock--board .section-header__meta {
+  font-size: var(--type-2xs);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--hud-paper) 68%, var(--hud-brass) 32%);
+}
+
+/* Right-column SupplyDock layout: vertical stack with market as 2×3 grid
+Layout-only — visual treatment (gradient/border/shadow) comes from the unified panel rule
+─── Final unified panel treatment ───────────────────────────────────────
+   All in-game container panels — roster, ticket dock, hand rail, chat,
+   market, plus the privacy "hidden" panel during handoff — render with the
+   same dark brass envelope so they read as one set.
+─── Unify outer padding on the 3 bottom panels so their bottom edges land
+   at the same Y when columns are equal height.
+Right-col SupplyDock — vertical stack: header / 3+2 market grid / draw button
+   Overrides the base `.supply-dock--board` horizontal grid layout from ui.css */
+.app-shell--gameplay-hud .right-col .supply-dock--board {
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--hud-brass) 42%, oklch(0% 0 0 / 0.34));
+  border-radius: var(--radius-sm);
+  background: var(--hud-grain), linear-gradient(180deg, oklch(24.35% 0.0172 74.79 / 0.94), oklch(14.65% 0.0057 69.2 / 0.94));
+  box-shadow: inset 0 0 0 1px oklch(94.6% 0.0574 85.03 / 0.08), inset 0 10px 18px oklch(94.6% 0.0574 85.03 / 0.035), 0 18px 36px var(--hud-shadow);
+  color: var(--hud-paper-bright);
+  backdrop-filter: none;
+  padding: 10px 12px;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 6px;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board > .section-header {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board > .supply-dock__market {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board > .system-button {
+  grid-column: 1;
+  grid-row: 3;
+  min-width: 0;
+}
+
+/* Market: 3 + 2 layout, RIGHT-aligned, cards rendered with hand-slot square shape
+Market inner grid: 2 columns × 3 rows (2 + 2 + 1). 5th card centered alone in row 3.
+   Rows are auto so each card stays at its natural 72px hand-slot height. */
+.app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market {
+  flex: 1 1 auto;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(3, auto);
+  gap: 12px;
+  min-height: 0;
+  align-content: start;
+}
+
+/* Row 1: cards 1, 2, 3 fill the row */
+.app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market > :nth-child(1) {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market > :nth-child(2) {
+  grid-row: 1;
+  grid-column: 2;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market > :nth-child(3) {
+  grid-row: 2;
+  grid-column: 1;
+}
+
+/* Row 2: cards 4, 5 — right-aligned (columns 2 and 3) */
+.app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market > :nth-child(4) {
+  grid-row: 2;
+  grid-column: 2;
+}
+
+.app-shell--gameplay-hud .right-col .supply-dock--board .supply-dock__market > :nth-child(5) {
+  grid-row: 3;
+  grid-column: 1;
+}
+
+@media (max-width: 1040px) {
+  .app-shell--gameplay-hud .supply-dock--board {
+    grid-column: 1;
+  }
+
+  .market-grid {
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  }
+}
+
+@media (max-width: 820px) {
+  .supply-dock--board {
+    grid-template-columns: 1fr;
+  }
+
+  .supply-dock--board .section-header,
+  .supply-dock--board .supply-dock__market,
+  .supply-dock--board .system-button {
+    grid-column: 1;
+    width: 100%;
+  }
+}

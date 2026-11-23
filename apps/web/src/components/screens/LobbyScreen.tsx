@@ -5,11 +5,11 @@ import {
   SetupBackButton,
   SetupShell,
   SetupStepPanel,
-  SetupSummaryRow,
-  type SetupStep
+  SetupSummaryRow
 } from "../setup";
 import { Badge } from "../ui/primitives/Badge";
 import { Button } from "../ui/primitives/Button";
+import { InviteLinkButton } from "../online/InviteLinkButton";
 import { StateSurface } from "../ui/primitives/StateSurface";
 
 interface LobbyScreenProps {
@@ -89,19 +89,6 @@ export function LobbyScreen({
     : localSeat?.isHost
       ? `Seats occupied: ${occupiedCount}/${room.playerCount}. Ready: ${readyCount}/${room.playerCount}.`
       : "Share the room code, mark yourself ready, and wait for the host to start.";
-  const lobbySteps: SetupStep[] = [
-    { label: room.roomCode, meta: room.mapName, status: "current" },
-    {
-      label: "Seats",
-      meta: `${occupiedCount}/${room.playerCount} occupied`,
-      status: occupiedCount === room.playerCount ? "complete" : "current"
-    },
-    {
-      label: "Departure",
-      meta: canStart ? "Ready" : `${readyCount}/${room.playerCount} ready`,
-      status: canStart ? "current" : "upcoming"
-    }
-  ];
   const lobbyPreflight = (
     <div className="setup-preflight-card">
       <span className="setup-preflight-card__eyebrow">Room board</span>
@@ -111,6 +98,7 @@ export function LobbyScreen({
         <SetupSummaryRow label="Seats" value={`${occupiedCount}/${room.playerCount}`} detail={`${readyCount} ready`} />
         <SetupSummaryRow label="Timer" value={room.turnTimeLimitSeconds === 0 ? "Untimed" : `${room.turnTimeLimitSeconds}s`} />
       </div>
+      <InviteLinkButton roomCode={room.roomCode} />
     </div>
   );
 
@@ -120,7 +108,6 @@ export function LobbyScreen({
       title="Boarding"
       lead="Seats, readiness, and departure stay here until the host starts the table."
       backgroundImageUrl={setupHeroImageUrl}
-      steps={lobbySteps}
       backAction={<SetupBackButton onClick={onLeaveRoom}>Leave room</SetupBackButton>}
       preflight={lobbyPreflight}
       className="setup-board-shell--lobby"
@@ -164,6 +151,8 @@ export function LobbyScreen({
                 key={seat.seatId}
                 className={`seat-row ${isSelf ? "seat-row--self" : ""} ${isEmpty ? "seat-row--open" : ""}`}
                 data-testid={`seat-row-${seat.seatId}`}
+                data-host={seat.isHost}
+                data-connection={isEmpty ? "open" : seat.controllerType === "bot" ? "server" : seat.connected ? "connected" : "offline"}
               >
                 <img
                   className={`seat-avatar ${isEmpty ? "seat-avatar--empty" : ""}`}

@@ -1,0 +1,143 @@
+.eyebrow {
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: var(--type-eyebrow);
+  font-weight: var(--weight-semibold);
+  color: var(--ink-soft);
+}
+
+.section-header {
+  display: grid;
+  gap: var(--space-stack-xs);
+  margin-bottom: var(--space-stack-sm);
+}
+
+.section-header--compact {
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.section-header--standard {
+  gap: var(--space-stack-xs);
+}
+
+.section-header__eyebrow {
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: var(--type-utility-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--ink-soft);
+}
+
+.section-header__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.section-header__title {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--type-md);
+  line-height: 1.06;
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.03em;
+}
+
+.section-header--compact .section-header__title {
+  font-size: var(--type-body);
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+}
+
+/* ceremony section — display font for reveal/announcement framing */
+.section-header--ceremony .section-header__title {
+  font-family: var(--font-display);
+  font-size: var(--type-xl);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.section-header--ceremony {
+  gap: 8px;
+  margin-bottom: var(--space-stack-md);
+}
+
+.section-header__meta {
+  color: var(--ink-soft);
+  font-size: var(--type-xs);
+  letter-spacing: 0.01em;
+  opacity: 0.76;
+}
+
+.section-header--compact .section-header__meta {
+  font-size: var(--type-xs);
+  opacity: 0.78;
+}
+
+.lead {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.muted-copy {
+  color: var(--ink-soft);
+  font-size: var(--type-body-sm);
+}
+
+.theme-line {
+  fill: none;
+  stroke: oklch(34.76% 0.0409 68.76 / 0.16);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 3 8;
+  pointer-events: none;
+}
+
+.theme-line--ferry {
+  stroke: oklch(58.33% 0.071 236.12 / 0.22);
+  stroke-dasharray: 2 10;
+}
+
+.floating-build-panel .muted-copy {
+  font-size: var(--type-xs);
+  color: color-mix(in oklch, var(--hud-paper-solid) 50%, transparent);
+  font-style: italic;
+}
+
+/* Executed critique checklist: make every HUD family use a different physical shape. */
+.app-shell--gameplay-hud .section-header__eyebrow {
+  font-variant-caps: all-small-caps;
+  font-size: var(--hud-type-label);
+  letter-spacing: 0.095em;
+  color: oklch(87.97% 0.0509 82.77 / 0.78);
+}
+
+.app-shell--gameplay-hud .section-header__title {
+  font-family: var(--font-body);
+  text-shadow: 0 1px 0 oklch(0% 0 0 / 0.34);
+  font-size: var(--hud-type-title);
+  font-weight: var(--weight-bold);
+  line-height: 1.08;
+  letter-spacing: -0.005em;
+  color: var(--hud-paper-bright);
+}
+
+.app-shell--gameplay-hud .section-header__meta {
+  font-weight: var(--weight-bold);
+  letter-spacing: 0;
+  font-size: var(--hud-type-small);
+  line-height: 1.26;
+  color: var(--hud-paper-soft);
+}
+
+.app-shell--gameplay-hud .muted-copy {
+  font-size: var(--hud-type-small);
+  line-height: 1.26;
+  color: var(--hud-paper-soft);
+}

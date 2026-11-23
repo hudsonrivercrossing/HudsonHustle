@@ -1,0 +1,187 @@
+.modal-shell__card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, oklch(100% 0 0 / 0.2), transparent 34%), linear-gradient(180deg, oklch(72.26% 0.0396 234.75 / 0.06), transparent 52%);
+  pointer-events: none;
+}
+
+.modal-shell {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: var(--z-modal);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: oklch(15.28% 0.0132 75.83 / 0.72);
+  animation: shell-fade-in var(--duration-slow) var(--easing-standard);
+}
+
+.modal-shell > * {
+  pointer-events: auto;
+}
+
+.modal-shell--tutorial {
+  background: oklch(21.85% 0.0242 65.99 / 0.68);
+}
+
+.modal-shell__card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-strong);
+  transition: transform var(--duration-base) var(--easing-standard), box-shadow var(--duration-base) var(--easing-standard), border-color var(--duration-base) var(--easing-standard), background-color var(--duration-base) var(--easing-standard);
+  width: min(560px, 100%);
+  padding: 28px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  animation: shell-rise-in var(--duration-slow) var(--easing-standard);
+}
+
+.modal-shell__card--md {
+  width: min(560px, 100%);
+}
+
+.modal-shell__card--lg {
+  width: min(980px, 100%);
+}
+
+.modal-shell__card--left {
+  text-align: left;
+}
+
+/* modal ceremony/summary context — reinforces display font from base rules above */
+.modal-shell .surface-card--summary .surface-card__title {
+  font-family: var(--font-display);
+  letter-spacing: -0.04em;
+}
+
+/* modal ceremony/summary context — reinforces display font from base rules above */
+.modal-shell .section-header--ceremony .section-header__title {
+  font-family: var(--font-display);
+  letter-spacing: -0.04em;
+  font-size: var(--type-xl);
+  line-height: 1;
+}
+
+@keyframes shell-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes shell-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.app-shell--gameplay-hud .leave-confirm-card p {
+  color: color-mix(in oklch, var(--hud-paper-solid) 72%, transparent);
+}
+
+.app-shell--gameplay-hud .leave-confirm-card .section-header__eyebrow {
+  color: color-mix(in oklch, var(--hud-brass-light-solid) 82%, transparent);
+}
+
+.app-shell--gameplay-hud .leave-confirm-card .section-header__title {
+  color: var(--hud-paper-bright);
+}
+
+/* All in-game modals (handoff, leave, draw-reveal): dark HUD treatment for contrast */
+.app-shell--gameplay-hud ~ .modal-shell .modal-shell__card {
+  background: var(--hud-grain), linear-gradient(180deg, oklch(24.35% 0.0172 74.79 / 0.97), oklch(14.65% 0.0057 69.2 / 0.97));
+  border: 1px solid color-mix(in srgb, var(--hud-brass) 48%, oklch(0% 0 0 / 0.4));
+  border-radius: var(--radius-sm);
+  color: var(--hud-paper-bright, oklch(98.08% 0.0199 84.59));
+  box-shadow: inset 0 0 0 1px oklch(94.6% 0.0574 85.03 / 0.08), 0 24px 48px oklch(0% 0 0 / 0.55);
+}
+
+/* All in-game modals (handoff, leave, draw-reveal): dark HUD treatment for contrast */
+.app-shell--gameplay-hud .modal-shell .modal-shell__card {
+  background: var(--hud-grain), linear-gradient(180deg, oklch(24.35% 0.0172 74.79 / 0.97), oklch(14.65% 0.0057 69.2 / 0.97));
+  border: 1px solid color-mix(in srgb, var(--hud-brass) 48%, oklch(0% 0 0 / 0.4));
+  border-radius: var(--radius-sm);
+  color: var(--hud-paper-bright, oklch(98.08% 0.0199 84.59));
+  box-shadow: inset 0 0 0 1px oklch(94.6% 0.0574 85.03 / 0.08), 0 24px 48px oklch(0% 0 0 / 0.55);
+}
+
+/* All in-game modals (handoff, leave, draw-reveal): dark HUD treatment for contrast */
+body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card {
+  background: var(--hud-grain), linear-gradient(180deg, oklch(24.35% 0.0172 74.79 / 0.97), oklch(14.65% 0.0057 69.2 / 0.97));
+  border: 1px solid color-mix(in srgb, var(--hud-brass) 48%, oklch(0% 0 0 / 0.4));
+  border-radius: var(--radius-sm);
+  color: var(--hud-paper-bright, oklch(98.08% 0.0199 84.59));
+  box-shadow: inset 0 0 0 1px oklch(94.6% 0.0574 85.03 / 0.08), 0 24px 48px oklch(0% 0 0 / 0.55);
+}
+
+.app-shell--gameplay-hud .modal-shell .modal-shell__card p,
+body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card p {
+  color: color-mix(in oklch, var(--hud-paper-solid) 78%, transparent);
+}
+
+.app-shell--gameplay-hud .modal-shell .modal-shell__card .section-header__eyebrow,
+body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .section-header__eyebrow {
+  color: color-mix(in oklch, var(--hud-brass-light-solid) 82%, transparent);
+}
+
+.app-shell--gameplay-hud .modal-shell .modal-shell__card .section-header__title,
+body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .section-header__title {
+  color: var(--hud-paper-bright, oklch(98.08% 0.0199 84.59));
+}
+
+/* Primary action button in modals */
+.app-shell--gameplay-hud .modal-shell .modal-shell__card .system-button.primary-button {
+  background: linear-gradient(180deg, oklch(82.1% 0.0692 89.66), oklch(56.29% 0.0797 83.17));
+  border-color: oklch(56.29% 0.0797 83.17);
+  color: oklch(19.94% 0.0155 75.95);
+  font-weight: var(--weight-bold);
+}
+
+/* Primary action button in modals */
+body:has(.app-shell--gameplay-hud) .modal-shell .modal-shell__card .system-button.primary-button {
+  background: linear-gradient(180deg, oklch(82.1% 0.0692 89.66), oklch(56.29% 0.0797 83.17));
+  border-color: oklch(56.29% 0.0797 83.17);
+  color: oklch(19.94% 0.0155 75.95);
+  font-weight: var(--weight-bold);
+}
+
+/* (Old angular clip-path removed for visual consistency across panels.)
+   Disabled by overriding with `none` below. */
+.app-shell--gameplay-hud .leave-confirm-card {
+  border-color: oklch(70.15% 0.0832 84.6 / 0.34);
+  background: var(--hud-grain), linear-gradient(180deg, oklch(24.35% 0.0172 74.79 / 0.97), oklch(13.62% 0.0065 71.35 / 0.96));
+  color: var(--hud-paper);
+  backdrop-filter: none;
+  border-radius: var(--radius-sm);
+  clip-path: none;
+  box-shadow: inset 0 0 0 1px oklch(96.88% 0.0372 88.46 / 0.08), inset 0 0 0 7px oklch(70.15% 0.0832 84.6 / 0.055), 0 24px 54px oklch(0% 0 0 / 0.5);
+}
+
+@media (max-width: 820px) {
+  .modal-shell__card {
+    padding: var(--space-panel-md);
+  }
+}
+
+@media (max-width: 720px) {
+  .modal-shell {
+    padding: 16px;
+  }
+}

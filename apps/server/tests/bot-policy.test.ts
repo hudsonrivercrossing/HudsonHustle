@@ -82,6 +82,7 @@ function buildGame(overrides: Partial<PublicGameState> = {}): PublicGameState {
     finalRoundRemaining: null,
     finalRoundTriggeredBy: null,
     log: [],
+    logSequence: 0,
     ...overrides
   };
 }
@@ -276,7 +277,10 @@ describe("chooseBotAction", () => {
   it("claims an affordable tunnel when it is the useful legal route for the current ticket", () => {
     const action = chooseBotAction({
       config: baseConfig,
-      game: buildGame(),
+      // With B-C taken by the rival, the tunnel is the only way left from A to C.
+      game: buildGame({
+        routeClaims: [{ routeId: "B-C-blue", playerId: "p2", colorUsed: "cobalt", cardsSpent: ["cobalt", "cobalt"], tunnelExtraCost: 0 }]
+      }),
       privateState: buildPrivateState({
         hand: [
           { id: "c1", color: "amber" },
@@ -317,10 +321,56 @@ describe("chooseBotAction", () => {
       })
     });
 
+    // One train builds nothing, so no ticket route is worth collecting for either.
+    expect(action).toEqual({
+      type: "draw_card",
+      source: "deck"
+    });
+  });
+
+  it("saves its cards for its ticket rather than claiming an affordable route off its path", () => {
+    const action = chooseBotAction({
+      config: baseConfig,
+      game: buildGame(),
+      privateState: buildPrivateState({
+        hand: [
+          { id: "c1", color: "obsidian" },
+          { id: "c2", color: "obsidian" },
+          { id: "c3", color: "emerald" },
+          { id: "c4", color: "emerald" }
+        ]
+      })
+    });
+
     expect(action).toEqual({
       type: "draw_card",
       source: "market",
       marketIndex: 1
+    });
+  });
+
+  it("builds from the route it already owns instead of starting the ticket over", () => {
+    const action = chooseBotAction({
+      config: baseConfig,
+      game: buildGame({
+        routeClaims: [{ routeId: "A-B-red", playerId: "p1", colorUsed: "crimson", cardsSpent: ["crimson", "crimson"], tunnelExtraCost: 0 }]
+      }),
+      privateState: buildPrivateState({
+        hand: [
+          { id: "c1", color: "amber" },
+          { id: "c2", color: "amber" },
+          { id: "c3", color: "amber" },
+          { id: "c4", color: "cobalt" },
+          { id: "c5", color: "cobalt" }
+        ],
+        tickets: [{ id: "ticket-ac", from: "A", to: "C", points: 8, bucket: "regular" }]
+      })
+    });
+
+    expect(action).toEqual({
+      type: "claim_route",
+      routeId: "B-C-blue",
+      color: "cobalt"
     });
   });
 
