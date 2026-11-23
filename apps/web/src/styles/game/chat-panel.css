@@ -35,8 +35,10 @@
   border-radius: var(--radius-1);
 }
 
-.app-shell--gameplay-hud .right-col .chat-panel-dock .chat-panel__messages::-webkit-scrollbar-thumb:hover {
-  background: color-mix(in oklch, var(--hud-brass-light-solid) 50%, transparent);
+@media (hover: hover) and (pointer: fine) {
+  .app-shell--gameplay-hud .right-col .chat-panel-dock .chat-panel__messages::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in oklch, var(--hud-brass-light-solid) 50%, transparent);
+  }
 }
 
 .app-shell--gameplay-hud .chat-panel-dock::before {

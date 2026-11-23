@@ -1,5 +1,7 @@
-.chip-button:hover {
-  transform: translateY(0);
+@media (hover: hover) and (pointer: fine) {
+  .chip-button:hover {
+    transform: translateY(0);
+  }
 }
 
 .choice-chip-button:active,
@@ -154,28 +156,32 @@
   letter-spacing: -0.01em;
 }
 
-.chip-button:hover {
-  transform: translateY(0);
-  border-color: color-mix(in srgb, var(--choice-chip-accent) 58%, color-mix(in oklch, var(--control-ink-solid) 18%, transparent));
-  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--control-surface-solid) 10%, transparent), 0 4px 0 color-mix(in oklch, var(--control-shadow-solid) 24%, transparent);
+@media (hover: hover) and (pointer: fine) {
+  .chip-button:hover {
+    transform: translateY(0);
+    border-color: color-mix(in srgb, var(--choice-chip-accent) 58%, color-mix(in oklch, var(--control-ink-solid) 18%, transparent));
+    box-shadow: inset 0 1px 0 color-mix(in oklch, var(--control-surface-solid) 10%, transparent), 0 4px 0 color-mix(in oklch, var(--control-shadow-solid) 24%, transparent);
+  }
 }
 
 .chip-button:focus-visible {
-  outline: var(--border-medium) solid oklch(53.46% 0.1192 253.15 / 0.42);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
   transform: translateY(0);
   border-color: color-mix(in srgb, var(--choice-chip-accent) 58%, color-mix(in oklch, var(--control-ink-solid) 18%, transparent));
   box-shadow: inset 0 1px 0 color-mix(in oklch, var(--control-surface-solid) 10%, transparent), 0 4px 0 color-mix(in oklch, var(--control-shadow-solid) 24%, transparent);
 }
 
-.choice-chip-button:hover {
-  transform: translateY(0);
-  border-color: color-mix(in srgb, var(--choice-chip-accent) 58%, color-mix(in oklch, var(--control-ink-solid) 18%, transparent));
-  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--control-surface-solid) 11%, transparent), 0 4px 0 color-mix(in oklch, var(--control-shadow-solid) 26%, transparent);
+@media (hover: hover) and (pointer: fine) {
+  .choice-chip-button:hover {
+    transform: translateY(0);
+    border-color: color-mix(in srgb, var(--choice-chip-accent) 58%, color-mix(in oklch, var(--control-ink-solid) 18%, transparent));
+    box-shadow: inset 0 1px 0 color-mix(in oklch, var(--control-surface-solid) 11%, transparent), 0 4px 0 color-mix(in oklch, var(--control-shadow-solid) 26%, transparent);
+  }
 }
 
 .choice-chip-button:focus-visible {
-  outline: var(--border-medium) solid oklch(53.46% 0.1192 253.15 / 0.42);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
   transform: translateY(0);
   border-color: color-mix(in srgb, var(--choice-chip-accent) 58%, color-mix(in oklch, var(--control-ink-solid) 18%, transparent));

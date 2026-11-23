@@ -70,6 +70,8 @@ export interface GameplayScreenProps {
   /** What sits above the market: room chat online, the turn guide in pass-and-play. */
   sidePanel: ReactNode;
   notifications: GameplayNotification[];
+  /** Online only: shown for as long as the room connection is down. */
+  connectionNotice?: string | null;
   error?: string | null;
   onAction: (action: GameAction) => void;
   copy: {
@@ -101,6 +103,7 @@ export function GameplayScreen({
   timerLabel,
   sidePanel,
   notifications,
+  connectionNotice = null,
   error = null,
   onAction,
   copy,
@@ -240,9 +243,13 @@ export function GameplayScreen({
   // Every player's lines are read out in step; totals wait for the longest list to finish.
   const endgameTotalBeat = Math.max(0, ...endgameLedgers.map((ledger) => 3 + ledger.completed.length + ledger.failed.length));
 
+  // The final scoreboard covers the table. What is under it must not take focus or be read out.
+  // React 18 passes `inert` through only as a string attribute.
+  const behindSheet: object = game.phase === "gameOver" ? { inert: "" } : {};
+
   return (
     <div className="app-shell app-shell--gameplay-hud tabletop" data-config-theme={visuals.theme} data-tray={shownTray}>
-      <header className="tabletop__top">
+      <header className="tabletop__top" {...behindSheet}>
         <div className="tabletop__seats" data-tour-target="roster">
           <TableSeats
             seats={seats}
@@ -260,7 +267,13 @@ export function GameplayScreen({
         </div>
       </header>
 
-      <main className="tabletop__table">
+      {connectionNotice ? (
+        <p className="tabletop__connection" role="alert">
+          {connectionNotice}
+        </p>
+      ) : null}
+
+      <main className="tabletop__table" {...behindSheet}>
         <aside className="tabletop__left" data-tour-target="tickets">
           {choosingTickets ? (
             <TicketChoice
@@ -386,7 +399,7 @@ export function GameplayScreen({
         </div>
       </main>
 
-      <nav className="tabletop__tabs" aria-label="Show">
+      <nav className="tabletop__tabs" aria-label="Show" {...behindSheet}>
         <button type="button" aria-pressed={shownTray === "cards"} onClick={() => setTray("cards")}>Cards</button>
         <button type="button" aria-pressed={shownTray === "tickets"} onClick={() => setTray("tickets")}>
           Tickets ({ticketProgress.filter((entry) => entry.completed).length}/{ticketProgress.length})

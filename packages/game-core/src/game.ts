@@ -364,16 +364,14 @@ function evaluateTickets(player: PlayerState, state: GameState, config: MapConfi
   return { total: bestTotal, completed: bestCompleted, failed: bestFailed };
 }
 
+/** Which of a player's tickets count as connected right now, by the same rule the final scoring uses:
+ * their own routes, plus one rival route borrowed through each station they have built. */
 export function getTicketProgress(state: GameState, config: MapConfig, playerId: string): Array<{ ticket: TicketDef; completed: boolean }> {
   const player = state.players.find((entry) => entry.id === playerId);
   invariant(player, "Unknown player.");
-  const ownedRoutes = state.routeClaims.filter((claim) => claim.playerId === player.id);
-  const adjacency = buildAdjacency(ownedRoutes, config);
+  const completed = new Set(evaluateTickets(player, state, config).completed);
 
-  return player.tickets.map((ticket) => ({
-    ticket,
-    completed: canReach(adjacency, ticket.from, ticket.to)
-  }));
+  return player.tickets.map((ticket) => ({ ticket, completed: completed.has(ticket.id) }));
 }
 
 function longestRouteLength(playerId: string, state: GameState, config: MapConfig): number {

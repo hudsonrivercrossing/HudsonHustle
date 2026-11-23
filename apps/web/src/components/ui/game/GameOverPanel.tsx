@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { SectionHeader } from "../primitives/SectionHeader";
 
 interface GameOverPanelProps {
@@ -17,14 +17,18 @@ interface GameOverPanelProps {
 export function GameOverPanel({ title, subtitle, actions, headlineDelayMs, children }: GameOverPanelProps): JSX.Element {
   const [settled, setSettled] = useState(false);
   const settle = () => setSettled(true);
+  const layerRef = useRef<HTMLElement>(null);
+
+  // Focus moves onto the sheet's first action, and any key skips the count wherever focus is.
+  useEffect(() => {
+    layerRef.current?.querySelector<HTMLElement>(".game-over-layer__actions button")?.focus({ preventScroll: true });
+    const onKey = () => setSettled(true);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   return (
-    <section
-      className={`game-over-layer ${settled ? "game-over-layer--settled" : ""}`}
-      aria-label="Final scoreboard"
-      onClick={settle}
-      onKeyDown={settle}
-    >
+    <section ref={layerRef} className={`game-over-layer ${settled ? "game-over-layer--settled" : ""}`} aria-label="Final scoreboard" onClick={settle}>
       <div className="game-over-layer__header">
         <div className="game-over-layer__headline" style={{ animationDelay: `${headlineDelayMs}ms` }}>
           <SectionHeader eyebrow="Game over" title={title} variant="ceremony" />

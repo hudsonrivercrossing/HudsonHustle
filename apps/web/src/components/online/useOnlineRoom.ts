@@ -19,6 +19,7 @@ import type {
   TimerUpdate
 } from "@hudson-hustle/game-core";
 import { hudsonHustleReleasedConfigs, type HudsonHustleReleasedConfigSummary } from "@hudson-hustle/game-data";
+import { storageGet, storageRemove, storageSet } from "../shared/safeStorage";
 import { encodeReconnectToken, readReconnectCredentials, type ReconnectCredentials } from "../../reconnect-token";
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8787";
@@ -39,22 +40,22 @@ class ApiError extends Error {
 }
 
 function readSession(): ReconnectCredentials | null {
-  const raw = window.localStorage.getItem(sessionKey);
+  const raw = storageGet(sessionKey);
   const credentials = readReconnectCredentials(raw);
   if (!raw || !credentials || raw.trim().startsWith("hh1.")) {
     return credentials;
   }
 
-  window.localStorage.setItem(sessionKey, encodeReconnectToken(credentials));
+  storageSet(sessionKey, encodeReconnectToken(credentials));
   return credentials;
 }
 
 function saveSession(credentials: ReconnectCredentials | null): void {
   if (!credentials) {
-    window.localStorage.removeItem(sessionKey);
+    storageRemove(sessionKey);
     return;
   }
-  window.localStorage.setItem(sessionKey, encodeReconnectToken(credentials));
+  storageSet(sessionKey, encodeReconnectToken(credentials));
 }
 
 async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
@@ -74,9 +75,18 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
   return (await response.json()) as T;
 }
 
+const UNREACHABLE_MESSAGE = "Can't reach the game server. Check your connection and try again.";
+
 function errorMessage(caught: unknown, fallback: string): string {
+  // fetch reports a dropped connection as a TypeError whose text ("Failed to fetch") means nothing to a player.
+  if (caught instanceof TypeError) {
+    return UNREACHABLE_MESSAGE;
+  }
   return caught instanceof Error ? caught.message : fallback;
 }
+
+/** A request the player started and is waiting on; a second press is ignored until it settles. */
+export type PendingRequest = "preview" | "join" | "start" | "restart";
 
 interface UseOnlineRoomOptions {
   /** Try to rejoin the room saved in this browser when the app opens. */
@@ -96,6 +106,8 @@ export function useOnlineRoom({ reconnectOnMount, onNotice }: UseOnlineRoomOptio
   );
   const [error, setError] = useState<string | null>(null);
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
+  const [pendingRequest, setPendingRequest] = useState<PendingRequest | null>(null);
+  const pendingRequestRef = useRef<PendingRequest | null>(null);
   const [timer, setTimer] = useState<TimerUpdate | null>(null);
   const [realtimeStatus, setRealtimeStatus] = useState<RealtimeStatus>("idle");
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -172,9 +184,9 @@ export function useOnlineRoom({ reconnectOnMount, onNotice }: UseOnlineRoomOptio
       }
       awaitingSocketHandshakeRef.current = false;
       setRealtimeStatus("failed");
-      setError("Realtime connection timed out before the room subscription was confirmed.");
+      // The socket is left alone: it keeps retrying, and a slow server start still gets through.
+      setError("The room is taking a while to answer. Still trying to connect.");
       setReconnectState("reconnect-failed");
-      socket.disconnect();
     }, HANDSHAKE_TIMEOUT_MS);
 
     const resolveHandshake = () => {
@@ -239,8 +251,12 @@ export function useOnlineRoom({ reconnectOnMount, onNotice }: UseOnlineRoomOptio
         return;
       }
       setRealtimeStatus("failed");
-      setError("Connection lost. Reconnect using your saved session details.");
+      setError("Connection lost. Trying to reconnect.");
       setReconnectState("reconnect-failed");
+      // After a drop the socket reconnects by itself, except when the server closed it.
+      if (reason === "io server disconnect") {
+        socket.connect();
+      }
     });
 
     return () => {
@@ -280,17 +296,33 @@ export function useOnlineRoom({ reconnectOnMount, onNotice }: UseOnlineRoomOptio
     try {
       enterRoom(await requestJson<CreateRoomResponse>("/rooms", { method: "POST", body: JSON.stringify(form) }));
     } catch (caught) {
-      setError(
-        caught instanceof TypeError
-          ? "Could not reach the multiplayer server. Make sure the local backend is running and this web port is allowed."
-          : errorMessage(caught, "Could not create the room.")
-      );
+      setError(errorMessage(caught, "Could not create the room."));
     } finally {
       setIsCreatingRoom(false);
     }
   }
 
-  async function previewRoom(roomCode: string) {
+  /** Runs one player-started request at a time; a repeat press while it is in flight does nothing. */
+  async function whilePending(kind: PendingRequest, run: () => Promise<void>) {
+    if (pendingRequestRef.current) {
+      return;
+    }
+    pendingRequestRef.current = kind;
+    setPendingRequest(kind);
+    try {
+      await run();
+    } finally {
+      pendingRequestRef.current = null;
+      setPendingRequest(null);
+    }
+  }
+
+  const previewRoom = (roomCode: string) => whilePending("preview", () => fetchRoomPreview(roomCode));
+  const joinRoom = (form: JoinRoomRequest & { roomCode: string }) => whilePending("join", () => postJoinRoom(form));
+  const startRoom = () => whilePending("start", postStartRoom);
+  const restartRoom = () => whilePending("restart", postRestartRoom);
+
+  async function fetchRoomPreview(roomCode: string) {
     try {
       const room = await requestJson<RoomSnapshot>(`/rooms/${roomCode}`);
       setRoomPreview(room.room);
@@ -301,7 +333,7 @@ export function useOnlineRoom({ reconnectOnMount, onNotice }: UseOnlineRoomOptio
     }
   }
 
-  async function joinRoom(form: JoinRoomRequest & { roomCode: string }) {
+  async function postJoinRoom(form: JoinRoomRequest & { roomCode: string }) {
     try {
       enterRoom(
         await requestJson<JoinRoomResponse>(`/rooms/${form.roomCode}/join`, {
@@ -317,7 +349,7 @@ export function useOnlineRoom({ reconnectOnMount, onNotice }: UseOnlineRoomOptio
     }
   }
 
-  async function startRoom() {
+  async function postStartRoom() {
     if (!credentials || !snapshot) {
       return;
     }
@@ -333,7 +365,7 @@ export function useOnlineRoom({ reconnectOnMount, onNotice }: UseOnlineRoomOptio
     }
   }
 
-  async function restartRoom() {
+  async function postRestartRoom() {
     if (!credentials || !snapshot) {
       return;
     }
@@ -401,6 +433,7 @@ export function useOnlineRoom({ reconnectOnMount, onNotice }: UseOnlineRoomOptio
     reconnectState,
     error,
     isCreatingRoom,
+    pendingRequest,
     timer,
     realtimeStatus,
     chatMessages,

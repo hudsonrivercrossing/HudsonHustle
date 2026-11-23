@@ -942,6 +942,18 @@ describe("game-core", () => {
     ]);
   });
 
+  it("counts a rival route borrowed through a station as ticket progress, as the final scoring does", () => {
+    const state = finishInitialTickets(startGame(hudsonHustleMap, { playerNames: ["A", "B"], seed: 14 }));
+    const [first, second] = state.players;
+    first.tickets = [{ id: "custom-ticket", from: "newark-penn", to: "grove-st", points: 5, bucket: "regular" }];
+    state.routeClaims = [{ routeId: "newark-penn-grove-st", playerId: second.id, colorUsed: "obsidian", cardsSpent: [], tunnelExtraCost: 0 }];
+
+    expect(getTicketProgress(state, hudsonHustleMap, first.id)[0].completed).toBe(false);
+
+    state.stations = [{ cityId: "grove-st", playerId: first.id }];
+    expect(getTicketProgress(state, hudsonHustleMap, first.id)[0].completed).toBe(true);
+  });
+
   it("lets a player cancel a freshly drawn ticket choice and restore the deck order", () => {
     let state = finishInitialTickets(startGame(hudsonHustleMap, { playerNames: ["A", "B"], seed: 21 }));
     const nextThreeTicketIds = state.regularTickets.slice(0, 3).map((ticket) => ticket.id);

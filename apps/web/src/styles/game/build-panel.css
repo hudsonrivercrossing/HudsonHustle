@@ -50,9 +50,11 @@
   transition: color var(--duration-fast, 100ms) ease, border-color var(--duration-fast, 100ms) ease;
 }
 
-.floating-build-panel__close:hover {
-  color: var(--hud-paper-bright);
-  border-color: color-mix(in oklch, var(--hud-brass-light-solid) 36%, transparent);
+@media (hover: hover) and (pointer: fine) {
+  .floating-build-panel__close:hover {
+    color: var(--hud-paper-bright);
+    border-color: color-mix(in oklch, var(--hud-brass-light-solid) 36%, transparent);
+  }
 }
 
 .floating-build-panel__body {

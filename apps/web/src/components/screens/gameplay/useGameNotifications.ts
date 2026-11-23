@@ -3,7 +3,7 @@ import { getEventsSince, type GameState, type MapConfig } from "@hudson-hustle/g
 import type { GameplayNotification } from "../../ui/game";
 import { notificationsFromEvents, type PendingDraws } from "./gameNotifications";
 
-const NOTIFICATION_LIFETIME_MS = 2000;
+const NOTIFICATION_LIFETIME_MS = 4000;
 
 /**
  * Shows a notification for each new game event and exposes `notify` for one-off messages.

@@ -24,6 +24,8 @@ interface JoinRoomFlowProps {
   onChangePreferredSeatId: (v: string | undefined) => void;
   onPreviewRoom: (code: string) => void;
   onJoinRoom: (form: { roomCode: string; playerName: string; preferredSeatId?: string }) => void;
+  /** The request in flight, if any; its button shows it and cannot be pressed twice. */
+  pending?: "preview" | "join" | null;
 }
 
 export function JoinRoomFlow({
@@ -38,29 +40,41 @@ export function JoinRoomFlow({
   onChangeJoinPlayerName,
   onChangePreferredSeatId,
   onPreviewRoom,
-  onJoinRoom
+  onJoinRoom,
+  pending = null
 }: JoinRoomFlowProps): JSX.Element {
+  const codeComplete = joinRoomCode.length >= ROOM_CODE_LENGTH;
+
   return (
     <div className="setup-flow-grid setup-flow-grid--join" data-testid="join-room-panel">
       {step === 0 ? (
         <SetupStepPanel eyebrow="Now" title="Room code" meta="Check the table before choosing a seat">
-          <div className="setup-field-grid setup-field-grid--launch">
+          <form
+            className="setup-field-grid setup-field-grid--launch"
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (codeComplete) {
+                onPreviewRoom(joinRoomCode);
+              }
+            }}
+          >
             <FormField label="Room code" helper={`${ROOM_CODE_LENGTH}-character code`}>
               <input
                 value={joinRoomCode}
                 onChange={(e) => onChangeJoinRoomCode(e.target.value)}
                 maxLength={ROOM_CODE_LENGTH}
                 placeholder="------"
+                autoCapitalize="characters"
+                autoCorrect="off"
+                autoComplete="off"
+                spellCheck={false}
+                enterKeyHint="go"
               />
             </FormField>
-            <Button
-              className="join-preview-button"
-              disabled={joinRoomCode.length < ROOM_CODE_LENGTH}
-              onClick={() => onPreviewRoom(joinRoomCode)}
-            >
+            <Button type="submit" className="join-preview-button" disabled={!codeComplete} loading={pending === "preview"}>
               Preview
             </Button>
-          </div>
+          </form>
           {roomPreview ? (
             <div className="room-preview room-preview--ticket">
               <MapThumbnail configId={roomPreview.configId} mapName={roomPreview.mapName} version={roomPreview.configVersion} />
@@ -110,6 +124,13 @@ export function JoinRoomFlow({
       ) : null}
 
       {step === 2 ? (
+        <form
+          className="setup-form"
+          onSubmit={(event) => {
+            event.preventDefault();
+            onJoinRoom({ roomCode: joinRoomCode, playerName: joinPlayerName.trim() || "Player", preferredSeatId });
+          }}
+        >
         <SetupStepPanel
           eyebrow="Now"
           title="Enter room"
@@ -117,25 +138,17 @@ export function JoinRoomFlow({
           actions={
             <SetupActions>
               <Button onClick={() => onChangeStep(1)}>Back</Button>
-              <Button
-                variant="primary"
-                onClick={() =>
-                  onJoinRoom({
-                    roomCode: joinRoomCode,
-                    playerName: joinPlayerName.trim() || "Player",
-                    preferredSeatId
-                  })
-                }
-              >
+              <Button type="submit" variant="primary" loading={pending === "join"}>
                 Join room
               </Button>
             </SetupActions>
           }
         >
           <FormField label="Your name">
-            <input value={joinPlayerName} maxLength={24} onChange={(e) => onChangeJoinPlayerName(e.target.value)} />
+            <input value={joinPlayerName} maxLength={24} autoComplete="nickname" enterKeyHint="go" onChange={(e) => onChangeJoinPlayerName(e.target.value)} />
           </FormField>
         </SetupStepPanel>
+        </form>
       ) : null}
     </div>
   );

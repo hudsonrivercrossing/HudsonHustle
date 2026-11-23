@@ -455,9 +455,14 @@ Action rows */
   box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.08);
 }
 
-.setup-board-shell .secondary-button:hover,
 .setup-board-shell .secondary-button:focus-visible {
   background: oklch(98.38% 0.0159 82.79 / 0.13);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .setup-board-shell .secondary-button:hover {
+    background: oklch(98.38% 0.0159 82.79 / 0.13);
+  }
 }
 
 .setup-step-panel .form-field {
@@ -1012,9 +1017,11 @@ Action rows */
   opacity: 0.72;
 }
 
-.setup-entry-artifact:disabled:hover {
-  transform: none;
-  border-color: oklch(94.28% 0.0234 82.12 / 0.16);
+@media (hover: hover) and (pointer: fine) {
+  .setup-entry-artifact:disabled:hover {
+    transform: none;
+    border-color: oklch(94.28% 0.0234 82.12 / 0.16);
+  }
 }
 
 .setup-entry-artifact:focus-visible {
@@ -1346,4 +1353,9 @@ Ticket dock: extra bottom padding so last ticket doesn't clip
 .ticket-slip em {
   color: oklch(94.28% 0.0234 82.12 / 0.72);
   font-style: normal;
+}
+
+/* A form that only exists so Enter submits: it adds no box of its own to the layout. */
+.setup-form {
+  display: contents;
 }

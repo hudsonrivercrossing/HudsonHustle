@@ -4,6 +4,7 @@ import {
   hudsonHustleReleasedConfigs,
   getHudsonHustleMapByConfigId
 } from "@hudson-hustle/game-data";
+import { storageGet, storageRemove } from "../shared/safeStorage";
 
 export const AVATAR_NAMES = [
   "Conductor", "Milo", "Engineer", "Rosa", "Switchman",
@@ -42,14 +43,55 @@ export function shuffleAvatars(seed: string, count: number): string[] {
   return pool.slice(0, count);
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Whether a stored value is a game this build can resume: the current save version, the fields the table
+ * reads on its first render, and only routes and stations that exist on a map this build still ships.
+ */
+export function isRestorableGame(value: unknown): value is GameState {
+  if (!isRecord(value) || value.version !== 1 || typeof value.mapId !== "string" || typeof value.phase !== "string") {
+    return false;
+  }
+  const { players, routeClaims, stations, market, activePlayerIndex } = value;
+  if (!Array.isArray(players) || players.length < 2 || !Array.isArray(routeClaims) || !Array.isArray(stations) || !Array.isArray(market)) {
+    return false;
+  }
+  if (typeof activePlayerIndex !== "number" || !players[activePlayerIndex]) {
+    return false;
+  }
+  const playersOk = players.every(
+    (player) => isRecord(player) && typeof player.id === "string" && typeof player.name === "string" && Array.isArray(player.hand) && Array.isArray(player.tickets)
+  );
+  if (!playersOk) {
+    return false;
+  }
+  const maps = hudsonHustleReleasedConfigs
+    .map((config) => getHudsonHustleMapByConfigId(config.configId))
+    .filter((map) => map.id === value.mapId);
+  return maps.some(
+    (map) =>
+      routeClaims.every((claim) => isRecord(claim) && map.routes.some((route) => route.id === claim.routeId)) &&
+      stations.every((station) => isRecord(station) && map.cities.some((city) => city.id === station.cityId))
+  );
+}
+
+/** The saved local game, or null. A save this build cannot resume is thrown away so it cannot fail again. */
 export function readSavedGame(): GameState | null {
-  const raw = window.localStorage.getItem(LOCAL_SAVE_KEY);
+  const raw = storageGet(LOCAL_SAVE_KEY);
   if (!raw) return null;
   try {
-    return JSON.parse(raw) as GameState;
+    const parsed: unknown = JSON.parse(raw);
+    if (isRestorableGame(parsed)) {
+      return parsed;
+    }
   } catch {
-    return null;
+    // Falls through to discarding the save.
   }
+  storageRemove(LOCAL_SAVE_KEY);
+  return null;
 }
 
 export function configIdForSavedMap(mapId: string): string {

@@ -51,9 +51,11 @@
   font-weight: var(--weight-bold);
 }
 
-.app-shell--gameplay-hud .leave-confirm-card .leave-button:hover {
-  background: linear-gradient(180deg, oklch(61.83% 0.1601 33.99), oklch(47.49% 0.1387 30.22));
-  border-color: oklch(61.83% 0.1601 33.99);
+@media (hover: hover) and (pointer: fine) {
+  .app-shell--gameplay-hud .leave-confirm-card .leave-button:hover {
+    background: linear-gradient(180deg, oklch(61.83% 0.1601 33.99), oklch(47.49% 0.1387 30.22));
+    border-color: oklch(61.83% 0.1601 33.99);
+  }
 }
 
 /* Field grid

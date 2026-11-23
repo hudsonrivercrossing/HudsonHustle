@@ -1,3 +1,4 @@
+import { storageGet, storageRemove, storageSet } from "../shared/safeStorage";
 import { botDifficulties, type BotDifficulty } from "@hudson-hustle/game-core";
 
 const LAST_SETUP_KEY = "hudson-hustle-local-setup-v1";
@@ -30,7 +31,7 @@ function readDifficulty(value: unknown): BotDifficulty {
 
 function readJson(key: string): unknown {
   try {
-    const raw = window.localStorage.getItem(key);
+    const raw = storageGet(key);
     return raw ? JSON.parse(raw) : null;
   } catch {
     // Unreadable or corrupted storage is the same as nothing saved.
@@ -80,7 +81,7 @@ export function readLastLocalSetup(availableConfigIds: string[]): LastLocalSetup
 }
 
 export function saveLastLocalSetup(setup: LastLocalSetup): void {
-  window.localStorage.setItem(LAST_SETUP_KEY, JSON.stringify(setup));
+  storageSet(LAST_SETUP_KEY, JSON.stringify(setup));
 }
 
 export function readLocalSaveMeta(): LocalSaveMeta | null {
@@ -98,8 +99,8 @@ export function readLocalSaveMeta(): LocalSaveMeta | null {
 
 export function saveLocalSaveMeta(meta: LocalSaveMeta | null): void {
   if (meta) {
-    window.localStorage.setItem(SAVE_META_KEY, JSON.stringify(meta));
+    storageSet(SAVE_META_KEY, JSON.stringify(meta));
   } else {
-    window.localStorage.removeItem(SAVE_META_KEY);
+    storageRemove(SAVE_META_KEY);
   }
 }

@@ -38,13 +38,10 @@
   line-height: 1.25;
   text-align: center;
   text-shadow: 0 1px 2px oklch(0% 0 0 / 0.42);
-  animation: notification-drift 4.2s linear forwards;
+  animation: notification-drift 4s linear forwards;
   pointer-events: auto;
 }
 
-.notification-pipe__item:hover {
-  animation-play-state: paused;
-}
 
 .notification-pipe__item--success {
   border-color: oklch(75.77% 0.1031 155.34 / 0.42);
@@ -58,7 +55,7 @@
 
 .notification-pipe {
   position: fixed;
-  bottom: var(--space-stack-lg, 24px);
+  bottom: max(var(--space-stack-lg), env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -67,4 +64,12 @@
   gap: var(--space-stack-xs, 4px);
   z-index: var(--z-toast);
   pointer-events: none;
+}
+
+/* With reduced motion a notice does not fade: it is simply there until it is removed. Without this the
+   global rule would end the animation at once, on its last, invisible frame. */
+@media (prefers-reduced-motion: reduce) {
+  .notification-pipe__item {
+    animation: none;
+  }
 }

@@ -12,12 +12,12 @@
   left: 0;
   right: 0;
   bottom: 0;
-  width: 100vw;
-  height: 100vh;
   z-index: var(--z-modal);
   display: grid;
   place-items: center;
-  padding: 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
   background: oklch(15.28% 0.0132 75.83 / 0.72);
   animation: shell-fade-in var(--duration-slow) var(--easing-enter);
 }

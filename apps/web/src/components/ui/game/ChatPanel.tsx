@@ -51,14 +51,9 @@ export function ChatPanel({ messages = [], onSendMessage, className = "" }: Chat
               aria-label="Message"
               value={draft}
               maxLength={280}
+              autoComplete="off"
+              enterKeyHint="send"
               onChange={(event) => setDraft(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" && draft.trim().length > 0) {
-                  event.preventDefault();
-                  onSendMessage(draft.trim());
-                  setDraft("");
-                }
-              }}
             />
           </div>
         ) : null}

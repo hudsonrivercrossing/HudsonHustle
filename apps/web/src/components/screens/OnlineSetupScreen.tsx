@@ -24,6 +24,7 @@ interface OnlineSetupScreenProps {
   roomPreview: RoomSummary | null;
   error: string | null;
   isCreatingRoom?: boolean;
+  pendingRequest?: "preview" | "join" | "start" | "restart" | null;
   /** Room code from a shared link; opens the join flow with it filled in. */
   initialJoinRoomCode?: string;
   onOpenLocal?: () => void;
@@ -40,6 +41,7 @@ export function OnlineSetupScreen({
   roomPreview,
   error,
   isCreatingRoom = false,
+  pendingRequest = null,
   initialJoinRoomCode,
   onBack,
   onClearRoomPreview,
@@ -228,6 +230,7 @@ export function OnlineSetupScreen({
           onChangePreferredSeatId={setPreferredSeatId}
           onPreviewRoom={onPreviewRoom}
           onJoinRoom={onJoinRoom}
+          pending={pendingRequest === "preview" || pendingRequest === "join" ? pendingRequest : null}
         />
       ) : null}
     </SetupShell>

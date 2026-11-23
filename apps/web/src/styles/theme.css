@@ -1,15 +1,16 @@
 :root {
-  color-scheme: light;
-  --color-canvas-base: oklch(88.33% 0.0352 82.9);
-  --color-canvas-deep: oklch(76.88% 0.0517 80.88);
-  --color-canvas-glow-warm: oklch(96.85% 0.0384 89.09 / 0.88);
-  --color-canvas-glow-cool: oklch(70.22% 0.0574 231.96 / 0.18);
-  --color-surface-panel: oklch(96.88% 0.0159 82.79 / 0.9);
-  --color-ink-strong: oklch(26.54% 0.0268 68.7);
-  --color-ink-muted: oklch(43.22% 0.032 64.97);
-  --color-border-subtle: oklch(33.55% 0.037 66 / 0.18);
-  --color-accent-base: oklch(53.45% 0.1309 252.18);
-  --color-accent-strong: oklch(43.11% 0.1005 251.34);
+  /* The whole app is one dark theme. There is no light variant and the OS setting does not change it. */
+  color-scheme: dark;
+  --color-canvas-base: oklch(20.82% 0.0154 76.01);
+  --color-canvas-deep: oklch(17.42% 0.0145 87.56);
+  --color-canvas-glow-warm: oklch(90.67% 0.1062 86.69 / 0.12);
+  --color-canvas-glow-cool: oklch(58.33% 0.071 236.12 / 0.1);
+  --color-surface-panel: oklch(23.6% 0.0196 73.61 / 0.92);
+  --color-ink-strong: oklch(92.7% 0.0311 86.46);
+  --color-ink-muted: oklch(69.47% 0.0443 66.99);
+  --color-border-subtle: oklch(81.74% 0.0633 74.68 / 0.13);
+  --color-accent-base: oklch(66.62% 0.1038 246.04);
+  --color-accent-strong: oklch(58.78% 0.1144 251.04);
   --color-setup-station-enamel: oklch(19.15% 0.0162 244.65 / 0.94);
   --color-setup-station-enamel-soft: oklch(24.64% 0.0186 241.89 / 0.9);
   --color-setup-ticket-field: oklch(31.08% 0.0186 238.73);
@@ -24,8 +25,8 @@
   --color-control-face-strong: oklch(24.92% 0.024 241.31);
   --color-control-border: oklch(94.28% 0.0234 82.12 / 0.2);
   --color-control-accent: oklch(65.91% 0.1012 73.74);
-  --color-danger: oklch(49.64% 0.1358 30.5);
-  --shadow-strong: 0 24px 56px oklch(30.12% 0.0457 64.55 / 0.22);
+  --color-danger: oklch(60.99% 0.1376 30.88);
+  --shadow-strong: 0 24px 56px oklch(0% 0 0 / 0.52);
   /* --- Radius Scale --- four steps; nested surfaces step down one (inner = outer − padding) */
   --radius-1: 4px;           /* chips, icon corners */
   --radius-2: 8px;           /* controls, cards in hand, tickets */
@@ -45,6 +46,7 @@
   /* --- Border Width --- */
   --border-thin: 1px;
   --border-medium: 2px;
+  --focus-ring: oklch(83.88% 0.0602 81.93);   /* keyboard focus on any dark surface */
 
   /* --- Control Sizing --- */
   --control-height-row: 38px;      /* compact button/row variant */
@@ -139,32 +141,31 @@
   --z-raised-2: 2;
   --z-chrome: 100;
   --z-dropdown: 120;
-  --z-menu: 300;
   --z-popover: 400;
   --z-toast: 500;
   --z-overlay: 600;
   --z-modal: 700;
 
 
-  --status-neutral-bg: linear-gradient(180deg, oklch(98.92% 0.0102 81.8 / 0.94), oklch(95.87% 0.0198 77.32 / 0.9));
-  --status-neutral-border: oklch(46.33% 0.0535 71.16 / 0.18);
-  --status-neutral-shadow: 0 14px 30px oklch(30.12% 0.0457 64.55 / 0.12);
+  --status-neutral-bg: linear-gradient(180deg, oklch(25.8% 0.0215 72.85 / 0.94), oklch(23.28% 0.0219 72.63 / 0.9));
+  --status-neutral-border: oklch(69.06% 0.0654 74.36 / 0.16);
+  --status-neutral-shadow: 0 14px 30px oklch(0% 0 0 / 0.28);
 
-  --status-active-bg: linear-gradient(135deg, oklch(53.57% 0.1296 253.1 / 0.18), oklch(98.68% 0.0118 79.79 / 0.96));
-  --status-active-border: oklch(53.45% 0.1309 252.18 / 0.34);
-  --status-active-shadow: 0 18px 38px oklch(43.11% 0.1005 251.34 / 0.15);
+  --status-active-bg: linear-gradient(135deg, oklch(53.77% 0.1229 257.17 / 0.22), oklch(25.8% 0.0215 72.85 / 0.96));
+  --status-active-border: oklch(65.67% 0.1073 248.99 / 0.32);
+  --status-active-shadow: 0 18px 38px oklch(0% 0 0 / 0.32);
 
   --status-waiting-bg: linear-gradient(135deg, oklch(65.51% 0.1003 81.08 / 0.16), oklch(98.68% 0.0118 79.79 / 0.96));
   --status-waiting-border: oklch(65.51% 0.1003 81.08 / 0.28);
   --status-waiting-shadow: 0 16px 34px oklch(47.71% 0.0827 70.73 / 0.13);
 
-  --status-warning-bg: linear-gradient(135deg, oklch(62.93% 0.1295 62.87 / 0.16), oklch(98.68% 0.0118 79.79 / 0.96));
-  --status-warning-border: oklch(62.93% 0.1295 62.87 / 0.3);
-  --status-warning-shadow: 0 16px 34px oklch(49.48% 0.0978 71.3 / 0.14);
+  --status-warning-bg: linear-gradient(135deg, oklch(62.14% 0.1187 69.43 / 0.2), oklch(25.8% 0.0215 72.85 / 0.96));
+  --status-warning-border: oklch(64.71% 0.1169 62.93 / 0.3);
+  --status-warning-shadow: 0 16px 34px oklch(0% 0 0 / 0.3);
 
-  --status-failure-bg: linear-gradient(135deg, oklch(49.64% 0.1358 30.5 / 0.18), oklch(97.93% 0.0105 39.44 / 0.98));
-  --status-failure-border: oklch(49.64% 0.1358 30.5 / 0.34);
-  --status-failure-shadow: 0 18px 38px oklch(42.37% 0.117 30.19 / 0.16);
+  --status-failure-bg: linear-gradient(135deg, oklch(60.99% 0.1376 30.88 / 0.2), oklch(24.79% 0.0308 39.2 / 0.98));
+  --status-failure-border: oklch(60.99% 0.1376 30.88 / 0.32);
+  --status-failure-shadow: 0 18px 38px oklch(0% 0 0 / 0.34);
 
   --card-radius: var(--radius-4);
 
@@ -195,68 +196,5 @@
     --space-page-x: 16px;
     --space-page-y: 16px;
     --space-stack-lg: 20px;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-
-    /* Canvas */
-    --color-canvas-base: oklch(20.82% 0.0154 76.01);
-    --color-canvas-deep: oklch(17.42% 0.0145 87.56);
-    --color-canvas-glow-warm: oklch(90.67% 0.1062 86.69 / 0.12);
-    --color-canvas-glow-cool: oklch(58.33% 0.071 236.12 / 0.1);
-
-    /* Ink */
-    --color-ink-strong: oklch(92.7% 0.0311 86.46);
-    --color-ink-muted: oklch(69.47% 0.0443 66.99);
-
-    /* Surfaces */
-    --color-surface-panel: oklch(23.6% 0.0196 73.61 / 0.92);
-
-    /* Border */
-    --color-border-subtle: oklch(81.74% 0.0633 74.68 / 0.13);
-
-    /* Accent */
-    --color-accent-base: oklch(66.62% 0.1038 246.04);
-    --color-accent-strong: oklch(58.78% 0.1144 251.04);
-
-    /* Status */
-    --color-danger: oklch(60.99% 0.1376 30.88);
-
-    /* Shadows */
-    --shadow-strong: 0 24px 56px oklch(0% 0 0 / 0.52);
-
-    /* Alias updates */
-    --panel: var(--color-surface-panel);
-    --ink: var(--color-ink-strong);
-    --ink-soft: var(--color-ink-muted);
-    --line: var(--color-border-subtle);
-    --accent-strong: var(--color-accent-strong);
-    --danger: var(--color-danger);
-
-    /* Panel variants */
-
-    /* Status surfaces */
-    --status-neutral-bg: linear-gradient(180deg, oklch(25.8% 0.0215 72.85 / 0.94), oklch(23.28% 0.0219 72.63 / 0.9));
-    --status-neutral-border: oklch(69.06% 0.0654 74.36 / 0.16);
-    --status-neutral-shadow: 0 14px 30px oklch(0% 0 0 / 0.28);
-
-    --status-active-bg: linear-gradient(135deg, oklch(53.77% 0.1229 257.17 / 0.22), oklch(25.8% 0.0215 72.85 / 0.96));
-    --status-active-border: oklch(65.67% 0.1073 248.99 / 0.32);
-    --status-active-shadow: 0 18px 38px oklch(0% 0 0 / 0.32);
-
-    --status-warning-bg: linear-gradient(135deg, oklch(62.14% 0.1187 69.43 / 0.2), oklch(25.8% 0.0215 72.85 / 0.96));
-    --status-warning-border: oklch(64.71% 0.1169 62.93 / 0.3);
-    --status-warning-shadow: 0 16px 34px oklch(0% 0 0 / 0.3);
-
-    --status-failure-bg: linear-gradient(135deg, oklch(60.99% 0.1376 30.88 / 0.2), oklch(24.79% 0.0308 39.2 / 0.98));
-    --status-failure-border: oklch(60.99% 0.1376 30.88 / 0.32);
-    --status-failure-shadow: 0 18px 38px oklch(0% 0 0 / 0.34);
-
-    /* Material overrides */
-
-    /* Surface overlays */
   }
 }

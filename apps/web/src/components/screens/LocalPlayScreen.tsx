@@ -28,6 +28,7 @@ import {
   type LocalStartSetup,
   type VisibilityMode
 } from "../local";
+import { storageRemove, storageSet } from "../shared/safeStorage";
 import { SetupScreen } from "./SetupScreen";
 import { GameplayScreen } from "./gameplay/GameplayScreen";
 import { useGameNotifications } from "./gameplay/useGameNotifications";
@@ -59,7 +60,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
 
   useEffect(() => {
     if (!game) return;
-    window.localStorage.setItem(LOCAL_SAVE_KEY, JSON.stringify(game));
+    storageSet(LOCAL_SAVE_KEY, JSON.stringify(game));
     setHasSavedGame(true);
   }, [game]);
 
@@ -159,7 +160,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
   }
 
   function resetGame() {
-    window.localStorage.removeItem(LOCAL_SAVE_KEY);
+    storageRemove(LOCAL_SAVE_KEY);
     saveLocalSaveMeta(null);
     setHasSavedGame(false);
     setGame(null);

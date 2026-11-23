@@ -21,6 +21,8 @@ interface LobbyScreenProps {
   timer: TimerUpdate | null;
   realtimeReady: boolean;
   realtimeMessage: string | null;
+  /** The start request is on its way. */
+  isStarting?: boolean;
 }
 
 type SeatStatus = { label: string; tone: "neutral" | "info" | "danger" | "success" | "warning" };
@@ -95,7 +97,8 @@ export function LobbyScreen({
   onLeaveRoom,
   timer,
   realtimeReady,
-  realtimeMessage
+  realtimeMessage,
+  isStarting = false
 }: LobbyScreenProps): JSX.Element {
   const setupHeroImageUrl = "/setup/landing-bg.png";
   const localSeat = room.seats.find((seat) => seat.seatId === localSeatId);
@@ -151,7 +154,7 @@ export function LobbyScreen({
               {localSeat?.ready ? "Mark not ready" : "Mark ready"}
             </Button>
             {localSeat?.isHost ? (
-              <Button variant={localSeat.ready ? "primary" : "secondary"} disabled={!canStart} onClick={onStart}>
+              <Button variant={localSeat.ready ? "primary" : "secondary"} disabled={!canStart} loading={isStarting} onClick={onStart}>
                 Start game
               </Button>
             ) : null}

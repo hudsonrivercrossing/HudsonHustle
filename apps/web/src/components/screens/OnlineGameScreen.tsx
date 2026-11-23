@@ -53,7 +53,9 @@ export function OnlineGameScreen({ room, snapshot, playerId, notices, onLeave }:
   }, [notify, ownTimer, secondsRemaining, timer?.deadlineAt]);
 
   const activePlayer = snapshot.game.players[snapshot.game.activePlayerIndex];
-  const canAct = activePlayer?.id === playerId;
+  // A dropped connection is said out loud and moves are held back, instead of being sent into nothing.
+  const offline = room.realtimeStatus !== "subscribed";
+  const canAct = !offline && activePlayer?.id === playerId;
   const activePlayerName = activePlayer?.name ?? "the next player";
 
   return (
@@ -65,10 +67,11 @@ export function OnlineGameScreen({ room, snapshot, playerId, notices, onLeave }:
       viewerPlayerId={playerId}
       canAct={canAct}
       avatarSeed={roomCode}
-      turnLabel={canAct ? "Your turn" : `Waiting for ${activePlayerName}`}
+      turnLabel={activePlayer?.id === playerId ? "Your turn" : `Waiting for ${activePlayerName}`}
       timerLabel={secondsRemaining !== null ? `${secondsRemaining}s left` : turnTimeLimitSeconds > 0 ? `Timer ${turnTimeLimitSeconds}s` : null}
       sidePanel={<ChatPanel messages={room.chatMessages} onSendMessage={room.sendChatMessage} />}
       notifications={[...notifications, ...notices]}
+      connectionNotice={offline ? "Connection lost. Reconnecting…" : null}
       onAction={room.sendGameAction}
       copy={{
         initialTicketsTitle: "Choose starting tickets",
