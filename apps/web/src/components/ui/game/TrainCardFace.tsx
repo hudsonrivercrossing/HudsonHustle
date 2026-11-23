@@ -1,5 +1,6 @@
 import type { TrainCardFace as Face } from "@hudson-hustle/game-core";
 import { formatCardLabel } from "./CardSlot";
+import { ColorMark, colorMarkInk } from "./ColorMark";
 
 interface TrainCardFaceProps {
   face: Face;
@@ -23,7 +24,13 @@ export function TrainCardFace({ face, color, back = false, className = "" }: Tra
       data-face={face}
     >
       <span className="train-card__pip" aria-hidden="true">
-        {face === "locomotive" ? "★" : ""}
+        {face === "locomotive" ? (
+          "★"
+        ) : (
+          <svg viewBox="-6 -6 12 12" className={`train-card__mark train-card__mark--${colorMarkInk(face)}`}>
+            <ColorMark color={face} />
+          </svg>
+        )}
       </span>
       <span className="train-card__name">{face === "locomotive" ? "Wild" : formatCardLabel(face)}</span>
     </span>

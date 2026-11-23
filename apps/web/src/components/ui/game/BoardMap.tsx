@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { getCityName, type MapConfig, type RouteDef } from "@hudson-hustle/game-core";
 import type { BoardBackdrop, SnapshotVisuals } from "@hudson-hustle/game-data";
+import { ColorMark, colorMarkInk } from "./ColorMark";
 import { TRACK_CELLS, TRACK_MARGIN, placeTokens, trackCell } from "./scoreTrack";
 
 interface PathPoint {
@@ -127,7 +128,7 @@ function getPathSlice(points: PathPoint[], startDistance: number, endDistance: n
 function getSegments(
   route: RouteDef,
   points: PathPoint[],
-): Array<{ pathD: string; jointPoint?: PathPoint }> {
+): Array<{ pathD: string; midPoint: PathPoint; jointPoint?: PathPoint }> {
   const totalLength = getPathLength(points);
   const curvature = getPathCurvature(points);
   const outerPadding = Math.min(38, Math.max(24, totalLength * 0.14) + curvature * 8);
@@ -146,6 +147,7 @@ function getSegments(
       : undefined;
     return {
       pathD: buildPathD(slicePoints),
+      midPoint: getPointAlongPath(points, segmentStart + segmentLength / 2),
       jointPoint,
     };
   });
@@ -272,9 +274,13 @@ export function BoardMap({
                     rx="5"
                     className={milestone ? "score-track__cell score-track__cell--milestone" : "score-track__cell"}
                   />
-                  <text x={cell.x + cell.width / 2} y={cell.y + cell.height / 2} className={milestone ? "score-track__number score-track__number--milestone" : "score-track__number"}>
-                    {index}
-                  </text>
+                  {milestone ? (
+                    <text x={cell.x + cell.width / 2} y={cell.y + cell.height / 2} className="score-track__number">
+                      {index}
+                    </text>
+                  ) : (
+                    <circle cx={cell.x + cell.width / 2} cy={cell.y + cell.height / 2} r="2.4" className="score-track__tick" />
+                  )}
                 </g>
               );
             })}
@@ -407,7 +413,9 @@ export function BoardMap({
           const direction = getPathDirection(pathPoints, totalLength / 2);
           const markerX = middlePoint.x + direction.nx * 18;
           const markerY = middlePoint.y + direction.ny * 18;
-          const fillOpacity = claim ? 0.95 : 0.78;
+          const fillOpacity = claim ? 0.95 : 0.9;
+          // An open route of a named colour carries that colour's shape on every space.
+          const marked = !claim && route.color !== "gray";
           const ownerBadge = claimingPlayer?.name.trim().charAt(0).toUpperCase() ?? "";
           // V5 Sector Cable: dark jacket → color core → inner dark hairline → brass rivets between segments
           const jacketStroke = claim ? (claimedByViewer ? "rgba(40,32,22,0.9)" : "rgba(40,30,22,0.7)") : "rgba(40,30,22,0.55)";
@@ -438,6 +446,8 @@ export function BoardMap({
                   className={freshRouteIds.includes(route.id) ? "route-car route-car--landing" : "route-car"}
                   style={freshRouteIds.includes(route.id) ? { animationDelay: `${index * 45}ms` } : undefined}
                 >
+                  {/* Pale halo, so a dark route still reads on a dark part of the map */}
+                  {claim ? null : <path d={segment.pathD} fill="none" className="route-halo" strokeLinecap="round" strokeLinejoin="round" />}
                   {/* Outer dark cable jacket */}
                   <path
                     d={segment.pathD}
@@ -457,14 +467,16 @@ export function BoardMap({
                     strokeLinejoin="round"
                     opacity={fillOpacity}
                   />
-                  {/* Inner dark hairline running down centre */}
-                  <path
-                    d={segment.pathD}
-                    fill="none"
-                    stroke={innerHairlineStroke}
-                    strokeWidth={1.8}
-                    strokeLinecap="butt"
-                  />
+                  {marked ? (
+                    <g
+                      transform={`translate(${segment.midPoint.x} ${segment.midPoint.y}) scale(0.82)`}
+                      className={`route-mark route-mark--${colorMarkInk(route.color)}`}
+                    >
+                      <ColorMark color={route.color} />
+                    </g>
+                  ) : (
+                    <path d={segment.pathD} fill="none" stroke={innerHairlineStroke} strokeWidth={1.8} strokeLinecap="butt" />
+                  )}
                   {claim ? (
                     <path
                       d={segment.pathD}

@@ -62,7 +62,7 @@
 
 /* map city label — display font for transit map station signage */
 .board-label {
-  font-size: var(--type-sm);
+  font-size: var(--type-board-lg);
   fill: oklch(28.6% 0.0252 66.54);
   font-family: var(--font-display);
   font-weight: var(--weight-bold);
@@ -334,19 +334,48 @@
   fill: var(--hud-paper);
 }
 
+/* Only every fifth square is numbered; the squares between carry a tick, which stays legible when the board is small. */
 .score-track__number {
-  fill: color-mix(in oklch, var(--hud-ink) 46%, transparent);
+  fill: var(--hud-ink);
   font-family: var(--font-body);
-  font-size: var(--type-board);
+  font-size: var(--type-board-lg);
   font-variant-numeric: tabular-nums;
+  font-weight: var(--weight-bold);
   dominant-baseline: central;
   text-anchor: middle;
 }
 
-.score-track__number--milestone {
-  fill: var(--hud-ink);
-  font-size: var(--type-board-lg);
-  font-weight: var(--weight-bold);
+.score-track__tick {
+  fill: color-mix(in oklch, var(--hud-ink) 34%, transparent);
+}
+
+.route-halo {
+  stroke: color-mix(in oklch, var(--hud-paper-bright) 62%, transparent);
+  stroke-width: 18px;
+}
+
+/* The shape for a card colour, printed on each space of an open route and on the card itself. */
+.color-mark {
+  fill: currentColor;
+}
+
+.color-mark--line {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 2.2px;
+}
+
+.route-mark {
+  pointer-events: none;
+}
+
+.route-mark--dark {
+  color: color-mix(in oklch, var(--hud-ink) 78%, transparent);
+}
+
+.route-mark--light {
+  color: color-mix(in oklch, var(--hud-paper-bright) 92%, transparent);
 }
 
 /* A marker walks to its new square. It is already on the board and only moves, so it eases both ways. */

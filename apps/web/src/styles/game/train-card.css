@@ -21,6 +21,19 @@
   font-size: var(--type-lg);
 }
 
+.train-card__mark {
+  width: 46%;
+  filter: drop-shadow(0 1px 1px color-mix(in oklch, var(--hud-ink) 30%, transparent));
+}
+
+.train-card__mark--dark {
+  color: color-mix(in oklch, var(--hud-ink) 72%, transparent);
+}
+
+.train-card__mark--light {
+  color: var(--hud-paper-bright);
+}
+
 .train-card__name {
   padding: 3px 2px;
   overflow: hidden;
