@@ -4,4 +4,5 @@ export * from "./game.js";
 export * from "./multiplayer.js";
 export * from "./projection.js";
 export * from "./random.js";
+export * from "./rules.js";
 export * from "./types.js";

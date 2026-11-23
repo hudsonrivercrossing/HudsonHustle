@@ -1,156 +1,12 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
-import { getCityName, type MapConfig, type RouteDef } from "@hudson-hustle/game-core";
-import type { BoardBackdrop, SnapshotVisuals } from "@hudson-hustle/game-data";
+import { getCityName, type MapConfig } from "@hudson-hustle/game-core";
+import { labelAnchorPoint, pathLength, pathNormal, pointAlong, routePath, routeSpaces, type BoardBackdrop, type BoardPoint2, type SnapshotVisuals } from "@hudson-hustle/game-data";
 import { ColorMark, colorMarkInk } from "./ColorMark";
 import { TRACK_CELLS, TRACK_MARGIN, placeTokens, trackCell } from "./scoreTrack";
 
-interface PathPoint {
-  x: number;
-  y: number;
-}
-
-function getPathPoints(route: RouteDef, config: MapConfig): PathPoint[] {
-  const from = config.cities.find((city) => city.id === route.from)!;
-  const to = config.cities.find((city) => city.id === route.to)!;
-  if (route.waypoints && route.waypoints.length > 0) {
-    return [{ x: from.x, y: from.y }, ...route.waypoints, { x: to.x, y: to.y }];
-  }
-
-  const dx = to.x - from.x;
-  const dy = to.y - from.y;
-  const length = Math.hypot(dx, dy) || 1;
-  const nx = -(dy / length);
-  const ny = dx / length;
-  const offset = route.offset ?? 0;
-  const ox = nx * offset;
-  const oy = ny * offset;
-
-  return [
-    { x: from.x + ox, y: from.y + oy },
-    { x: to.x + ox, y: to.y + oy }
-  ];
-}
-
-function getPathLength(points: PathPoint[]): number {
-  let total = 0;
-  for (let index = 1; index < points.length; index += 1) {
-    total += Math.hypot(points[index].x - points[index - 1].x, points[index].y - points[index - 1].y);
-  }
-  return total;
-}
-
-function getPointAlongPath(points: PathPoint[], distance: number): { x: number; y: number; angle: number } {
-  let remaining = distance;
-
-  for (let index = 1; index < points.length; index += 1) {
-    const start = points[index - 1];
-    const end = points[index];
-    const dx = end.x - start.x;
-    const dy = end.y - start.y;
-    const segmentLength = Math.hypot(dx, dy) || 1;
-    if (remaining <= segmentLength || index === points.length - 1) {
-      const ratio = Math.max(0, Math.min(1, remaining / segmentLength));
-      return {
-        x: start.x + dx * ratio,
-        y: start.y + dy * ratio,
-        angle: (Math.atan2(dy, dx) * 180) / Math.PI
-      };
-    }
-    remaining -= segmentLength;
-  }
-
-  const last = points.at(-1) ?? { x: 0, y: 0 };
-  const previous = points.at(-2) ?? last;
-  return {
-    x: last.x,
-    y: last.y,
-    angle: (Math.atan2(last.y - previous.y, last.x - previous.x) * 180) / Math.PI
-  };
-}
-
-function getPathDirection(points: PathPoint[], distance: number): { nx: number; ny: number } {
-  const before = getPointAlongPath(points, Math.max(0, distance - 2));
-  const after = getPointAlongPath(points, Math.min(getPathLength(points), distance + 2));
-  const dx = after.x - before.x;
-  const dy = after.y - before.y;
-  const length = Math.hypot(dx, dy) || 1;
-  return {
-    nx: -(dy / length),
-    ny: dx / length
-  };
-}
-
-function getAngleDelta(firstAngle: number, secondAngle: number) {
-  let delta = secondAngle - firstAngle;
-  while (delta > Math.PI) delta -= Math.PI * 2;
-  while (delta < -Math.PI) delta += Math.PI * 2;
-  return Math.abs(delta);
-}
-
-function getPathCurvature(points: PathPoint[]) {
-  if (points.length < 3) {
-    return 0;
-  }
-
-  let totalTurn = 0;
-  for (let index = 2; index < points.length; index += 1) {
-    const a = points[index - 2];
-    const b = points[index - 1];
-    const c = points[index];
-    const firstAngle = Math.atan2(b.y - a.y, b.x - a.x);
-    const secondAngle = Math.atan2(c.y - b.y, c.x - b.x);
-    totalTurn += getAngleDelta(firstAngle, secondAngle);
-  }
-
-  return Math.min(1, totalTurn / (Math.PI / 1.5));
-}
-
-function buildPathD(points: PathPoint[], closed = false): string {
+function buildPathD(points: BoardPoint2[], closed = false): string {
   const path = points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`).join(" ");
   return closed ? `${path} Z` : path;
-}
-
-function getPathSlice(points: PathPoint[], startDistance: number, endDistance: number, curvature: number): PathPoint[] {
-  const safeStart = Math.max(0, startDistance);
-  const safeEnd = Math.max(safeStart, endDistance);
-  const sliceLength = safeEnd - safeStart;
-  const sampleSpacing = 16 - curvature * 8;
-  const sampleCount = Math.max(2, Math.ceil(sliceLength / sampleSpacing));
-
-  return Array.from({ length: sampleCount + 1 }, (_, index) => {
-    const ratio = index / sampleCount;
-    const distance = safeStart + sliceLength * ratio;
-    const point = getPointAlongPath(points, distance);
-    return { x: point.x, y: point.y };
-  });
-}
-
-function getSegments(
-  route: RouteDef,
-  points: PathPoint[],
-): Array<{ pathD: string; midPoint: PathPoint; jointPoint?: PathPoint }> {
-  const totalLength = getPathLength(points);
-  const curvature = getPathCurvature(points);
-  const outerPadding = Math.min(38, Math.max(24, totalLength * 0.14) + curvature * 8);
-  const usableLength = Math.max(36, totalLength - outerPadding * 2);
-  // Larger gap so adjacent segments (and their rounded caps) clearly separate — needed for V5 cable look.
-  const gap = Math.max(16, Math.min(22, usableLength / Math.max(4, route.length * 2.4)));
-  const segmentLength = Math.max(16, (usableLength - gap * (route.length - 1)) / route.length);
-  const start = outerPadding;
-
-  return Array.from({ length: route.length }, (_, index) => {
-    const segmentStart = start + index * (segmentLength + gap);
-    const segmentEnd = segmentStart + segmentLength;
-    const slicePoints = getPathSlice(points, segmentStart, segmentEnd, curvature);
-    const jointPoint = index < route.length - 1
-      ? getPointAlongPath(points, segmentEnd + gap / 2)
-      : undefined;
-    return {
-      pathD: buildPathD(slicePoints),
-      midPoint: getPointAlongPath(points, segmentStart + segmentLength / 2),
-      jointPoint,
-    };
-  });
 }
 
 interface BoardMapProps {
@@ -396,10 +252,10 @@ export function BoardMap({
         ))}
 
         {config.routes.map((route) => {
-          const pathPoints = getPathPoints(route, config);
+          const pathPoints = routePath(route, config);
           const pathD = buildPathD(pathPoints);
-          const totalLength = getPathLength(pathPoints);
-          const segments = getSegments(route, pathPoints);
+          const totalLength = pathLength(pathPoints);
+          const segments = routeSpaces(route, config).map((space) => ({ pathD: buildPathD(space.points), midPoint: space.mid, jointPoint: space.joint }));
           const claim = game.routeClaims.find((item) => item.routeId === route.id);
           const claimedByViewer = claim?.playerId === claimViewerPlayerId;
           const claimingPlayer = claim ? game.players.find((player) => player.id === claim.playerId) : null;
@@ -409,8 +265,8 @@ export function BoardMap({
               ? "#7e7463"
               : cardPalette[route.color];
           const selected = selectedRouteId === route.id;
-          const middlePoint = getPointAlongPath(pathPoints, totalLength / 2);
-          const direction = getPathDirection(pathPoints, totalLength / 2);
+          const middlePoint = pointAlong(pathPoints, totalLength / 2);
+          const direction = pathNormal(pathPoints, totalLength / 2);
           const markerX = middlePoint.x + direction.nx * 18;
           const markerY = middlePoint.y + direction.ny * 18;
           const fillOpacity = claim ? 0.95 : 0.9;
@@ -515,8 +371,8 @@ export function BoardMap({
                 Array.from({ length: tieCount }, (_, i) => {
                   const dist = 6 + i * 10;
                   if (dist > totalLength - 6) return null;
-                  const pt = getPointAlongPath(pathPoints, dist);
-                  const dir = getPathDirection(pathPoints, dist);
+                  const pt = pointAlong(pathPoints, dist);
+                  const dir = pathNormal(pathPoints, dist);
                   const tieLen = 14;
                   return (
                     <line
@@ -568,7 +424,7 @@ export function BoardMap({
                   `${getCityName(config, route.from)} to ${getCityName(config, route.to)}`,
                   `${route.length} train${route.length === 1 ? "" : "s"}`,
                   route.color === "gray" ? "any color" : route.color,
-                  route.type === "normal" ? null : route.type,
+                  route.type === "normal" ? null : (config.typeLabelOverrides?.[route.type] ?? route.type),
                   claimingPlayer ? `claimed by ${claimingPlayer.name}` : "open"
                 ]
                   .filter(Boolean)
@@ -586,8 +442,7 @@ export function BoardMap({
           const station = game.stations.find((item) => item.cityId === city.id);
           const selected = selectedCityId === city.id;
           const highlighted = highlightedCitySet.has(city.id);
-          const labelDx = city.labelDx ?? 14;
-          const labelDy = city.labelDy ?? -14;
+          const labelPoint = labelAnchorPoint(city);
           const labelAnchor = city.labelAnchor ?? "start";
           return (
             <g key={city.id} className={highlighted ? "city-node city-node--highlighted" : "city-node"}>
@@ -628,8 +483,8 @@ export function BoardMap({
                 />
               ) : null}
               <text
-                x={city.x + labelDx}
-                y={city.y + labelDy}
+                x={labelPoint.x}
+                y={labelPoint.y}
                 textAnchor={labelAnchor}
                 className={highlighted ? "board-label board-label--highlighted" : "board-label"}
               >

@@ -4,13 +4,12 @@ import {
   trainCardColors,
   type GameAction,
   type MapConfig,
-  type RouteClaim,
   type RouteDef,
-  type StationPlacement,
   type TrainCard,
   type TrainCardColor
 } from "./types.js";
 import type { PublicGameState, SeatPrivateState } from "./multiplayer.js";
+import { canPay, canTakeMarketCard, isRouteOpen, stationCost } from "./rules.js";
 
 export const botDifficulties = ["easy", "standard", "hard"] as const;
 export type BotDifficulty = (typeof botDifficulties)[number];
@@ -57,38 +56,11 @@ export function countHand(hand: TrainCard[]): Map<TrainCard["color"], number> {
 }
 
 export function canAffordRoute(route: RouteDef, color: TrainCardColor, hand: TrainCard[]): boolean {
-  const counts = countHand(hand);
-  const colored = counts.get(color) ?? 0;
-  const locomotives = counts.get("locomotive") ?? 0;
-  const baseNeed = route.length;
-  const locoNeed = route.locomotiveCost ?? 0;
-  if (locomotives < locoNeed) {
-    return false;
-  }
-  const usableLocomotives = locomotives;
-  return colored + usableLocomotives >= baseNeed;
+  return canPay(hand, color, route.length, route.locomotiveCost ?? 0);
 }
 
 export function getAvailableRoutes(config: MapConfig, game: PublicGameState): RouteDef[] {
-  const claimedRouteIds = new Set(game.routeClaims.map((claim) => claim.routeId));
-  const blockedTwinGroups =
-    game.players.length <= 3
-      ? new Set(
-          game.routeClaims
-            .map((claim) => config.routes.find((route) => route.id === claim.routeId)?.twinGroup ?? null)
-            .filter((group): group is string => group !== null)
-        )
-      : new Set<string>();
-
-  return config.routes.filter((route) => {
-    if (claimedRouteIds.has(route.id)) {
-      return false;
-    }
-    if (route.twinGroup && blockedTwinGroups.has(route.twinGroup)) {
-      return false;
-    }
-    return true;
-  });
+  return config.routes.filter((route) => isRouteOpen(route, game.routeClaims, game.players.length, config));
 }
 
 /** What a route costs when planning a path: its length, plus a little for a tunnel's possible surcharge. */
@@ -161,11 +133,8 @@ export function chooseAnyAffordableStation(context: BotDecisionContext): GameAct
   if (!city) {
     return null;
   }
-  const cost = context.config.settings.stationsPerPlayer - self.stationsLeft + 1;
-  const locomotives = context.privateState.hand.filter((card) => card.color === "locomotive").length;
-  const color = trainCardColors.find(
-    (candidate) => context.privateState.hand.filter((card) => card.color === candidate).length + locomotives >= cost
-  );
+  const cost = stationCost(context.config.settings.stationsPerPlayer, self.stationsLeft);
+  const color = trainCardColors.find((candidate) => canPay(context.privateState.hand, candidate, cost));
   return color ? { type: "build_station", cityId: city.id, color } : null;
 }
 
@@ -174,7 +143,7 @@ export function canDrawCard(game: PublicGameState): boolean {
   return (
     game.trainDeckCount > 0 ||
     game.discardCount > 0 ||
-    game.market.some((card) => !(game.turn.drawsTaken === 1 && card.color === "locomotive"))
+    game.market.some((card) => canTakeMarketCard(game.turn, card))
   );
 }
 
@@ -214,101 +183,4 @@ export function drawBlindOrLastResort(context: BotDecisionContext): GameAction {
   }
 
   throw new Error("No legal bot action is available.");
-}
-
-/**
- * The ticket result the end-of-game scoring would give: each of the player's stations may borrow
- * one rival route touching its city, and the best combination counts.
- */
-export function scoreTickets(
-  config: MapConfig,
-  routeClaims: RouteClaim[],
-  stations: StationPlacement[],
-  playerId: string,
-  tickets: SeatTicket[]
-): { total: number; completedIds: Set<string> } {
-  const routeById = new Map(config.routes.map((route) => [route.id, route]));
-  const owned: RouteDef[] = [];
-  const rival: RouteDef[] = [];
-  for (const claim of routeClaims) {
-    const route = routeById.get(claim.routeId);
-    if (route) {
-      (claim.playerId === playerId ? owned : rival).push(route);
-    }
-  }
-  const borrowChoices = stations
-    .filter((station) => station.playerId === playerId)
-    .map((station) => [null, ...rival.filter((route) => route.from === station.cityId || route.to === station.cityId)]);
-
-  let best = { total: Number.NEGATIVE_INFINITY, completedIds: new Set<string>() };
-  const visit = (index: number, borrowed: RouteDef[]): void => {
-    if (index < borrowChoices.length) {
-      for (const choice of borrowChoices[index]!) {
-        visit(index + 1, choice ? [...borrowed, choice] : borrowed);
-      }
-      return;
-    }
-    const reach = connectedCities([...owned, ...borrowed]);
-    let total = 0;
-    const completedIds = new Set<string>();
-    for (const ticket of tickets) {
-      if (ticket.from === ticket.to || (reach.get(ticket.from) !== undefined && reach.get(ticket.from) === reach.get(ticket.to))) {
-        total += ticket.points;
-        completedIds.add(ticket.id);
-      } else {
-        total -= ticket.points;
-      }
-    }
-    if (total > best.total) {
-      best = { total, completedIds };
-    }
-  };
-  visit(0, []);
-  return best;
-}
-
-/** Length in trains of the longest continuous path over `routes` that uses no route twice. */
-export function longestTrail(routes: RouteDef[]): number {
-  const edgesByCity = new Map<string, Array<{ index: number; to: string; length: number }>>();
-  routes.forEach((route, index) => {
-    edgesByCity.set(route.from, [...(edgesByCity.get(route.from) ?? []), { index, to: route.to, length: route.length }]);
-    edgesByCity.set(route.to, [...(edgesByCity.get(route.to) ?? []), { index, to: route.from, length: route.length }]);
-  });
-  const used = routes.map(() => false);
-  let best = 0;
-  const walk = (city: string, total: number): void => {
-    best = Math.max(best, total);
-    for (const edge of edgesByCity.get(city) ?? []) {
-      if (!used[edge.index]) {
-        used[edge.index] = true;
-        walk(edge.to, total + edge.length);
-        used[edge.index] = false;
-      }
-    }
-  };
-  for (const city of edgesByCity.keys()) {
-    walk(city, 0);
-  }
-  return best;
-}
-
-/** Labels every city touched by `routes` with the id of its connected group. */
-function connectedCities(routes: RouteDef[]): Map<string, string> {
-  const parent = new Map<string, string>();
-  const find = (city: string): string => {
-    let root = city;
-    while (parent.get(root) !== root) {
-      root = parent.get(root)!;
-    }
-    return root;
-  };
-  for (const route of routes) {
-    for (const city of [route.from, route.to]) {
-      if (!parent.has(city)) {
-        parent.set(city, city);
-      }
-    }
-    parent.set(find(route.from), find(route.to));
-  }
-  return new Map([...parent.keys()].map((city) => [city, find(city)]));
 }

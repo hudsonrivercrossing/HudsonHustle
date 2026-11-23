@@ -4,8 +4,8 @@
 
 - **App:** `apps/web/` — React + Vite + TypeScript
 - **Server:** `apps/server/` — Fastify + Socket.IO, Postgres through Drizzle (migrations in `apps/server/drizzle/`)
-- **Rules engine:** `packages/game-core/` — pure, deterministic, no UI imports
-- **Map data:** `packages/game-data/` and `configs/hudson-hustle/`
+- **Rules engine:** `packages/game-core/` — pure, deterministic, no UI imports. `src/rules.ts` holds each rule once (points, payment, open routes, draws, final scoring); the reducer, the bots, the table and the server all call it. A rule copied anywhere else is a bug waiting to happen
+- **Map data:** `packages/game-data/` and `configs/hudson-hustle/`. Maps are checked when loaded (`map-validation.ts`), and `board-geometry.ts` is the one place that says where a route runs, how long each space is and what box a station name takes. Layout tests in `packages/game-data/tests/` run on every released map
 - **Styles:** `apps/web/src/styles/` — plain CSS with custom properties, one file per component
 - **Design tokens:** `apps/web/src/styles/theme.css` — the single source of truth
 

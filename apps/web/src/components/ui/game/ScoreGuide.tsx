@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from "react";
+import { ROUTE_POINTS } from "@hudson-hustle/game-core";
 import { Button } from "../primitives/Button";
 
 interface ScoreGuideProps {
@@ -7,14 +8,7 @@ interface ScoreGuideProps {
   tooltipLabel?: string;
 }
 
-const routePointRows = [
-  "1 train = 1 point",
-  "2 trains = 2 points",
-  "3 trains = 4 points",
-  "4 trains = 7 points",
-  "5 trains = 10 points",
-  "6 trains = 15 points"
-];
+const routePointRows = Object.entries(ROUTE_POINTS).map(([length, points]) => `${length} train${length === "1" ? "" : "s"} = ${points} point${points === 1 ? "" : "s"}`);
 
 export function ScoreGuide({ className, label = "Scoring", tooltipLabel }: ScoreGuideProps): JSX.Element {
   const panelId = useId();

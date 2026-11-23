@@ -12,13 +12,11 @@ import {
   drawBlindOrLastResort,
   findShortestPath,
   getAvailableRoutes,
-  longestTrail,
-  scoreTickets,
   type BotDecisionContext,
   type SeatTicket
 } from "./bot-shared.js";
+import { longestTrail, paymentSpend, routePoints, scoreTickets, stationCost as ruleStationCost } from "./rules.js";
 
-const routePoints: Record<number, number> = { 1: 1, 2: 2, 3: 4, 4: 7, 5: 10, 6: 15 };
 
 const tuning = {
   /** Path cost of borrowing a rival's route through a station, in train-lengths. */
@@ -288,8 +286,7 @@ function chooseTickets(board: Board, minimumKept: number): string[] {
 // Paying
 
 function canPay(counts: CardCounts, color: TrainCardColor, total: number, minimumLocomotives: number): boolean {
-  const locomotives = counts.get("locomotive") ?? 0;
-  return locomotives >= minimumLocomotives && (counts.get(color) ?? 0) + locomotives >= total;
+  return paymentSpend(counts.get(color) ?? 0, counts.get("locomotive") ?? 0, total, minimumLocomotives) !== null;
 }
 
 /** Cards a claim should have in hand before trying: a tunnel may ask for more than its length. */
@@ -368,7 +365,7 @@ function choosePaymentColor(board: Board, route: RouteDef, otherPlanned: RouteDe
 }
 
 function stationCost(board: Board): number {
-  return board.context.config.settings.stationsPerPlayer - board.me.stationsLeft + 1;
+  return ruleStationCost(board.context.config.settings.stationsPerPlayer, board.me.stationsLeft);
 }
 
 function chooseStationColor(board: Board, counts: CardCounts = board.counts): TrainCardColor | null {
@@ -397,7 +394,7 @@ function longestPathWith(board: Board, route: RouteDef): number {
 
 /** What a route outside the plan is worth: its points, plus its reach toward the longest-path bonus. */
 function spareValue(board: Board, route: RouteDef): number {
-  const points = routePoints[route.length] ?? route.length * 2;
+  const points = routePoints(route.length);
   if (board.rivalLongestPath - board.longestPath > tuning.longestPathReach) {
     return points;
   }
@@ -496,7 +493,7 @@ function chooseClosingAction(board: Board): GameAction | null {
     }
     const claim = { routeId: route.id, playerId: board.me.id, colorUsed: color, cardsSpent: [], tunnelExtraCost: 0 };
     const gain =
-      (routePoints[route.length] ?? route.length * 2) +
+      (routePoints(route.length)) +
       ticketTotal([...game.routeClaims, claim]) -
       before +
       longestBonus(longestPathWith(board, route)) -

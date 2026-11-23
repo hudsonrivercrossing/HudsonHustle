@@ -3,6 +3,7 @@ import { projectGeoDiagramCities } from "./cartography.js";
 import type { BoardPoint, GeoDiagramCitySeed } from "./cartography.js";
 import { activeHudsonHustleConfig, hudsonHustleConfigRegistry, hudsonHustleCurrentPointer } from "./config-registry.js";
 import type { BoardBackdrop, SnapshotMeta, StationAuthorityRef } from "./config-types.js";
+import { findSnapshotProblems } from "./map-validation.js";
 
 export interface HudsonHustleReleasedConfigSummary {
   configId: string;
@@ -14,6 +15,11 @@ export interface HudsonHustleReleasedConfigSummary {
 }
 
 function buildHudsonHustleMap(bundle: typeof activeHudsonHustleConfig): MapConfig {
+  const problems = findSnapshotProblems(bundle.map, bundle.tickets, bundle.rules);
+  if (problems.length > 0) {
+    throw new Error(`Map config "${bundle.configId}" cannot be used:\n- ${problems.join("\n- ")}`);
+  }
+
   const activeStations = bundle.map.stations.filter((station) => station.active);
   const boardFrame = {
     width: bundle.map.board.width,
@@ -38,6 +44,7 @@ function buildHudsonHustleMap(bundle: typeof activeHudsonHustleConfig): MapConfi
   return {
     id: bundle.map.mapId,
     name: bundle.map.name,
+    ...(bundle.map.typeLabelOverrides ? { typeLabelOverrides: bundle.map.typeLabelOverrides } : {}),
     settings: {
       trainsPerPlayer: bundle.rules.trainsPerPlayer,
       stationsPerPlayer: bundle.rules.stationsPerPlayer,
@@ -98,12 +105,21 @@ export const hudsonHustleReleasedConfigs: HudsonHustleReleasedConfigSummary[] = 
     routeCount: bundle.map.routes.length
   }));
 
+const builtMaps = new Map<string, MapConfig>();
+
+/** The playable map for a config. Built and checked once; later calls return the same object, so do not change it. */
 export function getHudsonHustleMapByConfigId(configId: string): MapConfig {
+  const built = builtMaps.get(configId);
+  if (built) {
+    return built;
+  }
   const bundle = getHudsonHustleRegisteredConfig(configId);
   if (!bundle) {
     throw new Error(`Unknown Hudson Hustle config: ${configId}`);
   }
-  return buildHudsonHustleMap(bundle);
+  const map = buildHudsonHustleMap(bundle);
+  builtMaps.set(configId, map);
+  return map;
 }
 
 export function getHudsonHustleVisualsByConfigId(configId: string) {
@@ -170,7 +186,7 @@ const { cities: hudsonHustleCities, bounds: hudsonHustleGeoBounds } = projectGeo
 export { hudsonHustleGeoBounds };
 export const hudsonHustleBackdrop: BoardBackdrop = activeHudsonHustleConfig.visuals.backdrop;
 
-export const hudsonHustleMap: MapConfig = buildHudsonHustleMap(activeHudsonHustleConfig);
+export const hudsonHustleMap: MapConfig = getHudsonHustleMapByConfigId(activeHudsonHustleConfig.configId);
 
 export const cardColorPalette: Record<string, string> = activeHudsonHustleConfig.visuals.palettes.cards;
 
@@ -192,6 +208,9 @@ export function resolveRouteDisplayState(
 
 export { createGeoProjector, projectGeoDiagramCities } from "./cartography.js";
 export { buildBasemapProtectedZones } from "./basemap-protection.js";
+export { findSnapshotProblems } from "./map-validation.js";
+export { labelAnchorPoint, labelBox, pathLength, pathNormal, pointAlong, routePath, routeSpaces } from "./board-geometry.js";
+export type { BoardBox, BoardPoint2, RouteSpace } from "./board-geometry.js";
 export { activeHudsonHustleConfig, hudsonHustleConfigRegistry, hudsonHustleCurrentPointer } from "./config-registry.js";
 export type {
   BasemapBoardFrame,

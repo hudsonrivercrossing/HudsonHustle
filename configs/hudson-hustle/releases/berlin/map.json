@@ -113,8 +113,8 @@
       "lon": 13.413,
       "boardX": 860,
       "boardY": 404,
-      "labelDx": 16,
-      "labelDy": -8,
+      "labelDx": 20,
+      "labelDy": 10,
       "labelAnchor": "start",
       "labelPreset": "top-near"
     },
@@ -232,7 +232,7 @@
       "lat": 52.567,
       "lon": 13.412,
       "boardX": 793,
-      "boardY": 117,
+      "boardY": 100,
       "labelDx": 0,
       "labelDy": -16,
       "labelAnchor": "middle",
@@ -261,8 +261,8 @@
       "tier": "anchor",
       "lat": 52.52,
       "lon": 13.387,
-      "boardX": 756,
-      "boardY": 356,
+      "boardX": 758,
+      "boardY": 350,
       "labelDx": -22,
       "labelDy": -28,
       "labelAnchor": "end",
@@ -276,8 +276,8 @@
       "tier": "first-ring",
       "lat": 52.515,
       "lon": 13.483,
-      "boardX": 1030,
-      "boardY": 410,
+      "boardX": 1012,
+      "boardY": 396,
       "labelDx": 16,
       "labelDy": -12,
       "labelAnchor": "start",
@@ -294,7 +294,7 @@
       "boardX": 600,
       "boardY": 701,
       "labelDx": 4,
-      "labelDy": -20,
+      "labelDy": -16,
       "labelAnchor": "end",
       "labelPreset": "bottom-near"
     },
@@ -308,9 +308,9 @@
       "lon": 13.424,
       "boardX": 767,
       "boardY": 628,
-      "labelDx": -14,
-      "labelDy": -10,
-      "labelAnchor": "end",
+      "labelDx": 4,
+      "labelDy": 30,
+      "labelAnchor": "start",
       "labelPreset": "top-left-near"
     },
     {
@@ -321,8 +321,8 @@
       "tier": "anchor",
       "lat": 52.509,
       "lon": 13.376,
-      "boardX": 730,
-      "boardY": 530,
+      "boardX": 738,
+      "boardY": 540,
       "labelDx": -18,
       "labelDy": 8,
       "labelAnchor": "end",
@@ -336,8 +336,8 @@
       "tier": "first-ring",
       "lat": 52.506,
       "lon": 13.449,
-      "boardX": 929,
-      "boardY": 491,
+      "boardX": 936,
+      "boardY": 498,
       "labelDx": 0,
       "labelDy": 18,
       "labelAnchor": "middle",
@@ -381,8 +381,8 @@
       "tier": "first-ring",
       "lat": 52.479,
       "lon": 13.352,
-      "boardX": 360,
-      "boardY": 650,
+      "boardX": 354,
+      "boardY": 648,
       "labelDx": -18,
       "labelDy": 8,
       "labelAnchor": "end",
@@ -447,7 +447,7 @@
       "to": "friedrichstrasse",
       "length": 2,
       "color": "rose",
-      "type": "Border Crossing",
+      "type": "ferry",
       "locomotiveCost": 1,
       "twinGroup": "hbf-friedrichstr",
       "waypoints": []
@@ -458,7 +458,7 @@
       "to": "friedrichstrasse",
       "length": 2,
       "color": "cobalt",
-      "type": "Border Crossing",
+      "type": "ferry",
       "locomotiveCost": 1,
       "twinGroup": "hbf-friedrichstr",
       "waypoints": [
@@ -474,7 +474,7 @@
       "to": "brandenburger-tor",
       "length": 2,
       "color": "crimson",
-      "type": "Border Crossing",
+      "type": "ferry",
       "locomotiveCost": 1,
       "waypoints": []
     },
@@ -563,7 +563,7 @@
       "to": "friedrichstrasse",
       "length": 3,
       "color": "amber",
-      "type": "Border Crossing",
+      "type": "ferry",
       "waypoints": [
         {
           "x": 725,
@@ -577,7 +577,7 @@
       "to": "schoenhauser-allee",
       "length": 2,
       "color": "rose",
-      "type": "Border Crossing",
+      "type": "ferry",
       "locomotiveCost": 1,
       "waypoints": []
     },
@@ -587,7 +587,7 @@
       "to": "hermannplatz",
       "length": 3,
       "color": "violet",
-      "type": "Border Crossing",
+      "type": "ferry",
       "locomotiveCost": 1,
       "waypoints": []
     },
@@ -615,7 +615,7 @@
       "to": "flughafen-ber",
       "length": 5,
       "color": "cobalt",
-      "type": "Border Crossing",
+      "type": "ferry",
       "locomotiveCost": 1,
       "waypoints": []
     },
@@ -625,7 +625,7 @@
       "to": "potsdamer-platz",
       "length": 2,
       "color": "ivory",
-      "type": "Border Crossing",
+      "type": "ferry",
       "waypoints": []
     },
     {
@@ -637,8 +637,8 @@
       "type": "normal",
       "waypoints": [
         {
-          "x": 758,
-          "y": 492
+          "x": 776,
+          "y": 500
         }
       ]
     },
@@ -648,9 +648,14 @@
       "to": "suedkreuz",
       "length": 3,
       "color": "gray",
-      "type": "Border Crossing",
+      "type": "ferry",
       "locomotiveCost": 1,
-      "waypoints": []
+      "waypoints": [
+        {
+          "x": 620,
+          "y": 596
+        }
+      ]
     },
     {
       "id": "schoenhauser-allee-pankow",
@@ -708,7 +713,7 @@
       "to": "flughafen-ber",
       "length": 4,
       "color": "obsidian",
-      "type": "Border Crossing",
+      "type": "ferry",
       "locomotiveCost": 1,
       "waypoints": [
         {
@@ -751,7 +756,7 @@
       "length": 3,
       "color": "gray",
       "locomotiveCost": 1,
-      "type": "Border Crossing",
+      "type": "ferry",
       "waypoints": []
     },
     {

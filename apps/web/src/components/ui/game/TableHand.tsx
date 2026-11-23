@@ -1,4 +1,4 @@
-import { trainCardColors, type TrainCard, type TrainCardColor, type TrainCardFace as Face } from "@hudson-hustle/game-core";
+import { paymentSpend as spendByRule, trainCardColors, type TrainCard, type TrainCardColor, type TrainCardFace as Face } from "@hudson-hustle/game-core";
 import { formatCardLabel } from "./CardSlot";
 import { LOCOMOTIVE_COLOR, TrainCardFace } from "./TrainCardFace";
 
@@ -21,18 +21,18 @@ export function countByFace(hand: TrainCard[]): Record<Face, number> {
   return counts;
 }
 
-/** Which cards a payment takes: the colour first, locomotives for the required ones and for any shortfall. */
+/** Which cards a payment takes, by the rule the game itself pays with. */
 export function paymentSpend(
   counts: Record<Face, number>,
   preview: NonNullable<TableHandProps["paymentPreview"]>
 ): Partial<Record<Face, number>> {
-  const minimumLocomotives = preview.minimumLocomotives ?? 0;
-  const baseNeed = Math.max(0, preview.totalCost - minimumLocomotives);
-  const coloured = Math.min(counts[preview.color], baseNeed);
-  const locomotives = minimumLocomotives + Math.max(0, baseNeed - coloured);
+  // A hand that cannot pay in full still shows what it would put toward the price.
+  const affordable = Math.min(preview.totalCost, counts[preview.color] + counts.locomotive);
+  const minimumLocomotives = Math.min(preview.minimumLocomotives ?? 0, counts.locomotive, affordable);
+  const spent = spendByRule(counts[preview.color], counts.locomotive, affordable, minimumLocomotives);
   const spend: Partial<Record<Face, number>> = {};
-  if (coloured > 0) spend[preview.color] = coloured;
-  if (locomotives > 0) spend.locomotive = locomotives;
+  if (spent && spent.colored > 0) spend[preview.color] = spent.colored;
+  if (spent && spent.locomotives > 0) spend.locomotive = spent.locomotives;
   return spend;
 }
 

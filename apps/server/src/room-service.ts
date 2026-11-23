@@ -1,5 +1,6 @@
 import { createHash, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
 import {
+  drawsRemaining,
   botDifficulties,
   chooseBotAction,
   type BotDifficulty,
@@ -487,24 +488,8 @@ function fromStoredRecord(record: StoredRoomRecord, history: StoredGameHistory):
   };
 }
 
-function timedAutoDrawsRemaining(game: GameState): number {
-  if (game.phase !== "main") {
-    return 0;
-  }
-
-  if (game.turn.stage === "idle") {
-    return 2;
-  }
-
-  if (game.turn.stage === "drawing" && game.turn.drawsTaken === 1 && !game.turn.tookFaceUpLocomotive) {
-    return 1;
-  }
-
-  return 0;
-}
-
 function hasEnoughBlindCardsForTimedAutoDraw(game: GameState): boolean {
-  return game.trainDeck.length + game.discardPile.length >= timedAutoDrawsRemaining(game);
+  return game.trainDeck.length + game.discardPile.length >= drawsRemaining(game);
 }
 
 export class RoomService {
@@ -1058,7 +1043,7 @@ export class RoomService {
         return;
       }
       const beforeGame = structuredClone(room.game) as GameState;
-      const autoDrawsRemaining = timedAutoDrawsRemaining(room.game);
+      const autoDrawsRemaining = drawsRemaining(room.game);
       if (room.turnTimeLimitSeconds <= 0 || room.game.phase !== "main" || autoDrawsRemaining === 0) {
         return;
       }
@@ -1184,7 +1169,7 @@ export class RoomService {
       return;
     }
 
-    if (room.game.phase !== "main" || timedAutoDrawsRemaining(room.game) === 0 || !hasEnoughBlindCardsForTimedAutoDraw(room.game)) {
+    if (room.game.phase !== "main" || drawsRemaining(room.game) === 0 || !hasEnoughBlindCardsForTimedAutoDraw(room.game)) {
       room.deadlineAt = null;
       this.onTimerChanged?.(room.roomCode, null);
       return;

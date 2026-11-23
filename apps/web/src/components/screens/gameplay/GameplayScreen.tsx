@@ -2,7 +2,9 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   getAffordableRouteColors,
   getAffordableStationColors,
+  canTakeMarketCard,
   getTicketProgress,
+  stationCost as ruleStationCost,
   type GameAction,
   type GameState,
   type MapConfig,
@@ -230,7 +232,7 @@ export function GameplayScreen({
   const currentRouteClaim = currentRoute ? game.routeClaims.find((claim) => claim.routeId === currentRoute.id) : null;
   const currentRouteOwner = currentRouteClaim ? game.players.find((player) => player.id === currentRouteClaim.playerId) : null;
   const currentCityOccupied = currentCity ? game.stations.some((station) => station.cityId === currentCity.id) : false;
-  const stationCost = config.settings.stationsPerPlayer - viewer.stationsLeft + 1;
+  const stationCost = ruleStationCost(config.settings.stationsPerPlayer, viewer.stationsLeft);
   const highlightedTicket = focusedTicket ?? pinnedTicket;
   const highlightedCityIds = highlightedTicket ? [highlightedTicket.from, highlightedTicket.to] : [];
   const cardPalette = visuals.palettes.cards;
@@ -381,7 +383,7 @@ export function GameplayScreen({
             deckCount={game.trainDeck.length}
             cardPalette={cardPalette}
             disabled={!canDrawCards(game, canAct)}
-            isMarketCardDisabled={(card) => game.turn.drawsTaken === 1 && card.color === "locomotive"}
+            isMarketCardDisabled={(card) => !canTakeMarketCard(game.turn, card)}
             onDrawFromMarket={(marketIndex) => {
               markSource(document.querySelectorAll('[data-draw-source="market"]')[marketIndex] ?? null);
               onAction({ type: "draw_card", source: "market", marketIndex });
