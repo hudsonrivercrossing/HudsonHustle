@@ -1,4 +1,4 @@
-/* The two families, served from this app. Each is one variable file covering every weight in use. */
+/* The families served from this app. Fraunces and IBM Plex Sans are each one variable file covering every weight in use. */
 @font-face {
   font-family: "Fraunces";
   src: url("/fonts/fraunces-latin.woff2") format("woff2");
@@ -13,6 +13,26 @@
   font-weight: 100 700;
   font-style: normal;
   font-display: swap;
+}
+
+/* Chinese station and place names on the Henan map, in LXGW WenKai. The files hold only the characters
+   that map uses (see public/fonts/README.md); the unicode-range keeps Latin text in the families above. */
+@font-face {
+  font-family: "LXGW WenKai";
+  src: url("/fonts/lxgw-wenkai-henan-regular.woff2") format("woff2");
+  font-weight: 100 500;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+00B7, U+2E80-9FFF;
+}
+
+@font-face {
+  font-family: "LXGW WenKai";
+  src: url("/fonts/lxgw-wenkai-henan-medium.woff2") format("woff2");
+  font-weight: 600 900;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+00B7, U+2E80-9FFF;
 }
 
 /* Until Fraunces arrives, headings are set in Georgia narrowed to Fraunces's width (measured: bold

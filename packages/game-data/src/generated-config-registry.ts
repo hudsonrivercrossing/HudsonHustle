@@ -12,6 +12,11 @@ import releaseBerlinMeta from "../../../configs/hudson-hustle/releases/berlin/me
 import releaseBerlinRules from "../../../configs/hudson-hustle/releases/berlin/rules.json" with { type: "json" };
 import releaseBerlinTickets from "../../../configs/hudson-hustle/releases/berlin/tickets.json" with { type: "json" };
 import releaseBerlinVisuals from "../../../configs/hudson-hustle/releases/berlin/visuals.json" with { type: "json" };
+import releaseHenanMap from "../../../configs/hudson-hustle/releases/henan/map.json" with { type: "json" };
+import releaseHenanMeta from "../../../configs/hudson-hustle/releases/henan/meta.json" with { type: "json" };
+import releaseHenanRules from "../../../configs/hudson-hustle/releases/henan/rules.json" with { type: "json" };
+import releaseHenanTickets from "../../../configs/hudson-hustle/releases/henan/tickets.json" with { type: "json" };
+import releaseHenanVisuals from "../../../configs/hudson-hustle/releases/henan/visuals.json" with { type: "json" };
 import releaseV03AtlanticHobokenMap from "../../../configs/hudson-hustle/releases/v0.3-atlantic-hoboken/map.json" with { type: "json" };
 import releaseV03AtlanticHobokenMeta from "../../../configs/hudson-hustle/releases/v0.3-atlantic-hoboken/meta.json" with { type: "json" };
 import releaseV03AtlanticHobokenRules from "../../../configs/hudson-hustle/releases/v0.3-atlantic-hoboken/rules.json" with { type: "json" };
@@ -49,6 +54,16 @@ export const generatedHudsonHustleConfigRegistry: Record<string, RegisteredConfi
     tickets: releaseBerlinTickets as SnapshotTickets,
     rules: releaseBerlinRules as SnapshotRules,
     visuals: releaseBerlinVisuals as SnapshotVisuals
+  },
+  "henan": {
+    configId: "henan",
+    configPath: "configs/hudson-hustle/releases/henan",
+    mode: "release",
+    meta: releaseHenanMeta as SnapshotMeta,
+    map: releaseHenanMap as SnapshotMap,
+    tickets: releaseHenanTickets as SnapshotTickets,
+    rules: releaseHenanRules as SnapshotRules,
+    visuals: releaseHenanVisuals as SnapshotVisuals
   },
   "v0.3-atlantic-hoboken": {
     configId: "v0.3-atlantic-hoboken",

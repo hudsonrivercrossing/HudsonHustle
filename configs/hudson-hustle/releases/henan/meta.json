@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "henan",
+  "gameId": "hudson-hustle",
+  "version": "v1",
+  "status": "released",
+  "basedOn": null,
+  "createdAt": "2026-11-23",
+  "updatedAt": "2026-11-23T00:00:00.000Z",
+  "summary": "Henan province: 18 cities and 7 sights and gateways on the 米-shaped rail hub at Zhengzhou, with Yellow River bridges and mountain tunnels as the special routes.",
+  "designGoals": [
+    "Keep the 米-shaped high-speed hub at Zhengzhou as the skeleton, with an outer ring of conventional lines so that going around Zhengzhou is a real choice.",
+    "Make the Yellow River the theme: every route between the north bank and the rest of the province is a Yellow River Bridge and needs a locomotive.",
+    "Put mountain tunnels where the Taihang, Xiao, Funiu, Song and Dabie ranges are.",
+    "Place stations in their real relative positions and name them in Chinese.",
+    "Reuse the standard rules unchanged; only the number of trains per player is set for this map."
+  ],
+  "changeSummary": [
+    "First version: 25 stations, 40 routes (5 Yellow River bridges, 8 mountain tunnels, 4 double routes), 6 long and 38 regular tickets, 30 trains per player.",
+    "map.json and tickets.json are written by scripts/config/henan-map-source.mjs; a ticket is worth the fewest spaces between its two stations.",
+    "The basemap is drawn by scripts/config/henan-basemap.mjs."
+  ],
+  "playtestFocus": [
+    "Whether Zhengzhou is still too strong a hub with four players.",
+    "Whether the scenic spurs (Red Flag Canal, Jigong Mountain, Shaolin Temple, Laojun Mountain) are worth the trip.",
+    "Whether five Yellow River bridges are enough for four players heading north.",
+    "Which stations and routes can be removed; notes.md marks the candidates."
+  ]
+}

@@ -123,6 +123,9 @@ export const LABEL_DEFAULT_DY = -14;
 
 /** Board units of width per character of a station name at the size the board draws it. */
 const LABEL_CHARACTER_WIDTH = 9;
+/** A Chinese, Japanese or Korean character is drawn as a full square, about as wide as the type is tall. */
+const LABEL_WIDE_CHARACTER_WIDTH = 17;
+const WIDE_CHARACTER = /[\u2e80-\u9fff\uf900-\ufaff\uff00-\uffef]/;
 const LABEL_ASCENT = 16;
 const LABEL_DESCENT = 5;
 
@@ -131,11 +134,20 @@ export function labelAnchorPoint(city: CityDef): BoardPoint2 {
   return { x: city.x + (city.labelDx ?? LABEL_DEFAULT_DX), y: city.y + (city.labelDy ?? LABEL_DEFAULT_DY) };
 }
 
+/** How wide a station name is drawn, in board units. */
+export function labelTextWidth(text: string): number {
+  let width = 0;
+  for (const character of text) {
+    width += WIDE_CHARACTER.test(character) ? LABEL_WIDE_CHARACTER_WIDTH : LABEL_CHARACTER_WIDTH;
+  }
+  return width;
+}
+
 /** The box a station's name takes up on the board. */
 export function labelBox(city: CityDef): BoardBox {
   const text = city.label ?? city.name;
   const anchorPoint = labelAnchorPoint(city);
-  const width = Math.max(44, text.length * LABEL_CHARACTER_WIDTH);
+  const width = Math.max(44, labelTextWidth(text));
   const anchor = city.labelAnchor ?? "start";
   const left = anchor === "end" ? anchorPoint.x - width : anchor === "middle" ? anchorPoint.x - width / 2 : anchorPoint.x;
   return { left, top: anchorPoint.y - LABEL_ASCENT, right: left + width, bottom: anchorPoint.y + LABEL_DESCENT };

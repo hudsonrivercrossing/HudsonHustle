@@ -183,7 +183,7 @@ export const playerColorPalette: Record<string, string> = activeHudsonHustleConf
 export { projectGeoDiagramCities } from "./cartography.js";
 export { buildBasemapProtectedZones } from "./basemap-protection.js";
 export { findSnapshotProblems } from "./map-validation.js";
-export { labelAnchorPoint, labelBox, pathLength, pathNormal, pointAlong, routePath, routeSpaces } from "./board-geometry.js";
+export { labelAnchorPoint, labelBox, labelTextWidth, pathLength, pathNormal, pointAlong, routePath, routeSpaces } from "./board-geometry.js";
 export type { BoardBox, BoardPoint2, RouteSpace } from "./board-geometry.js";
 export { activeHudsonHustleConfig, hudsonHustleConfigRegistry, hudsonHustleCurrentPointer } from "./config-registry.js";
 export type {

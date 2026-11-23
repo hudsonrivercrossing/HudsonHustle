@@ -69,8 +69,8 @@
   --space-panel-md: 16px;
 
   /* --- Font Families --- */
-  --font-display: "Fraunces", "Fraunces Fallback", Georgia, serif;
-  --font-body: "IBM Plex Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Fraunces", "LXGW WenKai", "Fraunces Fallback", Georgia, "Kaiti SC", "STKaiti", "KaiTi", "Songti SC", "Noto Serif CJK SC", serif;
+  --font-body: "IBM Plex Sans", "LXGW WenKai", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --font-setup: var(--font-body);
 
   /* --- Type Scale (major-second 1.125) --- */

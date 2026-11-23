@@ -18,6 +18,7 @@ import {
   getHudsonHustleMapByConfigId,
   findSnapshotProblems,
   labelBox,
+  labelTextWidth,
   routePath,
   routeSpaces
 } from "../src";
@@ -717,6 +718,18 @@ describe("New York Harbor layout", () => {
 
   it("does not let unrelated routes intersect away from shared stations", () => {
     expect(routeCrossings(hudsonHustleMap)).toEqual([]);
+  });
+});
+
+describe("station name width", () => {
+  it("gives a Chinese character about twice the room of a Latin letter", () => {
+    expect(labelTextWidth("Penn")).toBe(36);
+    expect(labelTextWidth("郑州")).toBe(34);
+    expect(labelTextWidth("三门峡")).toBeGreaterThan(labelTextWidth("Penn"));
+  });
+
+  it("sizes a mixed name character by character", () => {
+    expect(labelTextWidth("郑州 East")).toBe(labelTextWidth("郑州") + labelTextWidth(" East"));
   });
 });
 

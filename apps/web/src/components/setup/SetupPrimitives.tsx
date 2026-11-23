@@ -267,16 +267,42 @@ interface MapThumbnailProps {
   version?: string;
 }
 
+/** The picture and short name the map picker shows for each board. */
+const mapThumbnails = {
+  hudson: {
+    shortLabel: "NYC / NJ",
+    water: "M122 0 C104 36 109 72 96 104 C84 132 58 150 45 180 L0 180 L0 0 Z",
+    routes: ["M42 132 C93 102 132 83 177 92 C220 101 248 74 286 41", "M70 39 C113 54 132 92 163 116 C199 144 233 134 279 128", "M109 158 C125 118 145 84 171 53 C194 26 238 25 279 54"]
+  },
+  berlin: {
+    shortLabel: "Berlin",
+    water: "M0 94 C62 74 112 126 173 103 C218 86 244 75 320 94 L320 180 L0 180 Z",
+    routes: ["M38 128 C86 82 133 70 185 92 C225 108 248 83 286 48", "M54 48 C92 73 109 112 158 124 C204 136 235 122 286 137", "M89 151 C119 116 125 71 158 43 C188 18 226 28 265 63"]
+  },
+  henan: {
+    shortLabel: "河南",
+    water: "M0 60 C48 70 96 58 150 62 C204 66 238 58 270 40 C290 28 304 14 320 6 L320 30 C300 44 284 58 262 68 C226 82 190 80 150 78 C100 76 52 86 0 78 Z",
+    routes: ["M42 132 C93 112 132 96 177 92 C220 88 250 104 279 128", "M158 43 C166 62 172 78 177 92 C182 118 186 140 190 160", "M89 151 C120 128 150 108 177 92 C204 76 240 60 286 41"]
+  }
+} as const;
+
+function mapThumbnailKind(configId: string, mapName: string): keyof typeof mapThumbnails {
+  const text = `${configId} ${mapName}`.toLowerCase();
+  if (text.includes("berlin")) return "berlin";
+  if (text.includes("henan") || text.includes("河南")) return "henan";
+  return "hudson";
+}
+
 export function MapThumbnail({ configId, mapName, version }: MapThumbnailProps): JSX.Element {
-  const isBerlin = configId.toLowerCase().includes("berlin") || mapName.toLowerCase().includes("berlin");
-  const shortLabel = isBerlin ? "Berlin" : "NYC / NJ";
+  const kind = mapThumbnailKind(configId, mapName);
+  const { shortLabel, water, routes } = mapThumbnails[kind];
   return (
-    <div className={`map-thumbnail ${isBerlin ? "map-thumbnail--berlin" : "map-thumbnail--hudson"}`} aria-label={`${mapName} map preview`}>
+    <div className={`map-thumbnail map-thumbnail--${kind}`} aria-label={`${mapName} map preview`}>
       <svg viewBox="0 0 320 180" role="img" aria-hidden="true" focusable="false">
-        <path className="map-thumbnail__water" d={isBerlin ? "M0 94 C62 74 112 126 173 103 C218 86 244 75 320 94 L320 180 L0 180 Z" : "M122 0 C104 36 109 72 96 104 C84 132 58 150 45 180 L0 180 L0 0 Z"} />
-        <path className="map-thumbnail__route map-thumbnail__route--a" d={isBerlin ? "M38 128 C86 82 133 70 185 92 C225 108 248 83 286 48" : "M42 132 C93 102 132 83 177 92 C220 101 248 74 286 41"} />
-        <path className="map-thumbnail__route map-thumbnail__route--b" d={isBerlin ? "M54 48 C92 73 109 112 158 124 C204 136 235 122 286 137" : "M70 39 C113 54 132 92 163 116 C199 144 233 134 279 128"} />
-        <path className="map-thumbnail__route map-thumbnail__route--c" d={isBerlin ? "M89 151 C119 116 125 71 158 43 C188 18 226 28 265 63" : "M109 158 C125 118 145 84 171 53 C194 26 238 25 279 54"} />
+        <path className="map-thumbnail__water" d={water} />
+        <path className="map-thumbnail__route map-thumbnail__route--a" d={routes[0]} />
+        <path className="map-thumbnail__route map-thumbnail__route--b" d={routes[1]} />
+        <path className="map-thumbnail__route map-thumbnail__route--c" d={routes[2]} />
         <g className="map-thumbnail__nodes">
           <circle cx="42" cy="132" r="7" />
           <circle cx="89" cy="151" r="6" />

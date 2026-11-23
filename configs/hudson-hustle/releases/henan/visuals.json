@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "visualSetId": "henan-central-plains-v1-visuals",
+  "boardStyle": "graph-first-transit-nostalgia",
+  "theme": "warm-transit-nostalgia",
+  "backdropMode": "muted",
+  "boardLabelMode": "station-only",
+  "backdrop": {
+    "image": {
+      "href": "/basemaps/henan-central-plains-v1.webp",
+      "opacity": 1,
+      "preserveAspectRatio": "none"
+    },
+    "landAreas": [],
+    "waterAreas": [],
+    "shorelines": [],
+    "regionLabels": [],
+    "generatedBy": {
+      "recipeId": "henan-central-plains-v1",
+      "generatorVersion": "scripts/config/henan-basemap.mjs",
+      "acceptedAt": "2026-11-23",
+      "notes": [
+        "Drawn by script in board coordinates, not by an image model: province outline, Yellow River, Huai, Taihang, Funiu and Dabie ranges, neighbouring provinces and a few sights.",
+        "Rivers, ranges and names are part of the image; nothing in it is playable."
+      ]
+    }
+  },
+  "palettes": {
+    "cards": {
+      "crimson": "#c95d72",
+      "amber": "#d6a436",
+      "emerald": "#2f988c",
+      "cobalt": "#4769d0",
+      "violet": "#8659c4",
+      "obsidian": "#39414f",
+      "ivory": "#efe2c7",
+      "rose": "#db82a5",
+      "locomotive": "#f5efe2"
+    },
+    "players": {
+      "harbor-blue": "#0f7b86",
+      "signal-red": "#c44c2d",
+      "path-green": "#2f8b57",
+      "ferry-gold": "#b58b1f"
+    }
+  },
+  "notes": [
+    "The basemap is one image. Regenerate it with node scripts/config/henan-basemap.mjs after moving stations across the Yellow River line."
+  ]
+}

@@ -732,12 +732,20 @@ Action rows */
   background: linear-gradient(135deg, oklch(28.39% 0.0108 99.27), oklch(21.88% 0.0072 229.22));
 }
 
+.map-thumbnail--henan {
+  background: linear-gradient(135deg, color-mix(in oklch, var(--color-setup-token-brass) 22%, var(--color-canvas-base)), var(--color-canvas-deep));
+}
+
 .map-thumbnail__water {
   fill: oklch(64.9% 0.0643 228.11 / 0.24);
 }
 
 .map-thumbnail--berlin .map-thumbnail__water {
   fill: oklch(52.32% 0.0357 137.89 / 0.24);
+}
+
+.map-thumbnail--henan .map-thumbnail__water {
+  fill: color-mix(in oklch, var(--color-setup-departure-letter) 34%, transparent);
 }
 
 .map-thumbnail__route {

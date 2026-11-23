@@ -1,0 +1,316 @@
+{
+  "schemaVersion": 1,
+  "ticketSetId": "henan-v1-tickets",
+  "long": [
+    {
+      "id": "t-sanmenxia-shangqiu",
+      "from": "sanmenxia",
+      "to": "shangqiu",
+      "points": 15,
+      "notes": []
+    },
+    {
+      "id": "t-anyang-xinyang",
+      "from": "anyang",
+      "to": "xinyang",
+      "points": 14,
+      "notes": []
+    },
+    {
+      "id": "t-puyang-nanyang",
+      "from": "puyang",
+      "to": "nanyang",
+      "points": 14,
+      "notes": []
+    },
+    {
+      "id": "t-sanmenxia-xinyang",
+      "from": "sanmenxia",
+      "to": "xinyang",
+      "points": 14,
+      "notes": []
+    },
+    {
+      "id": "t-shangqiu-nanyang",
+      "from": "shangqiu",
+      "to": "nanyang",
+      "points": 12,
+      "notes": []
+    },
+    {
+      "id": "t-anyang-sanmenxia",
+      "from": "anyang",
+      "to": "sanmenxia",
+      "points": 14,
+      "notes": []
+    }
+  ],
+  "regular": [
+    {
+      "id": "t-zhengzhou-xinyang",
+      "from": "zhengzhou",
+      "to": "xinyang",
+      "points": 8,
+      "notes": []
+    },
+    {
+      "id": "t-zhengzhou-nanyang",
+      "from": "zhengzhou",
+      "to": "nanyang",
+      "points": 7,
+      "notes": []
+    },
+    {
+      "id": "t-zhengzhou-shangqiu",
+      "from": "zhengzhou",
+      "to": "shangqiu",
+      "points": 7,
+      "notes": []
+    },
+    {
+      "id": "t-zhengzhou-sanmenxia",
+      "from": "zhengzhou",
+      "to": "sanmenxia",
+      "points": 8,
+      "notes": []
+    },
+    {
+      "id": "t-kaifeng-zhoukou",
+      "from": "kaifeng",
+      "to": "zhoukou",
+      "points": 7,
+      "notes": []
+    },
+    {
+      "id": "t-xinxiang-shangqiu",
+      "from": "xinxiang",
+      "to": "shangqiu",
+      "points": 9,
+      "notes": []
+    },
+    {
+      "id": "t-jiaozuo-pingdingshan",
+      "from": "jiaozuo",
+      "to": "pingdingshan",
+      "points": 7,
+      "notes": []
+    },
+    {
+      "id": "t-jiyuan-zhengzhou",
+      "from": "jiyuan",
+      "to": "zhengzhou",
+      "points": 5,
+      "notes": []
+    },
+    {
+      "id": "t-anyang-kaifeng",
+      "from": "anyang",
+      "to": "kaifeng",
+      "points": 8,
+      "notes": []
+    },
+    {
+      "id": "t-hebi-jiaozuo",
+      "from": "hebi",
+      "to": "jiaozuo",
+      "points": 6,
+      "notes": []
+    },
+    {
+      "id": "t-puyang-xuchang",
+      "from": "puyang",
+      "to": "xuchang",
+      "points": 9,
+      "notes": []
+    },
+    {
+      "id": "t-xuchang-shangqiu",
+      "from": "xuchang",
+      "to": "shangqiu",
+      "points": 8,
+      "notes": []
+    },
+    {
+      "id": "t-pingdingshan-xinyang",
+      "from": "pingdingshan",
+      "to": "xinyang",
+      "points": 7,
+      "notes": []
+    },
+    {
+      "id": "t-zhumadian-nanyang",
+      "from": "zhumadian",
+      "to": "nanyang",
+      "points": 7,
+      "notes": []
+    },
+    {
+      "id": "t-sanmenxia-pingdingshan",
+      "from": "sanmenxia",
+      "to": "pingdingshan",
+      "points": 7,
+      "notes": []
+    },
+    {
+      "id": "t-sanmenxia-jiyuan",
+      "from": "sanmenxia",
+      "to": "jiyuan",
+      "points": 6,
+      "notes": []
+    },
+    {
+      "id": "t-shaolin-temple-kaifeng",
+      "from": "shaolin-temple",
+      "to": "kaifeng",
+      "points": 5,
+      "notes": []
+    },
+    {
+      "id": "t-yuntai-mountain-anyang",
+      "from": "yuntai-mountain",
+      "to": "anyang",
+      "points": 6,
+      "notes": []
+    },
+    {
+      "id": "t-red-flag-canal-xinxiang",
+      "from": "red-flag-canal",
+      "to": "xinxiang",
+      "points": 7,
+      "notes": []
+    },
+    {
+      "id": "t-laojun-mountain-zhengzhou",
+      "from": "laojun-mountain",
+      "to": "zhengzhou",
+      "points": 7,
+      "notes": []
+    },
+    {
+      "id": "t-laojun-mountain-nanyang",
+      "from": "laojun-mountain",
+      "to": "nanyang",
+      "points": 6,
+      "notes": []
+    },
+    {
+      "id": "t-xixia-pingdingshan",
+      "from": "xixia",
+      "to": "pingdingshan",
+      "points": 7,
+      "notes": []
+    },
+    {
+      "id": "t-jigong-mountain-luohe",
+      "from": "jigong-mountain",
+      "to": "luohe",
+      "points": 6,
+      "notes": []
+    },
+    {
+      "id": "t-lankao-xinxiang",
+      "from": "lankao",
+      "to": "xinxiang",
+      "points": 6,
+      "notes": []
+    },
+    {
+      "id": "t-luoyang-shangqiu",
+      "from": "luoyang",
+      "to": "shangqiu",
+      "points": 11,
+      "notes": []
+    },
+    {
+      "id": "t-xinxiang-nanyang",
+      "from": "xinxiang",
+      "to": "nanyang",
+      "points": 9,
+      "notes": []
+    },
+    {
+      "id": "t-kaifeng-xinyang",
+      "from": "kaifeng",
+      "to": "xinyang",
+      "points": 10,
+      "notes": []
+    },
+    {
+      "id": "t-jiyuan-xuchang",
+      "from": "jiyuan",
+      "to": "xuchang",
+      "points": 7,
+      "notes": []
+    },
+    {
+      "id": "t-jiaozuo-zhoukou",
+      "from": "jiaozuo",
+      "to": "zhoukou",
+      "points": 8,
+      "notes": []
+    },
+    {
+      "id": "t-hebi-luoyang",
+      "from": "hebi",
+      "to": "luoyang",
+      "points": 8,
+      "notes": []
+    },
+    {
+      "id": "t-luohe-puyang",
+      "from": "luohe",
+      "to": "puyang",
+      "points": 11,
+      "notes": []
+    },
+    {
+      "id": "t-red-flag-canal-zhengzhou",
+      "from": "red-flag-canal",
+      "to": "zhengzhou",
+      "points": 9,
+      "notes": []
+    },
+    {
+      "id": "t-shaolin-temple-xinyang",
+      "from": "shaolin-temple",
+      "to": "xinyang",
+      "points": 11,
+      "notes": []
+    },
+    {
+      "id": "t-yuntai-mountain-kaifeng",
+      "from": "yuntai-mountain",
+      "to": "kaifeng",
+      "points": 6,
+      "notes": []
+    },
+    {
+      "id": "t-jigong-mountain-zhengzhou",
+      "from": "jigong-mountain",
+      "to": "zhengzhou",
+      "points": 10,
+      "notes": []
+    },
+    {
+      "id": "t-xixia-luoyang",
+      "from": "xixia",
+      "to": "luoyang",
+      "points": 5,
+      "notes": []
+    },
+    {
+      "id": "t-zhumadian-kaifeng",
+      "from": "zhumadian",
+      "to": "kaifeng",
+      "points": 8,
+      "notes": []
+    },
+    {
+      "id": "t-zhoukou-luoyang",
+      "from": "zhoukou",
+      "to": "luoyang",
+      "points": 8,
+      "notes": []
+    }
+  ]
+}
