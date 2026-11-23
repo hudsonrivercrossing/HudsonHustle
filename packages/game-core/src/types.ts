@@ -141,8 +141,8 @@ export interface GameState {
   log: string[];
   /** Count of every entry ever appended to `log`, which itself keeps only the most recent ones. */
   logSequence: number;
-  /** The most recent things that happened, oldest first. Absent on states saved before events existed. */
-  events?: GameEvent[];
+  /** The most recent things that happened, oldest first. */
+  events: GameEvent[];
   /**
    * Every change to the board, in order, for the whole game. Unlike `events` this is never
    * trimmed: it is what a replay steps through, and a full game has at most a few dozen entries.

@@ -37,16 +37,15 @@ function invariant(condition: unknown, message: string): asserts condition {
 const VISIBLE_LOG_LENGTH = 18;
 
 function appendLog(state: GameState, message: string): void {
-  state.logSequence = (state.logSequence ?? state.log.length) + 1;
+  state.logSequence += 1;
   state.log = [...state.log, message].slice(-VISIBLE_LOG_LENGTH);
 }
 
 const RECENT_EVENT_LIMIT = 32;
 
 function recordEvent(state: GameState, event: GameEventInput): void {
-  const events = state.events ?? [];
-  const seq = (events.at(-1)?.seq ?? 0) + 1;
-  state.events = [...events, { ...event, seq } as GameEvent].slice(-RECENT_EVENT_LIMIT);
+  const seq = (state.events.at(-1)?.seq ?? 0) + 1;
+  state.events = [...state.events, { ...event, seq } as GameEvent].slice(-RECENT_EVENT_LIMIT);
   // A game saved before moves were recorded has no list to extend; replay falls back to the final board.
   if (state.moves && isMove(event)) {
     state.moves = [...state.moves, event];
@@ -64,16 +63,16 @@ function isMove(event: GameEventInput): event is GameMove {
 }
 
 /** Events with a sequence number above `lastSeenSeq`, oldest first. */
-export function getEventsSince(game: { events?: GameEvent[] }, lastSeenSeq: number): GameEvent[] {
-  return (game.events ?? []).filter((event) => event.seq > lastSeenSeq);
+export function getEventsSince(game: { events: GameEvent[] }, lastSeenSeq: number): GameEvent[] {
+  return game.events.filter((event) => event.seq > lastSeenSeq);
 }
 
 /**
  * Log entries appended after `lastSeenSequence`. Comparing `log.length` cannot do this:
  * the log is trimmed, so its length stops growing once it is full.
  */
-export function getLogEntriesSince(game: { log: string[]; logSequence?: number }, lastSeenSequence: number): string[] {
-  const added = (game.logSequence ?? game.log.length) - lastSeenSequence;
+export function getLogEntriesSince(game: { log: string[]; logSequence: number }, lastSeenSequence: number): string[] {
+  const added = game.logSequence - lastSeenSequence;
   return added > 0 ? game.log.slice(-Math.min(added, game.log.length)) : [];
 }
 
@@ -465,7 +464,7 @@ export function reduceGame(state: GameState, untrustedAction: GameAction, config
       player.trainsLeft -= route.length;
       nextState.discardPile.push(
         ...payment.spent.map((color, index) => ({
-          id: `spent-${route.id}-${index}-${nextState.logSequence ?? nextState.log.length}`,
+          id: `spent-${route.id}-${index}-${nextState.logSequence}`,
           color
         }))
       );
@@ -536,7 +535,7 @@ export function reduceGame(state: GameState, untrustedAction: GameAction, config
       player.stationsLeft -= 1;
       nextState.discardPile.push(
         ...payment.spent.map((color, index) => ({
-          id: `station-${action.cityId}-${index}-${nextState.logSequence ?? nextState.log.length}`,
+          id: `station-${action.cityId}-${index}-${nextState.logSequence}`,
           color
         }))
       );

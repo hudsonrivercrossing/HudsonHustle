@@ -3,11 +3,21 @@ import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import postgres from "postgres";
+import { restoreGameState, type GameState } from "@hudson-hustle/game-core";
 import { gameEventsTable, gameHistoryCheckpointsTable, gameSnapshotsTable, roomsTable, roomSeatsTable } from "../db/schema.js";
 import type { RoomRepository, SaveRoomOptions, StoredGameHistory, StoredGameHistoryUpdate, StoredRoomRecord } from "./types.js";
 
 /** `drizzle/` sits beside `src/` in development and beside `dist/` once built. */
 const migrationsFolder = fileURLToPath(new URL("../../drizzle", import.meta.url));
+
+/** A stored game is checked on the way in; one this server cannot read fails loudly instead of mid-turn. */
+function readStoredGame(roomCode: string, stored: unknown): GameState {
+  const game = restoreGameState(stored);
+  if (!game) {
+    throw new Error(`Room ${roomCode} has a stored game this server cannot read.`);
+  }
+  return game;
+}
 
 export class PostgresRoomRepository implements RoomRepository {
   private readonly sql: postgres.Sql;
@@ -168,7 +178,7 @@ export class PostgresRoomRepository implements RoomRepository {
       updatedAt: room.updatedAt.toISOString(),
       deadlineAt: room.deadlineAt ? room.deadlineAt.toISOString() : null,
       snapshotVersion: snapshot?.snapshotVersion ?? 0,
-      game: (snapshot?.snapshot ?? null) as StoredRoomRecord["game"],
+      game: snapshot ? readStoredGame(roomCode, snapshot.snapshot) : null,
       seats: seats.map((seat) => ({
         seatId: seat.seatId,
         playerId: seat.playerId,

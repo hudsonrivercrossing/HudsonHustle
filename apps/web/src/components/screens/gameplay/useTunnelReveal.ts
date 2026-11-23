@@ -9,7 +9,7 @@ import type { TunnelRevealView } from "../../ui/game";
 export function useTunnelReveal(game: GameState, config: MapConfig): { reveal: TunnelRevealView | null; dismiss: () => void } {
   const [reveal, setReveal] = useState<TunnelRevealView | null>(null);
   const lastSeq = useRef<number | null>(null);
-  const latestSeq = game.events?.at(-1)?.seq ?? 0;
+  const latestSeq = game.events.at(-1)?.seq ?? 0;
 
   useEffect(() => {
     const seenUpTo = lastSeq.current;
@@ -17,7 +17,7 @@ export function useTunnelReveal(game: GameState, config: MapConfig): { reveal: T
     if (seenUpTo === null) {
       return;
     }
-    const attempt = (game.events ?? [])
+    const attempt = game.events
       .filter((event) => event.seq > seenUpTo)
       .reverse()
       .find((event) => (event.type === "route_claimed" || event.type === "tunnel_failed") && event.tunnel);

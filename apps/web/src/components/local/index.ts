@@ -8,7 +8,6 @@ export {
   botPlayerIdsFromSavedGame,
   botPlayerIdsFromSeatIds,
   configIdForSavedMap,
-  readSavedGame,
   shuffleAvatars,
   type LocalStartSetup,
   type VisibilityMode
@@ -21,3 +20,5 @@ export {
   type LastLocalSetup,
   type LocalSaveMeta
 } from "./localSetupStorage";
+export { useLocalGame } from "./useLocalGame";
+export { isBotTurn, type LocalSession } from "./localSession";

@@ -35,7 +35,7 @@ export function useGameNotifications(game: GameState | null, config: MapConfig |
     };
   }, []);
 
-  const latestSeq = game ? game.events?.at(-1)?.seq ?? 0 : null;
+  const latestSeq = game ? game.events.at(-1)?.seq ?? 0 : null;
 
   useEffect(() => {
     if (!game || !config || latestSeq === null) {

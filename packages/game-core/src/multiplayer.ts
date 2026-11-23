@@ -63,7 +63,7 @@ export interface PublicGameState {
   finalRoundTriggeredBy: string | null;
   log: string[];
   logSequence: number;
-  events?: GameEvent[];
+  events: GameEvent[];
   moves?: GameMove[];
 }
 

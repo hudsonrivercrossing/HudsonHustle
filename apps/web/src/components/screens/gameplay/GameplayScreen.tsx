@@ -410,7 +410,7 @@ export function GameplayScreen({
 
       <TurnAnnouncement
         active={announceTurn && canAct && game.phase === "main" && !privateInfoHidden}
-        turnKey={`${game.activePlayerIndex}:${game.events?.filter((event) => event.type === "turn_started").at(-1)?.seq ?? 0}`}
+        turnKey={`${game.activePlayerIndex}:${game.events.filter((event) => event.type === "turn_started").at(-1)?.seq ?? 0}`}
         color={playerPalette[viewer.color]}
       />
       {tunnel.reveal ? <TunnelRevealMoment reveal={tunnel.reveal} cardPalette={cardPalette} onDone={tunnel.dismiss} /> : null}

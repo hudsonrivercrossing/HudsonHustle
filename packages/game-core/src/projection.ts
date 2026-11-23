@@ -34,8 +34,8 @@ export function toPublicGameState(game: GameState): PublicGameState {
     finalRoundRemaining: game.finalRoundRemaining,
     finalRoundTriggeredBy: game.finalRoundTriggeredBy,
     log: game.log,
-    logSequence: game.logSequence ?? game.log.length,
-    events: game.events ?? [],
+    logSequence: game.logSequence,
+    events: game.events,
     moves: game.moves
   };
 }
@@ -107,8 +107,8 @@ export function fromPlayerView(game: PublicGameState, privateState: SeatPrivateS
     finalRoundRemaining: game.finalRoundRemaining,
     finalRoundTriggeredBy: game.finalRoundTriggeredBy,
     log: game.log,
-    logSequence: game.logSequence ?? game.log.length,
-    events: game.events ?? [],
+    logSequence: game.logSequence,
+    events: game.events,
     moves: game.moves
   };
 }

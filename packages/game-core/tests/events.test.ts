@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getEventsSince, reduceGame, startGame } from "../src/game";
+import { restoreGameState } from "../src/restore";
 import { fromPlayerView, runBotTurns, toPrivateState, toPublicGameState } from "../src/projection";
 import type { GameEvent, GameState } from "../src/types";
 import { hudsonHustleMap } from "../../game-data/src";
@@ -140,9 +141,10 @@ describe("game events", () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it("treats a state saved before events existed as having none", () => {
-    const legacy = mainPhaseState();
-    delete (legacy as Partial<GameState>).events;
+  it("restores a state saved before events existed as having none", () => {
+    const stored = JSON.parse(JSON.stringify(mainPhaseState())) as Record<string, unknown>;
+    delete stored.events;
+    const legacy = restoreGameState(stored)!;
     expect(getEventsSince(legacy, 0)).toEqual([]);
     const next = reduceGame(legacy, { type: "draw_card", source: "deck" }, hudsonHustleMap);
     expect(next.events).toHaveLength(1);
