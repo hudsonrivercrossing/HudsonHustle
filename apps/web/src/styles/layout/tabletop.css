@@ -103,6 +103,11 @@
   box-shadow: none;
 }
 
+/* The chat keeps its frame, so it needs its own inset. */
+.tabletop .tabletop__side > .chat-panel-dock {
+  padding: var(--space-stack-md);
+}
+
 .tabletop__board {
   grid-area: board;
   position: relative;
