@@ -183,7 +183,7 @@ scripts/
 - working branches
   - branch off `main`
   - open PRs into `main`; CI and a Vercel preview run on every PR
-  - merging is the release: there is no staging backend, and PR previews have no API configured, so they cover local play only
+  - merging is the release: there is no staging backend, and PR previews talk to the production API
 
 ## Working In This Repo
 - Keep game rules in shared code, not in React components.

@@ -15,6 +15,17 @@ describe("createCorsOriginMatcher", () => {
     expect(allowFallbackLocal).toBe(true);
     expect(blockOther).toBe(false);
   });
+
+  it("admits one project's preview deployments and not another project's", async () => {
+    const matcher = createCorsOriginMatcher(["https://hudson-hustle.vercel.app", "https://hudson-hustle-*-djfan1s-projects.vercel.app"]);
+
+    expect(await resolveOriginCheck(matcher, "https://hudson-hustle.vercel.app")).toBe(true);
+    expect(await resolveOriginCheck(matcher, "https://hudson-hustle-git-some-branch-djfan1s-projects.vercel.app")).toBe(true);
+    expect(await resolveOriginCheck(matcher, "https://hudson-hustle-2y4znxuqq-djfan1s-projects.vercel.app")).toBe(true);
+    expect(await resolveOriginCheck(matcher, "https://other-app-djfan1s-projects.vercel.app")).toBe(false);
+    expect(await resolveOriginCheck(matcher, "https://hudson-hustle-abc-someone-else.vercel.app")).toBe(false);
+    expect(await resolveOriginCheck(matcher, "https://hudson-hustle-x-djfan1s-projects.vercel.app.evil.example")).toBe(false);
+  });
 });
 
 describe("createSocketIoCorsOriginMatcher", () => {

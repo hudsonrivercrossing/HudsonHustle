@@ -14,7 +14,7 @@ One branch, one environment:
 - working branches
   - short-lived branches from `main`
   - open PRs back into `main`
-  - run CI and get a Vercel preview without a backend
+  - run CI and get a Vercel preview that talks to the production API
 
 There is no staging backend. The `develop` branch and the Railway `develop` environment were removed on 2026-11-22: the staging service had been offline since June and nothing was validated there. Merging to `main` is the release.
 
@@ -56,7 +56,7 @@ Recommended production values:
 - `VITE_API_BASE_URL=https://api.<your-domain>`
 - `VITE_WS_URL=https://api.<your-domain>`
 
-Preview deployments have no API values set, so a PR preview covers local play only. To try online play from a preview, set the two variables for the Preview environment and add the preview origin to the API's `CORS_ORIGIN`.
+Preview deployments use the same two values for every branch, so a PR preview talks to the production API and its rooms are real production rooms.
 
 ### Vercel Git Deployment
 - project: `hudson-hustle`
@@ -85,7 +85,8 @@ The server is deployed from the repo root with [railway.json](../../../railway.j
 
 Recommended production values:
 - `PORT` is managed by Railway
-- `CORS_ORIGIN=https://<your-vercel-domain>`
+- `CORS_ORIGIN=https://<your-vercel-domain>,https://<project>-*-<team>.vercel.app`
+  - a comma-separated list; `*` matches any run of characters, so the second entry admits this project's preview deployments and nobody else's
 - `DATABASE_URL=<Railway Postgres connection string>`
 
 ### Railway Native Deployment
