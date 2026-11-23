@@ -1,5 +1,4 @@
 import { trainCardColors, type GameAction, type MapConfig, type RouteDef, type TrainCard, type TrainCardColor } from "./types.js";
-import type { PublicGameState } from "./multiplayer.js";
 import { chooseHardAction } from "./bot-hard.js";
 import {
   canAffordRoute,
@@ -9,6 +8,7 @@ import {
   drawBlindOrLastResort,
   findShortestPath,
   getAvailableRoutes,
+  plainRouteCost,
   type BotDecisionContext,
   type SeatTicket
 } from "./bot-shared.js";
@@ -26,10 +26,28 @@ interface RouteDemand {
   route: RouteDef;
   score: number;
   ticketIds: Set<string>;
+  tickets: Set<SeatTicket>;
 }
 
-/** Above this many cards even the easy bot stops waiting for its ticket routes and builds something. */
+/** With this many cards and still nothing on its ticket to build, the easy bot builds something anyway. */
 const EASY_HAND_LIMIT = 12;
+
+const standardTuning = {
+  /** While tickets are unfinished, cards are saved for them until the hand is this big. */
+  handLimit: 18,
+  /** With every ticket settled, the hand is spent on any route once it is this big. */
+  settledHandLimit: 8,
+  /** With every ticket settled, routes this long are built as soon as the hand can pay for them. */
+  spareMinLength: 3,
+  /** More tickets are drawn while at least this many trains are left... */
+  ticketDrawMinTrains: 4,
+  /** ...and fewer than this many tickets are held. */
+  ticketDrawMaxHeld: 8,
+  /** How much a ticket's points count against the trains its path costs when choosing tickets. */
+  ticketPointWeight: 2,
+  drawnTicketPointWeight: 12,
+  ticketTrainWeight: 3
+};
 
 export function chooseBotAction(context: BotDecisionContext): GameAction {
   const difficulty = context.difficulty ?? "standard";
@@ -41,28 +59,28 @@ export function chooseBotAction(context: BotDecisionContext): GameAction {
 }
 
 /**
- * A beginner: keeps three opening tickets, always the ones worth most, draws only from the deck,
- * builds along its tickets, and lets about every other turn it could have built on go by.
+ * A beginner. It acts every turn, but short-sightedly: it keeps three opening tickets (one more
+ * than it can comfortably build), draws only from the deck, works on one ticket at a time, and
+ * builds the smallest route it can pay for whenever that ticket is done or its hand has filled up.
+ * It never builds a station, and never thinks about the longest route or the end of the game.
  */
 function chooseEasyAction(context: BotDecisionContext): GameAction {
-  const { config, game, privateState } = context;
+  const { game, privateState } = context;
   if (game.phase === "initialTickets") {
-    return { type: "select_initial_tickets", keptTicketIds: chooseDearestTickets(privateState.pendingTickets, 3) };
+    return { type: "select_initial_tickets", keptTicketIds: chooseCheapestTickets(privateState.pendingTickets, 3) };
   }
   if (game.phase === "ticketChoice") {
-    return { type: "keep_drawn_tickets", keptTicketIds: chooseDearestTickets(privateState.pendingTickets, 1) };
+    return { type: "keep_drawn_tickets", keptTicketIds: chooseCheapestTickets(privateState.pendingTickets, 1) };
   }
   if (game.phase !== "main") {
     throw new Error(`Unsupported bot phase: ${game.phase}`);
   }
 
   if (game.turn.stage === "idle") {
-    const demand = buildRouteDemand(context);
-    // Variety without randomness: the same state always hesitates, different states do not.
-    const hesitates = canDrawCard(game) && stateNumber(context) % 2 === 0;
+    const demand = focusOnDearestTicket(buildRouteDemand(context));
     // With no ticket route left to build, or a hand too big to keep growing, any route will do.
     const anyRouteWillDo = demand.length === 0 || privateState.hand.length >= EASY_HAND_LIMIT || !canDrawCard(game);
-    const claim = hesitates ? null : chooseTicketAlignedClaim(context, demand) ?? (anyRouteWillDo ? chooseShortestClaim(context) : null);
+    const claim = chooseTicketAlignedClaim(context, demand) ?? (anyRouteWillDo ? chooseShortestClaim(context) : null);
     if (claim) {
       return claim;
     }
@@ -70,17 +88,17 @@ function chooseEasyAction(context: BotDecisionContext): GameAction {
   return drawBlindOrLastResort(context);
 }
 
-/** A number that differs from one game state to the next but is always the same for the same state. */
-function stateNumber(context: BotDecisionContext): number {
-  const { game, privateState } = context;
-  const mixed = game.logSequence * 31 + privateState.hand.length * 17 + game.routeClaims.length * 13 + game.trainDeckCount * 7 + game.discardCount * 3;
-  return (mixed ^ (mixed >>> 3)) >>> 0;
+/** Only the dearest unfinished ticket that can still be built gets any attention. */
+function focusOnDearestTicket(demand: RouteDemand[]): RouteDemand[] {
+  const tickets = new Map(demand.flatMap((entry) => [...entry.tickets].map((ticket) => [ticket.id, ticket] as const)));
+  const dearest = [...tickets.values()].sort((left, right) => right.points - left.points || left.id.localeCompare(right.id))[0];
+  return dearest ? demand.filter((entry) => entry.ticketIds.has(dearest.id)) : [];
 }
 
-/** Beginners go for the big numbers: the tickets worth most, whatever they take to build. */
-function chooseDearestTickets(tickets: SeatTicket[], keepCount: number): string[] {
+/** Beginners shy away from the big tickets: the ones worth least look the easiest. */
+function chooseCheapestTickets(tickets: SeatTicket[], keepCount: number): string[] {
   return [...tickets]
-    .sort((left, right) => right.points - left.points || left.id.localeCompare(right.id))
+    .sort((left, right) => left.points - right.points || left.id.localeCompare(right.id))
     .slice(0, keepCount)
     .map((ticket) => ticket.id);
 }
@@ -95,23 +113,26 @@ function chooseShortestClaim(context: BotDecisionContext): GameAction | null {
   return candidates[0] ? { type: "claim_route", routeId: candidates[0].route.id, color: candidates[0].color } : null;
 }
 
+/**
+ * A steady player: keeps two opening tickets it has the trains for, plans each one through the
+ * routes it already owns, builds along those plans and saves its cards for them. Once its tickets
+ * are settled it draws more, whether or not there is time left to build them. It does not use
+ * stations, reserve cards between routes, cushion tunnels, chase the longest route or time the
+ * end of the game; those are the hard bot's edge.
+ */
 function chooseStandardAction(context: BotDecisionContext): GameAction {
   if (context.game.phase === "initialTickets") {
     return {
       type: "select_initial_tickets",
-      keptTicketIds: chooseTicketSet(context.config, context.config.routes, context.privateState.pendingTickets, 2)
+      keptTicketIds: chooseTicketSet(context.config, context.config.routes, plainRouteCost, context.privateState.pendingTickets, 2, ownTrainsLeft(context), standardTuning.ticketPointWeight)
     };
   }
 
   if (context.game.phase === "ticketChoice") {
+    const network = readNetwork(context);
     return {
       type: "keep_drawn_tickets",
-      keptTicketIds: chooseTicketSet(
-        context.config,
-        getTicketChoiceRoutes(context.config, context.game, context.privateState.playerId),
-        context.privateState.pendingTickets,
-        1
-      )
+      keptTicketIds: chooseTicketSet(context.config, network.routes, network.cost, context.privateState.pendingTickets, 1, ownTrainsLeft(context), standardTuning.drawnTicketPointWeight)
     };
   }
 
@@ -121,7 +142,17 @@ function chooseStandardAction(context: BotDecisionContext): GameAction {
 
   const demand = buildRouteDemand(context);
   if (context.game.turn.stage === "idle") {
-    const claim = chooseTicketAlignedClaim(context, demand) ?? chooseFallbackClaim(context, demand);
+    const settled = demand.length === 0;
+    const aligned = chooseTicketAlignedClaim(context, demand, true);
+    if (!aligned && settled && wantsMoreTickets(context)) {
+      return { type: "draw_tickets" };
+    }
+    // Off-plan routes only once the tickets are settled, and then only ones worth saving up for,
+    // unless the hand is full or nothing can be drawn.
+    const handLimit = settled ? standardTuning.settledHandLimit : standardTuning.handLimit;
+    const mustBuild = context.privateState.hand.length >= handLimit || !canDrawCard(context.game);
+    const spareMinLength = mustBuild ? 1 : settled ? standardTuning.spareMinLength : Number.POSITIVE_INFINITY;
+    const claim = aligned ?? chooseFallbackClaim(context, demand, spareMinLength);
     if (claim) {
       return claim;
     }
@@ -130,14 +161,49 @@ function chooseStandardAction(context: BotDecisionContext): GameAction {
   return chooseDrawAction(context, demand);
 }
 
-function chooseTicketSet(config: MapConfig, routes: RouteDef[], tickets: SeatTicket[], keepCount: number): string[] {
-  const plans = buildTicketPlans(config, routes, tickets);
+/** With its tickets settled and a few trains left, the standard bot asks for more. */
+function wantsMoreTickets(context: BotDecisionContext): boolean {
+  return (
+    context.game.regularTicketsCount > 0 &&
+    ownTrainsLeft(context) >= standardTuning.ticketDrawMinTrains &&
+    context.privateState.tickets.length < standardTuning.ticketDrawMaxHeld
+  );
+}
+
+function ownTrainsLeft(context: BotDecisionContext): number {
+  return context.game.players.find((player) => player.id === context.privateState.playerId)?.trainsLeft ?? Number.POSITIVE_INFINITY;
+}
+
+/** The routes a seat can plan over: open ones at their price, its own for nothing. */
+function readNetwork(context: BotDecisionContext): { routes: RouteDef[]; open: RouteDef[]; ownIds: Set<string>; cost: (route: RouteDef) => number } {
+  const ownIds = new Set(
+    context.game.routeClaims.filter((claim) => claim.playerId === context.privateState.playerId).map((claim) => claim.routeId)
+  );
+  const open = getAvailableRoutes(context.config, context.game);
+  return {
+    routes: open.concat(context.config.routes.filter((route) => ownIds.has(route.id))),
+    open,
+    ownIds,
+    cost: (route) => (ownIds.has(route.id) ? 0 : plainRouteCost(route))
+  };
+}
+
+function chooseTicketSet(
+  config: MapConfig,
+  routes: RouteDef[],
+  routeCost: (route: RouteDef) => number,
+  tickets: SeatTicket[],
+  keepCount: number,
+  trainBudget: number,
+  pointWeight: number
+): string[] {
+  const plans = buildTicketPlans(config, routes, routeCost, tickets);
   const selections = combinations(plans, keepCount);
 
   const bestSelection = selections
     .map((selection) => ({
       selection,
-      score: scoreTicketSelection(selection)
+      score: scoreTicketSelection(selection, routeCost, trainBudget, pointWeight)
     }))
     .sort((left, right) => {
       const score = right.score - left.score;
@@ -153,25 +219,38 @@ function chooseTicketSet(config: MapConfig, routes: RouteDef[], tickets: SeatTic
     .slice(0, keepCount);
 }
 
+/**
+ * The open routes the seat's unfinished tickets still need, most wanted first. A ticket with no
+ * path left, or one that needs more trains than the seat has, asks for nothing.
+ */
 function buildRouteDemand(context: BotDecisionContext): RouteDemand[] {
-  const availableRoutes = getAvailableRoutes(context.config, context.game);
+  const network = readNetwork(context);
   const incompleteTickets = context.privateState.tickets.filter((ticket) => !isTicketCompleted(context, ticket.from, ticket.to));
-  const plans = buildTicketPlans(context.config, availableRoutes, incompleteTickets);
+  const plans = buildTicketPlans(context.config, network.routes, network.cost, incompleteTickets);
   const demandByRoute = new Map<string, RouteDemand>();
+  const trainsLeft = ownTrainsLeft(context);
 
   for (const plan of plans) {
     const ticketWeight = Math.max(1, plan.ticket.points) * 14;
-    for (const [index, route] of plan.path.entries()) {
-      const progressBonus = Math.max(1, plan.path.length - index) * 3;
+    // Routes the seat already owns are part of the path but need no building.
+    const toBuild = plan.path.filter((route) => !network.ownIds.has(route.id));
+    if (toBuild.reduce((total, route) => total + route.length, 0) > trainsLeft) {
+      // Not enough trains left to finish this ticket: stop working on it.
+      continue;
+    }
+    for (const [index, route] of toBuild.entries()) {
+      const progressBonus = Math.max(1, toBuild.length - index) * 3;
       const tunnelPenalty = route.type === "tunnel" ? 10 : 0;
       const routeValue = ticketWeight + route.length * 4 + progressBonus - tunnelPenalty;
       const current = demandByRoute.get(route.id) ?? {
         route,
         score: 0,
-        ticketIds: new Set<string>()
+        ticketIds: new Set<string>(),
+        tickets: new Set<SeatTicket>()
       };
       current.score += routeValue;
       current.ticketIds.add(plan.ticket.id);
+      current.tickets.add(plan.ticket);
       demandByRoute.set(route.id, current);
     }
   }
@@ -190,12 +269,21 @@ function buildRouteDemand(context: BotDecisionContext): RouteDemand[] {
   });
 }
 
-function chooseTicketAlignedClaim(context: BotDecisionContext, demand: RouteDemand[]): GameAction | null {
+function chooseTicketAlignedClaim(context: BotDecisionContext, demand: RouteDemand[], keepLocomotives = false): GameAction | null {
+  const trainsLeft = context.game.players[context.game.activePlayerIndex]?.trainsLeft ?? 0;
+  // Locomotives another planned route cannot be built without are not spent as wild cards.
+  const handFor = (route: RouteDef): TrainCard[] => {
+    if (!keepLocomotives || route.locomotiveCost) {
+      return context.privateState.hand;
+    }
+    let owed = Math.max(0, ...demand.filter((entry) => entry.route.id !== route.id).map((entry) => entry.route.locomotiveCost ?? 0));
+    return context.privateState.hand.filter((card) => card.color !== "locomotive" || owed-- <= 0);
+  };
   const candidates = demand
     .map((entry) => ({
       route: entry.route,
       score: entry.score + entry.ticketIds.size * 18,
-      color: chooseAffordableColor(entry.route, context.privateState.hand, context.game.players[context.game.activePlayerIndex]?.trainsLeft ?? 0)
+      color: chooseAffordableColor(entry.route, handFor(entry.route), trainsLeft)
     }))
     .filter((candidate): candidate is { route: RouteDef; score: number; color: TrainCardColor } => candidate.color !== null)
     .sort((left, right) => {
@@ -218,9 +306,10 @@ function chooseTicketAlignedClaim(context: BotDecisionContext, demand: RouteDema
   };
 }
 
-function chooseFallbackClaim(context: BotDecisionContext, demand: RouteDemand[]): GameAction | null {
+function chooseFallbackClaim(context: BotDecisionContext, demand: RouteDemand[], minLength: number): GameAction | null {
   const fallbackBonus = new Map(demand.map((entry) => [entry.route.id, entry.score]));
   const candidates = getAvailableRoutes(context.config, context.game)
+    .filter((route) => route.length >= minLength)
     .map((route) => ({
       route,
       color: chooseAffordableColor(route, context.privateState.hand, context.game.players[context.game.activePlayerIndex]?.trainsLeft ?? 0),
@@ -249,6 +338,9 @@ function chooseFallbackClaim(context: BotDecisionContext, demand: RouteDemand[])
 
 function chooseDrawAction(context: BotDecisionContext, demand: RouteDemand[]): GameAction {
   const desiredColors = getDesiredColorScores(context, demand);
+  // A planned route that must be paid partly in locomotives makes a face-up one worth the whole draw.
+  const locomotivesHeld = countHand(context.privateState.hand).get("locomotive") ?? 0;
+  const owesLocomotives = demand.some((entry) => (entry.route.locomotiveCost ?? 0) > locomotivesHeld);
   const marketCandidates = context.game.market
     .map((card, marketIndex) => ({
       card,
@@ -256,7 +348,7 @@ function chooseDrawAction(context: BotDecisionContext, demand: RouteDemand[]): G
       score:
         card.color === "locomotive"
           ? context.game.turn.drawsTaken === 0
-            ? highestColorScore(desiredColors) * 0.9
+            ? highestColorScore(desiredColors) * (owesLocomotives ? 1.5 : 0.9)
             : Number.NEGATIVE_INFINITY
           : desiredColors.get(card.color as TrainCardColor) ?? 0
     }))
@@ -286,10 +378,6 @@ function getDesiredColorScores(context: BotDecisionContext, demand: RouteDemand[
   const counts = countHand(context.privateState.hand);
 
   for (const entry of demand) {
-    if (entry.route.type === "tunnel") {
-      continue;
-    }
-
     if (entry.route.color === "gray") {
       const grayColor = choosePreferredGrayColor(entry.route, context.privateState.hand, dominant);
       if (grayColor) {
@@ -381,32 +469,45 @@ function paymentWaste(route: RouteDef, color: TrainCardColor, hand: TrainCard[])
   return totalLocosUsed + Math.max(0, colored - baseNeed);
 }
 
-function buildTicketPlans(config: MapConfig, routes: RouteDef[], tickets: SeatTicket[]): TicketPlan[] {
+function buildTicketPlans(
+  config: MapConfig,
+  routes: RouteDef[],
+  routeCost: (route: RouteDef) => number,
+  tickets: SeatTicket[]
+): TicketPlan[] {
   return [...tickets]
     .map((ticket) => {
-      const path = findShortestPath(config, routes, ticket.from, ticket.to);
+      const path = findShortestPath(config, routes, ticket.from, ticket.to, routeCost);
       return {
         ticket,
         path,
-        pathCost: path.reduce((total, route) => total + route.length + (route.type === "tunnel" ? 2 : 0), 0),
+        pathCost: path.reduce((total, route) => total + routeCost(route), 0),
         cityIds: new Set(path.flatMap((route) => [route.from, route.to]))
       };
     })
     .sort((left, right) => right.ticket.points - left.ticket.points || left.ticket.id.localeCompare(right.ticket.id));
 }
 
-function scoreTicketSelection(selection: TicketPlan[]): number {
+function scoreTicketSelection(
+  selection: TicketPlan[],
+  routeCost: (route: RouteDef) => number,
+  trainBudget: number,
+  pointWeight: number
+): number {
   if (selection.some((plan) => plan.path.length === 0)) {
     return Number.NEGATIVE_INFINITY;
   }
 
-  let score = 0;
+  // Tickets that together need more trains than the seat has cannot all be finished.
+  const toBuild = new Map(selection.flatMap((plan) => plan.path.filter((route) => routeCost(route) > 0).map((route) => [route.id, route.length] as const)));
+  const trains = [...toBuild.values()].reduce((total, length) => total + length, 0);
+  let score = trains > trainBudget ? -1000 * (trains - trainBudget) : 0;
   const routeCounts = new Map<string, number>();
   const cityCounts = new Map<string, number>();
 
   for (const plan of selection) {
-    score += plan.ticket.points * 12;
-    score -= plan.pathCost * 3;
+    score += plan.ticket.points * pointWeight;
+    score -= plan.pathCost * standardTuning.ticketTrainWeight;
 
     for (const route of plan.path) {
       routeCounts.set(route.id, (routeCounts.get(route.id) ?? 0) + 1);
@@ -475,16 +576,4 @@ function isTicketCompleted(context: BotDecisionContext, from: string, to: string
   }
 
   return false;
-}
-
-function getTicketChoiceRoutes(config: MapConfig, game: PublicGameState, playerId: string | null): RouteDef[] {
-  if (!playerId) {
-    return getAvailableRoutes(config, game);
-  }
-
-  const claimedByPlayer = new Set(
-    game.routeClaims.filter((claim) => claim.playerId === playerId).map((claim) => claim.routeId)
-  );
-
-  return getAvailableRoutes(config, game).concat(config.routes.filter((route) => claimedByPlayer.has(route.id)));
 }

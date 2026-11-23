@@ -267,6 +267,31 @@ export function scoreTickets(
   return best;
 }
 
+/** Length in trains of the longest continuous path over `routes` that uses no route twice. */
+export function longestTrail(routes: RouteDef[]): number {
+  const edgesByCity = new Map<string, Array<{ index: number; to: string; length: number }>>();
+  routes.forEach((route, index) => {
+    edgesByCity.set(route.from, [...(edgesByCity.get(route.from) ?? []), { index, to: route.to, length: route.length }]);
+    edgesByCity.set(route.to, [...(edgesByCity.get(route.to) ?? []), { index, to: route.from, length: route.length }]);
+  });
+  const used = routes.map(() => false);
+  let best = 0;
+  const walk = (city: string, total: number): void => {
+    best = Math.max(best, total);
+    for (const edge of edgesByCity.get(city) ?? []) {
+      if (!used[edge.index]) {
+        used[edge.index] = true;
+        walk(edge.to, total + edge.length);
+        used[edge.index] = false;
+      }
+    }
+  };
+  for (const city of edgesByCity.keys()) {
+    walk(city, 0);
+  }
+  return best;
+}
+
 /** Labels every city touched by `routes` with the id of its connected group. */
 function connectedCities(routes: RouteDef[]): Map<string, string> {
   const parent = new Map<string, string>();

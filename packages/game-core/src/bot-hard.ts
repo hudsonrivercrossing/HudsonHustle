@@ -1,7 +1,8 @@
-// The "hard" bot. Where the standard bot follows a fresh shortest path each turn and claims
-// whatever it can afford, this one keeps a plan: it routes every ticket through the network it
-// already owns, saves cards for the routes that plan needs, borrows a rival's link with a station
-// when that is the way to finish a ticket, and spends its last turn on whatever scores most.
+// The "hard" bot. The standard bot also plans its tickets through its own network, but this one
+// plans them together: it weighs which tickets are worth their trains, saves cards for the routes
+// the plan needs, borrows a rival's link with a station when that is the way to finish a ticket,
+// builds toward the longest path with its spare trains, and spends its last turn on whatever
+// scores most.
 import { trainCardColors, type GameAction, type RouteDef, type TrainCardColor, type TrainCardFace } from "./types.js";
 import type { PublicPlayerState } from "./multiplayer.js";
 import {
@@ -11,6 +12,7 @@ import {
   drawBlindOrLastResort,
   findShortestPath,
   getAvailableRoutes,
+  longestTrail,
   scoreTickets,
   type BotDecisionContext,
   type SeatTicket
@@ -32,7 +34,11 @@ const tuning = {
   /** Stop drawing tickets once this many are held. */
   ticketDrawMaxHeld: 7,
   /** Off-plan routes shorter than this are not worth a turn while tickets are unfinished. */
-  spareClaimMinLength: 3
+  spareClaimMinLength: 3,
+  /** What one more train on the longest path is worth, in points, while that bonus is in reach. */
+  longestPathTrainValue: 1.5,
+  /** The longest-path bonus counts as in reach while no rival's path is this much longer. */
+  longestPathReach: 8
 };
 
 type CardCounts = Map<TrainCardFace, number>;
@@ -51,6 +57,9 @@ interface Board {
   closing: boolean;
   /** True when a rival could end the game before the bot's turn after next. */
   rivalNearEnd: boolean;
+  /** The bot's longest continuous path, and the longest any rival has. */
+  longestPath: number;
+  rivalLongestPath: number;
 }
 
 interface StationStep {
@@ -124,6 +133,15 @@ function readBoard(context: BotDecisionContext): Board | null {
     }
   }
   const openRoutes = getAvailableRoutes(config, game);
+  const rivalLongestPath = Math.max(
+    0,
+    ...game.players
+      .filter((player) => player.id !== me.id)
+      .map((player) => {
+        const ids = new Set(game.routeClaims.filter((claim) => claim.playerId === player.id).map((claim) => claim.routeId));
+        return longestTrail(rivalRoutes.filter((route) => ids.has(route.id)));
+      })
+  );
   return {
     context,
     me,
@@ -135,7 +153,9 @@ function readBoard(context: BotDecisionContext): Board | null {
     rivalIds: new Set(rivalRoutes.map((route) => route.id)),
     stationOwnerByCity: new Map(game.stations.map((station) => [station.cityId, station.playerId])),
     closing: game.finalRoundRemaining !== null,
-    rivalNearEnd: game.players.some((player) => player.id !== me.id && player.trainsLeft <= tuning.rivalNearEnd)
+    rivalNearEnd: game.players.some((player) => player.id !== me.id && player.trainsLeft <= tuning.rivalNearEnd),
+    longestPath: longestTrail(ownRoutes),
+    rivalLongestPath
   };
 }
 
@@ -369,6 +389,21 @@ function chooseStationColor(board: Board, counts: CardCounts = board.counts): Tr
 // ---------------------------------------------------------------------------------------------
 // Turn choices
 
+/** The bot's longest path once `route` is added to its network. */
+function longestPathWith(board: Board, route: RouteDef): number {
+  const touchesNetwork = board.ownRoutes.some((own) => [own.from, own.to].some((city) => city === route.from || city === route.to));
+  return touchesNetwork ? longestTrail([...board.ownRoutes, route]) : Math.max(board.longestPath, route.length);
+}
+
+/** What a route outside the plan is worth: its points, plus its reach toward the longest-path bonus. */
+function spareValue(board: Board, route: RouteDef): number {
+  const points = routePoints[route.length] ?? route.length * 2;
+  if (board.rivalLongestPath - board.longestPath > tuning.longestPathReach) {
+    return points;
+  }
+  return points + (longestPathWith(board, route) - board.longestPath) * tuning.longestPathTrainValue;
+}
+
 function wouldEndOwnGame(board: Board, route: RouteDef): boolean {
   return board.me.trainsLeft - route.length <= 2;
 }
@@ -421,7 +456,8 @@ function chooseSpareClaim(board: Board, plan: Plan): GameAction | null {
     .filter((route) => settled || (route.length >= tuning.spareClaimMinLength && board.me.trainsLeft - plan.trains - route.length >= 1 && !wouldEndOwnGame(board, route)))
     .map((route) => ({ route, color: choosePaymentColor(spareBoard, route, [], cardsWanted(board, route)) }))
     .filter((option): option is { route: RouteDef; color: TrainCardColor } => option.color !== null)
-    .sort((left, right) => right.route.length - left.route.length || left.route.id.localeCompare(right.route.id));
+    .map((option) => ({ ...option, value: spareValue(board, option.route) }))
+    .sort((left, right) => right.value - left.value || left.route.id.localeCompare(right.route.id));
   return options[0] ? { type: "claim_route", routeId: options[0].route.id, color: options[0].color } : null;
 }
 
@@ -444,6 +480,7 @@ function chooseClosingAction(board: Board): GameAction | null {
   const ticketTotal = (claims = game.routeClaims, stations = game.stations): number =>
     scoreTickets(config, claims, stations, board.me.id, privateState.tickets).total;
   const before = ticketTotal();
+  const longestBonus = (length: number): number => (length > 0 && length >= board.rivalLongestPath ? config.settings.longestRouteBonus : 0);
   const deckCanReveal = game.trainDeckCount + game.discardCount > 0;
   let best: { action: GameAction; gain: number } | null = null;
   const consider = (action: GameAction, gain: number): void => {
@@ -458,7 +495,12 @@ function chooseClosingAction(board: Board): GameAction | null {
       continue;
     }
     const claim = { routeId: route.id, playerId: board.me.id, colorUsed: color, cardsSpent: [], tunnelExtraCost: 0 };
-    const gain = (routePoints[route.length] ?? route.length * 2) + ticketTotal([...game.routeClaims, claim]) - before;
+    const gain =
+      (routePoints[route.length] ?? route.length * 2) +
+      ticketTotal([...game.routeClaims, claim]) -
+      before +
+      longestBonus(longestPathWith(board, route)) -
+      longestBonus(board.longestPath);
     // A tunnel can ask for up to three more cards; without that cushion it may fail.
     const cushion = (board.counts.get(color) ?? 0) + (board.counts.get("locomotive") ?? 0) - route.length;
     const tunnelOdds = route.type !== "tunnel" || !deckCanReveal ? 1 : [0.45, 0.85, 0.98][cushion] ?? 1;
@@ -511,6 +553,8 @@ function chooseDraw(board: Board, plan: Plan): GameAction {
 function chooseSpareTargets(board: Board): RouteDef[] {
   return board.openRoutes
     .filter((route) => route.length <= board.me.trainsLeft)
-    .sort((left, right) => right.length - left.length || left.id.localeCompare(right.id))
-    .slice(0, 2);
+    .map((route) => ({ route, value: spareValue(board, route) }))
+    .sort((left, right) => right.value - left.value || left.route.id.localeCompare(right.route.id))
+    .slice(0, 2)
+    .map((entry) => entry.route);
 }

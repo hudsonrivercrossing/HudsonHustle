@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { botDifficulties, chooseBotAction, type BotDifficulty } from "../src/bot-policy";
 import { reduceGame, startGame } from "../src/game";
 import { chooseBotActionForActivePlayer, runBotTurns, toPrivateState, toPublicGameState } from "../src/projection";
-import type { GameAction, GameState, MapConfig, RouteDef, TicketDef, TrainCard } from "../src/types";
+import { trainCardColors, type GameAction, type GameState, type MapConfig, type RouteDef, type TicketDef, type TrainCard } from "../src/types";
 import { getHudsonHustleMapByConfigId, hudsonHustleMap } from "../../game-data/src";
 
 const berlinMap = getHudsonHustleMapByConfigId("berlin");
@@ -62,6 +62,19 @@ function cards(color: TrainCard["color"], count: number): TrainCard[] {
 
 function ticket(from: string, to: string, points: number): TicketDef {
   return { id: `test-${from}-${to}`, from, to, points, bucket: "regular" };
+}
+
+/**
+ * `wanted` is the only sensible way to join its two cities, so a ticket between them asks for exactly
+ * that route; `other` is a route of another color that the same cards could never pay for.
+ */
+function wantedAndOtherRoute(config: MapConfig): { wanted: RouteDef; other: RouteDef } {
+  const plain = (route: RouteDef) => route.type === "normal" && route.color !== "gray" && !route.locomotiveCost && !route.twinGroup;
+  const wanted = config.routes.find((route) => plain(route) && route.length === 3)!;
+  const other = config.routes.find(
+    (route) => plain(route) && route.color !== wanted.color && route.length <= 2 && ![route.from, route.to].some((city) => city === wanted.from || city === wanted.to)
+  )!;
+  return { wanted, other };
 }
 
 function finalScoring(state: GameState): GameState {
@@ -141,8 +154,8 @@ describe("easy bot", () => {
     const final = playToEnd(hudsonHustleMap, ["easy", "easy"], 4, (before, action) => {
       if (action.type === "select_initial_tickets") {
         const offered = before.players[before.activePlayerIndex].pendingTickets;
-        const dearest = [...offered].sort((left, right) => right.points - left.points || left.id.localeCompare(right.id)).slice(0, 3);
-        expect([...action.keptTicketIds].sort()).toEqual(dearest.map((entry) => entry.id).sort());
+        const cheapest = [...offered].sort((left, right) => left.points - right.points || left.id.localeCompare(right.id)).slice(0, 3);
+        expect([...action.keptTicketIds].sort()).toEqual(cheapest.map((entry) => entry.id).sort());
       }
       if (action.type === "draw_card" && before.trainDeck.length + before.discardPile.length > 0) {
         expect(action.source).toBe("deck");
@@ -159,6 +172,76 @@ describe("easy bot", () => {
     state.market = [];
     state.regularTickets = [];
     expect(chooseBotActionForActivePlayer(state, hudsonHustleMap, "easy")).toMatchObject({ type: "claim_route" });
+  });
+
+  it("never lets a turn go by when it can build on its ticket", () => {
+    const route = hudsonHustleMap.routes.find((candidate) => candidate.color !== "gray" && !candidate.locomotiveCost && candidate.type === "normal")!;
+    const state = scenario([ticket(route.from, route.to, 5)], cards(route.color as TrainCard["color"], route.length));
+    // Whatever else differs between two states, the affordable ticket route is always claimed.
+    for (let turn = 0; turn < 8; turn += 1) {
+      const later = structuredClone(state);
+      later.logSequence += turn;
+      later.trainDeck = later.trainDeck.slice(turn);
+      later.players[0].hand = [...later.players[0].hand, ...cards("locomotive", turn % 3)];
+      expect(chooseBotActionForActivePlayer(later, hudsonHustleMap, "easy")).toMatchObject({ type: "claim_route", routeId: route.id });
+    }
+  });
+
+  it("builds something small once its hand has filled up, and otherwise keeps collecting", () => {
+    const { wanted, other } = wantedAndOtherRoute(hudsonHustleMap);
+    const state = scenario([ticket(wanted.from, wanted.to, 6)], cards(other.color as TrainCard["color"], other.length));
+    expect(chooseBotActionForActivePlayer(state, hudsonHustleMap, "easy")).toEqual({ type: "draw_card", source: "deck" });
+
+    state.players[0].hand = trainCardColors.filter((color) => color !== wanted.color).flatMap((color) => cards(color, 2));
+    const action = chooseBotActionForActivePlayer(state, hudsonHustleMap, "easy");
+    expect(action.type).toBe("claim_route");
+    const claimed = hudsonHustleMap.routes.find((candidate) => candidate.id === (action as { routeId: string }).routeId)!;
+    expect(claimed.length).toBe(Math.min(...hudsonHustleMap.routes.map((route) => route.length)));
+  });
+});
+
+describe("standard bot", () => {
+  const map = hudsonHustleMap;
+
+  it("routes a ticket through the network it already owns", () => {
+    const owned = map.routes.find((route) => map.routes.some((other) => other.id !== route.id && (other.from === route.to || other.to === route.to)))!;
+    const next = map.routes.find(
+      (route) => route.id !== owned.id && (route.from === owned.to || route.to === owned.to) && ![route.from, route.to].includes(owned.from)
+    )!;
+    const far = next.from === owned.to ? next.to : next.from;
+    const state = scenario([ticket(owned.from, far, 9)], cards("locomotive", next.length + 1));
+    claimFor(state, 0, owned);
+    expect(chooseBotActionForActivePlayer(state, map, "standard")).toMatchObject({ type: "claim_route", routeId: next.id });
+  });
+
+  it("saves its cards for an unfinished ticket instead of claiming whatever it can pay for", () => {
+    const { wanted, other } = wantedAndOtherRoute(map);
+    const state = scenario([ticket(wanted.from, wanted.to, 6)], cards(other.color as TrainCard["color"], other.length));
+    expect(chooseBotActionForActivePlayer(state, map, "standard").type).toBe("draw_card");
+
+    state.players[0].hand = cards(wanted.color as TrainCard["color"], wanted.length);
+    expect(chooseBotActionForActivePlayer(state, map, "standard")).toEqual({ type: "claim_route", routeId: wanted.id, color: wanted.color });
+  });
+
+  it("draws more tickets once every ticket it holds is finished", () => {
+    const route = map.routes.find((candidate) => candidate.type === "normal" && !candidate.locomotiveCost)!;
+    const state = scenario([ticket(route.from, route.to, 5)], cards("rose", 1));
+    claimFor(state, 0, route);
+    expect(chooseBotActionForActivePlayer(state, map, "standard")).toEqual({ type: "draw_tickets" });
+  });
+
+  it("finishes most of the tickets it keeps", () => {
+    for (const [, config] of maps) {
+      let done = 0;
+      let held = 0;
+      for (let seed = 1; seed <= 6; seed += 1) {
+        for (const player of playToEnd(config, ["standard", "standard"], seed).players) {
+          done += player.endgame?.completedTicketIds.length ?? 0;
+          held += player.tickets.length;
+        }
+      }
+      expect(done / held).toBeGreaterThan(0.6);
+    }
   });
 });
 
@@ -223,18 +306,63 @@ describe("hard bot", () => {
     expect(chooseBotActionForActivePlayer(state, map, "hard")).toMatchObject({ type: "claim_route", routeId: borrowed.id });
   });
 
-  it("finishes most of its tickets over a run of games, where the standard bot does not", () => {
-    const done = { hard: 0, standard: 0 };
-    const held = { hard: 0, standard: 0 };
-    for (let seed = 1; seed <= 6; seed += 1) {
-      const tiers: BotDifficulty[] = seed % 2 === 0 ? ["hard", "standard"] : ["standard", "hard"];
-      playToEnd(map, tiers, seed).players.forEach((player, index) => {
-        const tier = tiers[index] as "hard" | "standard";
-        done[tier] += player.endgame?.completedTicketIds.length ?? 0;
-        held[tier] += player.tickets.length;
-      });
+  it("extends its longest path when it has nothing left to build for its tickets", () => {
+    // Two open routes of the same length and price: one continues the bot's own line, one stands alone.
+    const pairs = map.routes.flatMap((own) =>
+      map.routes
+        .filter((next) => next.id !== own.id && next.type === "normal" && !next.locomotiveCost && [next.from, next.to].some((city) => city === own.from || city === own.to))
+        .map((next) => ({ own, next }))
+    );
+    const found = pairs
+      .map((pair) => ({
+        ...pair,
+        apart: map.routes.find(
+          (route) =>
+            route.type === "normal" &&
+            !route.locomotiveCost &&
+            route.length === pair.next.length &&
+            route.id.localeCompare(pair.next.id) < 0 &&
+            ![route.from, route.to].some((city) => [pair.own.from, pair.own.to].includes(city))
+        )
+      }))
+      .find((entry) => entry.apart)!;
+    const state = scenario([], cards("locomotive", found.next.length));
+    claimFor(state, 0, found.own);
+    state.regularTickets = [];
+    state.players[0].trainsLeft = found.next.length + 3;
+    // By id alone the stand-alone route would come first; the longer path decides.
+    const action = chooseBotActionForActivePlayer(state, map, "hard") as { type: string; routeId: string };
+    expect(action.type).toBe("claim_route");
+    const claimed = map.routes.find((route) => route.id === action.routeId)!;
+    expect([claimed.from, claimed.to].some((city) => [found.own.from, found.own.to].includes(city))).toBe(true);
+  });
+
+  it("finishes more of its tickets and wins more games than the standard bot, which beats the easy bot", () => {
+    const tally = (strong: BotDifficulty, weak: BotDifficulty, config: MapConfig) => {
+      const stats = { strongWins: 0, weakWins: 0, done: { [strong]: 0, [weak]: 0 }, held: { [strong]: 0, [weak]: 0 } };
+      for (let seed = 1; seed <= 12; seed += 1) {
+        const tiers = seed % 2 === 0 ? [strong, weak] : [weak, strong];
+        const players = playToEnd(config, tiers, seed).players;
+        players.forEach((player, index) => {
+          stats.done[tiers[index]!] += player.endgame?.completedTicketIds.length ?? 0;
+          stats.held[tiers[index]!] += player.tickets.length;
+        });
+        const strongScore = players[tiers.indexOf(strong)]!.score;
+        const weakScore = players[tiers.indexOf(weak)]!.score;
+        stats.strongWins += strongScore > weakScore ? 1 : 0;
+        stats.weakWins += weakScore > strongScore ? 1 : 0;
+      }
+      return stats;
+    };
+    for (const [, config] of maps) {
+      const hardVsStandard = tally("hard", "standard", config);
+      expect(hardVsStandard.strongWins).toBeGreaterThan(hardVsStandard.weakWins);
+      expect(hardVsStandard.done.hard! / hardVsStandard.held.hard!).toBeGreaterThan(0.6);
+      expect(hardVsStandard.done.hard! / hardVsStandard.held.hard!).toBeGreaterThan(hardVsStandard.done.standard! / hardVsStandard.held.standard!);
+      expect(hardVsStandard.done.standard! / hardVsStandard.held.standard!).toBeGreaterThan(0.5);
+
+      const standardVsEasy = tally("standard", "easy", config);
+      expect(standardVsEasy.strongWins).toBeGreaterThan(standardVsEasy.weakWins);
     }
-    expect(done.hard / held.hard).toBeGreaterThan(0.6);
-    expect(done.hard / held.hard).toBeGreaterThan(done.standard / held.standard);
   });
 });
