@@ -30,7 +30,7 @@ export function ChatPanel({ messages = [], onSendMessage, className = "" }: Chat
         }}
       >
         <SectionHeader title="Chat" variant="compact" />
-        <div className="chat-panel__messages" aria-label="Chat messages">
+        <div className="chat-panel__messages" role="log" aria-live="polite" aria-label="Chat messages">
           {messages.length > 0 ? (
             messages.map((msg) => (
               <p key={msg.id} className="chat-panel__message">

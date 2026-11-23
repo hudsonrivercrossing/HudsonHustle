@@ -1,4 +1,5 @@
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useDialogFocus } from "../primitives/useDialogFocus";
 
 interface FloatingBuildPanelProps {
   children: ReactNode;
@@ -36,18 +37,8 @@ export function FloatingBuildPanel({ children, onClose, anchor = null, className
     setPos({ top, left });
   }, [anchor?.x, anchor?.y]);
 
-  const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
-
-  useEffect(() => {
-    function closeOnEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        onCloseRef.current();
-      }
-    }
-    window.addEventListener("keydown", closeOnEscape);
-    return () => window.removeEventListener("keydown", closeOnEscape);
-  }, []);
+  // Focus goes into the panel when it opens and back to the route or station that opened it when it closes.
+  useDialogFocus(ref, { onEscape: onClose });
 
   const style: React.CSSProperties = pos
     ? { position: "fixed", top: pos.top, left: pos.left, width: PANEL_WIDTH }
@@ -61,6 +52,10 @@ export function FloatingBuildPanel({ children, onClose, anchor = null, className
       aria-label="Build options"
       style={style}
     >
+      <div className="floating-build-panel__body">
+        {children}
+      </div>
+      {/* Last in the tab order: the actions come first. It is placed in the corner by CSS. */}
       <button
         type="button"
         className="floating-build-panel__close"
@@ -69,9 +64,6 @@ export function FloatingBuildPanel({ children, onClose, anchor = null, className
       >
         ✕
       </button>
-      <div className="floating-build-panel__body">
-        {children}
-      </div>
     </div>
   );
 }

@@ -390,11 +390,11 @@ export function GameplayScreen({
       {children}
 
       {showLeaveConfirm ? (
-        <ModalShell width="md" align="center" cardClassName="leave-confirm-card">
+        <ModalShell width="md" align="center" cardClassName="leave-confirm-card" aria-label="Leave this game?" onDismiss={() => setShowLeaveConfirm(false)}>
           <SectionHeader eyebrow="Leave game" title="Leave this game?" variant="ceremony" />
           <p>{copy.leaveBody}</p>
           <div className="setup-actions">
-            <Button onClick={() => setShowLeaveConfirm(false)}>Cancel</Button>
+            <Button data-autofocus onClick={() => setShowLeaveConfirm(false)}>Cancel</Button>
             <Button
               variant="primary"
               className="leave-button"
