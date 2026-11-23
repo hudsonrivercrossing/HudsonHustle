@@ -81,7 +81,7 @@
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 760px), (orientation: landscape) and (max-height: 500px) {
   .table-supply {
     grid-template-columns: repeat(6, var(--card-w));
     justify-content: start;

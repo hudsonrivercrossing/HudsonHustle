@@ -2,7 +2,8 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { coachHints, markMomentSeen, readSeenMoments, turnOffTips, type CoachMoment } from "./coachHints";
 
 const RING_PADDING = 6;
-const PHONE = "(max-width: 760px)";
+// Matches the phone arrangement of the table: a narrow screen, or a phone turned on its side.
+const PHONE = "(max-width: 760px), (orientation: landscape) and (max-height: 500px)";
 const TIP_GAP = 8;
 
 interface Ring {

@@ -181,7 +181,7 @@
 }
 
 /* On a phone four tickets and the button share less than half the screen. */
-@media (max-width: 760px) {
+@media (max-width: 760px), (orientation: landscape) and (max-height: 500px) {
   .ticket-stub {
     min-height: 56px;
   }

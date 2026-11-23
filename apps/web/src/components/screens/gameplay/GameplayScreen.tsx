@@ -46,6 +46,7 @@ import { ReplayScreen } from "../replay/ReplayScreen";
 import { canDrawCards, describeRouteCost, getRouteUnavailableReason } from "./routeAvailability";
 import { useCardFlight } from "./useCardFlight";
 import { useDrawnCardHighlight } from "./useDrawnCardHighlight";
+import { useFullScreen, useScreenAwake } from "./useImmersive";
 import { useTunnelReveal } from "./useTunnelReveal";
 
 /** The pause between one line of the final count and the next. */
@@ -122,6 +123,9 @@ export function GameplayScreen({
   const [guideOpen, setGuideOpen] = useState(false);
   const [tipsResetToken, setTipsResetToken] = useState(0);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const fullScreen = useFullScreen();
+  const [showHomeScreenHelp, setShowHomeScreenHelp] = useState(false);
+  useScreenAwake(game.phase !== "gameOver");
   const [replayOpen, setReplayOpen] = useState(false);
   /** Phones show one tray at a time under the map. Wider screens show both and ignore this. */
   const [tray, setTray] = useState<"cards" | "tickets">("cards");
@@ -300,6 +304,18 @@ export function GameplayScreen({
         </p>
         <TurnIndicator label={turnLabel} timerLabel={timerLabel} data-tour-target="turn" />
         <div className="tabletop__menu">
+          {fullScreen.mode === "none" ? null : (
+            <Button
+              className="tabletop__menu-button tabletop__menu-button--icon"
+              aria-label={fullScreen.active ? "Leave full screen" : "Full screen"}
+              aria-pressed={fullScreen.mode === "button" ? fullScreen.active : undefined}
+              onClick={fullScreen.mode === "button" ? fullScreen.toggle : () => setShowHomeScreenHelp(true)}
+            >
+              <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                {fullScreen.active ? <path d="M7 3v4H3M13 3v4h4M7 17v-4H3M13 17v-4h4" /> : <path d="M3 7V3h4M17 7V3h-4M3 13v4h4M17 13v4h-4" />}
+              </svg>
+            </Button>
+          )}
           <Button className="tabletop__menu-button" onClick={() => setGuideOpen(true)}>Guide</Button>
           <ScoreGuide className="score-guide--subtle tabletop__menu-item" label="Score" />
           <Button className="tabletop__menu-button tabletop__menu-button--leave" onClick={() => setShowLeaveConfirm(true)}>{copy.leaveLabel}</Button>
@@ -420,6 +436,21 @@ export function GameplayScreen({
       ) : null}
 
       {children}
+
+      {showHomeScreenHelp ? (
+        <ModalShell width="md" align="center" aria-label="Play without the browser bars" onDismiss={() => setShowHomeScreenHelp(false)}>
+          <SectionHeader eyebrow="Full screen" title="Play without the browser bars" variant="ceremony" />
+          <p>This browser cannot hide its own bars, but an app on your home screen can.</p>
+          <ol className="home-screen-steps">
+            <li>Tap the Share button in the browser’s toolbar.</li>
+            <li>Choose “Add to Home Screen”.</li>
+            <li>Open Hudson Hustle from the new icon and start or rejoin there. A local game saved in the browser does not carry over.</li>
+          </ol>
+          <div className="setup-actions">
+            <Button variant="primary" data-autofocus onClick={() => setShowHomeScreenHelp(false)}>Got it</Button>
+          </div>
+        </ModalShell>
+      ) : null}
 
       {showLeaveConfirm ? (
         <ModalShell width="md" align="center" cardClassName="leave-confirm-card" aria-label="Leave this game?" onDismiss={() => setShowLeaveConfirm(false)}>

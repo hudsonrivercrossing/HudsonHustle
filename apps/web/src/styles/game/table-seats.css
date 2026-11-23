@@ -93,7 +93,7 @@
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 760px), (orientation: landscape) and (max-height: 500px) {
   .table-seat {
     flex: none;
   }

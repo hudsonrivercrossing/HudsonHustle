@@ -83,7 +83,7 @@
 }
 
 /* On a phone only the newest notice shows, as one small line, so the board is not buried under a stack. */
-@media (max-width: 760px) {
+@media (max-width: 760px), (orientation: landscape) and (max-height: 500px) {
   .notification-pipe__item {
     padding: var(--space-stack-xs) var(--space-stack-md);
     font-size: var(--type-xs);

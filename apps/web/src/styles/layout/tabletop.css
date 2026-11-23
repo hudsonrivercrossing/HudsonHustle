@@ -69,6 +69,35 @@
   transition: color var(--duration-fast) var(--easing-standard), background-color var(--duration-fast) var(--easing-standard);
 }
 
+/* A menu item that is only a mark: square, the size of a fingertip. */
+.tabletop .tabletop__menu-button--icon.system-button {
+  display: grid;
+  place-items: center;
+  width: var(--hit-target-min);
+  padding: 0;
+}
+
+.home-screen-steps {
+  display: grid;
+  gap: var(--space-stack-sm);
+  margin: 0;
+  padding-left: var(--space-stack-xl);
+  padding-bottom: var(--space-stack-lg);
+  text-align: left;
+}
+
+/* A long name shortens; it never takes a second line from the board. */
+.tabletop .turn-indicator {
+  min-width: 0;
+}
+
+.tabletop .turn-indicator__name {
+  overflow: hidden;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .tabletop .tabletop__menu-button.system-button::before,
 .tabletop .tabletop__menu-button.system-button::after,
 .tabletop .tabletop__menu-item .score-guide__trigger.system-button::before,
@@ -189,7 +218,7 @@
 
 /* Phones: the board keeps most of the screen and pans under the finger. Cards and tickets share
    one tray below it, and the hand stays pinned at the bottom. */
-@media (max-width: 760px) {
+@media (max-width: 760px), (orientation: landscape) and (max-height: 500px) {
   .tabletop {
     --card-w: 56px;
     --supply-card-w: 56px;
@@ -321,5 +350,78 @@
   .tabletop__tabs button[aria-pressed="true"] {
     background: var(--hud-paper);
     color: var(--hud-ink);
+  }
+}
+
+/* A phone on its side is wide and very short. The board takes the whole height on the left and is
+   shown whole; everything else stacks in one rail on the right, so nothing sits above or below the map. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .tabletop {
+    --card-w: 42px;
+    --supply-card-w: 40px;
+    grid-template-columns: minmax(0, 1fr) clamp(272px, 40vw, 344px);
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "board top"
+      "board tabs"
+      "board tray"
+      "board hand";
+    column-gap: var(--space-stack-sm);
+  }
+
+  .tabletop__board {
+    overflow: hidden;
+  }
+
+  /* The rail is narrow: the menu words sit closer so the turn stays on one line. */
+  .tabletop__menu {
+    gap: 0;
+  }
+
+  .tabletop .tabletop__menu-button.system-button,
+  .tabletop .tabletop__menu-item .score-guide__trigger.system-button {
+    padding: 0 var(--space-stack-xs);
+  }
+
+  .tabletop .tabletop__board .board-shell {
+    display: grid;
+    width: 100%;
+    height: 100%;
+  }
+
+  .tabletop .tabletop__board .board-map {
+    height: 100%;
+  }
+
+  .tabletop__left,
+  .tabletop__right,
+  .tabletop__left:has(.ticket-choice),
+  .tabletop__right:has(.chat-panel) {
+    max-height: none;
+  }
+
+  /* Choosing tickets needs the room more than it needs the hand, the tabs or the seats, none of which matter meanwhile. */
+  .tabletop:has(.ticket-choice) .tabletop__hand,
+  .tabletop:has(.ticket-choice) .tabletop__tabs,
+  .tabletop:has(.ticket-choice) .tabletop__seats {
+    display: none;
+  }
+
+  .tabletop .ticket-choice__title {
+    font-size: var(--type-md);
+  }
+
+  .tabletop__hand {
+    min-height: calc(var(--card-w) * 1.4 + var(--space-stack-sm));
+    padding-bottom: 0;
+  }
+
+  /* Safari keeps a tab bar in landscape, so every row of the rail gives up a little for the cards. */
+  .tabletop__tabs button {
+    min-height: 40px;
+  }
+
+  .tabletop__side {
+    margin-top: var(--space-stack-xs);
   }
 }
