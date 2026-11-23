@@ -1,0 +1,202 @@
+# 应用体检 · 2026-11-23
+
+对 `claude/tabletop-layout` 分支（提交 `c1cc3c5`）做的一次整体检查。只查不改，下面每一条都是待办。
+
+## 用了什么方法
+
+| 维度 | 方法 | 说明 |
+|---|---|---|
+| 界面与上线准备 | Emil 的 `emil-prep-for-prod`（九项体检，只查不改模式） | 分四路并行：无障碍与表单、性能／状态／动效、手机端、主题／遗留物／页面元信息 |
+| 代码架构 | Matt Pocock 的 `improve-codebase-architecture` 方法 | 这台机器没有安装他的技能包；方法文本读自他公开仓库 `mattpocock/skills`（提交 `49dd158`），只当参考资料用 |
+| 桌游设计 | 项目自带的 `game-balance` 技能 + 地图数据统计 + 机器人模拟 | 没有找到评价高、专门针对桌游的第三方技能，所以没有用外部的 |
+
+核实方式：各路结果先由子代理在代码里逐条确认，我再抽查了其中的阻断项和影响大的条目（见"我亲自核实过的"）。标了"未核实"的是只按代码推断、需要真机或线上确认的。
+
+## 结论：还不能上线
+
+有 8 个阻断项，其中 5 个会被普通玩家在第一局里碰到。
+
+| # | 阻断项 | 谁受影响 | 位置 | 改法 |
+|---|---|---|---|---|
+| 1 | Score 面板打开后被牌堆和地图盖住，读不全 | 每个点 Score 的玩家 | `styles/layout/app-shell.css:17`、`styles/game/score-guide.css:95` | 给 `.tabletop__top` 更高的层级；面板改成点击开关 |
+| 2 | 手机联机局聊天输入框被裁掉，打不了字 | 手机联机玩家 | `styles/layout/tabletop.css:203` | 手机上让托盘滚动，或给聊天单独一个标签页 |
+| 3 | 游戏外壳留着 `100vh`，手机地址栏显示时手牌被浏览器工具栏挡住（未核实，需真机） | 手机玩家 | `styles/layout/app-shell.css:31,53,83` | 三处改成 `100dvh` |
+| 4 | 开了"减少动效"的人看不到任何提示条 | 开了该系统设置的玩家；联机时被拒绝的操作只靠提示条告知 | `styles/game/notifications.css:41` + `styles/base.css:62` | 提示条在减少动效下取消动画 |
+| 5 | 联机中途掉线，界面没有任何提示，操作发进了断开的连接 | 手机锁屏或网络波动的联机玩家 | `components/screens/OnlineGameScreen.tsx:60`、`components/online/useOnlineRoom.ts:241` | 掉线时显示"正在重连"并禁用操作 |
+| 6 | 键盘焦点环在深色界面上几乎看不见（对比度 1.25–1.6:1） | 键盘用户 | `styles/primitives/button.css:117`、`chip.css:164,178` | 换成不透明的浅色环 |
+| 7 | 设置页的提示文字和灰色说明在浅色系统下读不清（1.6–2.3:1） | 系统是浅色模式的玩家（默认情况） | `styles/primitives/form-field.css:27`、`section-header.css:87` | 在深色设置面板里改用已有的浅色文字值 |
+| 8 | 结算页盖住了牌桌，但键盘和读屏仍会先走过后面所有按钮和地图热区 | 键盘和读屏用户 | `components/screens/gameplay/GameplayScreen.tsx:403` | 结算时把后面的区域设为 `inert`，焦点移到"再来一局" |
+
+另有两条按技能的判定规则算"应修"，但我认为和阻断项同等重要：
+
+- **出错页显示一屏调试堆栈，没有"重新加载"**（`components/shared/ErrorBoundary.tsx:25`）。配合下面"本地存档不校验"，一个旧存档就能让玩家每次点继续都卡在这页。
+- **车票进度和结算规则不一致**（`packages/game-core/src/game.ts:367`）。游戏中"已连通"只算自己的线路，结算却把通过车站借用的对手线路算进去：靠车站完成的票全程显示未连通，最后却得分。
+
+## A. 无障碍
+
+| 级别 | 问题 | 位置 | 改法 |
+|---|---|---|---|
+| 阻断 | 见上表 4、6、7、8 | | |
+| 应修 | 联机创建／加入页的错误横幅在浅色系统下文字对比不足 | `components/screens/OnlineSetupScreen.tsx:180`、`styles/primitives/state-surface.css:51` | 把大厅已有的深色覆盖扩大到整个设置外壳 |
+| 应修 | 计时局里读屏每秒重读一次"轮到你 24 秒" | `components/ui/game/TurnIndicator.tsx:12` | `role="status"` 只放在名字上，计时器用 `role="timer"` |
+| 应修 | 地图上线路和车站的焦点样式太淡（1.4–3.2:1） | `styles/game/board-map.css:306` | 改用固定的深色 |
+| 应修 | 聊天输入框去掉了焦点轮廓，只剩 1px 边框变色 | `styles/game/chat-panel.css:220` | 恢复 2px 轮廓 |
+| 应修 | 选座位、选模式的"已选中"只靠颜色，读屏不知道选了哪个 | `components/setup/SetupPrimitives.tsx:174,257` | 加 `aria-pressed` |
+| 应修 | 错误和状态横幅出现时读屏不播报 | `components/ui/primitives/StateSurface.tsx:28` | 危险类用 `role="alert"`，其余 `role="status"` |
+| 应修 | 加入房间换步骤、确认车票、交接弹窗关闭后，焦点掉回页面顶部 | `components/online/JoinRoomFlow.tsx:45,75,112`、`TableTickets.tsx:130`、`HandoffModal.tsx:19` | 把焦点移到新步骤的标题或第一个控件 |
+| 应修 | 提示条固定 2 秒就消失，而它自己的动画是 4.2 秒；悬停暂停无效 | `screens/gameplay/useGameNotifications.ts:6`、`App.tsx:12` | 统一为一个时长，按字数给时间 |
+| 应修 | 新手提示的小标题和"Got it"按钮对比 3.65:1 | `styles/screens/onboarding.css:108,148` | 用深一档的强调色 |
+| 应修 | "No messages yet" 和输入框占位文字对比约 3.3:1 | `styles/game/chat-panel.css:76,216` | 透明度从 40% 提到 60% |
+| 应修 | 规则书翻页后读屏不播报新内容 | `components/screens/GuidebookScreen.tsx:149` | `aria-live="polite"` |
+| 应修 | 所有页面标题都是 "Hudson Hustle"；游戏页没有一级标题，回放页没有 `<main>` | `app/routes.ts:46` | 按页面设置标题 |
+| 应修 | 计时器的加减按钮读作 "-15" / "+15"，标签没有关联 | `components/ui/primitives/TimerPicker.tsx:12` | 分组并加可读名称 |
+| 应修 | 回放里的地图热区仍可聚焦但什么都不做 | `components/screens/replay/ReplayScreen.tsx:82` | 给地图加"不可交互"开关 |
+| 打磨 | 几处 `aria-label` 写在没有角色的元素上不生效；头像的 `alt` 重复了旁边的名字；邀请按钮的播报方式不可靠 | `SetupPrimitives.tsx:216,273`、`LobbyScreen.tsx:178`、`InviteLinkButton.tsx:36` | 逐个修正 |
+
+已知且之前记录过的：地图上约 52 个 Tab 停靠点，没有方向键导航。
+
+## B. 性能
+
+| 级别 | 问题 | 位置 | 改法 |
+|---|---|---|---|
+| 应修 | 底图是 2.3–3.4MB 的 PNG，手机流量下地图要过几秒才出来 | `apps/web/public/basemaps/` | 转成 WebP 或 AVIF，在设置页或大厅预加载 |
+| 应修 | 首页背景图 1.6MB，要等脚本跑完才开始下载 | `components/screens/SetupGateway.tsx:11` | 转格式并在 `index.html` 预加载 |
+| 应修 | 字体从谷歌样式表加载，阻塞首屏，换字时整页重排 | `apps/web/index.html:21` | 自托管并预加载；斜体没有加载字形，是合成的 |
+| 应修 | 计时局里整张地图每秒重算重画一次，悬停车票时也是 | `components/ui/game/BoardMap.tsx:398`、`OnlineGameScreen.tsx:35` | 线路几何按地图缓存，地图组件加 `memo`，计时文字拆成独立小组件 |
+| 打磨 | 脚本是单个 415KB 的包（压缩后 125KB） | | 规则书、回放、联机库可以按需加载 |
+
+## C. 手机
+
+| 级别 | 问题 | 位置 | 改法 |
+|---|---|---|---|
+| 阻断 | 见上表 2、3 | | |
+| 应修 | 视口标签缺 `viewport-fit=cover`，所以底部安全区的值永远是 0 | `apps/web/index.html:5` | 加上，并和下一条一起改 |
+| 应修 | 除牌桌底部外，7 处贴边元素没有留安全区 | `game-over.css:10`、`modal-shell.css:20`、`table-moments.css:56`、`guidebook.css:17`、`notifications.css:61`、`setup.css:116`、`tabletop.css:161` | 用 `max(原值, env(safe-area-inset-*))` |
+| 应修 | 21 条悬停样式里 18 条没有限定在有鼠标的设备上，触屏点完会留着悬停态 | `button.css`、`chip.css`、`game-over.css` 等 | 包进 `@media (hover: hover) and (pointer: fine)` |
+| 应修 | Score 面板只能靠悬停打开，触屏上行为不可靠 | `components/ui/game/ScoreGuide.tsx:25` | 改成点击开关 |
+| 应修 | 手机上地图的点击热区只有约 16px | `components/ui/game/BoardMap.tsx:561,605` | 触屏下放大车站和线路的透明热区 |
+| 应修 | 第一次点线路时，新手提示被建造面板盖住，"Got it" 点不到 | `styles/screens/onboarding.css:14`、`game/build-panel.css:13` | 窄屏上错开位置 |
+| 应修 | 建造面板固定 340px 宽，320 宽的手机上关闭按钮在屏幕外 | `styles/game/build-panel.css:8`、`FloatingBuildPanel.tsx:11` | `min(340px, 100vw - 24px)` |
+| 应修 | 9 类控件小于 44px：建造面板的关闭按钮 28px、确认按钮 32px、聊天输入 35px、规则书链接 20px 等 | `build-panel.css:39,93`、`chat-panel.css:209`、`button.css:9,176`、`setup.css:318,474,538` | 用已有的 `--hit-target-min` |
+| 应修 | 没有去掉点击高亮，没有 `touch-action: manipulation`，多数控件没有按下态 | `styles/base.css` | 在基础样式里统一加 |
+| 应修 | 弹窗用 `100vw/100vh` 且不能滚动 | `styles/primitives/modal-shell.css:15` | 去掉这两行，允许纵向滚动 |
+| 应修 | 页面没有禁用下拉刷新，安卓上拖地图可能把整局刷掉 | `styles/base.css` | `html, body { overscroll-behavior: none }` |
+| 应修 | 开局选车票时"Keep 2 tickets"按钮在 375×812 上被裁掉一半，要滚动才看得到 | `styles/layout/tabletop.css:211` | 按钮吸底，或放宽高度上限 |
+| 应修 | 房间码输入框会被手机自动纠错和自动大写改写 | `components/online/JoinRoomFlow.tsx:49` | 关掉自动纠错等属性 |
+| 打磨 | 第六张公开牌被裁掉没有提示；顶栏在手机上占 110px，360×640 上地图只剩 193px 高 | `table-supply.css:85`、`tabletop.css:164` | 牌宽按屏宽算；菜单和回合提示并到一行 |
+
+## D. 表单
+
+| 级别 | 问题 | 位置 | 改法 |
+|---|---|---|---|
+| 应修 | 联机设置没有 `<form>`，输完房间码或名字按回车没反应 | `JoinRoomFlow.tsx:49,120`、`CreateRoomFlow.tsx:68` | 每一步包成表单 |
+| 应修 | "预览""加入房间""开始游戏""再来一局"没有等待状态，连点两次会发两次请求 | `JoinRoomFlow.tsx:56,120`、`LobbyScreen.tsx:154`、`GameplayScreen.tsx:410` | 按钮已有 `loading` 属性，没有地方用 |
+| 应修 | 有存档时点"开始本地游戏"会直接覆盖存档，没有确认；离开提示写"回到设置"，实际会删存档 | `components/screens/SetupScreen.tsx:124`、`LocalPlayScreen.tsx:162,257` | 有存档时先确认，文案写明会删除 |
+| 应修 | 聊天框在 Safari 里用中文输入法，按回车确认选词会把半句话发出去 | `components/ui/game/ChatPanel.tsx:55` | 删掉这段按键处理（表单提交已经处理回车），或判断输入法状态 |
+| 打磨 | 联机名字默认填着 "Host" / "Player"，要先删掉才能输入，也不记住上次的名字 | `OnlineSetupScreen.tsx:54,63` | 改成占位或记住上次 |
+
+## E. 稳定性与各种状态
+
+| 级别 | 问题 | 位置 | 改法 |
+|---|---|---|---|
+| 阻断 | 见上表 5 | | |
+| 应修 | 出错页显示调试堆栈，没有出路 | `components/shared/ErrorBoundary.tsx:25` | 正式环境只显示说明和"重新加载""回到首页" |
+| 应修 | 握手超过 8 秒就主动断开，之后不再自动重连，只能刷新页面 | `useOnlineRoom.ts:169` | 不主动断开，或给"重试连接"按钮 |
+| 应修 | 大厅里"开始游戏""离开房间"失败时没有任何显示 | `useOnlineRoom.ts:332,387`、`App.tsx:67` | 把错误传给大厅 |
+| 应修 | 断网时显示的是给开发者看的话（"确认本地后端在运行"）或浏览器原文 | `useOnlineRoom.ts:78,285` | 统一成一句给玩家的话 |
+| 应修 | 读写本地存储没有保护，存储被禁用时应用启动就崩 | `useOnlineRoom.ts:42`、`localGame.utils.ts:46`、`LocalPlayScreen.tsx:62`、`localSetupStorage.ts:83,101` | 加保护，失败当作没有存档 |
+| 应修 | 本地存档不校验就恢复，旧版本的存档会崩，而且每次点继续都崩 | `components/local/localGame.utils.ts:49` | 校验版本和结构，不合格就丢弃 |
+| 应修 | 重连中的页面仍显示可用的加入表单 | `components/screens/OnlineSetupScreen.tsx:85` | 重连时只显示状态 |
+| 打磨 | 关掉回放后结算动画会重放；"按任意键跳过"要先点一下才生效 | `GameOverPanel.tsx:18,25` | 状态上提；监听整个窗口 |
+
+## F. 动效
+
+| 级别 | 问题 | 位置 | 改法 |
+|---|---|---|---|
+| 阻断 | 见上表 4 | | |
+| 打磨 | 减少动效下，车厢落位仍按延迟逐个出现 | `styles/game/board-map.css:403` | 加 `animation: none` |
+| 打磨 | 悬停上浮移动的是按钮自己的热区，边缘可能闪 | `table-supply.css:78`、`setup.css:1004` | 改成移动内层 |
+| 打磨 | 计时器从 100 到 99、10 到 9 时宽度变化，会把名字挤动 | `OnlineGameScreen.tsx:69` | 给计时器固定最小宽度 |
+| 打磨 | 弹窗、建造面板、隧道时刻只有进场没有退场 | | 上线后再决定 |
+
+其余检查通过：没有 `transition: all`，没有对布局属性做动画，时长都在预期范围内。
+
+## G. 主题
+
+| 级别 | 问题 | 位置 | 改法 |
+|---|---|---|---|
+| 应修 | 声明的配色方案是浅色，界面实际全是深色；还留着一段深色模式的媒体查询会翻转约 20 个颜色变量 | `styles/theme.css:2,201` | 只声明深色并删掉那段。上面多处"浅色系统下看不清"都源于此 |
+| 应修 | `pnpm css:debt` 漏掉了几类规则 | `scripts/css/css-debt.mjs` | 见下 |
+| 应修 | 重复和失效的样式 | `modal-shell.css:114,123,132`、`button.css:201–228` 等 | 合并 |
+
+`css:debt` 没有管到的：组件里 19 处内联颜色（`BoardMap.tsx` 16 处）；30 处 `color-mix(in srgb)`，规则要求 `in oklch`；31 个定义在 `theme.css` 之外的颜色变量；带回退值的 `var()` 掩盖了两个从未定义的变量（`--state-danger-ink`、`--weight-regular`）；`!important` 基线是 35 个，其中 `surface-card.css` 有 12 个不在 CLAUDE.md 说的例外里。
+
+## H. 内容与遗留物
+
+| 级别 | 问题 | 位置 | 改法 |
+|---|---|---|---|
+| 应修 | 选图列表里有两个同名选项 "Hudson Hustle Anchor Prototype" | `configs/hudson-hustle/releases/v0.4-*/map.json:4`、`v0.5-*/map.json:4` | v0.4 归档，v0.5 起一个正式名字（名字要你定） |
+| 应修 | 建房限流可能全站共用：服务器没有设置信任代理（未核实，要看 Railway 日志） | `apps/server/src/app.ts:101,197` | `trustProxy: true` |
+| 应修 | 正式构建缺环境变量时会悄悄连本机地址，而不是构建失败 | `components/online/useOnlineRoom.ts:24` | 正式环境缺变量直接报错 |
+| 应修 | 一张 3.5MB 的旧柏林底图没有任何引用 | `apps/web/public/basemaps/berlin-cold-war-reference-v4.png` | 删除；纽约 v1 等 v0.4 归档后也可以删 |
+| 应修 | 多份文档和代码不符 | `docs/product/design-system.md`、`docs/product/tech-spec.md:76,133`、`docs/config/config-snapshot-guide.md:69`、`.github/ISSUE_TEMPLATE/config.yml:4`、`docs/planning/v2-status.md`、`AGENTS.md:27` | 更新或删除 |
+| 打磨 | 样式里的过期注释；过期的回退地图编号；没有 ESLint 却有 ESLint 注释；`CardSlot.tsx` 名不副实 | `topbar.css:37–60`、`OnlineSetupScreen.tsx:51`、`ReplayScreen.tsx:47` | 清理 |
+
+干净的：没有调试输出、待办标记、占位文字、调试面板、提交进来的密钥；跨域是明确的白名单；没有未使用的依赖。
+
+## I. 页面元信息
+
+| 级别 | 问题 | 位置 | 改法 |
+|---|---|---|---|
+| 应修 | 任何不存在的地址（包括 `/robots.txt`）都返回首页；房间邀请页可被搜索引擎收录 | `vercel.json:7` | 加 `robots.txt`，禁止收录 `/room/` |
+| 应修 | 分享预览图的地址依赖一个构建变量，缺了就是相对地址（未核实线上） | `apps/web/index.html:14`、`vite.config.ts:14` | 在 Vercel 设好并查看线上源码 |
+| 应修 | 没有触屏图标和 manifest | `apps/web/index.html:9` | 需要做一张图 |
+
+## 代码架构（Matt Pocock 的方法）
+
+大的边界是好的：规则引擎 `reduceGame` 用 10 个导出管 813 行；房间存储有 3 个方法、两套实现；本地和联机共用同一个游戏界面；通信类型只定义一次。问题在别处，按回报排序：
+
+| 顺序 | 问题 | 代价 | 建议 |
+|---|---|---|---|
+| 1 | **地图数据是强制转型的，没有校验；地图测试写在规则测试文件里，而且只查当前地图** | 柏林的 11 条线路类型写的是 "Border Crossing"，引擎只认 normal / tunnel / ferry，一直没报错，所以渡轮标记不画；`rules.json` 里的计分表根本没人读；柏林的站名碰撞没有任何测试。最近每次提交都在手改地图 | 在 game-data 里做一个带校验的地图加载；把 32 条布局测试搬过去，对每张已发布地图都跑 |
+| 2 | **同一条规则写在五个地方** | 线路是否开放、车站费用、计分表、能否支付、车票结果、最长路径，在引擎、机器人、界面、服务器里各有一份。车票进度和结算不一致就是这么来的；最终计分没有直接的测试 | game-core 里加一个纯函数的 `rules.ts`，其余地方都调它 |
+| 3 | **线路几何写了四份，站名框算了三种** | 决定"每格多长"的函数藏在地图组件里，没有测试。最近两次"拉近每格长度"是靠截图调的；站名碰撞测试用的站名框和界面实际画的不一样 | game-data 里加 `board-geometry.ts`，就能写"每张地图每格长度在某个范围内"的测试 |
+| 4 | 服务器里"替某个座位执行动作再结束回合"有三份；测试有 15 处直接伸手改私有状态 | 改计时器逻辑有风险 | 引擎提供 `playAction`，服务器里拆出一个小的回合计时模块 |
+| 5 | 服务器的对局历史约 400 行，没有任何客户端使用 | 每加一种动作都要多教它一遍 | 先决定这是不是要保留的功能，再动 |
+| 6 | 本地对局的状态全在一个 268 行的界面里，没有测试；本地计时器归零后什么都不做 | 本地是 CLAUDE.md 里的主流程，却没有任何自动化测试 | 抽成 `useLocalGame()` |
+| 7 | 存档和数据库读出来的对局状态都没有校验 | 旧存档崩溃 | 引擎提供 `restoreGameState` |
+| 8 | game-data 导出 26 个值，应用只用 5 个；`summarizeEndgame` 没有调用者；每次动作都重建一遍地图 | 小 | 清理并缓存 |
+
+不值得做的：把 `reduceGame` 按动作拆文件；给服务器加更多抽象层；改 game-core 的总出口。
+
+## 桌游设计
+
+机器人模拟：两张图各 300 局 × 2 / 3 / 4 人，全部正常结束。所有座位用同一个机器人策略，所以它反映的是地图结构，不能预测真人对局；标准难度的机器人从不建车站，车站机制是否有用模拟判断不了。
+
+| 发现 | 数据 | 建议 |
+|---|---|---|
+| 两张图实际只够 2–3 人 | 纽约全图 82 格、每人 24 节车厢，4 人需要 96 格；柏林 95 格对 112 格。4 人局几乎每条线都被占（91–100%），平均分从 2 人的 72 降到 52 | 减少 4 人局的车厢数，或标明是 2–3 人地图 |
+| 4 人局后手吃亏 | 纽约各座位胜率 29 / 26 / 20 / 22%，柏林 28 / 26 / 26 / 18% | 后手给补偿 |
+| 纽约有 4 张"占一条线就完成"的车票 | Atlantic Terminal–Jamaica、Battery Park–Downtown Brooklyn、Battery Park–Red Hook、Chelsea–World Trade：2 格线路值 5 分，每节车厢 2.5 分，最低的票只有 1.0 | 降到 2–3 分，或换更远的终点 |
+| 柏林车票性价比差距更大 | 每节车厢 0.64–2.0 分 | 按最短路径重新定分 |
+| 纽约那条 6 格长线几乎没人用 | 2 人局 4%、3 人局 11% 被占 | 配一张专属长票 |
+| 车票集中在东侧 | Jamaica 是 9 张票的终点，Downtown Brooklyn 7 张，Union Square 1 张，Williamsburg 和柏林的 Westhafen 一张都没有 | 给空白站补票 |
+| 短线路占比高 | 纽约 32 条里 19 条是 2 格，柏林 38 条里 25 条 | 增加 4–5 格线路 |
+| 港口地图只有 1 条渡轮 | 纽约 7 条隧道、1 条渡轮 | 把一两条跨河线改成渡轮 |
+| 柏林 Pankow 是死胡同 | 唯一的线路被占后 2 张票无路可走 | 加第二条连接，或依赖车站棋子 |
+
+难度分层是合理的：三档同场 200 局，困难 58%、标准 29%、简单 13%。
+
+## 建议的顺序
+
+1. **先修 8 个阻断项加出错页和车票进度**。多数是一两行的改动；手机聊天框和掉线提示稍大。
+2. **一次性的全局基线**：配色方案声明、视口标签和安全区、悬停限定、点击高亮、下拉刷新、`100dvh`。这一批改完，上面"应修"里有二十多条会一起消失。
+3. **表单和状态**：表单回车、等待状态、存档覆盖确认、本地存储保护、存档校验。
+4. **架构第 1–3 项**，顺序是地图校验 → 规则模块 → 几何模块。它们直接保护最近一直在改的地图文件。
+5. **桌游设计**的调整要你来定，因为每一条都是规则或数据的改动。
+
+## 我亲自核实过的
+
+阻断项 1（有截图）、4、5、6、7、8 的代码位置；出错页；车票进度与结算不一致；两张地图同名；柏林的线路类型字符串；计分表没人读；服务器没有信任代理的设置；视口标签；`100vh`；聊天框的回车处理；Score 按钮没有点击处理。
+
+没有核实、需要真机或线上的：阻断项 3 在真实手机上的表现；限流是否真的全站共用；分享预览图在线上是否是绝对地址；Safari 输入法；读屏和纯键盘走一遍主流程；中低端手机上地图重画的实际帧率。
