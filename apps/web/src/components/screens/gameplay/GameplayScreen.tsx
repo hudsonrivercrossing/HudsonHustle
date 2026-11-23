@@ -47,6 +47,7 @@ import { canDrawCards, describeRouteCost, getRouteUnavailableReason } from "./ro
 import { useCardFlight } from "./useCardFlight";
 import { useDrawnCardHighlight } from "./useDrawnCardHighlight";
 import { useFullScreen, useScreenAwake } from "./useImmersive";
+import { buzzFor, useBoardFollow, usePanHint, usePhoneTable } from "./phoneTable";
 import { useTunnelReveal } from "./useTunnelReveal";
 
 /** The pause between one line of the final count and the next. */
@@ -124,6 +125,32 @@ export function GameplayScreen({
   const [tipsResetToken, setTipsResetToken] = useState(0);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const fullScreen = useFullScreen();
+  const [wholeMap, setWholeMap] = useState(false);
+  const phoneTable = usePhoneTable();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const boardRef = useRef<HTMLDivElement | null>(null);
+  const panHint = usePanHint(boardRef);
+  useBoardFollow(boardRef, game.events);
+  const act = useCallback(
+    (action: GameAction) => {
+      buzzFor(action);
+      onAction(action);
+    },
+    [onAction]
+  );
+  useEffect(() => {
+    if (!menuOpen) return;
+    const close = (event: Event) => {
+      if (event instanceof KeyboardEvent ? event.key === "Escape" : !menuRef.current?.contains(event.target as Node)) setMenuOpen(false);
+    };
+    document.addEventListener("pointerdown", close);
+    document.addEventListener("keydown", close);
+    return () => {
+      document.removeEventListener("pointerdown", close);
+      document.removeEventListener("keydown", close);
+    };
+  }, [menuOpen]);
   const [showHomeScreenHelp, setShowHomeScreenHelp] = useState(false);
   useScreenAwake(game.phase !== "gameOver");
   const [replayOpen, setReplayOpen] = useState(false);
@@ -287,7 +314,7 @@ export function GameplayScreen({
   }
 
   return (
-    <div className="app-shell app-shell--gameplay-hud tabletop" data-config-theme={visuals.theme} data-tray={shownTray}>
+    <div className="app-shell app-shell--gameplay-hud tabletop" data-config-theme={visuals.theme} data-tray={shownTray} data-map={wholeMap ? "whole" : "close"}>
       <header className="tabletop__top" {...behindSheet}>
         <h1 className="visually-hidden">{config.name} game table</h1>
         <div className="tabletop__seats" data-tour-target="roster">
@@ -303,7 +330,7 @@ export function GameplayScreen({
           {lastMove}
         </p>
         <TurnIndicator label={turnLabel} timerLabel={timerLabel} data-tour-target="turn" />
-        <div className="tabletop__menu">
+        <div className="tabletop__menu" ref={menuRef} data-open={menuOpen}>
           {fullScreen.mode === "none" ? null : (
             <Button
               className="tabletop__menu-button tabletop__menu-button--icon"
@@ -316,9 +343,30 @@ export function GameplayScreen({
               </svg>
             </Button>
           )}
-          <Button className="tabletop__menu-button" onClick={() => setGuideOpen(true)}>Guide</Button>
+          <Button className="tabletop__menu-button tabletop__menu-toggle" aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)}>
+            Menu
+          </Button>
+          <div className="tabletop__menu-items">
+          <Button
+            className="tabletop__menu-button"
+            onClick={() => {
+              setMenuOpen(false);
+              setGuideOpen(true);
+            }}
+          >
+            Guide
+          </Button>
           <ScoreGuide className="score-guide--subtle tabletop__menu-item" label="Score" />
-          <Button className="tabletop__menu-button tabletop__menu-button--leave" onClick={() => setShowLeaveConfirm(true)}>{copy.leaveLabel}</Button>
+          <Button
+            className="tabletop__menu-button tabletop__menu-button--leave"
+            onClick={() => {
+              setMenuOpen(false);
+              setShowLeaveConfirm(true);
+            }}
+          >
+            {copy.leaveLabel}
+          </Button>
+          </div>
         </div>
       </header>
 
@@ -343,7 +391,7 @@ export function GameplayScreen({
                 setSelectedTicketIds((current) => (current.includes(ticketId) ? current.filter((id) => id !== ticketId) : [...current, ticketId]))
               }
               onConfirm={() =>
-                onAction({ type: isInitialTickets ? "select_initial_tickets" : "keep_drawn_tickets", keptTicketIds: selectedTicketIds })
+                act({ type: isInitialTickets ? "select_initial_tickets" : "keep_drawn_tickets", keptTicketIds: selectedTicketIds })
               }
             />
           ) : null}
@@ -355,13 +403,13 @@ export function GameplayScreen({
               pinnedTicketId={pinnedTicket?.id ?? null}
               onFocusTicket={setFocusedTicket}
               onTogglePinnedTicket={(ticket) => setPinnedTicket((current) => (current?.id === ticket.id ? null : ticket))}
-              onDrawTickets={() => onAction({ type: "draw_tickets" })}
+              onDrawTickets={() => act({ type: "draw_tickets" })}
               drawTicketsDisabled={!canTakeTurnAction}
             />
           )}
         </aside>
 
-        <div className={`tabletop__board ${canAct && game.phase === "main" ? "tabletop__board--my-turn" : ""}`} data-tour-target="board">
+        <div className={`tabletop__board ${canAct && game.phase === "main" ? "tabletop__board--my-turn" : ""}`} data-tour-target="board" ref={boardRef}>
           <BoardMap
             config={config}
             backdrop={visuals.backdrop}
@@ -380,6 +428,13 @@ export function GameplayScreen({
           />
         </div>
 
+        <div className="tabletop__map-tools">
+          {panHint && !wholeMap ? <p className="tabletop__pan-hint">Drag the map to look around</p> : null}
+          <button type="button" className="tabletop__map-toggle" aria-pressed={wholeMap} onClick={() => setWholeMap((whole) => !whole)}>
+            {wholeMap ? "Zoom in" : "Whole map"}
+          </button>
+        </div>
+
         <aside className="tabletop__right" data-tour-target="market">
           <TableSupply
             market={game.market}
@@ -389,11 +444,11 @@ export function GameplayScreen({
             isMarketCardDisabled={(card) => !canTakeMarketCard(game.turn, card)}
             onDrawFromMarket={(marketIndex) => {
               markSource(document.querySelectorAll('[data-draw-source="market"]')[marketIndex] ?? null);
-              onAction({ type: "draw_card", source: "market", marketIndex });
+              act({ type: "draw_card", source: "market", marketIndex });
             }}
             onDrawFromDeck={() => {
               markSource(document.querySelector('[data-draw-source="deck"] .train-card'));
-              onAction({ type: "draw_card", source: "deck" });
+              act({ type: "draw_card", source: "deck" });
             }}
           />
           <div className="tabletop__side">{sidePanel}</div>
@@ -474,7 +529,7 @@ export function GameplayScreen({
 
       {/* Outside the board: on a phone the board scrolls, and Safari loses taps on a fixed panel inside a scroller. */}
       {(currentRoute || currentCity) && game.phase === "main" && !privateInfoHidden ? (
-        <FloatingBuildPanel anchor={buildAnchor} onClose={clearSelection}>
+        <FloatingBuildPanel anchor={buildAnchor} sheet={phoneTable} onClose={clearSelection}>
           {currentRoute ? (
             <RouteBuildPanel
               route={currentRoute}
@@ -485,7 +540,7 @@ export function GameplayScreen({
               disabled={!canTakeTurnAction}
               claimedByName={currentRouteOwner?.name ?? null}
               costSummary={describeRouteCost(currentRoute)}
-              onClaim={(color) => onAction({ type: "claim_route", routeId: currentRoute.id, color })}
+              onClaim={(color) => act({ type: "claim_route", routeId: currentRoute.id, color })}
               onPaymentPreviewEnter={setPaymentPreview}
               onPaymentPreviewLeave={() => setPaymentPreview(null)}
             />
@@ -499,7 +554,7 @@ export function GameplayScreen({
               cardPalette={cardPalette}
               disabled={!canTakeTurnAction}
               turnStage={game.turn.stage}
-              onBuild={(color) => onAction({ type: "build_station", cityId: currentCity.id, color })}
+              onBuild={(color) => act({ type: "build_station", cityId: currentCity.id, color })}
               onPaymentPreviewEnter={setPaymentPreview}
               onPaymentPreviewLeave={() => setPaymentPreview(null)}
             />

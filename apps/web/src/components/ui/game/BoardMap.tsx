@@ -346,7 +346,7 @@ export const BoardMap = memo(function BoardMap({
           const tieCount = claim ? Math.floor(totalLength / 10) : 0;
 
           return (
-            <g key={route.id}>
+            <g key={route.id} data-route-id={route.id}>
               {selected ? (
                 <path d={pathD} className="route-selection" fill="none" />
               ) : null}

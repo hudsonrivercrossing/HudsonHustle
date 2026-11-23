@@ -170,6 +170,16 @@
   cursor: pointer;
 }
 
+.ticket-choice__confirm,
+.table-tickets__deck {
+  transition: transform var(--duration-fast) var(--easing-standard);
+}
+
+.ticket-choice__confirm:active:not(:disabled),
+.table-tickets__deck:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
 .ticket-choice__confirm:disabled {
   cursor: default;
   opacity: 0.5;
@@ -181,7 +191,7 @@
 }
 
 /* On a phone four tickets and the button share less than half the screen. */
-@media (max-width: 760px), (orientation: landscape) and (max-height: 500px) {
+@media (max-width: 760px), (orientation: landscape) and (max-height: 500px) and (min-width: 560px) {
   .ticket-stub {
     min-height: 56px;
   }

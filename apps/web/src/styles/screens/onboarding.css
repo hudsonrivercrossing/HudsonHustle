@@ -91,7 +91,7 @@
 
 /* On a phone the bottom of the screen is the hand and the trays, so the tip goes to the top,
    over the upper edge of the board, which can be panned out from under it. */
-@media (max-width: 760px), (orientation: landscape) and (max-height: 500px) {
+@media (max-width: 760px), (orientation: landscape) and (max-height: 500px) and (min-width: 560px) {
   .table-tip {
     top: max(7.5rem, calc(env(safe-area-inset-top) + 7.5rem));
     right: var(--space-stack-sm);

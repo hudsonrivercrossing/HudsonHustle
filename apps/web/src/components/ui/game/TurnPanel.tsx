@@ -18,7 +18,7 @@ export function TurnPanel({ state, className = "" }: TurnPanelProps): JSX.Elemen
     <div className={["turn-panel", className].filter(Boolean).join(" ")}>
       <div className="turn-panel__body" aria-live="polite">
         {state.kind === "idle" ? (
-          <p className="turn-panel__note">Draw cards, claim a route, build a station, or draw tickets.</p>
+          <p className="turn-panel__note turn-panel__note--idle">Draw cards, claim a route, build a station, or draw tickets.</p>
         ) : null}
         {state.kind === "drawing" ? (
           <>

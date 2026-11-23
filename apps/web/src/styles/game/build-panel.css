@@ -182,3 +182,58 @@
   border: none;
   background: none;
 }
+
+/* On a phone the panel is a sheet along the bottom of the table: always in the same place, under the thumb.
+   It is placed against the table, not the window, because Safari's toolbar can cover the window's bottom edge. */
+.floating-build-panel.floating-build-panel--sheet {
+  position: absolute;
+  top: auto;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: auto;
+  padding-top: 0;
+  padding-bottom: max(var(--space-stack-lg), env(safe-area-inset-bottom));
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  transform: none;
+  transition: transform var(--duration-slow) var(--easing-enter);
+  animation: build-sheet-up var(--duration-slow) var(--easing-enter) both;
+}
+
+@keyframes build-sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+/* The strip to drag the sheet down by. */
+.floating-build-panel__grip {
+  display: grid;
+  place-items: center;
+  height: var(--space-stack-xl);
+  cursor: grab;
+  touch-action: none;
+}
+
+.floating-build-panel__grip::before {
+  content: "";
+  width: var(--space-stack-xl);
+  height: var(--space-stack-xs);
+  border-radius: var(--radius-pill);
+  background: color-mix(in oklch, var(--hud-paper-solid) 36%, transparent);
+}
+
+/* On its side the phone has no room across the bottom: the sheet keeps to the rail. */
+@media (orientation: landscape) and (max-height: 500px) and (min-width: 560px) {
+  .floating-build-panel.floating-build-panel--sheet {
+    left: auto;
+    width: clamp(272px, 40vw, 344px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floating-build-panel.floating-build-panel--sheet {
+    animation: none;
+    transition: none;
+  }
+}

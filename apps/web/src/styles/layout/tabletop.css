@@ -69,6 +69,16 @@
   transition: color var(--duration-fast) var(--easing-standard), background-color var(--duration-fast) var(--easing-standard);
 }
 
+/* On a wide screen the menu is three words in a row; the button that folds them away is for phones. */
+.tabletop .tabletop__menu-toggle.system-button,
+.tabletop__map-tools {
+  display: none;
+}
+
+.tabletop__menu-items {
+  display: contents;
+}
+
 /* A menu item that is only a mark: square, the size of a fingertip. */
 .tabletop .tabletop__menu-button--icon.system-button {
   display: grid;
@@ -218,7 +228,7 @@
 
 /* Phones: the board keeps most of the screen and pans under the finger. Cards and tickets share
    one tray below it, and the hand stays pinned at the bottom. */
-@media (max-width: 760px), (orientation: landscape) and (max-height: 500px) {
+@media (max-width: 760px), (orientation: landscape) and (max-height: 500px) and (min-width: 560px) {
   .tabletop {
     --card-w: 56px;
     --supply-card-w: 56px;
@@ -351,11 +361,125 @@
     background: var(--hud-paper);
     color: var(--hud-ink);
   }
+  /* Three words do not fit beside the turn on a phone: they fold into one. */
+  .tabletop .tabletop__menu-toggle.system-button {
+    display: inline-flex;
+  }
+
+  .tabletop__menu-items {
+    position: absolute;
+    top: calc(100% + var(--space-stack-xs));
+    right: 0;
+    z-index: var(--z-dropdown);
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    min-width: 176px;
+    padding: var(--space-stack-xs);
+    border-radius: var(--radius-card);
+    background: var(--hud-wood-light);
+    box-shadow: 0 12px 28px var(--hud-shadow);
+  }
+
+  .tabletop__menu[data-open="true"] .tabletop__menu-items {
+    display: flex;
+    animation: table-menu-in var(--duration-fast) var(--easing-enter) both;
+  }
+
+  .tabletop .tabletop__menu-items .tabletop__menu-button.system-button,
+  .tabletop .tabletop__menu-items .score-guide__trigger.system-button {
+    justify-content: flex-start;
+    width: 100%;
+    padding: 0 var(--space-stack-md);
+  }
+
+  .tabletop__menu-items .score-guide {
+    width: 100%;
+  }
+
+  /* The tip card and the cards themselves already say what a turn is. */
+  .turn-panel__note--idle {
+    display: none;
+  }
+
+  /* Over the lower right corner of the board: one button to see the whole map, and a word about dragging. */
+  .tabletop__map-tools {
+    grid-area: board;
+    place-self: end;
+    z-index: var(--z-raised);
+    display: flex;
+    gap: var(--space-stack-xs);
+    align-items: center;
+    margin: var(--space-stack-xs);
+    pointer-events: none;
+  }
+
+  .tabletop__map-toggle,
+  .tabletop__pan-hint {
+    margin: 0;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: color-mix(in oklch, var(--hud-wood) 84%, transparent);
+    color: var(--hud-paper-bright);
+    font: inherit;
+    font-size: var(--type-sm);
+  }
+
+  .tabletop__map-toggle {
+    min-height: var(--hit-target-min);
+    padding: 0 var(--space-stack-md);
+    font-weight: var(--weight-bold);
+    pointer-events: auto;
+    transition: transform var(--duration-fast) var(--easing-standard);
+  }
+
+  .tabletop__map-toggle:active,
+  .tabletop__tabs button:active {
+    transform: scale(0.97);
+  }
+
+  .tabletop__tabs button {
+    transition: transform var(--duration-fast) var(--easing-standard);
+  }
+
+  .tabletop__pan-hint {
+    padding: var(--space-stack-xs) var(--space-stack-md);
+    color: var(--hud-paper-soft);
+    animation: table-menu-in var(--duration-slow) var(--easing-enter) both;
+  }
+
+  /* The whole map at once: small, for planning; names are drawn larger so they can still be read. */
+  .tabletop[data-map="whole"] .tabletop__board .board-shell {
+    width: 100%;
+  }
+
+  .tabletop[data-map="whole"] .board-label {
+    font-size: calc(var(--type-board-lg) * 1.4);
+  }
 }
 
-/* A phone on its side is wide and very short. The board takes the whole height on the left and is
-   shown whole; everything else stacks in one rail on the right, so nothing sits above or below the map. */
-@media (orientation: landscape) and (max-height: 500px) {
+/* With the keyboard up the board has almost no height left, and nothing to float a button over. */
+@media (max-width: 760px) and (max-height: 520px) {
+  .tabletop__map-tools {
+    display: none;
+  }
+}
+
+@keyframes table-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tabletop__menu[data-open="true"] .tabletop__menu-items,
+  .tabletop__pan-hint {
+    animation: none;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) and (min-width: 560px) {
   .tabletop {
     --card-w: 42px;
     --supply-card-w: 40px;
@@ -371,6 +495,10 @@
 
   .tabletop__board {
     overflow: hidden;
+  }
+
+  .tabletop__map-tools {
+    display: none;
   }
 
   /* The rail is narrow: the menu words sit closer so the turn stays on one line. */

@@ -3,7 +3,7 @@ import { coachHints, markMomentSeen, readSeenMoments, turnOffTips, type CoachMom
 
 const RING_PADDING = 6;
 // Matches the phone arrangement of the table: a narrow screen, or a phone turned on its side.
-const PHONE = "(max-width: 760px), (orientation: landscape) and (max-height: 500px)";
+const PHONE = "(max-width: 760px), (orientation: landscape) and (max-height: 500px) and (min-width: 560px)";
 const TIP_GAP = 8;
 
 interface Ring {

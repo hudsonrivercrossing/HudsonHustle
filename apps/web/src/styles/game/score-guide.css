@@ -108,7 +108,7 @@
   box-shadow: inset 0 0 0 1px oklch(96.88% 0.0372 88.46 / 0.08), 0 24px 54px oklch(0% 0 0 / 0.54);
 }
 
-@media (max-width: 760px), (orientation: landscape) and (max-height: 500px) {
+@media (max-width: 760px), (orientation: landscape) and (max-height: 500px) and (min-width: 560px) {
   .app-shell--gameplay-hud .score-guide__panel {
     right: auto;
     left: 0;

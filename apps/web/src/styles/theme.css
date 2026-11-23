@@ -196,3 +196,11 @@
     --space-stack-lg: 20px;
   }
 }
+
+/* Under a finger and at arm's length the two smallest sizes are too small: each steps up one. */
+@media (pointer: coarse) {
+  :root {
+    --type-2xs: 0.75rem;
+    --type-xs: 0.8125rem;
+  }
+}
