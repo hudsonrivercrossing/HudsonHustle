@@ -23,6 +23,11 @@ export class PostgresRoomRepository implements RoomRepository {
     this.ready = migrate(this.db, { migrationsFolder });
   }
 
+  /** Resolves once the schema is migrated; rejects if a migration failed. */
+  whenReady(): Promise<void> {
+    return this.ready;
+  }
+
   async saveRoom(record: StoredRoomRecord, historyUpdate?: StoredGameHistoryUpdate, options?: SaveRoomOptions): Promise<void> {
     await this.ready;
     const updatedAt = new Date(record.updatedAt);

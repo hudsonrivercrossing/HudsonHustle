@@ -8,7 +8,6 @@ export {
   botPlayerIdsFromSavedGame,
   botPlayerIdsFromSeatIds,
   configIdForSavedMap,
-  formatFaceLabel,
   readSavedGame,
   shuffleAvatars,
   type LocalStartSetup,

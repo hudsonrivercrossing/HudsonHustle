@@ -44,7 +44,6 @@ Keep these families distinct:
 - Keep gameplay rules in shared code, not React components.
 - UI changes must not silently change gameplay behavior.
 - Update player-facing docs when gameplay behavior changes.
-- Use showcases and Storybook as review tools, not source of truth.
 - Stay shell-first and map-conservative unless a task explicitly expands map work.
 
 ## Canonical Docs

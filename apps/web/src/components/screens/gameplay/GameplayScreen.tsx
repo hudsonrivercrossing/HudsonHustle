@@ -26,7 +26,8 @@ import {
   type GameplayNotification
 } from "../../ui/game";
 import { EndgameGrid, RouteBuildPanel, StationBuildPanel, shuffleAvatars } from "../../local";
-import OnboardingTour, { resetTourSeen, shouldShowTour } from "../../shared/OnboardingTour";
+import { CoachHint } from "../../shared/CoachHint";
+import { pickCoachMoment, resetTips } from "../../shared/coachHints";
 import { Button } from "../../ui/primitives/Button";
 import { ModalShell } from "../../ui/primitives/ModalShell";
 import { Panel } from "../../ui/primitives/Panel";
@@ -109,7 +110,7 @@ export function GameplayScreen({
   const [pinnedTicket, setPinnedTicket] = useState<TicketDef | null>(null);
   const [paymentPreview, setPaymentPreview] = useState<PaymentPreview | null>(null);
   const [guideOpen, setGuideOpen] = useState(false);
-  const [tourOpen, setTourOpen] = useState(() => shouldShowTour());
+  const [tipsResetToken, setTipsResetToken] = useState(0);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [replayOpen, setReplayOpen] = useState(false);
   const lastPendingTicketKeyRef = useRef("");
@@ -194,9 +195,9 @@ export function GameplayScreen({
       <GuidebookScreen
         onBack={() => setGuideOpen(false)}
         onReplayTour={() => {
-          resetTourSeen();
+          resetTips();
+          setTipsResetToken((current) => current + 1);
           setGuideOpen(false);
-          setTourOpen(true);
         }}
       />
     );
@@ -351,7 +352,7 @@ export function GameplayScreen({
               onDrawFromDeck={() => onAction({ type: "draw_card", source: "deck" })}
               className="supply-dock--board"
             />
-            {pendingTickets.length > 0 && !privateInfoHidden && !ticketChoiceSuppressed && !tourOpen ? (
+            {pendingTickets.length > 0 && !privateInfoHidden && !ticketChoiceSuppressed ? (
               <TicketChoiceSheet
                 title={isInitialTickets ? copy.initialTicketsTitle : copy.drawnTicketsTitle}
                 subtitle={isInitialTickets ? copy.initialTicketsSubtitle : copy.drawnTicketsSubtitle}
@@ -415,7 +416,23 @@ export function GameplayScreen({
 
       <NotificationPipe notifications={notifications} />
 
-      {tourOpen ? <OnboardingTour onDismiss={() => setTourOpen(false)} /> : null}
+      <CoachHint
+        resetToken={tipsResetToken}
+        moment={
+          showLeaveConfirm || replayOpen
+            ? null
+            : pickCoachMoment({
+                phase: game.phase,
+                canAct,
+                privateInfoHidden,
+                choosingTickets: pendingTickets.length > 0 && !ticketChoiceSuppressed,
+                turnStage: game.turn.stage,
+                routeSelected: Boolean(currentRoute),
+                citySelected: Boolean(currentCity),
+                finalRound: game.finalRoundRemaining !== null
+              })
+        }
+      />
     </div>
   );
 }

@@ -134,7 +134,7 @@ export function GuidebookScreen({ onBack, onReplayTour }: GuidebookScreenProps):
       <div className="guidebook-page-action">
         <Button onClick={onBack}>Back</Button>
         {onReplayTour ? (
-          <Button onClick={onReplayTour}>Replay tour</Button>
+          <Button onClick={onReplayTour}>Show tips again</Button>
         ) : null}
       </div>
       <section className="guidebook-card" aria-labelledby="guidebook-step-title">

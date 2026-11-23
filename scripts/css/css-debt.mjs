@@ -28,10 +28,9 @@ function walk(dir, matches, out = []) {
   return out;
 }
 
-const cssFiles = readdirSync(stylesDir)
-  .filter((name) => name.endsWith(".css"))
+const cssFiles = walk(stylesDir, (name) => name.endsWith(".css"))
   .sort()
-  .map((name) => ({ name, text: stripComments(readFileSync(path.join(stylesDir, name), "utf8")) }));
+  .map((file) => ({ name: path.relative(stylesDir, file), text: stripComments(readFileSync(file, "utf8")) }));
 const componentCss = cssFiles.filter((file) => file.name !== TOKEN_FILE);
 const tsxText = walk(sourceDir, (name) => /\.tsx?$/.test(name))
   .map((file) => readFileSync(file, "utf8"))
@@ -86,8 +85,12 @@ const metrics = {
     .flatMap(([token, uses]) => uses.filter((use) => !use.hasFallback).map((use) => `${where(use)} ${token}`)),
   unusedTokens: [...themeTokens].filter((token) => !usedTokens.has(token)).map((token) => `${TOKEN_FILE} ${token}`),
   important: allDeclarations.filter((entry) => entry.value.includes("!important")).map((entry) => `${where(entry)} ${entry.property}`),
+  // Colours are written in OKLCH; hex and rgb() are not allowed back in at all.
+  legacyColors: allDeclarations
+    .filter((entry) => /#[0-9a-f]{3,8}\b|\b(rgba?|hsla?)\(/i.test(entry.value))
+    .map((entry) => `${where(entry)} ${entry.property}: ${entry.value}`),
   literalColors: allDeclarations
-    .filter((entry) => /#[0-9a-f]{3,8}\b|\brgba?\(\s*\d/i.test(entry.value))
+    .filter((entry) => /\boklch\(\s*[\d.]/i.test(entry.value))
     .map((entry) => `${where(entry)} ${entry.property}: ${entry.value}`),
   literalFontWeights: allDeclarations
     .filter((entry) => entry.property === "font-weight" && /^\d/.test(entry.value))

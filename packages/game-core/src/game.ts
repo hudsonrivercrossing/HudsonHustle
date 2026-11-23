@@ -5,6 +5,7 @@ import {
   type GameAction,
   type GameEvent,
   type GameEventInput,
+  type GameMove,
   type GameSetup,
   type GameState,
   type MapConfig,
@@ -54,6 +55,20 @@ function recordEvent(state: GameState, event: GameEventInput): void {
   const events = state.events ?? [];
   const seq = (events.at(-1)?.seq ?? 0) + 1;
   state.events = [...events, { ...event, seq } as GameEvent].slice(-RECENT_EVENT_LIMIT);
+  // A game saved before moves were recorded has no list to extend; replay falls back to the final board.
+  if (state.moves && isMove(event)) {
+    state.moves = [...state.moves, event];
+  }
+}
+
+function isMove(event: GameEventInput): event is GameMove {
+  return (
+    event.type === "route_claimed" ||
+    event.type === "station_built" ||
+    event.type === "tickets_kept" ||
+    event.type === "card_drawn" ||
+    event.type === "tunnel_failed"
+  );
 }
 
 /** Events with a sequence number above `lastSeenSeq`, oldest first. */
@@ -653,10 +668,6 @@ export function reduceGame(state: GameState, untrustedAction: GameAction, config
       beginAwaitingHandoff(nextState, `${player.name} claimed ${route.id}.`);
       appendLog(nextState, `${player.name} claimed ${route.id} for ${routeScoreTable[route.length] ?? route.length * 2} points.`);
       recordEvent(nextState, { type: "route_claimed", playerId: player.id, routeId: route.id, points: routeScoreTable[route.length] ?? route.length * 2 });
-      nextState.moves = [
-        ...(nextState.moves ?? []),
-        { type: "route_claimed", playerId: player.id, routeId: route.id, points: routeScoreTable[route.length] ?? route.length * 2 }
-      ];
       return nextState;
     }
     case "draw_tickets": {
@@ -718,7 +729,6 @@ export function reduceGame(state: GameState, untrustedAction: GameAction, config
       beginAwaitingHandoff(nextState, `${player.name} built a station in ${action.cityId}.`);
       appendLog(nextState, `${player.name} built a station in ${action.cityId}.`);
       recordEvent(nextState, { type: "station_built", playerId: player.id, cityId: action.cityId });
-      nextState.moves = [...(nextState.moves ?? []), { type: "station_built", playerId: player.id, cityId: action.cityId }];
       return nextState;
     }
     case "advance_turn": {

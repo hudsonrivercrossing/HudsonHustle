@@ -3,40 +3,44 @@
 ## Stack at a glance
 
 - **App:** `apps/web/` — React + Vite + TypeScript
-- **Styles:** `apps/web/src/styles/` — CSS custom properties, no CSS-in-JS
-- **Design tokens:** `apps/web/src/styles/theme.css` — single source of truth for all tokens
-- **Design files:** `apps/web/src/design/*.pen` — Pencil files, sync via `/pencil-push` or `/pencil-pull`
-- **Components:** `apps/web/src/components/` — see folder map below
-- **Storybook:** `pnpm --filter web storybook`
+- **Server:** `apps/server/` — Fastify + Socket.IO, Postgres through Drizzle (migrations in `apps/server/drizzle/`)
+- **Rules engine:** `packages/game-core/` — pure, deterministic, no UI imports
+- **Map data:** `packages/game-data/` and `configs/hudson-hustle/`
+- **Styles:** `apps/web/src/styles/` — plain CSS with custom properties, one file per component
+- **Design tokens:** `apps/web/src/styles/theme.css` — the single source of truth
+
+There is no Storybook and no separate design file. The running app is the reference: change the code, then look at it.
 
 ---
 
 ## CSS file map
 
-| File | What it styles | Component folder |
-|---|---|---|
-| `theme.css` | All design tokens — colors, space, type, radius, motion, z-index | — (tokens only) |
-| `ui.css` | Game-agnostic UI primitives | `components/ui/primitives/` |
-| `game.css` | Game-domain primitives + live HUD | `components/ui/game/` + `components/screens/gameplay/` |
-| `layout.css` | App shell, game grid, board column | `components/screens/` |
-| `setup.css` | Setup and lobby flow styles | `components/setup/` + `components/online/` |
-| `onboarding.css` | Onboarding overlay | `components/shared/OnboardingTour` |
+`apps/web/src/styles.css` lists every stylesheet in cascade order. Keep that order: tokens, then base, layout, primitives, then features.
 
-Import order in `styles.css`: `theme.css` → `ui.css` → `game.css` → `layout.css` → `setup.css` → `onboarding.css`
+| Folder | What it styles | Component folder |
+|---|---|---|
+| `theme.css` | All tokens — colour, space, type, radius, motion, stacking | — |
+| `base.css` | Element defaults and the reduced-motion rule | — |
+| `layout/` | App shell and the game grid | `components/screens/` |
+| `primitives/` | Game-agnostic pieces: button, chip, panel, form-field, modal-shell, … | `components/ui/primitives/` |
+| `game/` | Board, hand, supply dock, tickets, roster, topbar, replay, … | `components/ui/game/` + `components/screens/gameplay/` + `components/screens/replay/` |
+| `screens/` | Setup, lobby, guidebook, onboarding tips | `components/setup/` + `components/online/` + `components/screens/` + `components/shared/` |
+
+A rule lives in the file of the component that is doing the styling. `.supply-dock .system-button` belongs in `game/supply-dock.css`, not in `primitives/button.css`. A new component gets a new file and a new `@import` line.
 
 ---
 
 ## Component folder map
 
-| Folder | What lives here | CSS counterpart |
-|---|---|---|
-| `ui/primitives/` | Game-agnostic primitives: Button, Panel, Badge, FormField, ModalShell, SectionHeader, StateSurface, StatusBanner, SurfaceCard, ChoiceChipButton, TimerPicker | `ui.css` |
-| `ui/game/` | Game-domain primitives: CardSlot, SeatTile, TicketSlip, TransitCard, BoardMap, BoardStage, InspectorDock, PlayerRosterPanel, SupplyDock… | `game.css` |
-| `screens/` | Full screens — `screens/gameplay/` is the most complex | `layout.css` |
-| `local/` | Local-play feature panels and utilities | `game.css` |
-| `online/` | Online feature flows (create/join room) | `setup.css` |
-| `setup/` | Setup-flow shared pieces used by multiple screens | `setup.css` |
-| `shared/` | Cross-cutting: ErrorBoundary, OnboardingTour | `onboarding.css` |
+| Folder | What lives here |
+|---|---|
+| `ui/primitives/` | Game-agnostic primitives: Button, Panel, Badge, FormField, ModalShell, SectionHeader, StateSurface, StatusBanner, SurfaceCard, ChoiceChipButton, TimerPicker |
+| `ui/game/` | Game-domain primitives: CardSlot, SeatTile, TicketSlip, BoardMap, BoardStage, PlayerRosterPanel, SupplyDock, TurnPanel… |
+| `screens/` | Full screens — `screens/gameplay/` is shared by local and online play |
+| `local/` | Local-play panels and storage helpers |
+| `online/` | Online flows (create and join a room) and `useOnlineRoom` |
+| `setup/` | Setup pieces shared by local and online setup |
+| `shared/` | Cross-cutting: ErrorBoundary, CoachHint (tips shown at the moment they apply) |
 
 **The one rule:** if a component takes props and renders with no external state, socket, or store — it lives in `ui/`. If it assembles a full screen, it lives in `screens/`. Otherwise pick the right feature folder.
 
@@ -44,93 +48,65 @@ Each folder has one `index.ts`. No folder's index re-exports from a sibling or p
 
 ---
 
-## UI/UX change workflow
-
-Use this order for any visual or interaction change — from a small tweak to a new screen.
+## UI change workflow
 
 ### 1. Understand before touching code
 
 - Check `theme.css` first — does a token already exist for what you need?
-- Check the CSS file that owns the component (see CSS file map above)
-- If the idea is bigger than a 1-line tweak, use `/brainstorm` before writing anything
-- Before any feature work: open `hudsonhustle.pen` and confirm the token, component, or layout zone you need exists — add to Pencil first, then write CSS/TSX
+- Find the stylesheet that owns the component (see the map above).
+- Game rules never go in React components; they belong in `packages/game-core`.
 
 ### 2. Token-first
 
-All visual values must trace back to a token in `theme.css`:
-
 | What you're changing | Token family |
 |---|---|
-| Colors, surfaces, shadows | `--color-*`, `--surface-*`, `--shadow-*` |
+| Colours, surfaces, shadows | `--color-*`, `--surface-*`, `--shadow-*` |
 | Spacing, padding, gap | `--space-*` |
-| Typography | `--type-*`, `--weight-*`, `--font-*` |
+| Typography | `--type-*`, `--weight-*`, `--font-*`, `--ls-*` |
 | Border radius | `--radius-*` |
 | Motion | `--duration-*`, `--easing-*` |
+| Stacking | `--z-*` |
 
-Never hardcode `px`, hex, or `rem` values in component CSS — use `var(--token-name)`.
+### 3. Verify (all three)
 
-### 3. Implement
+1. **Checks** — `pnpm typecheck`, `pnpm test`, `pnpm css:debt`
+2. **Dev server** — `pnpm --filter @hudson-hustle/web dev`, golden path: setup → local game → keep tickets → draw → claim a route → end turn
+3. **End to end** — `pnpm --filter @hudson-hustle/web test:e2e` when a flow, a label, or a test id changed
 
-- Add/change token values in `theme.css`
-- Edit component styles in the correct CSS file (see map above)
-- New `ui/primitives/` or `ui/game/` component → add a `.stories.tsx` alongside it
-- Story title format: `"System/Primitives/ComponentName"` or `"System/Game/ComponentName"`
+### 4. PR checklist
 
-### 4. Visual verification (do all three)
-
-1. **Storybook** — `pnpm --filter web storybook` — component in isolation, all variants
-2. **Dev server** — `pnpm --filter web dev` — golden path: Setup → Lobby → Local game → draw a ticket → end turn
-3. **Regression check** — glance at unchanged screens for side-effects (buttons, form fields, badges)
-
-### 5. Sync design files
-
-After any token or visual change, sync back to Pencil:
-
-```
-/pencil-push
-```
-
-This keeps `tokens.pen` and `components.pen` aligned with the live CSS.
-
-### 6. PR checklist
-
-- [ ] No hardcoded values — all CSS uses tokens
-- [ ] Storybook passes (new/changed component has a story)
-- [ ] Golden path tested in dev server
-- [ ] `tokens.pen` / `components.pen` updated via `/pencil-push`
-- [ ] Screenshot in PR description showing before/after
+- [ ] `pnpm css:debt` does not report growth
+- [ ] New logic has a unit test beside it
+- [ ] Golden path walked in the dev server, at desktop and phone width
+- [ ] Screenshot in the PR description for a visible change
 
 ---
 
 ## CSS authoring rules
 
-- Token usage is mandatory — `var(--radius-md)` not `12px`
-- Spacing scale: `4 / 8 / 12 / 16 / 24 / 32px` → `--space-stack-xs/sm/md/lg/xl`
-- `backdrop-filter: blur()` capped at 2 layers per viewport — avoid on secondary surfaces
-- No `border-left` stripes for visual hierarchy — use token-backed fills or perforation edges
+- Colours are written in **OKLCH**. Hex, `rgb()` and `hsl()` are rejected by `pnpm css:debt`.
+- A tint is `color-mix(in oklch, var(--x-solid) 12%, transparent)`, not a second token with the alpha baked in.
+- `z-index` always uses a `--z-*` token. The scale is ordered in `theme.css`; add a named layer rather than a number.
+- Spacing scale: `4 / 8 / 12 / 16 / 24 / 32px` → `--space-stack-xs/sm/md/lg/xl`.
+- No `!important`. The ones left are the reduced-motion rule and the build-panel reset; do not add more — raise the question of why the cascade is being fought instead.
+- One rule per selector per file. If a selector appears twice, merge the two.
+- `backdrop-filter: blur()` capped at 2 layers per viewport.
+- No `border-left` stripes for hierarchy — use token-backed fills or perforation edges.
+- `transition` names its properties; never `transition: all`.
 
----
-
-## Pen file map
-
-**Active file:** `design/hudsonhustle.pen` — unified 3-column canvas, the only pen file in use.
-
-| Column | CSS source | Content |
-|---|---|---|
-| Column 1 — Tokens | `theme.css` | Color, space, type, motion, radius tokens |
-| Column 2 — Components | `ui.css` + `game.css` | Component specs and state matrices |
-| Column 3 — Layout | `layout.css` + `setup.css` | Screen compositions at 3 breakpoints |
-
-`tokens.pen`, `components.pen`, and `layout.pen` are deprecated — do not use or sync them.
-
-`.pen` files are encrypted — only access via `pencil` MCP tools, never `Read` or `grep`.
+`pnpm css:debt` counts literal values that should be tokens and fails when a count grows. When a count shrinks, lock it in with `pnpm css:debt --update`.
 
 ---
 
 ## Running the project
 
 ```bash
-pnpm --filter web dev          # dev server
-pnpm --filter web storybook    # component explorer
-pnpm --filter web tsc --noEmit # type check
+pnpm --filter @hudson-hustle/web dev      # web dev server
+pnpm --filter @hudson-hustle/server dev   # API and sockets (in-memory unless DATABASE_URL is set)
+pnpm typecheck                            # sources and tests, all packages
+pnpm test                                 # unit tests, all packages
+pnpm css:debt                             # token debt ratchet
+pnpm sim -- --duel hard,standard          # bot balance simulator
 ```
+
+The server tests clear `DATABASE_URL` and `PG*` so they can never reach a real database. The Postgres integration tests run only when `HH_TEST_DATABASE_URL` points at a disposable server.

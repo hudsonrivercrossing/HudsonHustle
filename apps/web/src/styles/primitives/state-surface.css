@@ -1,0 +1,128 @@
+.state-surface__aside::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(90deg, color-mix(in oklch, var(--control-surface-solid) 3.5%, transparent) 1px, transparent 1px) 0 0 / 16px 16px, linear-gradient(180deg, color-mix(in oklch, var(--control-surface-solid) 8%, transparent), transparent 42%);
+  z-index: var(--z-base);
+}
+
+.state-surface {
+  margin-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 14px;
+  padding: 18px 20px;
+  border-radius: calc(var(--radius-md) + 2px);
+  transition: transform var(--duration-base) var(--easing-standard), box-shadow var(--duration-base) var(--easing-standard), border-color var(--duration-base) var(--easing-standard), background-color var(--duration-base) var(--easing-standard);
+  flex-direction: column;
+  border: 1px solid var(--status-neutral-border);
+  box-shadow: var(--status-neutral-shadow);
+  background: var(--status-neutral-bg);
+}
+
+.state-surface--neutral {
+  border-color: var(--status-neutral-border);
+  box-shadow: var(--status-neutral-shadow);
+  background: var(--status-neutral-bg);
+}
+
+.state-surface--active {
+  background: var(--status-active-bg);
+  border-color: var(--status-active-border);
+  box-shadow: var(--status-active-shadow);
+}
+
+.state-surface--waiting {
+  background: var(--status-waiting-bg);
+  border-color: var(--status-waiting-border);
+  box-shadow: var(--status-waiting-shadow);
+}
+
+.state-surface--warning {
+  background: var(--status-warning-bg);
+  border-color: var(--status-warning-border);
+  box-shadow: var(--status-warning-shadow);
+}
+
+.state-surface--danger {
+  background: var(--status-failure-bg);
+  border-color: var(--status-failure-border);
+  box-shadow: var(--status-failure-shadow);
+}
+
+.state-surface__body {
+  display: grid;
+  gap: 6px;
+}
+
+.state-surface__eyebrow {
+  display: block;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: var(--type-eyebrow);
+  font-weight: var(--weight-semibold);
+  color: var(--ink-soft);
+}
+
+/* loading/waiting state surface — display font for prominent state message */
+.state-surface__headline {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.2vw, 2.15rem);
+  font-weight: var(--weight-bold);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+}
+
+.state-surface__copy {
+  display: block;
+  color: var(--ink-soft);
+  line-height: 1.48;
+  font-size: var(--type-body-sm);
+}
+
+.state-surface__aside {
+  align-self: flex-start;
+  padding: 10px 14px;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(180deg, oklch(99.2% 0.0073 80.72 / 0.96), oklch(93.35% 0.0246 83.42 / 0.9));
+  border: 1px solid color-mix(in oklch, var(--border-subtle-solid) 16%, transparent);
+  box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.54), 0 8px 16px color-mix(in oklch, var(--shadow-warm-solid) 7%, transparent);
+  font-family: var(--font-body);
+  font-size: var(--type-body-sm);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.state-surface__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.app-shell--gameplay-hud .state-surface {
+  border-color: color-mix(in oklch, var(--hud-brass-light-solid) 18%, transparent);
+  background: radial-gradient(circle at top right, oklch(63.46% 0.0823 241.13 / 0.12), transparent 28%), linear-gradient(180deg, oklch(97.81% 0.0227 84.59 / 0.1), oklch(16.09% 0.0134 248.52 / 0.12));
+  color: var(--hud-paper-bright);
+}
+
+.app-shell--gameplay-hud .state-surface__copy {
+  color: color-mix(in oklch, var(--hud-paper-solid) 68%, transparent);
+}
+
+@media (max-width: 720px) {
+  .state-surface {
+    gap: 10px;
+  }
+
+  .state-surface__headline {
+    font-size: clamp(1.35rem, 7vw, 1.9rem);
+  }
+}

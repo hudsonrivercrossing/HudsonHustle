@@ -14,9 +14,10 @@ interface ReplayScreenProps {
   onClose: () => void;
 }
 
-/** Steps through a finished game one route or station at a time. */
+/** Steps through a finished game one public move at a time. */
 export function ReplayScreen({ game, config, visuals, onClose }: ReplayScreenProps): JSX.Element {
-  const steps = useMemo(() => buildReplaySteps(game, config), [config, game]);
+  const [boardOnly, setBoardOnly] = useState(false);
+  const steps = useMemo(() => buildReplaySteps(game, config, { boardOnly }), [boardOnly, config, game]);
   const lastIndex = steps.length - 1;
   const [index, setIndex] = useState(lastIndex);
   const [playing, setPlaying] = useState(false);
@@ -33,6 +34,18 @@ export function ReplayScreen({ game, config, visuals, onClose }: ReplayScreenPro
     const timeout = window.setTimeout(() => setIndex((current) => Math.min(current + 1, lastIndex)), AUTOPLAY_INTERVAL_MS);
     return () => window.clearTimeout(timeout);
   }, [index, lastIndex, playing]);
+
+  function toggleBoardOnly() {
+    // The two lists number their steps differently, so go back to the finished board.
+    setPlaying(false);
+    setBoardOnly((current) => !current);
+  }
+
+  useEffect(() => {
+    setIndex(lastIndex);
+    // Only when the filter flips: lastIndex is then the end of the newly built list.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [boardOnly]);
 
   function play() {
     if (index >= lastIndex) {
@@ -74,7 +87,7 @@ export function ReplayScreen({ game, config, visuals, onClose }: ReplayScreenPro
       <footer className="replay-screen__controls">
         <p className="replay-screen__caption" aria-live="polite">
           <span className="replay-screen__step">
-            {index} / {lastIndex}
+            {Math.min(index, lastIndex)} / {lastIndex}
           </span>
           {step.caption}
         </p>
@@ -107,10 +120,20 @@ export function ReplayScreen({ game, config, visuals, onClose }: ReplayScreenPro
               <span className="replay-screen__swatch" style={{ background: visuals.palettes.players[player.color] }} aria-hidden="true" />
               <span>{player.name}</span>
               <span className="replay-screen__points">{step.routePoints[player.id] ?? 0}</span>
+              <span className="replay-screen__tally">
+                {step.cardsDrawn[player.id] ?? 0} cards · {step.ticketsKept[player.id] ?? 0} tickets
+              </span>
             </li>
           ))}
         </ul>
-        <p className="replay-screen__note">Route points only. Tickets, stations and the longest network are scored when the game ends.</p>
+        <label className="replay-screen__filter">
+          <input type="checkbox" checked={boardOnly} onChange={toggleBoardOnly} />
+          Routes and stations only
+        </label>
+        <p className="replay-screen__note">
+          Points shown are from routes. Tickets, stations and the longest network are scored when the game ends, and cards drawn from the deck stay
+          face down.
+        </p>
       </footer>
     </div>
   );

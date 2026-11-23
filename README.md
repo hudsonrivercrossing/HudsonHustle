@@ -1,6 +1,6 @@
 # Hudson Hustle
 
-![Hudson Hustle Cover 1](docs/assets/readme-cover.png)
+![Hudson Hustle Cover 1](docs/assets/readme-cover.jpg)
 
 Hudson Hustle is an original NYC/NJ transit strategy game for laptop play.
 
@@ -10,14 +10,14 @@ Hudson Hustle is an original NYC/NJ transit strategy game for laptop play.
 The project is inspired by route-building board games, but the branding, map, copy, and visuals are original to this repo.
 
 ## At A Glance
-![Hudson Hustle Cover 2](docs/assets/readme-cover2.jpeg)
+![Hudson Hustle Cover 2](docs/assets/readme-cover2.jpg)
 - Build a personal network across New Jersey, Manhattan, Brooklyn, and Queens.
 - Collect transit cards, claim routes, complete hidden tickets, and decide when to spend stations.
 - Use a lightweight handoff flow so players can safely share one laptop in `v1`.
 - Keep the rules engine deterministic and reusable so `v2` can add online multiplayer cleanly.
 
 ## Quick Guide
-![Hudson Hustle Cover 3](docs/assets/readme-cover3.png)
+![Hudson Hustle Cover 3](docs/assets/readme-cover3.jpg)
 
 ### Panel 1: Gather Cards
 Draw from the face-up market or the deck. Face-up locomotives are powerful, so taking one ends that draw action immediately.
@@ -195,5 +195,5 @@ scripts/
 - Read [AGENTS.md](AGENTS.md) before making larger changes.
 
 ## Design Direction
-![Hudson Hustle Cover 4](docs/assets/readme-cover4.png)
+![Hudson Hustle Cover 4](docs/assets/readme-cover4.jpg)
 Hudson Hustle aims for a transit-nostalgia look: warm paper, tactile route pieces, and readable geography. The UI should feel like an inviting board game, not a generic dashboard.

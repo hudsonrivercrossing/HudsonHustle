@@ -1,0 +1,181 @@
+/* Floating build popup — anchored to clicked route/city via inline style.
+   Falls back to fixed center if no anchor provided. */
+.floating-build-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 340px;
+  background: var(--hud-grain), linear-gradient(180deg, oklch(24.35% 0.0172 74.79 / 0.97), oklch(14.65% 0.0057 69.2 / 0.97));
+  border: 1px solid color-mix(in srgb, var(--hud-brass) 52%, oklch(0% 0 0 / 0.34));
+  border-radius: var(--radius-sm);
+  padding: 14px 16px 14px 18px;
+  z-index: var(--z-popover);
+  color: var(--hud-paper-bright, oklch(98.08% 0.0199 84.59));
+  box-shadow: inset 0 0 0 1px oklch(94.6% 0.0574 85.03 / 0.1), 0 24px 48px oklch(0% 0 0 / 0.55);
+  animation: floating-build-rise 160ms var(--easing-standard, ease) both;
+}
+
+@keyframes floating-build-rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Inline style overrides the centered fallback when anchor is set */
+.floating-build-panel[style*="position: fixed"][style*="top:"] {
+  transform: none;
+  animation: floating-build-rise-anchor 160ms var(--easing-standard, ease) both;
+}
+
+@keyframes floating-build-rise-anchor {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.floating-build-panel__close {
+  position: absolute;
+  top: var(--space-stack-xs, 4px);
+  right: var(--space-stack-xs, 4px);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid color-mix(in oklch, var(--hud-brass-light-solid) 16%, transparent);
+  border-radius: var(--radius-control);
+  color: color-mix(in oklch, var(--hud-paper-solid) 60%, transparent);
+  font-size: var(--type-xs);
+  cursor: pointer;
+  transition: color var(--duration-fast, 100ms) ease, border-color var(--duration-fast, 100ms) ease;
+}
+
+.floating-build-panel__close:hover {
+  color: var(--hud-paper-bright);
+  border-color: color-mix(in oklch, var(--hud-brass-light-solid) 36%, transparent);
+}
+
+.floating-build-panel__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-stack-sm, 8px);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.floating-build-panel .surface-card__header,
+.floating-build-panel .surface-card__row {
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+}
+
+.floating-build-panel .detail-card__summary {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.floating-build-panel .detail-card__facts {
+  gap: 4px;
+}
+
+.floating-build-panel .detail-card__prompt {
+  font-size: var(--type-xs);
+  line-height: 1.3;
+  font-weight: var(--weight-medium);
+  color: color-mix(in oklch, var(--hud-paper-solid) 82%, transparent);
+  margin: 4px 0 8px;
+  white-space: nowrap;
+}
+
+.floating-build-panel .choice-chip-button {
+  font-size: var(--type-xs) !important;
+  padding: 6px 12px !important;
+  min-height: 32px;
+}
+
+/* Build popup typography overrides — smaller and tighter for the compact 280px card
+─── Final aggressive reset for floating-build-panel internals ───────────
+   Strip every chrome layer applied by base/HUD rules so the popup is one
+   clean dark card with no nested boxes. */
+.floating-build-panel .detail-card {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  all: unset;
+  display: block;
+  color: var(--hud-paper-bright, oklch(98.08% 0.0199 84.59));
+}
+
+/* Build popup typography overrides — smaller and tighter for the compact 280px card
+─── Final aggressive reset for floating-build-panel internals ───────────
+   Strip every chrome layer applied by base/HUD rules so the popup is one
+   clean dark card with no nested boxes. */
+.floating-build-panel .surface-card {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  all: unset;
+  display: block;
+  color: var(--hud-paper-bright, oklch(98.08% 0.0199 84.59));
+}
+
+/* ─── Final aggressive reset for floating-build-panel internals ───────────
+   Strip every chrome layer applied by base/HUD rules so the popup is one
+   clean dark card with no nested boxes. */
+.app-shell--gameplay-hud .floating-build-panel .detail-card {
+  all: unset;
+  display: block;
+  color: var(--hud-paper-bright, oklch(98.08% 0.0199 84.59));
+}
+
+/* ─── Final aggressive reset for floating-build-panel internals ───────────
+   Strip every chrome layer applied by base/HUD rules so the popup is one
+   clean dark card with no nested boxes. */
+.app-shell--gameplay-hud .floating-build-panel .surface-card {
+  all: unset;
+  display: block;
+  color: var(--hud-paper-bright, oklch(98.08% 0.0199 84.59));
+}
+
+.floating-build-panel .detail-card__decision-shelf {
+  gap: 6px !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  all: unset;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.app-shell--gameplay-hud .floating-build-panel .detail-card__decision-shelf {
+  all: unset;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.floating-build-panel .detail-card__decision-shelf::before,
+.floating-build-panel .detail-card__decision-shelf::after,
+.app-shell--gameplay-hud .floating-build-panel .detail-card__decision-shelf::before,
+.app-shell--gameplay-hud .floating-build-panel .detail-card__decision-shelf::after {
+  content: none;
+  display: none;
+  border: none;
+  background: none;
+}

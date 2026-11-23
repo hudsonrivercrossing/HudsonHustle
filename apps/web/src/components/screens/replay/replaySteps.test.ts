@@ -30,7 +30,7 @@ function station(state: GameState, cityIndex: number): GameState {
 
 describe("buildReplaySteps", () => {
   it("starts from an empty board", () => {
-    const steps = buildReplaySteps(mainPhaseState(), config);
+    const steps = buildReplaySteps(mainPhaseState(), config, { boardOnly: true });
     expect(steps).toHaveLength(1);
     expect(steps[0]).toMatchObject({ routeClaims: [], stations: [], playerId: null });
   });
@@ -40,7 +40,7 @@ describe("buildReplaySteps", () => {
     state = claim(state, 0); // Ava
     state = station(state, 3); // Beau
     state = claim(state, 1); // Ava
-    const steps = buildReplaySteps(state, config);
+    const steps = buildReplaySteps(state, config, { boardOnly: true });
 
     expect(steps.map((step) => [step.routeClaims.length, step.stations.length])).toEqual([
       [0, 0],
@@ -62,5 +62,19 @@ describe("buildReplaySteps", () => {
     const steps = buildReplaySteps(state, config);
     expect(steps).toHaveLength(3);
     expect(steps.at(-1)).toMatchObject({ routeClaims: [{ routeId: plainRoutes[0].id }], stations: [{ cityId: config.cities[3].id }] });
+  });
+
+  it("also replays ticket choices and card draws, without the colour of a blind draw", () => {
+    let state = mainPhaseState();
+    state = reduceGame(state, { type: "draw_card", source: "deck" }, config);
+    state = reduceGame(state, { type: "draw_card", source: "deck" }, config);
+    const steps = buildReplaySteps(state, config);
+    const captions = steps.map((step) => step.caption);
+
+    expect(captions.filter((caption) => /kept \d tickets? to start\.$/.test(caption))).toHaveLength(2);
+    expect(captions.slice(-2)).toEqual(["Ava drew a card from the deck.", "Ava drew a card from the deck."]);
+    expect(steps.at(-1)).toMatchObject({ kind: "hand", cardsDrawn: { "player-1": 2, "player-2": 0 } });
+    expect(steps.at(-1)!.ticketsKept["player-1"]).toBeGreaterThanOrEqual(2);
+    expect(buildReplaySteps(state, config, { boardOnly: true })).toHaveLength(1);
   });
 });

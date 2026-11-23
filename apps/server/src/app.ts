@@ -125,6 +125,11 @@ export async function createServerApp() {
   });
 
   const repository: RoomRepository = env.databaseUrl ? new PostgresRoomRepository(env.databaseUrl) : new MemoryRoomRepository();
+  if (repository instanceof PostgresRoomRepository) {
+    // Fail the boot, not the first request: a deploy whose migration cannot run must never start
+    // answering health checks, so the platform keeps the previous version serving.
+    await repository.whenReady();
+  }
 
   let io: SocketIOServer<ClientToServerEvents, ServerToClientEvents>;
   const seatConnectionCounts = new Map<string, number>();
@@ -177,7 +182,7 @@ export async function createServerApp() {
     (context, error) => app.log.error({ err: error }, context)
   );
 
-  const roomCreationLimiter = createRateLimiter(10, 60_000);
+  const roomCreationLimiter = createRateLimiter(env.roomCreateLimitPerMinute, 60_000);
   const socketEventLimiter = createRateLimiter(40, 10_000);
 
 

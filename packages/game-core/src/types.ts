@@ -150,9 +150,14 @@ export interface GameState {
   moves?: GameMove[];
 }
 
-export type GameMove =
-  | { type: "route_claimed"; playerId: string; routeId: string; points: number }
-  | { type: "station_built"; playerId: string; cityId: string };
+/**
+ * The whole game as a list of public moves, never trimmed, so a finished game can be replayed.
+ * It holds only what every player saw: a card taken from the deck is recorded without its colour.
+ */
+export type GameMove = Extract<
+  GameEventBody,
+  { type: "route_claimed" | "station_built" | "tickets_kept" | "card_drawn" | "tunnel_failed" }
+>;
 
 type GameEventBody =
   | { type: "tickets_kept"; playerId: string; count: number; initial: boolean }

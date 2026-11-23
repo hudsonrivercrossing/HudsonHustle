@@ -78,13 +78,10 @@ async function createRoom(
   const botSeats = new Set(options?.botSeats ?? []);
   const playerCount = options?.playerCount ?? 2;
   await createPanel.getByLabel("Your name").fill("Host");
-  await createPanel.getByRole("button", { name: "Seat table" }).click();
   await createPanel.getByLabel("Players").selectOption(String(playerCount));
   for (const seatId of botSeats) {
     await createPanel.getByTestId(`seat-plan-toggle-${seatId}`).click();
   }
-  await createPanel.getByRole("button", { name: "Pick board" }).click();
-  await createPanel.getByRole("button", { name: "Set timer" }).click();
   for (let index = 0; index < timerAdjustments; index += 1) {
     await createPanel.getByRole("button", { name: "+15" }).click();
   }
@@ -538,8 +535,6 @@ test("guidebook opens from gateway and local setup without old tutorial chrome",
   });
   expect(playersSectionFontFamily).not.toContain("Fraunces");
 
-  await page.getByRole("button", { name: "Pick board" }).click();
-  await page.getByRole("button", { name: "Set timer" }).click();
   await page.getByRole("button", { name: "Start local game" }).click();
   await clearInitialTicketChoice(page);
   await page.getByRole("button", { name: "I'm ready" }).click();
@@ -549,6 +544,20 @@ test("guidebook opens from gateway and local setup without old tutorial chrome",
   await expect(page.getByTestId("guidebook-screen")).toBeVisible();
   await page.getByRole("button", { name: "Back" }).click();
   await expect(page.locator(".player-roster")).toBeVisible();
+
+  await context.close();
+});
+
+test("the lobby invite button copies a link that opens this room", async ({ browser }) => {
+  const context = await browser.newContext({ permissions: ["clipboard-read", "clipboard-write"] });
+  const page = await context.newPage();
+  await openMultiplayerSetup(page);
+  const { roomCode } = await createRoom(page);
+
+  await page.getByRole("button", { name: "Copy invite link" }).click();
+  await expect(page.getByRole("button", { name: "Link copied" })).toBeVisible();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toMatch(new RegExp(`/room/${roomCode}$`));
+  await expect(page.getByRole("button", { name: "Copy invite link" })).toBeVisible({ timeout: 4000 });
 
   await context.close();
 });

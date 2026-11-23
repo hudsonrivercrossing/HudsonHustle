@@ -42,13 +42,6 @@ export function shuffleAvatars(seed: string, count: number): string[] {
   return pool.slice(0, count);
 }
 
-export function formatFaceLabel(face: string): string {
-  return face
-    .split("-")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-}
-
 export function readSavedGame(): GameState | null {
   const raw = window.localStorage.getItem(LOCAL_SAVE_KEY);
   if (!raw) return null;
