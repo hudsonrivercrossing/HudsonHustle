@@ -16,7 +16,7 @@
     "Reuse the standard rules unchanged; only the number of trains per player is set for this map."
   ],
   "changeSummary": [
-    "First version: 25 stations, 43 routes (5 Yellow River bridges, 9 mountain tunnels, 5 double routes), 6 long and 44 regular tickets, 30 trains per player.",
+    "First version: 25 stations, 40 routes (5 Yellow River bridges, 8 mountain tunnels, 4 double routes), 6 long and 38 regular tickets, 30 trains per player.",
     "map.json and tickets.json are written by scripts/config/henan-map-source.mjs; a ticket is worth the fewest spaces between its two stations.",
     "The basemap is drawn by scripts/config/henan-basemap.mjs."
   ],

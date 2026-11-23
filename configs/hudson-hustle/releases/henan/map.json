@@ -698,50 +698,13 @@
       "waypoints": []
     },
     {
-      "id": "zhumadian-luohe-a",
+      "id": "zhumadian-luohe",
       "from": "zhumadian",
       "to": "luohe",
       "length": 2,
       "color": "violet",
       "type": "normal",
-      "twinGroup": "zhumadian-luohe",
-      "waypoints": [
-        {
-          "x": 780,
-          "y": 685
-        },
-        {
-          "x": 769,
-          "y": 655
-        },
-        {
-          "x": 762,
-          "y": 624
-        }
-      ]
-    },
-    {
-      "id": "zhumadian-luohe-b",
-      "from": "zhumadian",
-      "to": "luohe",
-      "length": 2,
-      "color": "rose",
-      "type": "normal",
-      "twinGroup": "zhumadian-luohe",
-      "waypoints": [
-        {
-          "x": 803,
-          "y": 678
-        },
-        {
-          "x": 796,
-          "y": 647
-        },
-        {
-          "x": 785,
-          "y": 617
-        }
-      ]
+      "waypoints": []
     },
     {
       "id": "luohe-xuchang",
@@ -767,15 +730,6 @@
       "to": "zhoukou",
       "length": 2,
       "color": "crimson",
-      "type": "normal",
-      "waypoints": []
-    },
-    {
-      "id": "xuchang-pingdingshan",
-      "from": "xuchang",
-      "to": "pingdingshan",
-      "length": 3,
-      "color": "cobalt",
       "type": "normal",
       "waypoints": []
     },
@@ -871,15 +825,6 @@
       "to": "red-flag-canal",
       "length": 3,
       "color": "gray",
-      "type": "tunnel",
-      "waypoints": []
-    },
-    {
-      "id": "red-flag-canal-hebi",
-      "from": "red-flag-canal",
-      "to": "hebi",
-      "length": 2,
-      "color": "violet",
       "type": "tunnel",
       "waypoints": []
     },

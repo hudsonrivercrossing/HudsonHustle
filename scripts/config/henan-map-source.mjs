@@ -75,12 +75,10 @@ export const routes = [
   R("nanyang", "xinyang", 5, "obsidian", "tunnel"),
   R("xinyang", "jigong-mountain", 2, "gray", "tunnel"),
   R("xinyang", "zhumadian", 2, "cobalt"),
-  R("zhumadian", "luohe", 2, "violet", "normal", { twin: "zhumadian-luohe", bend: 14, suffix: "a" }),
-  R("zhumadian", "luohe", 2, "rose", "normal", { twin: "zhumadian-luohe", bend: -14, suffix: "b" }),
+  R("zhumadian", "luohe", 2, "violet"),
   R("luohe", "xuchang", 2, "obsidian"),
   R("luohe", "pingdingshan", 3, "amber"),
   R("luohe", "zhoukou", 2, "crimson"),
-  R("xuchang", "pingdingshan", 3, "cobalt"),
   // East
   R("zhoukou", "shangqiu", 4, "ivory"),
   R("shangqiu", "lankao", 3, "rose"),
@@ -92,7 +90,6 @@ export const routes = [
   R("anyang", "hebi", 2, "cobalt", "normal", { bend: -12 }),
   R("hebi", "xinxiang", 2, "amber"),
   R("anyang", "red-flag-canal", 3, "gray", "tunnel"),
-  R("red-flag-canal", "hebi", 2, "violet", "tunnel"),
   R("xinxiang", "yuntai-mountain", 2, "obsidian"),
   R("yuntai-mountain", "jiaozuo", 2, "ivory"),
   R("jiaozuo", "jiyuan", 2, "crimson")
@@ -163,14 +160,10 @@ export const longTickets = [
   T("anyang", "sanmenxia")
 ];
 export const regularTickets = [
-  T("zhengzhou", "anyang"),
   T("zhengzhou", "xinyang"),
   T("zhengzhou", "nanyang"),
   T("zhengzhou", "shangqiu"),
   T("zhengzhou", "sanmenxia"),
-  T("luoyang", "kaifeng"),
-  T("luoyang", "xinxiang"),
-  T("kaifeng", "puyang"),
   T("kaifeng", "zhoukou"),
   T("xinxiang", "shangqiu"),
   T("jiaozuo", "pingdingshan"),
@@ -180,9 +173,7 @@ export const regularTickets = [
   T("puyang", "xuchang"),
   T("xuchang", "shangqiu"),
   T("pingdingshan", "xinyang"),
-  T("luohe", "shangqiu"),
   T("zhumadian", "nanyang"),
-  T("zhoukou", "xinyang"),
   T("sanmenxia", "pingdingshan"),
   T("sanmenxia", "jiyuan"),
   T("shaolin-temple", "kaifeng"),

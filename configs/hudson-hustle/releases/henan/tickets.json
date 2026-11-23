@@ -47,13 +47,6 @@
   ],
   "regular": [
     {
-      "id": "t-zhengzhou-anyang",
-      "from": "zhengzhou",
-      "to": "anyang",
-      "points": 6,
-      "notes": []
-    },
-    {
       "id": "t-zhengzhou-xinyang",
       "from": "zhengzhou",
       "to": "xinyang",
@@ -79,27 +72,6 @@
       "from": "zhengzhou",
       "to": "sanmenxia",
       "points": 8,
-      "notes": []
-    },
-    {
-      "id": "t-luoyang-kaifeng",
-      "from": "luoyang",
-      "to": "kaifeng",
-      "points": 6,
-      "notes": []
-    },
-    {
-      "id": "t-luoyang-xinxiang",
-      "from": "luoyang",
-      "to": "xinxiang",
-      "points": 6,
-      "notes": []
-    },
-    {
-      "id": "t-kaifeng-puyang",
-      "from": "kaifeng",
-      "to": "puyang",
-      "points": 6,
       "notes": []
     },
     {
@@ -166,24 +138,10 @@
       "notes": []
     },
     {
-      "id": "t-luohe-shangqiu",
-      "from": "luohe",
-      "to": "shangqiu",
-      "points": 6,
-      "notes": []
-    },
-    {
       "id": "t-zhumadian-nanyang",
       "from": "zhumadian",
       "to": "nanyang",
       "points": 7,
-      "notes": []
-    },
-    {
-      "id": "t-zhoukou-xinyang",
-      "from": "zhoukou",
-      "to": "xinyang",
-      "points": 6,
       "notes": []
     },
     {
@@ -218,7 +176,7 @@
       "id": "t-red-flag-canal-xinxiang",
       "from": "red-flag-canal",
       "to": "xinxiang",
-      "points": 4,
+      "points": 7,
       "notes": []
     },
     {
@@ -309,7 +267,7 @@
       "id": "t-red-flag-canal-zhengzhou",
       "from": "red-flag-canal",
       "to": "zhengzhou",
-      "points": 6,
+      "points": 9,
       "notes": []
     },
     {
