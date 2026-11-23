@@ -56,6 +56,12 @@
   text-align: left;
 }
 
+/* A centred card centres its heading too, so title and body share one axis. */
+.modal-shell__card:not(.modal-shell__card--left) .section-header {
+  justify-items: center;
+  text-align: center;
+}
+
 /* modal ceremony/summary context — reinforces display font from base rules above */
 .modal-shell .surface-card--summary .surface-card__title {
   font-family: var(--font-display);

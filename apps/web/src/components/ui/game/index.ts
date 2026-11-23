@@ -5,6 +5,7 @@ export { BoardStage } from "./BoardStage";
 export { CardSlot, formatCardLabel } from "./CardSlot";
 export type { CardSlotProps } from "./CardSlot";
 export { EndgameBreakdown } from "./EndgameBreakdown";
+export { buildEndgameLedgers, describeMargin, describeWinner, type EndgameLedger } from "./endgameLedger";
 export { GameOverPanel } from "./GameOverPanel";
 export { NotificationStack } from "./NotificationStack";
 export type { GameplayNotification } from "./NotificationStack";

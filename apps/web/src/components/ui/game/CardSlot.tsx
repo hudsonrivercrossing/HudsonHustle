@@ -39,7 +39,7 @@ export function CardSlot(props: CardSlotProps): JSX.Element {
         style={{ ["--hand-slot-color" as string]: accentColor }}
         {...rest}
       >
-        <span className="market-color-slot__count">{face === "locomotive" ? "L" : "1"}</span>
+        <span className="market-color-slot__count" aria-hidden="true">{face === "locomotive" ? "★" : ""}</span>
         <span className="market-color-slot__label">{formatCardLabel(face)}</span>
       </button>
     );

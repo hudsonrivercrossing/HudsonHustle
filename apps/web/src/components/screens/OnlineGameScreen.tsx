@@ -75,7 +75,6 @@ export function OnlineGameScreen({ room, snapshot, playerId, notices, onLeave }:
         initialTicketsSubtitle: "Keep at least two. There is no timer on this choice.",
         drawnTicketsTitle: "Keep new tickets",
         drawnTicketsSubtitle: "Keep at least one. This counts as your full turn.",
-        gameOverSubtitle: "Review the completed routes, station saves, and ticket swings before leaving the room.",
         leaveLabel: "Leave room",
         leaveBody: "You will return to setup and clear this room from the current browser."
       }}

@@ -1,36 +1,36 @@
-import { type GameState, type MapConfig } from "@hudson-hustle/game-core";
-import { EndgameBreakdown } from "../ui/game";
-import { SurfaceCard } from "../ui/primitives/SurfaceCard";
+import { EndgameBreakdown, type EndgameLedger } from "../ui/game";
 
 interface EndgameGridProps {
-  players: GameState["players"];
-  config: MapConfig;
+  ledgers: EndgameLedger[];
+  playerPalette: Record<string, string>;
 }
 
-export function EndgameGrid({ players, config }: EndgameGridProps): JSX.Element {
-  const winnerScore = Math.max(...players.map((p) => p.score));
+const ordinals = ["1st", "2nd", "3rd", "4th"];
 
+/** Final standings, best score first. */
+export function EndgameGrid({ ledgers, playerPalette }: EndgameGridProps): JSX.Element {
   return (
-    <div className="endgame-grid">
-      {players.map((player) => {
-        const isWinner = player.score === winnerScore;
-        return (
-          <SurfaceCard
-            key={player.id}
-            as="article"
-            variant="summary"
-            eyebrow={isWinner ? "Winner" : "Final score"}
-            title={player.name}
-            className={`endgame-card ${isWinner ? "endgame-card--winner" : ""}`}
-          >
-            <div className="endgame-card__hero">
-              <p className="endgame-score">{player.score}</p>
-              <span className="endgame-score__label">points</span>
-            </div>
-            <EndgameBreakdown player={player} config={config} />
-          </SurfaceCard>
-        );
-      })}
-    </div>
+    <ol className="endgame-grid">
+      {ledgers.map((ledger) => (
+        <li
+          key={ledger.playerId}
+          className={`endgame-card ${ledger.isWinner ? "endgame-card--winner" : ""}`}
+          style={{ ["--seat-color" as string]: playerPalette[ledger.color] }}
+        >
+          <header className="endgame-card__header">
+            <span className="endgame-card__rank">{ledger.isWinner ? "Winner" : ordinals[ledger.rank - 1] ?? `${ledger.rank}th`}</span>
+            <h3 className="endgame-card__name">
+              <span className="endgame-card__chip" aria-hidden="true" />
+              {ledger.name}
+            </h3>
+            <p className="endgame-score">
+              {ledger.total}
+              <span className="endgame-score__label"> points</span>
+            </p>
+          </header>
+          <EndgameBreakdown ledger={ledger} />
+        </li>
+      ))}
+    </ol>
   );
 }

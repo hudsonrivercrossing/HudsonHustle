@@ -57,13 +57,17 @@ export function PrivateHandRail({ hand, cardPalette, paymentPreview = null, high
 
   return (
     <Panel variant="private" className={["private-hand-rail", className].filter(Boolean).join(" ")}>
-      <SectionHeader title="Hand" meta={highlightedFace ? `Drew ${formatCardLabel(highlightedFace)}` : "Color counts"} variant="compact" />
+      <SectionHeader title="Hand" meta={highlightedFace ? `Drew ${formatCardLabel(highlightedFace)}` : hand.length === 0 ? "No cards yet" : undefined} variant="compact" />
       <div className="private-hand-rail__slots">
         {faces.map((face) => {
           const count = counts[face];
           const spendCount = spend[face] ?? 0;
           const afterCount = count - spendCount;
           const slotColor = face === "locomotive" ? "#91a8bd" : cardPalette[face];
+          // A colour you hold none of is not a card in your hand, so it is not drawn.
+          if (count === 0) {
+            return null;
+          }
           return (
             <CardSlot
               key={face}

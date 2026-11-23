@@ -23,6 +23,9 @@ import {
   TicketChoiceSheet,
   TicketDock,
   TurnIndicator,
+  buildEndgameLedgers,
+  describeMargin,
+  describeWinner,
   type GameplayNotification
 } from "../../ui/game";
 import { EndgameGrid, RouteBuildPanel, StationBuildPanel, shuffleAvatars } from "../../local";
@@ -30,7 +33,6 @@ import { CoachHint } from "../../shared/CoachHint";
 import { pickCoachMoment, resetTips } from "../../shared/coachHints";
 import { Button } from "../../ui/primitives/Button";
 import { ModalShell } from "../../ui/primitives/ModalShell";
-import { Panel } from "../../ui/primitives/Panel";
 import { SectionHeader } from "../../ui/primitives/SectionHeader";
 import { StatusBanner } from "../../ui/primitives/StatusBanner";
 import { SurfaceCard } from "../../ui/primitives/SurfaceCard";
@@ -69,7 +71,6 @@ export interface GameplayScreenProps {
     initialTicketsSubtitle: string;
     drawnTicketsTitle: string;
     drawnTicketsSubtitle: string;
-    gameOverSubtitle: string;
     leaveLabel: string;
     leaveBody: string;
   };
@@ -217,6 +218,7 @@ export function GameplayScreen({
   const cardPalette = visuals.palettes.cards;
   const playerPalette = visuals.palettes.players;
   const isInitialTickets = game.phase === "initialTickets";
+  const endgameLedgers = game.phase === "gameOver" ? buildEndgameLedgers(game.players, config) : [];
 
   return (
     <div className="app-shell app-shell--gameplay-hud" data-config-theme={visuals.theme}>
@@ -224,24 +226,18 @@ export function GameplayScreen({
         <div className="topbar-private-spacer" aria-hidden="true" />
         <TurnIndicator label={turnLabel} timerLabel={timerLabel} data-tour-target="turn" />
         <div className="topbar-actions">
-          <Button className="topbar-icon-btn" aria-label="Guide" onClick={() => setGuideOpen(true)} data-label="Guide">?</Button>
-          <ScoreGuide className="score-guide--subtle topbar-icon-btn" label="★" tooltipLabel="Score" />
-          <Button className="topbar-icon-btn topbar-icon-btn--leave" aria-label={copy.leaveLabel} onClick={() => setShowLeaveConfirm(true)} data-label="Leave">✕</Button>
+          <Button className="topbar-icon-btn" onClick={() => setGuideOpen(true)}>Guide</Button>
+          <ScoreGuide className="score-guide--subtle topbar-icon-btn" label="Score" />
+          <Button className="topbar-icon-btn topbar-icon-btn--leave" onClick={() => setShowLeaveConfirm(true)}>{copy.leaveLabel}</Button>
         </div>
       </header>
 
       <div className="game-layout">
         <aside className="side-panel" data-tour-target="roster">
-          {privateInfoHidden ? (
-            <Panel variant="danger" className="hidden-panel">
-              <SectionHeader eyebrow="Privacy shield" title="Private info hidden" variant="standard" />
-              <p>Hand and tickets stay covered until the next player is ready. The board is public.</p>
-            </Panel>
-          ) : (
-            <>
-              <div className="side-panel__top">
-                <PlayerRoster players={rosterPlayers} activePlayerIndex={game.activePlayerIndex} playerPalette={playerPalette} showOpenSeats={false} />
-              </div>
+          <div className="side-panel__top">
+            <PlayerRoster players={rosterPlayers} activePlayerIndex={game.activePlayerIndex} playerPalette={playerPalette} showOpenSeats={false} />
+          </div>
+          {privateInfoHidden ? null : (
               <div className="side-panel__bottom" data-tour-target="tickets">
                 <TicketDock
                   ticketProgress={ticketProgress}
@@ -254,7 +250,6 @@ export function GameplayScreen({
                   drawTicketsDisabled={!canTakeTurnAction}
                 />
               </div>
-            </>
           )}
         </aside>
 
@@ -376,19 +371,19 @@ export function GameplayScreen({
 
       {game.phase === "gameOver" ? (
         <GameOverLayer
-          title="Final board locked."
-          subtitle={copy.gameOverSubtitle}
+          title={describeWinner(endgameLedgers)}
+          subtitle={describeMargin(endgameLedgers)}
           actions={
             <>
-              <Button onClick={() => setReplayOpen(true)}>Replay</Button>
               <Button variant="primary" onClick={onPlayAgain}>Play again</Button>
+              <Button onClick={() => setReplayOpen(true)}>Replay</Button>
               {leaveOfferedAtGameOver ? (
                 <Button onClick={() => setShowLeaveConfirm(true)}>{copy.leaveLabel}</Button>
               ) : null}
             </>
           }
         >
-          <EndgameGrid players={game.players} config={config} />
+          <EndgameGrid ledgers={endgameLedgers} playerPalette={playerPalette} />
         </GameOverLayer>
       ) : null}
 

@@ -25,14 +25,6 @@
   font-weight: var(--weight-semibold);
 }
 
-.app-shell--gameplay-hud .turn-panel__options {
-  margin: 0;
-  padding-inline-start: var(--space-stack-md);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-stack-xs);
-}
-
 .app-shell--gameplay-hud .turn-panel__pass.system-button {
   width: 100%;
   min-height: var(--hit-target-min);

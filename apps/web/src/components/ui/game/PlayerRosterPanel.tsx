@@ -52,6 +52,7 @@ export function PlayerRoster({ players, activePlayerIndex, playerPalette, timer 
               ticketCount={player.ticketCount ?? 0}
               trainsLeft={player.trainsLeft}
               stationsLeft={player.stationsLeft}
+              score={player.score}
               active={isActive}
               timerLabel={slotTimer}
               avatarName={player.avatarName}

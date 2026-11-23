@@ -242,7 +242,7 @@ Side-panel player roster: dark seat tiles matching TicketDock */
   height: 100%;
   min-height: 0;
   padding: 4px 8px;
-  grid-template-columns: 28px minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
   grid-template-rows: 1fr;
   gap: 4px 8px;
   align-items: center;
@@ -269,8 +269,8 @@ Side-panel player roster: dark seat tiles matching TicketDock */
 
 .app-shell--gameplay-hud .side-panel .player-roster .row-object__meta {
   font-size: var(--type-2xs);
-  line-height: 1.1;
-  white-space: nowrap;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
   color: color-mix(in oklch, var(--hud-paper-solid) 66%, transparent);
 }
 
@@ -417,4 +417,30 @@ Inner-border decoration disabled — pseudo-element neutralised */
   .player-strip {
     grid-template-columns: 1fr;
   }
+}
+
+/* The frame around the portrait is the player's colour on the map. */
+.player-roster__token {
+  display: grid;
+  place-items: center;
+  min-width: 14px;
+  min-height: 14px;
+  padding: 3px;
+  border-radius: var(--radius-control);
+  background: var(--seat-color, transparent);
+}
+
+.player-roster__token .seat-avatar--tiny {
+  display: block;
+  border: 0;
+  border-radius: calc(var(--radius-control) - 3px);
+}
+
+.player-roster__score {
+  min-width: 2ch;
+  font-family: var(--font-display);
+  font-size: var(--type-xl);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: right;
 }

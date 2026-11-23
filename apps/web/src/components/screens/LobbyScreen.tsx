@@ -32,6 +32,35 @@ function getSeatStatus(seat: RoomSeatSummary): SeatStatus {
   return seat.ready ? { label: "Ready", tone: "success" } : { label: "Waiting", tone: "warning" };
 }
 
+function describeSeat(seat: RoomSeatSummary, isSelf: boolean): string {
+  if (seat.playerName === null) return "Waiting for a player";
+  if (seat.controllerType === "bot") return "Plays automatically";
+  const role = seat.isHost ? "Host" : "Player";
+  return isSelf ? `${role} · you` : role;
+}
+
+/** One sentence on what the lobby is waiting for, and one on what to do about it. */
+function describeLobby(room: RoomSummary, localSeat: RoomSeatSummary | undefined, canStart: boolean): { headline: string; copy: string } {
+  if (canStart) {
+    return { headline: "Everyone is ready.", copy: "Start the game when you like." };
+  }
+  const openSeats = room.seats.filter((seat) => seat.playerName === null).length;
+  if (openSeats > 0) {
+    return {
+      headline: openSeats === 1 ? "Waiting for one more player." : `Waiting for ${openSeats} more players.`,
+      copy: "Send the invite link. Anyone who opens it can take an open seat."
+    };
+  }
+  if (localSeat && !localSeat.ready) {
+    return { headline: "Mark yourself ready.", copy: "The game can start once every seat is ready." };
+  }
+  const waitingOn = room.seats.filter((seat) => !seat.ready && seat.playerName).map((seat) => seat.playerName as string);
+  if (waitingOn.length > 0) {
+    return { headline: `Waiting for ${waitingOn.join(" and ")}.`, copy: "The game can start once every seat is ready." };
+  }
+  return { headline: "Waiting for the host to start.", copy: "Every seat is ready." };
+}
+
 const AVATAR_NAMES = [
   "Conductor", "Milo", "Engineer", "Rosa", "Switchman",
   "Jack", "Dispatcher", "Lily", "Caboose", "Nellie"
@@ -75,20 +104,9 @@ export function LobbyScreen({
   const occupiedCount = room.seats.filter((seat) => seat.playerName).length;
   const readyCount = room.seats.filter((seat) => seat.ready).length;
   const lobbyTone = realtimeMessage ? "danger" : canStart ? "active" : "waiting";
-  const lobbyHeadline = realtimeMessage
-    ? "Realtime connection needs attention."
-    : canStart
-    ? "Table is ready to start."
-    : localSeat?.isHost
-      ? "Waiting for the full table."
-      : "Waiting for host.";
-  const lobbyCopy = realtimeMessage
-    ? realtimeMessage
-    : canStart
-    ? "Everyone is seated and ready. Start the game when you want."
-    : localSeat?.isHost
-      ? `Seats occupied: ${occupiedCount}/${room.playerCount}. Ready: ${readyCount}/${room.playerCount}.`
-      : "Share the room code, mark yourself ready, and wait for the host to start.";
+  const { headline: lobbyHeadline, copy: lobbyCopy } = realtimeMessage
+    ? { headline: "Connection lost.", copy: realtimeMessage }
+    : describeLobby(room, localSeat, Boolean(canStart));
   const lobbyPreflight = (
     <div className="setup-preflight-card">
       <span className="setup-preflight-card__eyebrow">Room board</span>
@@ -98,7 +116,6 @@ export function LobbyScreen({
         <SetupSummaryRow label="Seats" value={`${occupiedCount}/${room.playerCount}`} detail={`${readyCount} ready`} />
         <SetupSummaryRow label="Timer" value={room.turnTimeLimitSeconds === 0 ? "Untimed" : `${room.turnTimeLimitSeconds}s`} />
       </div>
-      <InviteLinkButton roomCode={room.roomCode} />
     </div>
   );
 
@@ -115,7 +132,7 @@ export function LobbyScreen({
       <div className="setup-counter__status">
         <StateSurface
           tone={lobbyTone}
-          eyebrow={canStart ? "Ready to start" : localSeat?.isHost ? "Host status" : "Lobby status"}
+          eyebrow={`Room ${room.roomCode}`}
           headline={lobbyHeadline}
           copy={lobbyCopy}
           testId="lobby-status-banner"
@@ -123,17 +140,18 @@ export function LobbyScreen({
       </div>
 
       <SetupStepPanel
-        eyebrow="Now"
+        eyebrow="Table"
         title="Seats"
         meta={`${occupiedCount}/${room.playerCount} occupied · ${readyCount}/${room.playerCount} ready`}
         className="lobby-seat-panel"
         actions={
           <SetupActions>
-            <Button disabled={!realtimeReady} onClick={() => onReadyChange(!localSeat?.ready)}>
+            <InviteLinkButton roomCode={room.roomCode} />
+            <Button variant={localSeat?.ready ? "secondary" : "primary"} disabled={!realtimeReady} onClick={() => onReadyChange(!localSeat?.ready)}>
               {localSeat?.ready ? "Mark not ready" : "Mark ready"}
             </Button>
             {localSeat?.isHost ? (
-              <Button variant="primary" disabled={!canStart} onClick={onStart}>
+              <Button variant={localSeat.ready ? "primary" : "secondary"} disabled={!canStart} onClick={onStart}>
                 Start game
               </Button>
             ) : null}
@@ -164,7 +182,7 @@ export function LobbyScreen({
                     {seat.playerName ?? "Open seat"}
                   </strong>
                   <p className="row-object__meta">
-                    {isEmpty ? "Waiting for player" : seat.seatId}
+                    {describeSeat(seat, isSelf)}
                   </p>
                 </div>
                 <div className="row-object__stats seat-status-stack">

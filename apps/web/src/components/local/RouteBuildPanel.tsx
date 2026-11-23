@@ -59,9 +59,7 @@ export function RouteBuildPanel({
             <span className="detail-card__fact">{route.locomotiveCost} locomotive{route.locomotiveCost === 1 ? "" : "s"}</span>
           ) : null}
         </div>
-        <p className="detail-card__prompt">
-          {claimedByName ? `Claimed by ${claimedByName}.` : costSummary}
-        </p>
+        {claimedByName ? null : <p className="detail-card__prompt">{costSummary}</p>}
       </div>
       <div className="detail-card__decision-shelf chip-row">
         {options.length > 0 ? (

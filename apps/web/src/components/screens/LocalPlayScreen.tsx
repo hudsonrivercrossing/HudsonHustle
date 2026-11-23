@@ -254,7 +254,6 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
         initialTicketsSubtitle: "Keep at least two. Anything you return is gone for this game.",
         drawnTicketsTitle: `${activePlayer.name}, keep new tickets`,
         drawnTicketsSubtitle: "Keep at least one. This counts as your full turn.",
-        gameOverSubtitle: "Review the completed routes, station saves, and ticket swings before leaving the table.",
         leaveLabel: "Leave game",
         leaveBody: "Your local match will return to setup."
       }}

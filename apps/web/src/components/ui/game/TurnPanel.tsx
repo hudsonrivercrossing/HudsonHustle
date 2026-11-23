@@ -15,8 +15,6 @@ interface TurnPanelProps {
   className?: string;
 }
 
-const idleOptions = ["Draw two cards", "Claim a route", "Build a station", "Draw new tickets"];
-
 /** Tells the player at the screen what they can do right now, and ends their turn when it is over. */
 export function TurnPanel({ playerName, state, className = "" }: TurnPanelProps): JSX.Element {
   return (
@@ -29,14 +27,7 @@ export function TurnPanel({ playerName, state, className = "" }: TurnPanelProps)
           </p>
         ) : null}
         {state.kind === "idle" ? (
-          <>
-            <p className="turn-panel__lead">Take one action:</p>
-            <ul className="turn-panel__options">
-              {idleOptions.map((option) => (
-                <li key={option}>{option}</li>
-              ))}
-            </ul>
-          </>
+          <p className="turn-panel__note">Draw cards, claim a route, build a station, or draw tickets.</p>
         ) : null}
         {state.kind === "drawing" ? (
           <>
