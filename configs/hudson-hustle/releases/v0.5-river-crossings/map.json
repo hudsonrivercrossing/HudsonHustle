@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "mapId": "hudson-hustle-anchor-prototype",
-  "name": "Hudson Hustle Anchor Prototype",
+  "name": "New York Harbor",
   "board": {
     "width": 1200,
     "height": 900,
@@ -434,7 +434,7 @@
       "id": "secaucus-newark-penn",
       "from": "secaucus",
       "to": "newark-penn",
-      "length": 3,
+      "length": 4,
       "color": "crimson",
       "type": "normal",
       "notes": []
@@ -452,7 +452,7 @@
       "id": "secaucus-midtown-west",
       "from": "secaucus",
       "to": "midtown-west",
-      "length": 3,
+      "length": 4,
       "color": "cobalt",
       "type": "tunnel",
       "notes": [],
@@ -505,7 +505,7 @@
       "id": "hoboken-grove-st",
       "from": "hoboken",
       "to": "grove-st",
-      "length": 2,
+      "length": 3,
       "color": "emerald",
       "type": "normal",
       "notes": [],
@@ -537,7 +537,7 @@
       "to": "world-trade",
       "length": 2,
       "color": "rose",
-      "type": "tunnel",
+      "type": "ferry",
       "notes": [],
       "twinGroup": "exchange-world",
       "waypoints": [
@@ -549,7 +549,8 @@
           "x": 472,
           "y": 460
         }
-      ]
+      ],
+      "locomotiveCost": 1
     },
     {
       "id": "hoboken-chelsea",
@@ -557,9 +558,10 @@
       "to": "chelsea",
       "length": 3,
       "color": "ivory",
-      "type": "normal",
+      "type": "ferry",
       "notes": [],
-      "waypoints": []
+      "waypoints": [],
+      "locomotiveCost": 1
     },
     {
       "id": "midtown-west-chelsea",
@@ -604,7 +606,7 @@
       "id": "union-square-williamsburg",
       "from": "union-square",
       "to": "williamsburg",
-      "length": 3,
+      "length": 4,
       "color": "cobalt",
       "type": "normal",
       "notes": [],
@@ -639,7 +641,7 @@
       "id": "battery-park-downtown-brooklyn",
       "from": "battery-park",
       "to": "downtown-brooklyn",
-      "length": 2,
+      "length": 3,
       "color": "crimson",
       "type": "tunnel",
       "notes": [],
@@ -649,7 +651,7 @@
       "id": "battery-park-red-hook",
       "from": "battery-park",
       "to": "red-hook",
-      "length": 2,
+      "length": 3,
       "color": "emerald",
       "type": "ferry",
       "notes": [],
@@ -776,7 +778,7 @@
       "id": "grand-central-jamaica",
       "from": "grand-central",
       "to": "jamaica",
-      "length": 4,
+      "length": 5,
       "color": "violet",
       "type": "normal",
       "notes": [],
@@ -833,7 +835,7 @@
       "id": "atlantic-terminal-jamaica",
       "from": "atlantic-terminal",
       "to": "jamaica",
-      "length": 2,
+      "length": 3,
       "color": "cobalt",
       "type": "normal",
       "notes": [],
@@ -848,7 +850,7 @@
       "id": "flushing-jamaica",
       "from": "flushing",
       "to": "jamaica",
-      "length": 3,
+      "length": 4,
       "color": "amber",
       "type": "normal",
       "notes": [],

@@ -54,10 +54,10 @@
       "notes": []
     },
     {
-      "id": "t-chelsea-world-trade",
+      "id": "t-chelsea-williamsburg",
       "from": "chelsea",
-      "to": "world-trade",
-      "points": 5,
+      "to": "williamsburg",
+      "points": 7,
       "notes": []
     },
     {
@@ -131,17 +131,17 @@
       "notes": []
     },
     {
-      "id": "t-battery-park-downtown-brooklyn",
+      "id": "t-battery-park-williamsburg",
       "from": "battery-park",
-      "to": "downtown-brooklyn",
-      "points": 5,
+      "to": "williamsburg",
+      "points": 6,
       "notes": []
     },
     {
-      "id": "t-battery-park-red-hook",
-      "from": "battery-park",
+      "id": "t-hoboken-red-hook",
+      "from": "hoboken",
       "to": "red-hook",
-      "points": 5,
+      "points": 11,
       "notes": []
     },
     {
@@ -201,10 +201,10 @@
       "notes": []
     },
     {
-      "id": "t-atlantic-terminal-jamaica",
+      "id": "t-atlantic-terminal-union-square",
       "from": "atlantic-terminal",
-      "to": "jamaica",
-      "points": 5,
+      "to": "union-square",
+      "points": 9,
       "notes": []
     },
     {
