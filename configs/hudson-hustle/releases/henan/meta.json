@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "henan",
+  "gameId": "hudson-hustle",
+  "version": "v1",
+  "status": "released",
+  "basedOn": null,
+  "createdAt": "2026-11-23",
+  "updatedAt": "2026-11-23T00:00:00.000Z",
+  "summary": "Henan",
+  "designGoals": [],
+  "changeSummary": [],
+  "playtestFocus": []
+}

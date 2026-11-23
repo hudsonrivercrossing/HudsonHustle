@@ -1,0 +1,946 @@
+{
+  "schemaVersion": 1,
+  "mapId": "henan-v1",
+  "name": "河南 · 大河中原",
+  "board": {
+    "width": 1200,
+    "height": 900,
+    "padX": 90,
+    "padY": 90
+  },
+  "typeLabelOverrides": {
+    "ferry": "黄河大桥",
+    "tunnel": "山岭隧道"
+  },
+  "stations": [
+    {
+      "id": "zhengzhou",
+      "name": "郑州",
+      "label": "郑州",
+      "active": true,
+      "tier": "anchor",
+      "lat": 34.75,
+      "lon": 113.65,
+      "boardX": 650,
+      "boardY": 345,
+      "labelDx": -40,
+      "labelDy": -14,
+      "labelAnchor": "end"
+    },
+    {
+      "id": "kaifeng",
+      "name": "开封",
+      "label": "开封",
+      "active": true,
+      "tier": "first-ring",
+      "lat": 34.8,
+      "lon": 114.31,
+      "boardX": 815,
+      "boardY": 350,
+      "labelDx": 6,
+      "labelDy": 32,
+      "labelAnchor": "middle"
+    },
+    {
+      "id": "luoyang",
+      "name": "洛阳",
+      "label": "洛阳",
+      "active": true,
+      "tier": "anchor",
+      "lat": 34.62,
+      "lon": 112.45,
+      "boardX": 360,
+      "boardY": 385,
+      "labelDx": -4,
+      "labelDy": -22,
+      "labelAnchor": "end"
+    },
+    {
+      "id": "sanmenxia",
+      "name": "三门峡",
+      "label": "三门峡",
+      "active": true,
+      "tier": "anchor",
+      "lat": 34.77,
+      "lon": 111.2,
+      "boardX": 95,
+      "boardY": 360,
+      "labelDx": -8,
+      "labelDy": -22,
+      "labelAnchor": "start"
+    },
+    {
+      "id": "shangqiu",
+      "name": "商丘",
+      "label": "商丘",
+      "active": true,
+      "tier": "anchor",
+      "lat": 34.41,
+      "lon": 115.66,
+      "boardX": 1125,
+      "boardY": 420,
+      "labelDx": -6,
+      "labelDy": -22,
+      "labelAnchor": "middle"
+    },
+    {
+      "id": "lankao",
+      "name": "兰考",
+      "label": "兰考",
+      "active": true,
+      "tier": "other",
+      "lat": 34.82,
+      "lon": 114.82,
+      "boardX": 955,
+      "boardY": 340,
+      "labelDx": 0,
+      "labelDy": 34,
+      "labelAnchor": "middle"
+    },
+    {
+      "id": "anyang",
+      "name": "安阳",
+      "label": "安阳",
+      "active": true,
+      "tier": "anchor",
+      "lat": 36.1,
+      "lon": 114.39,
+      "boardX": 930,
+      "boardY": 52,
+      "labelDx": 18,
+      "labelDy": 6,
+      "labelAnchor": "start"
+    },
+    {
+      "id": "hebi",
+      "name": "鹤壁",
+      "label": "鹤壁",
+      "active": true,
+      "tier": "first-ring",
+      "lat": 35.75,
+      "lon": 114.3,
+      "boardX": 845,
+      "boardY": 135,
+      "labelDx": 18,
+      "labelDy": 8,
+      "labelAnchor": "start"
+    },
+    {
+      "id": "xinxiang",
+      "name": "新乡",
+      "label": "新乡",
+      "active": true,
+      "tier": "first-ring",
+      "lat": 35.3,
+      "lon": 113.93,
+      "boardX": 745,
+      "boardY": 215,
+      "labelDx": 18,
+      "labelDy": 22,
+      "labelAnchor": "start"
+    },
+    {
+      "id": "jiaozuo",
+      "name": "焦作",
+      "label": "焦作",
+      "active": true,
+      "tier": "first-ring",
+      "lat": 35.22,
+      "lon": 113.24,
+      "boardX": 525,
+      "boardY": 215,
+      "labelDx": -16,
+      "labelDy": -12,
+      "labelAnchor": "end"
+    },
+    {
+      "id": "jiyuan",
+      "name": "济源",
+      "label": "济源",
+      "active": true,
+      "tier": "first-ring",
+      "lat": 35.07,
+      "lon": 112.6,
+      "boardX": 385,
+      "boardY": 260,
+      "labelDx": -16,
+      "labelDy": -12,
+      "labelAnchor": "end"
+    },
+    {
+      "id": "puyang",
+      "name": "濮阳",
+      "label": "濮阳",
+      "active": true,
+      "tier": "first-ring",
+      "lat": 35.76,
+      "lon": 115.03,
+      "boardX": 1070,
+      "boardY": 150,
+      "labelDx": 18,
+      "labelDy": 6,
+      "labelAnchor": "start"
+    },
+    {
+      "id": "yuntai-mountain",
+      "name": "云台山",
+      "label": "云台山",
+      "active": true,
+      "tier": "other",
+      "lat": 35.43,
+      "lon": 113.38,
+      "boardX": 610,
+      "boardY": 135,
+      "labelDx": 0,
+      "labelDy": -20,
+      "labelAnchor": "middle"
+    },
+    {
+      "id": "red-flag-canal",
+      "name": "红旗渠",
+      "label": "红旗渠",
+      "active": true,
+      "tier": "other",
+      "lat": 36.08,
+      "lon": 113.82,
+      "boardX": 705,
+      "boardY": 70,
+      "labelDx": -16,
+      "labelDy": 6,
+      "labelAnchor": "end"
+    },
+    {
+      "id": "shaolin-temple",
+      "name": "少林寺",
+      "label": "少林寺",
+      "active": true,
+      "tier": "other",
+      "lat": 34.51,
+      "lon": 112.94,
+      "boardX": 515,
+      "boardY": 432,
+      "labelDx": 0,
+      "labelDy": 34,
+      "labelAnchor": "middle"
+    },
+    {
+      "id": "xuchang",
+      "name": "许昌",
+      "label": "许昌",
+      "active": true,
+      "tier": "first-ring",
+      "lat": 34.04,
+      "lon": 113.85,
+      "boardX": 715,
+      "boardY": 472,
+      "labelDx": 18,
+      "labelDy": 6,
+      "labelAnchor": "start"
+    },
+    {
+      "id": "pingdingshan",
+      "name": "平顶山",
+      "label": "平顶山",
+      "active": true,
+      "tier": "first-ring",
+      "lat": 33.77,
+      "lon": 113.19,
+      "boardX": 540,
+      "boardY": 560,
+      "labelDx": -16,
+      "labelDy": 6,
+      "labelAnchor": "end"
+    },
+    {
+      "id": "luohe",
+      "name": "漯河",
+      "label": "漯河",
+      "active": true,
+      "tier": "first-ring",
+      "lat": 33.58,
+      "lon": 114.02,
+      "boardX": 765,
+      "boardY": 590,
+      "labelDx": -16,
+      "labelDy": 26,
+      "labelAnchor": "end"
+    },
+    {
+      "id": "zhoukou",
+      "name": "周口",
+      "label": "周口",
+      "active": true,
+      "tier": "first-ring",
+      "lat": 33.63,
+      "lon": 114.65,
+      "boardX": 930,
+      "boardY": 560,
+      "labelDx": 18,
+      "labelDy": 6,
+      "labelAnchor": "start"
+    },
+    {
+      "id": "zhumadian",
+      "name": "驻马店",
+      "label": "驻马店",
+      "active": true,
+      "tier": "first-ring",
+      "lat": 33.01,
+      "lon": 114.02,
+      "boardX": 800,
+      "boardY": 712,
+      "labelDx": 18,
+      "labelDy": 6,
+      "labelAnchor": "start"
+    },
+    {
+      "id": "nanyang",
+      "name": "南阳",
+      "label": "南阳",
+      "active": true,
+      "tier": "anchor",
+      "lat": 33,
+      "lon": 112.53,
+      "boardX": 395,
+      "boardY": 680,
+      "labelDx": 0,
+      "labelDy": 34,
+      "labelAnchor": "middle"
+    },
+    {
+      "id": "xixia",
+      "name": "西峡",
+      "label": "西峡",
+      "active": true,
+      "tier": "other",
+      "lat": 33.3,
+      "lon": 111.48,
+      "boardX": 160,
+      "boardY": 645,
+      "labelDx": 0,
+      "labelDy": 34,
+      "labelAnchor": "middle"
+    },
+    {
+      "id": "laojun-mountain",
+      "name": "老君山",
+      "label": "老君山",
+      "active": true,
+      "tier": "other",
+      "lat": 33.75,
+      "lon": 111.6,
+      "boardX": 205,
+      "boardY": 515,
+      "labelDx": -16,
+      "labelDy": 6,
+      "labelAnchor": "end"
+    },
+    {
+      "id": "xinyang",
+      "name": "信阳",
+      "label": "信阳",
+      "active": true,
+      "tier": "anchor",
+      "lat": 32.15,
+      "lon": 114.09,
+      "boardX": 760,
+      "boardY": 830,
+      "labelDx": 14,
+      "labelDy": 30,
+      "labelAnchor": "start"
+    },
+    {
+      "id": "jigong-mountain",
+      "name": "鸡公山",
+      "label": "鸡公山",
+      "active": true,
+      "tier": "other",
+      "lat": 31.8,
+      "lon": 114.07,
+      "boardX": 640,
+      "boardY": 870,
+      "labelDx": -16,
+      "labelDy": 6,
+      "labelAnchor": "end"
+    },
+    {
+      "id": "huangchuan",
+      "name": "潢川",
+      "label": "潢川",
+      "active": true,
+      "tier": "other",
+      "lat": 32.13,
+      "lon": 115.05,
+      "boardX": 1010,
+      "boardY": 800,
+      "labelDx": 18,
+      "labelDy": 6,
+      "labelAnchor": "start"
+    }
+  ],
+  "routes": [
+    {
+      "id": "zhengzhou-kaifeng-a",
+      "from": "zhengzhou",
+      "to": "kaifeng",
+      "length": 2,
+      "color": "amber",
+      "type": "normal",
+      "twinGroup": "zhengzhou-kaifeng",
+      "waypoints": [
+        {
+          "x": 692,
+          "y": 332
+        },
+        {
+          "x": 733,
+          "y": 332
+        },
+        {
+          "x": 774,
+          "y": 335
+        }
+      ]
+    },
+    {
+      "id": "zhengzhou-kaifeng-b",
+      "from": "zhengzhou",
+      "to": "kaifeng",
+      "length": 2,
+      "color": "cobalt",
+      "type": "normal",
+      "twinGroup": "zhengzhou-kaifeng",
+      "waypoints": [
+        {
+          "x": 691,
+          "y": 360
+        },
+        {
+          "x": 732,
+          "y": 363
+        },
+        {
+          "x": 773,
+          "y": 363
+        }
+      ]
+    },
+    {
+      "id": "zhengzhou-xuchang-a",
+      "from": "zhengzhou",
+      "to": "xuchang",
+      "length": 2,
+      "color": "crimson",
+      "type": "normal",
+      "twinGroup": "zhengzhou-xuchang",
+      "waypoints": [
+        {
+          "x": 679,
+          "y": 370
+        },
+        {
+          "x": 697,
+          "y": 401
+        },
+        {
+          "x": 711,
+          "y": 434
+        }
+      ]
+    },
+    {
+      "id": "zhengzhou-xuchang-b",
+      "from": "zhengzhou",
+      "to": "xuchang",
+      "length": 2,
+      "color": "ivory",
+      "type": "normal",
+      "twinGroup": "zhengzhou-xuchang",
+      "waypoints": [
+        {
+          "x": 654,
+          "y": 383
+        },
+        {
+          "x": 668,
+          "y": 416
+        },
+        {
+          "x": 686,
+          "y": 447
+        }
+      ]
+    },
+    {
+      "id": "zhengzhou-xinxiang-a",
+      "from": "zhengzhou",
+      "to": "xinxiang",
+      "length": 2,
+      "color": "emerald",
+      "type": "ferry",
+      "locomotiveCost": 1,
+      "twinGroup": "zhengzhou-xinxiang",
+      "waypoints": [
+        {
+          "x": 665,
+          "y": 306
+        },
+        {
+          "x": 687,
+          "y": 272
+        },
+        {
+          "x": 712,
+          "y": 241
+        }
+      ]
+    },
+    {
+      "id": "zhengzhou-xinxiang-b",
+      "from": "zhengzhou",
+      "to": "xinxiang",
+      "length": 2,
+      "color": "violet",
+      "type": "ferry",
+      "locomotiveCost": 1,
+      "twinGroup": "zhengzhou-xinxiang",
+      "waypoints": [
+        {
+          "x": 683,
+          "y": 319
+        },
+        {
+          "x": 708,
+          "y": 288
+        },
+        {
+          "x": 730,
+          "y": 254
+        }
+      ]
+    },
+    {
+      "id": "zhengzhou-luoyang",
+      "from": "zhengzhou",
+      "to": "luoyang",
+      "length": 4,
+      "color": "obsidian",
+      "type": "normal",
+      "waypoints": []
+    },
+    {
+      "id": "zhengzhou-shaolin-temple",
+      "from": "zhengzhou",
+      "to": "shaolin-temple",
+      "length": 3,
+      "color": "gray",
+      "type": "normal",
+      "waypoints": []
+    },
+    {
+      "id": "shaolin-temple-luoyang",
+      "from": "shaolin-temple",
+      "to": "luoyang",
+      "length": 2,
+      "color": "gray",
+      "type": "tunnel",
+      "waypoints": []
+    },
+    {
+      "id": "zhengzhou-jiaozuo",
+      "from": "zhengzhou",
+      "to": "jiaozuo",
+      "length": 3,
+      "color": "rose",
+      "type": "ferry",
+      "locomotiveCost": 1,
+      "waypoints": []
+    },
+    {
+      "id": "zhengzhou-zhoukou",
+      "from": "zhengzhou",
+      "to": "zhoukou",
+      "length": 5,
+      "color": "emerald",
+      "type": "normal",
+      "waypoints": []
+    },
+    {
+      "id": "zhengzhou-pingdingshan",
+      "from": "zhengzhou",
+      "to": "pingdingshan",
+      "length": 4,
+      "color": "violet",
+      "type": "normal",
+      "waypoints": []
+    },
+    {
+      "id": "luoyang-sanmenxia-a",
+      "from": "luoyang",
+      "to": "sanmenxia",
+      "length": 4,
+      "color": "amber",
+      "type": "tunnel",
+      "twinGroup": "luoyang-sanmenxia",
+      "waypoints": [
+        {
+          "x": 292,
+          "y": 396
+        },
+        {
+          "x": 226,
+          "y": 392
+        },
+        {
+          "x": 160,
+          "y": 383
+        }
+      ]
+    },
+    {
+      "id": "luoyang-sanmenxia-b",
+      "from": "luoyang",
+      "to": "sanmenxia",
+      "length": 4,
+      "color": "emerald",
+      "type": "normal",
+      "twinGroup": "luoyang-sanmenxia",
+      "waypoints": [
+        {
+          "x": 295,
+          "y": 362
+        },
+        {
+          "x": 229,
+          "y": 353
+        },
+        {
+          "x": 163,
+          "y": 349
+        }
+      ]
+    },
+    {
+      "id": "luoyang-jiyuan",
+      "from": "luoyang",
+      "to": "jiyuan",
+      "length": 2,
+      "color": "cobalt",
+      "type": "ferry",
+      "locomotiveCost": 1,
+      "waypoints": []
+    },
+    {
+      "id": "luoyang-pingdingshan",
+      "from": "luoyang",
+      "to": "pingdingshan",
+      "length": 3,
+      "color": "crimson",
+      "type": "normal",
+      "waypoints": []
+    },
+    {
+      "id": "luoyang-laojun-mountain",
+      "from": "luoyang",
+      "to": "laojun-mountain",
+      "length": 3,
+      "color": "gray",
+      "type": "tunnel",
+      "waypoints": []
+    },
+    {
+      "id": "sanmenxia-laojun-mountain",
+      "from": "sanmenxia",
+      "to": "laojun-mountain",
+      "length": 3,
+      "color": "gray",
+      "type": "tunnel",
+      "waypoints": []
+    },
+    {
+      "id": "laojun-mountain-xixia",
+      "from": "laojun-mountain",
+      "to": "xixia",
+      "length": 2,
+      "color": "gray",
+      "type": "tunnel",
+      "waypoints": []
+    },
+    {
+      "id": "xixia-nanyang",
+      "from": "xixia",
+      "to": "nanyang",
+      "length": 4,
+      "color": "rose",
+      "type": "normal",
+      "waypoints": []
+    },
+    {
+      "id": "pingdingshan-nanyang",
+      "from": "pingdingshan",
+      "to": "nanyang",
+      "length": 3,
+      "color": "ivory",
+      "type": "normal",
+      "waypoints": []
+    },
+    {
+      "id": "nanyang-xinyang",
+      "from": "nanyang",
+      "to": "xinyang",
+      "length": 5,
+      "color": "obsidian",
+      "type": "tunnel",
+      "waypoints": []
+    },
+    {
+      "id": "xinyang-jigong-mountain",
+      "from": "xinyang",
+      "to": "jigong-mountain",
+      "length": 2,
+      "color": "gray",
+      "type": "tunnel",
+      "waypoints": []
+    },
+    {
+      "id": "xinyang-huangchuan",
+      "from": "xinyang",
+      "to": "huangchuan",
+      "length": 4,
+      "color": "amber",
+      "type": "normal",
+      "waypoints": []
+    },
+    {
+      "id": "xinyang-zhumadian",
+      "from": "xinyang",
+      "to": "zhumadian",
+      "length": 2,
+      "color": "cobalt",
+      "type": "normal",
+      "waypoints": []
+    },
+    {
+      "id": "zhumadian-luohe-a",
+      "from": "zhumadian",
+      "to": "luohe",
+      "length": 2,
+      "color": "violet",
+      "type": "normal",
+      "twinGroup": "zhumadian-luohe",
+      "waypoints": [
+        {
+          "x": 780,
+          "y": 685
+        },
+        {
+          "x": 769,
+          "y": 655
+        },
+        {
+          "x": 762,
+          "y": 624
+        }
+      ]
+    },
+    {
+      "id": "zhumadian-luohe-b",
+      "from": "zhumadian",
+      "to": "luohe",
+      "length": 2,
+      "color": "rose",
+      "type": "normal",
+      "twinGroup": "zhumadian-luohe",
+      "waypoints": [
+        {
+          "x": 803,
+          "y": 678
+        },
+        {
+          "x": 796,
+          "y": 647
+        },
+        {
+          "x": 785,
+          "y": 617
+        }
+      ]
+    },
+    {
+      "id": "luohe-xuchang",
+      "from": "luohe",
+      "to": "xuchang",
+      "length": 2,
+      "color": "obsidian",
+      "type": "normal",
+      "waypoints": []
+    },
+    {
+      "id": "luohe-pingdingshan",
+      "from": "luohe",
+      "to": "pingdingshan",
+      "length": 3,
+      "color": "amber",
+      "type": "normal",
+      "waypoints": []
+    },
+    {
+      "id": "luohe-zhoukou",
+      "from": "luohe",
+      "to": "zhoukou",
+      "length": 2,
+      "color": "crimson",
+      "type": "normal",
+      "waypoints": []
+    },
+    {
+      "id": "xuchang-pingdingshan",
+      "from": "xuchang",
+      "to": "pingdingshan",
+      "length": 3,
+      "color": "cobalt",
+      "type": "normal",
+      "waypoints": []
+    },
+    {
+      "id": "zhoukou-shangqiu",
+      "from": "zhoukou",
+      "to": "shangqiu",
+      "length": 4,
+      "color": "ivory",
+      "type": "normal",
+      "waypoints": []
+    },
+    {
+      "id": "shangqiu-huangchuan",
+      "from": "shangqiu",
+      "to": "huangchuan",
+      "length": 6,
+      "color": "violet",
+      "type": "normal",
+      "waypoints": []
+    },
+    {
+      "id": "shangqiu-lankao",
+      "from": "shangqiu",
+      "to": "lankao",
+      "length": 3,
+      "color": "rose",
+      "type": "normal",
+      "waypoints": []
+    },
+    {
+      "id": "lankao-kaifeng",
+      "from": "lankao",
+      "to": "kaifeng",
+      "length": 2,
+      "color": "obsidian",
+      "type": "normal",
+      "waypoints": []
+    },
+    {
+      "id": "lankao-puyang",
+      "from": "lankao",
+      "to": "puyang",
+      "length": 4,
+      "color": "crimson",
+      "type": "ferry",
+      "locomotiveCost": 1,
+      "waypoints": []
+    },
+    {
+      "id": "puyang-anyang",
+      "from": "puyang",
+      "to": "anyang",
+      "length": 3,
+      "color": "ivory",
+      "type": "normal",
+      "waypoints": []
+    },
+    {
+      "id": "xinxiang-puyang",
+      "from": "xinxiang",
+      "to": "puyang",
+      "length": 5,
+      "color": "emerald",
+      "type": "normal",
+      "waypoints": []
+    },
+    {
+      "id": "anyang-hebi",
+      "from": "anyang",
+      "to": "hebi",
+      "length": 2,
+      "color": "cobalt",
+      "type": "normal",
+      "waypoints": [
+        {
+          "x": 902,
+          "y": 65
+        },
+        {
+          "x": 879,
+          "y": 85
+        },
+        {
+          "x": 859,
+          "y": 107
+        }
+      ]
+    },
+    {
+      "id": "hebi-xinxiang",
+      "from": "hebi",
+      "to": "xinxiang",
+      "length": 2,
+      "color": "amber",
+      "type": "normal",
+      "waypoints": []
+    },
+    {
+      "id": "anyang-red-flag-canal",
+      "from": "anyang",
+      "to": "red-flag-canal",
+      "length": 3,
+      "color": "gray",
+      "type": "tunnel",
+      "waypoints": []
+    },
+    {
+      "id": "red-flag-canal-hebi",
+      "from": "red-flag-canal",
+      "to": "hebi",
+      "length": 2,
+      "color": "violet",
+      "type": "tunnel",
+      "waypoints": []
+    },
+    {
+      "id": "xinxiang-yuntai-mountain",
+      "from": "xinxiang",
+      "to": "yuntai-mountain",
+      "length": 2,
+      "color": "obsidian",
+      "type": "normal",
+      "waypoints": []
+    },
+    {
+      "id": "yuntai-mountain-jiaozuo",
+      "from": "yuntai-mountain",
+      "to": "jiaozuo",
+      "length": 2,
+      "color": "ivory",
+      "type": "normal",
+      "waypoints": []
+    },
+    {
+      "id": "jiaozuo-jiyuan",
+      "from": "jiaozuo",
+      "to": "jiyuan",
+      "length": 2,
+      "color": "crimson",
+      "type": "normal",
+      "waypoints": []
+    }
+  ]
+}

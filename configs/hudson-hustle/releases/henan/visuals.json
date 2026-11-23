@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "visualSetId": "henan-v1-visuals",
+  "boardStyle": "graph-first-transit-nostalgia",
+  "theme": "warm-transit-nostalgia",
+  "backdropMode": "muted",
+  "boardLabelMode": "station-only",
+  "backdrop": {
+    "landAreas": [],
+    "waterAreas": [],
+    "shorelines": [],
+    "regionLabels": []
+  },
+  "palettes": {
+    "cards": {
+      "crimson": "#c95d72",
+      "amber": "#d6a436",
+      "emerald": "#2f988c",
+      "cobalt": "#4769d0",
+      "violet": "#8659c4",
+      "obsidian": "#39414f",
+      "ivory": "#efe2c7",
+      "rose": "#db82a5",
+      "locomotive": "#f5efe2"
+    },
+    "players": {
+      "harbor-blue": "#0f7b86",
+      "signal-red": "#c44c2d",
+      "path-green": "#2f8b57",
+      "ferry-gold": "#b58b1f"
+    }
+  },
+  "notes": []
+}
