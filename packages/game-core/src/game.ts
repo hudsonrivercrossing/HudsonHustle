@@ -665,7 +665,7 @@ export function reduceGame(state: GameState, untrustedAction: GameAction, config
         tunnelExtraCost
       });
       maybeTriggerFinalRound(nextState, config, player);
-      beginAwaitingHandoff(nextState, `${player.name} claimed ${route.id}.`);
+      beginAwaitingHandoff(nextState, `${player.name} claimed ${getCityName(config, route.from)} → ${getCityName(config, route.to)}.`);
       appendLog(nextState, `${player.name} claimed ${route.id} for ${routeScoreTable[route.length] ?? route.length * 2} points.`);
       recordEvent(nextState, {
         type: "route_claimed",
@@ -732,7 +732,7 @@ export function reduceGame(state: GameState, untrustedAction: GameAction, config
         cityId: action.cityId,
         playerId: player.id
       });
-      beginAwaitingHandoff(nextState, `${player.name} built a station in ${action.cityId}.`);
+      beginAwaitingHandoff(nextState, `${player.name} built a station in ${getCityName(config, action.cityId)}.`);
       appendLog(nextState, `${player.name} built a station in ${action.cityId}.`);
       recordEvent(nextState, { type: "station_built", playerId: player.id, cityId: action.cityId });
       return nextState;

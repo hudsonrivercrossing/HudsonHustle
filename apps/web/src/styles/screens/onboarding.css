@@ -15,15 +15,15 @@
   inset: 0;
   z-index: var(--z-chrome);
   pointer-events: none;
-  animation: tour-fade-in var(--duration-base, 160ms) var(--easing-standard, ease) both;
+  animation: tour-fade-in var(--duration-base, 160ms) var(--easing-enter) both;
 }
 
-/* A ring around the part of the screen the tip is about. Nothing is dimmed: the game stays usable. */
+/* A ring around the part of the screen the tip is about. Nothing is dimmed: the game stays usable.
+   It jumps to a new target rather than sliding: sliding meant animating its size and position. */
 .tour-spotlight {
   position: fixed;
   border-radius: var(--radius-sm);
   box-shadow: 0 0 0 var(--border-thin) var(--color-canvas-base), 0 0 0 calc(var(--border-thin) * 3) var(--color-accent-base);
-  transition: top var(--duration-base) var(--easing-standard), left var(--duration-base) var(--easing-standard), width var(--duration-base) var(--easing-standard), height var(--duration-base) var(--easing-standard);
   pointer-events: none;
 }
 
@@ -37,7 +37,7 @@
   padding: 20px 22px 18px;
   box-shadow: var(--shadow-strong);
   pointer-events: auto;
-  animation: tour-callout-in var(--duration-base, 160ms) var(--easing-standard, ease) both;
+  animation: tour-callout-in var(--duration-base, 160ms) var(--easing-enter) both;
 }
 
 /* Centered fallback when target element isn't found */

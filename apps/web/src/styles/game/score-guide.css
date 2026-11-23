@@ -27,7 +27,7 @@
   opacity: 0;
   pointer-events: none;
   transform: translateY(-4px);
-  transition: opacity var(--duration-fast) var(--easing-standard), transform var(--duration-fast) var(--easing-standard);
+  transition: opacity var(--duration-fast) var(--easing-enter), transform var(--duration-fast) var(--easing-enter);
 }
 
 .score-guide:hover .score-guide__panel,

@@ -436,7 +436,7 @@ export function BoardMap({
                 <g
                   key={`${route.id}-${index}`}
                   className={freshRouteIds.includes(route.id) ? "route-car route-car--landing" : "route-car"}
-                  style={freshRouteIds.includes(route.id) ? { animationDelay: `${index * 60}ms` } : undefined}
+                  style={freshRouteIds.includes(route.id) ? { animationDelay: `${index * 45}ms` } : undefined}
                 >
                   {/* Outer dark cable jacket */}
                   <path

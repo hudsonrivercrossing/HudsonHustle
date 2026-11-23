@@ -130,3 +130,14 @@
     transform: translateY(8px) scale(0.97);
   }
 }
+
+/* With reduced motion nothing is staged: the cards and the verdict are simply there. */
+@media (prefers-reduced-motion: reduce) {
+  .turn-announcement,
+  .tunnel-moment,
+  .tunnel-moment__card,
+  .tunnel-moment__slot,
+  .tunnel-moment__verdict {
+    animation: none;
+  }
+}

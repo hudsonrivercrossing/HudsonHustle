@@ -23,7 +23,7 @@ export const coachHints: Record<CoachMoment, CoachHintCopy> = {
     eyebrow: "Tickets",
     title: "Pick your destinations",
     body: "Each ticket names two stations. Connect them with your own routes to score its points; an unfinished ticket costs you the same points at the end. Keep the ones that share a path.",
-    target: "market"
+    target: "tickets"
   },
   "your-turn": {
     eyebrow: "Your turn",

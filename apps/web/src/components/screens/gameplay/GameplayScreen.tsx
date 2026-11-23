@@ -145,6 +145,11 @@ export function GameplayScreen({
     setPinnedTicket(null);
   }, [viewerPlayerId]);
 
+  // Once a route is claimed or a station built, its panel has done its job.
+  useEffect(() => {
+    clearSelection();
+  }, [game.routeClaims.length, game.stations.length]);
+
   // A payment preview belongs to the turn it was opened in.
   useEffect(() => {
     setPaymentPreview(null);
@@ -229,12 +234,14 @@ export function GameplayScreen({
   const playerPalette = visuals.palettes.players;
   const isInitialTickets = game.phase === "initialTickets";
   const choosingTickets = pendingTickets.length > 0 && !privateInfoHidden && !ticketChoiceSuppressed;
+  // While tickets are being chosen, a phone shows the ticket tray whichever tab was open.
+  const shownTray = choosingTickets ? "tickets" : tray;
   const endgameLedgers = game.phase === "gameOver" ? buildEndgameLedgers(game.players, config) : [];
   // Every player's lines are read out in step; totals wait for the longest list to finish.
   const endgameTotalBeat = Math.max(0, ...endgameLedgers.map((ledger) => 3 + ledger.completed.length + ledger.failed.length));
 
   return (
-    <div className="app-shell app-shell--gameplay-hud tabletop" data-config-theme={visuals.theme} data-tray={choosingTickets ? "tickets" : tray}>
+    <div className="app-shell app-shell--gameplay-hud tabletop" data-config-theme={visuals.theme} data-tray={shownTray}>
       <header className="tabletop__top">
         <div className="tabletop__seats" data-tour-target="roster">
           <TableSeats
@@ -380,8 +387,8 @@ export function GameplayScreen({
       </main>
 
       <nav className="tabletop__tabs" aria-label="Show">
-        <button type="button" aria-pressed={tray === "cards"} onClick={() => setTray("cards")}>Cards</button>
-        <button type="button" aria-pressed={tray === "tickets"} onClick={() => setTray("tickets")}>
+        <button type="button" aria-pressed={shownTray === "cards"} onClick={() => setTray("cards")}>Cards</button>
+        <button type="button" aria-pressed={shownTray === "tickets"} onClick={() => setTray("tickets")}>
           Tickets ({ticketProgress.filter((entry) => entry.completed).length}/{ticketProgress.length})
         </button>
       </nav>

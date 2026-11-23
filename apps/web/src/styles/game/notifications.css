@@ -1,22 +1,25 @@
+/* In over about 250ms, then perfectly still while it is read, then out in about 170ms. */
 @keyframes notification-drift {
   0% {
     opacity: 0;
-    transform: translateY(12px) scale(0.98);
+    transform: translateY(8px) scale(0.97);
+    animation-timing-function: var(--easing-enter);
   }
 
-  12% {
+  6% {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: none;
   }
 
-  78% {
+  96% {
     opacity: 1;
-    transform: translateY(-18px) scale(1);
+    transform: none;
+    animation-timing-function: ease-in;
   }
 
   100% {
     opacity: 0;
-    transform: translateY(-48px) scale(0.98);
+    transform: translateY(-8px);
   }
 }
 
@@ -35,7 +38,7 @@
   line-height: 1.25;
   text-align: center;
   text-shadow: 0 1px 2px oklch(0% 0 0 / 0.42);
-  animation: notification-drift 4.2s ease forwards;
+  animation: notification-drift 4.2s linear forwards;
   pointer-events: auto;
 }
 

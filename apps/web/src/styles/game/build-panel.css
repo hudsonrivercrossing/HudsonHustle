@@ -13,7 +13,7 @@
   z-index: var(--z-popover);
   color: var(--hud-paper-bright, oklch(98.08% 0.0199 84.59));
   box-shadow: inset 0 0 0 1px oklch(94.6% 0.0574 85.03 / 0.1), 0 24px 48px oklch(0% 0 0 / 0.55);
-  animation: floating-build-rise 160ms var(--easing-standard, ease) both;
+  animation: floating-build-rise 160ms var(--easing-enter) both;
 }
 
 @keyframes floating-build-rise {
@@ -24,7 +24,7 @@
 /* Inline style overrides the centered fallback when anchor is set */
 .floating-build-panel[style*="position: fixed"][style*="top:"] {
   transform: none;
-  animation: floating-build-rise-anchor 160ms var(--easing-standard, ease) both;
+  animation: floating-build-rise-anchor 160ms var(--easing-enter) both;
 }
 
 @keyframes floating-build-rise-anchor {

@@ -68,9 +68,9 @@ export function TableHand({ hand, cardPalette, paymentPreview = null, highlighte
                   className={index >= shown - Math.min(leaving, shown) ? "train-card--leaving" : ""}
                 />
               ))}
-              <span className="table-hand__count" aria-hidden="true">
+              <small className="table-hand__count" aria-hidden="true">
                 {leaving > 0 ? `${count} − ${leaving}` : `×${count}`}
-              </span>
+              </small>
             </li>
           );
         })}

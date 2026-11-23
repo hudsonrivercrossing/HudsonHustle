@@ -999,9 +999,12 @@ Action rows */
   border-top: 1px dashed oklch(94.28% 0.0234 82.12 / 0.18);
 }
 
-.setup-entry-artifact:hover {
-  transform: translateY(-2px);
-  border-color: oklch(83.23% 0.0894 82.33 / 0.34);
+/* A finger has no hover: on touch the lift would stick after the tap. */
+@media (hover: hover) and (pointer: fine) {
+  .setup-entry-artifact:hover {
+    transform: translateY(-2px);
+    border-color: oklch(83.23% 0.0894 82.33 / 0.34);
+  }
 }
 
 .setup-entry-artifact:disabled {

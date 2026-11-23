@@ -249,3 +249,10 @@
     outline-color: transparent;
   }
 }
+
+/* With reduced motion the count is not staged: every line and the result are shown at once. */
+@media (prefers-reduced-motion: reduce) {
+  .game-over-layer * {
+    animation: none;
+  }
+}

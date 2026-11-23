@@ -55,7 +55,8 @@
   --duration-fast: 140ms;   /* snappy interactive feedback */
   --duration-base: 160ms;   /* standard UI transitions */
   --duration-slow: 220ms;   /* deliberate panel / overlay motion */
-  --easing-standard: ease;
+  --easing-standard: ease;   /* hover, colour and shadow changes */
+  --easing-enter: cubic-bezier(0.32, 0.72, 0, 1);  /* anything arriving on screen: fast start, soft landing */
 
   --space-page-x: 24px;
   --space-page-y: 24px;

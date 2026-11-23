@@ -20,7 +20,7 @@ interface TunnelRevealMomentProps {
 
 /** Time between one card turning over and the next. Long enough to read a card, short enough to stay a beat. */
 export const TUNNEL_CARD_STEP_MS = 520;
-const VERDICT_HOLD_MS = 2200;
+const VERDICT_HOLD_MS = 1800;
 
 /**
  * The one gamble in the game, played out: the cards turn over one at a time, then the price is read out.
@@ -32,10 +32,11 @@ export function TunnelRevealMoment({ reveal, cardPalette, onDone }: TunnelReveal
   useEffect(() => {
     const timeout = window.setTimeout(onDone, verdictDelay + VERDICT_HOLD_MS);
     const close = () => onDone();
-    window.addEventListener("keydown", close);
+    // Capture phase: an open panel underneath must not swallow the key first.
+    window.addEventListener("keydown", close, true);
     return () => {
       window.clearTimeout(timeout);
-      window.removeEventListener("keydown", close);
+      window.removeEventListener("keydown", close, true);
     };
   }, [reveal.key]);
 

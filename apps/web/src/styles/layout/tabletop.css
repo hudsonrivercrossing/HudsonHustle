@@ -181,6 +181,11 @@
     overflow-y: auto;
   }
 
+  /* Choosing tickets needs room for four of them and the button. */
+  .tabletop__left:has(.ticket-choice) {
+    max-height: 46dvh;
+  }
+
   .tabletop[data-tray="cards"] .tabletop__left,
   .tabletop[data-tray="tickets"] .tabletop__right {
     display: none;

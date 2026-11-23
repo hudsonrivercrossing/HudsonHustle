@@ -21,9 +21,9 @@ There is no Storybook and no separate design file. The running app is the refere
 |---|---|---|
 | `theme.css` | All tokens — colour, space, type, radius, motion, stacking | — |
 | `base.css` | Element defaults and the reduced-motion rule | — |
-| `layout/` | App shell and the game grid | `components/screens/` |
+| `layout/` | App shell and the table: `tabletop.css` places the board, rails and hand, and holds the phone arrangement | `components/screens/` |
 | `primitives/` | Game-agnostic pieces: button, chip, panel, form-field, modal-shell, … | `components/ui/primitives/` |
-| `game/` | Board, hand, supply dock, tickets, roster, topbar, replay, … | `components/ui/game/` + `components/screens/gameplay/` + `components/screens/replay/` |
+| `game/` | Board and score track, transit cards, hand, supply, tickets, seats, turn and tunnel moments, game over, replay, … | `components/ui/game/` + `components/screens/gameplay/` + `components/screens/replay/` |
 | `screens/` | Setup, lobby, guidebook, onboarding tips | `components/setup/` + `components/online/` + `components/screens/` + `components/shared/` |
 
 A rule lives in the file of the component that is doing the styling. `.supply-dock .system-button` belongs in `game/supply-dock.css`, not in `primitives/button.css`. A new component gets a new file and a new `@import` line.
@@ -35,7 +35,7 @@ A rule lives in the file of the component that is doing the styling. `.supply-do
 | Folder | What lives here |
 |---|---|
 | `ui/primitives/` | Game-agnostic primitives: Button, Panel, Badge, FormField, ModalShell, SectionHeader, StateSurface, StatusBanner, SurfaceCard, ChoiceChipButton, TimerPicker |
-| `ui/game/` | Game-domain primitives: CardSlot, SeatTile, TicketSlip, BoardMap, BoardStage, PlayerRosterPanel, SupplyDock, TurnPanel… |
+| `ui/game/` | Game-domain pieces: BoardMap (with the score track), TableSeats, TableTickets, TableSupply, TableHand, TrainCardFace, TurnAnnouncement, TunnelRevealMoment, TurnPanel… |
 | `screens/` | Full screens — `screens/gameplay/` is shared by local and online play |
 | `local/` | Local-play panels and storage helpers |
 | `online/` | Online flows (create and join a room) and `useOnlineRoom` |
@@ -93,6 +93,9 @@ Each folder has one `index.ts`. No folder's index re-exports from a sibling or p
 - `backdrop-filter: blur()` capped at 2 layers per viewport.
 - No `border-left` stripes for hierarchy — use token-backed fills or perforation edges.
 - `transition` names its properties; never `transition: all`.
+- Motion animates `transform` and `opacity` only. Anything arriving on screen uses `--easing-enter`; hover and colour changes use `--easing-standard`. A hover lift sits inside `@media (hover: hover) and (pointer: fine)`.
+- Decide by frequency: an action taken every turn gets at most ~250ms; a moment that happens a few times a game (a tunnel, the final count) may take longer and must be skippable.
+- Every animation has a reduced-motion path. The global rule in `base.css` shortens durations; staged sequences also set `animation: none` so nothing waits on a delay.
 
 `pnpm css:debt` counts literal values that should be tokens and fails when a count grows. When a count shrinks, lock it in with `pnpm css:debt --update`.
 
