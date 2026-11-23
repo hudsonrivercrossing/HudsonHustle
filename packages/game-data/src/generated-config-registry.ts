@@ -22,6 +22,11 @@ import releaseV04FlushingNewarkAirportMeta from "../../../configs/hudson-hustle/
 import releaseV04FlushingNewarkAirportRules from "../../../configs/hudson-hustle/releases/v0.4-flushing-newark-airport/rules.json" with { type: "json" };
 import releaseV04FlushingNewarkAirportTickets from "../../../configs/hudson-hustle/releases/v0.4-flushing-newark-airport/tickets.json" with { type: "json" };
 import releaseV04FlushingNewarkAirportVisuals from "../../../configs/hudson-hustle/releases/v0.4-flushing-newark-airport/visuals.json" with { type: "json" };
+import releaseV05RiverCrossingsMap from "../../../configs/hudson-hustle/releases/v0.5-river-crossings/map.json" with { type: "json" };
+import releaseV05RiverCrossingsMeta from "../../../configs/hudson-hustle/releases/v0.5-river-crossings/meta.json" with { type: "json" };
+import releaseV05RiverCrossingsRules from "../../../configs/hudson-hustle/releases/v0.5-river-crossings/rules.json" with { type: "json" };
+import releaseV05RiverCrossingsTickets from "../../../configs/hudson-hustle/releases/v0.5-river-crossings/tickets.json" with { type: "json" };
+import releaseV05RiverCrossingsVisuals from "../../../configs/hudson-hustle/releases/v0.5-river-crossings/visuals.json" with { type: "json" };
 import type { RegisteredConfigBundle, SnapshotMap, SnapshotMeta, SnapshotRules, SnapshotTickets, SnapshotVisuals } from "./config-types.js";
 
 export const generatedHudsonHustleConfigRegistry: Record<string, RegisteredConfigBundle> = {
@@ -64,5 +69,15 @@ export const generatedHudsonHustleConfigRegistry: Record<string, RegisteredConfi
     tickets: releaseV04FlushingNewarkAirportTickets as SnapshotTickets,
     rules: releaseV04FlushingNewarkAirportRules as SnapshotRules,
     visuals: releaseV04FlushingNewarkAirportVisuals as SnapshotVisuals
+  },
+  "v0.5-river-crossings": {
+    configId: "v0.5-river-crossings",
+    configPath: "configs/hudson-hustle/releases/v0.5-river-crossings",
+    mode: "release",
+    meta: releaseV05RiverCrossingsMeta as SnapshotMeta,
+    map: releaseV05RiverCrossingsMap as SnapshotMap,
+    tickets: releaseV05RiverCrossingsTickets as SnapshotTickets,
+    rules: releaseV05RiverCrossingsRules as SnapshotRules,
+    visuals: releaseV05RiverCrossingsVisuals as SnapshotVisuals
   }
 };

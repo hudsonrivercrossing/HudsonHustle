@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "v0.5-river-crossings",
+  "gameId": "hudson-hustle",
+  "version": "v0.5",
+  "status": "released",
+  "basedOn": "v0.4-flushing-newark-airport",
+  "createdAt": "2026-11-23",
+  "updatedAt": "2026-11-23T00:00:00.000Z",
+  "sourceSync": {
+    "method": "release-copy",
+    "sourceModule": "packages/game-data/src/index.ts",
+    "sourceBuildPath": "packages/game-data/dist/game-data/src/index.js",
+    "sourceExport": "hudsonHustleMap",
+    "syncedAt": "2026-03-31"
+  },
+  "summary": "The v0.4 stations and routes laid out to match the harbor: every Manhattan station is on Manhattan, every New Jersey station is on the New Jersey shore, and each cross-river route visibly crosses the Hudson or the East River.",
+  "designGoals": [
+    "Preserve v0.3 as the stable 13-station baseline while the next wave explores new Manhattan, Queens, and Jersey nodes.",
+    "Keep the board graph-first and readable while testing west-Manhattan and outer-ring additions without collapsing into central overlap.",
+    "Prefer board-game compression over literal geography, but remove direct links that break real-world transit intuition too sharply.",
+    "Use controlled station waves so each addition justifies its strategy and space on the board."
+  ],
+  "changeSummary": [
+    "No station, route, length, colour or ticket changed from v0.4; only positions, labels and the basemap.",
+    "Moved Hudson Yards, Chelsea, Exchange Place and Grove St out of the water and onto their own shores.",
+    "Moved Battery Park to the southern tip of Manhattan; it was drawn on the Brooklyn side.",
+    "The Newark Airport to Hudson Yards route curves through New Jersey instead of following the board edge.",
+    "Board labels use the full station names, the same as tickets.",
+    "Basemap v2: the band painted along the left and top edges is gone."
+  ],
+  "playtestFocus": [
+    "Check that the Newark Airport to Hudson Yards route still reads as a long outer route now that it is off the edge."
+  ]
+}

@@ -86,3 +86,10 @@
 - Station authority metadata uses `station-proxy` references in draft one.
 - Some inactive candidates may prove stronger than current active nodes after playtest.
 - Berlin-specific backdrop and palette work is intentionally deferred until the graph and ticket structure stabilize.
+
+## 2026-11-23 Layout Pass
+- No station, route, length, colour or locomotive cost was added or removed; saved games on this map still load.
+- `Brandenburger Tor` and `Potsdamer Platz` sat exactly on the wall. Both are now just inside East Berlin, where the stations were.
+- Every route typed `Border Crossing` now crosses the wall on the board. Two did not and are typed `normal`: `friedrichstrasse-brandenburger-tor` and `potsdamer-platz-brandenburger-tor` (neither had a locomotive cost).
+- Hauptbahnhof, Friedrichstrasse, Alexanderplatz and Frankfurter Allee moved a little so the core routes no longer stack; `frankfurter-allee-ostkreuz` bends east so it no longer covers the sector lettering.
+- Station names are written in full with umlauts on both the board and the tickets.

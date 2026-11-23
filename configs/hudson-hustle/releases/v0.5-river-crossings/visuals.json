@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "visualSetId": "hudson-hustle-graph-prototype-visuals",
+  "boardStyle": "graph-first-transit-nostalgia",
+  "theme": "warm-transit-nostalgia",
+  "backdropMode": "muted",
+  "boardLabelMode": "station-only",
+  "backdrop": {
+    "image": {
+      "href": "/basemaps/nyc-hudson-ai-reference-v2.png",
+      "opacity": 1,
+      "preserveAspectRatio": "none"
+    },
+    "landAreas": [],
+    "waterAreas": [],
+    "shorelines": [],
+    "regionLabels": [
+      {
+        "id": "new-jersey",
+        "text": "New Jersey",
+        "point": {
+          "x": 252,
+          "y": 140
+        }
+      },
+      {
+        "id": "manhattan",
+        "text": "Manhattan",
+        "point": {
+          "x": 596,
+          "y": 320
+        },
+        "vertical": true
+      },
+      {
+        "id": "queens",
+        "text": "Queens",
+        "point": {
+          "x": 920,
+          "y": 126
+        }
+      },
+      {
+        "id": "brooklyn",
+        "text": "Brooklyn",
+        "point": {
+          "x": 838,
+          "y": 722
+        }
+      }
+    ],
+    "landmarks": [
+      {
+        "id": "liberty-ellis-harbor-memory",
+        "kind": "harbor-island",
+        "bounds": {
+          "x": 590,
+          "y": 874,
+          "width": 70,
+          "height": 22
+        },
+        "label": "Harbor",
+        "opacity": 0.22,
+        "priority": "low"
+      },
+      {
+        "id": "battery-harbor-edge",
+        "kind": "waterfront",
+        "bounds": {
+          "x": 672,
+          "y": 874,
+          "width": 72,
+          "height": 22
+        },
+        "opacity": 0.18,
+        "priority": "low"
+      },
+      {
+        "id": "queens-waterfront-memory",
+        "kind": "waterfront",
+        "bounds": {
+          "x": 900,
+          "y": 80,
+          "width": 86,
+          "height": 30
+        },
+        "opacity": 0.16,
+        "priority": "low"
+      }
+    ],
+    "themeLines": [
+      {
+        "id": "battery-liberty-ferry-memory",
+        "kind": "ferry",
+        "points": [
+          {
+            "x": 600,
+            "y": 884
+          },
+          {
+            "x": 630,
+            "y": 888
+          },
+          {
+            "x": 664,
+            "y": 892
+          }
+        ],
+        "opacity": 0.22,
+        "priority": "low"
+      }
+    ],
+    "generatedBy": {
+      "recipeId": "nyc-harbor-memory-v1",
+      "generatorVersion": "ai-reference-vector-pilot-2026-05-13",
+      "acceptedAt": "2026-05-13",
+      "notes": [
+        "Vectorized from the approved AI concept direction for the NYC/Hudson pilot.",
+        "Features are intentionally low contrast and placed outside core route/label corridors."
+      ]
+    }
+  },
+  "palettes": {
+    "cards": {
+      "crimson": "#c95d72",
+      "amber": "#d6a436",
+      "emerald": "#2f988c",
+      "cobalt": "#4769d0",
+      "violet": "#8659c4",
+      "obsidian": "#39414f",
+      "ivory": "#efe2c7",
+      "rose": "#db82a5",
+      "locomotive": "#f5efe2"
+    },
+    "players": {
+      "harbor-blue": "#0f7b86",
+      "signal-red": "#c44c2d",
+      "path-green": "#2f8b57",
+      "ferry-gold": "#b58b1f"
+    }
+  },
+  "notes": [
+    "NYC/Hudson basemap pilot uses local vector backdrop data derived from an approved AI concept image.",
+    "Backdrop remains secondary to routes, stations, and labels."
+  ]
+}

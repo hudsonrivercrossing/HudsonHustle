@@ -45,7 +45,7 @@
     },
     {
       "id": "suedkreuz",
-      "name": "Suedkreuz",
+      "name": "Südkreuz",
       "label": "Südkreuz",
       "active": true,
       "tier": "anchor",
@@ -96,8 +96,8 @@
       "tier": "anchor",
       "lat": 52.525,
       "lon": 13.369,
-      "boardX": 584,
-      "boardY": 334,
+      "boardX": 570,
+      "boardY": 340,
       "labelDx": -14,
       "labelDy": -16,
       "labelAnchor": "end",
@@ -111,11 +111,11 @@
       "tier": "anchor",
       "lat": 52.521,
       "lon": 13.413,
-      "boardX": 816,
-      "boardY": 406,
-      "labelDx": 70,
-      "labelDy": 20,
-      "labelAnchor": "middle",
+      "boardX": 860,
+      "boardY": 404,
+      "labelDx": 16,
+      "labelDy": -8,
+      "labelAnchor": "start",
       "labelPreset": "top-near"
     },
     {
@@ -126,17 +126,17 @@
       "tier": "first-ring",
       "lat": 52.516,
       "lon": 13.38,
-      "boardX": 680,
-      "boardY": 429,
-      "labelDx": 118,
-      "labelDy": 20,
-      "labelAnchor": "end",
+      "boardX": 716,
+      "boardY": 452,
+      "labelDx": 16,
+      "labelDy": 8,
+      "labelAnchor": "start",
       "labelPreset": "bottom-right-near"
     },
     {
       "id": "zoologischer-garten",
       "name": "Zoologischer Garten",
-      "label": "Zoo",
+      "label": "Zoologischer Garten",
       "active": true,
       "tier": "anchor",
       "lat": 52.507,
@@ -240,8 +240,8 @@
     },
     {
       "id": "schoenhauser-allee",
-      "name": "Schoenhauser Allee",
-      "label": "Schoenhauser",
+      "name": "Schönhauser Allee",
+      "label": "Schönhauser Allee",
       "active": true,
       "tier": "first-ring",
       "lat": 52.549,
@@ -261,11 +261,11 @@
       "tier": "anchor",
       "lat": 52.52,
       "lon": 13.387,
-      "boardX": 741,
-      "boardY": 372,
-      "labelDx": 0,
-      "labelDy": -10,
-      "labelAnchor": "middle",
+      "boardX": 756,
+      "boardY": 356,
+      "labelDx": -22,
+      "labelDy": -28,
+      "labelAnchor": "end",
       "labelPreset": "top-near"
     },
     {
@@ -276,11 +276,11 @@
       "tier": "first-ring",
       "lat": 52.515,
       "lon": 13.483,
-      "boardX": 1054,
+      "boardX": 1030,
       "boardY": 410,
-      "labelDx": -23,
-      "labelDy": -3,
-      "labelAnchor": "end",
+      "labelDx": 16,
+      "labelDy": -12,
+      "labelAnchor": "start",
       "labelPreset": "top-left-near"
     },
     {
@@ -321,8 +321,8 @@
       "tier": "anchor",
       "lat": 52.509,
       "lon": 13.376,
-      "boardX": 705,
-      "boardY": 540,
+      "boardX": 738,
+      "boardY": 548,
       "labelDx": -18,
       "labelDy": 8,
       "labelAnchor": "end",
@@ -330,8 +330,8 @@
     },
     {
       "id": "warschauer-strasse",
-      "name": "Warschauer Strasse",
-      "label": "Warschauer",
+      "name": "Warschauer Straße",
+      "label": "Warschauer Straße",
       "active": true,
       "tier": "first-ring",
       "lat": 52.506,
@@ -345,7 +345,7 @@
     },
     {
       "id": "neukoelln",
-      "name": "Neukoelln",
+      "name": "Neukölln",
       "label": "Neukölln",
       "active": true,
       "tier": "first-ring",
@@ -375,7 +375,7 @@
     },
     {
       "id": "schoenberg",
-      "name": "Schoenberg",
+      "name": "Schöneberg",
       "label": "Schöneberg",
       "active": true,
       "tier": "first-ring",
@@ -463,8 +463,8 @@
       "twinGroup": "hbf-friedrichstr",
       "waypoints": [
         {
-          "x": 680,
-          "y": 300
+          "x": 662,
+          "y": 376
         }
       ]
     },
@@ -476,7 +476,12 @@
       "color": "crimson",
       "type": "Border Crossing",
       "locomotiveCost": 1,
-      "waypoints": []
+      "waypoints": [
+        {
+          "x": 630,
+          "y": 424
+        }
+      ]
     },
     {
       "id": "friedrichstrasse-brandenburger-tor",
@@ -484,7 +489,7 @@
       "to": "brandenburger-tor",
       "length": 2,
       "color": "amber",
-      "type": "Border Crossing",
+      "type": "normal",
       "waypoints": []
     },
     {
@@ -507,8 +512,8 @@
       "twinGroup": "friedrichstr-alex",
       "waypoints": [
         {
-          "x": 770,
-          "y": 430
+          "x": 800,
+          "y": 414
         }
       ]
     },
@@ -564,7 +569,12 @@
       "length": 3,
       "color": "amber",
       "type": "Border Crossing",
-      "waypoints": []
+      "waypoints": [
+        {
+          "x": 725,
+          "y": 262
+        }
+      ]
     },
     {
       "id": "gesundbrunnen-schoenhauser-allee",
@@ -621,7 +631,12 @@
       "length": 2,
       "color": "ivory",
       "type": "Border Crossing",
-      "waypoints": []
+      "waypoints": [
+        {
+          "x": 604,
+          "y": 500
+        }
+      ]
     },
     {
       "id": "potsdamer-platz-brandenburger-tor",
@@ -629,7 +644,7 @@
       "to": "brandenburger-tor",
       "length": 2,
       "color": "gray",
-      "type": "Border Crossing",
+      "type": "normal",
       "waypoints": []
     },
     {
@@ -704,7 +719,12 @@
       "length": 2,
       "color": "crimson",
       "type": "normal",
-      "waypoints": []
+      "waypoints": [
+        {
+          "x": 1128,
+          "y": 480
+        }
+      ]
     },
     {
       "id": "ostkreuz-neukoelln",
