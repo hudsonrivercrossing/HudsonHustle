@@ -180,13 +180,10 @@ scripts/
 - `main`
   - stable production branch
   - deploys production frontend and backend through platform-native Git integration
-- `develop`
-  - shared integration branch
-  - deploys preview frontend and staging backend through platform-native Git integration
 - working branches
-  - branch off `develop`
-  - open PRs into `develop`
-  - promote from `develop` to `main` after staging validation
+  - branch off `main`
+  - open PRs into `main`; CI and a Vercel preview run on every PR
+  - merging is the release: there is no staging backend, and PR previews have no API configured, so they cover local play only
 
 ## Working In This Repo
 - Keep game rules in shared code, not in React components.

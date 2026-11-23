@@ -33,8 +33,7 @@ This folder now separates long-lived product docs from versioned playtest artifa
 
 ## Branch Workflow
 - `main`: stable production branch
-- `develop`: shared staging and integration branch
-- working branches: short-lived branches off `develop`
+- working branches: short-lived branches off `main`, merged back by PR
 - deployment details live in [V2 Deployment](product/v2/v2-deployment.md)
 
 ## Playtests
