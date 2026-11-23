@@ -37,7 +37,7 @@
       "lat": 52.503,
       "lon": 13.47,
       "boardX": 1080,
-      "boardY": 580,
+      "boardY": 560,
       "labelDx": 18,
       "labelDy": 8,
       "labelAnchor": "start",
@@ -96,8 +96,8 @@
       "tier": "anchor",
       "lat": 52.525,
       "lon": 13.369,
-      "boardX": 570,
-      "boardY": 340,
+      "boardX": 590,
+      "boardY": 356,
       "labelDx": -14,
       "labelDy": -16,
       "labelAnchor": "end",
@@ -156,8 +156,8 @@
       "tier": "first-ring",
       "lat": 52.421,
       "lon": 13.179,
-      "boardX": 80,
-      "boardY": 820,
+      "boardX": 110,
+      "boardY": 790,
       "labelDx": 18,
       "labelDy": 8,
       "labelAnchor": "start",
@@ -321,8 +321,8 @@
       "tier": "anchor",
       "lat": 52.509,
       "lon": 13.376,
-      "boardX": 738,
-      "boardY": 548,
+      "boardX": 730,
+      "boardY": 530,
       "labelDx": -18,
       "labelDy": 8,
       "labelAnchor": "end",
@@ -463,8 +463,8 @@
       "twinGroup": "hbf-friedrichstr",
       "waypoints": [
         {
-          "x": 662,
-          "y": 376
+          "x": 672,
+          "y": 392
         }
       ]
     },
@@ -476,12 +476,7 @@
       "color": "crimson",
       "type": "Border Crossing",
       "locomotiveCost": 1,
-      "waypoints": [
-        {
-          "x": 630,
-          "y": 424
-        }
-      ]
+      "waypoints": []
     },
     {
       "id": "friedrichstrasse-brandenburger-tor",
@@ -631,12 +626,7 @@
       "length": 2,
       "color": "ivory",
       "type": "Border Crossing",
-      "waypoints": [
-        {
-          "x": 616,
-          "y": 476
-        }
-      ]
+      "waypoints": []
     },
     {
       "id": "potsdamer-platz-brandenburger-tor",
@@ -647,8 +637,8 @@
       "type": "normal",
       "waypoints": [
         {
-          "x": 761,
-          "y": 496
+          "x": 758,
+          "y": 492
         }
       ]
     },
@@ -749,8 +739,8 @@
       "type": "normal",
       "waypoints": [
         {
-          "x": 1128,
-          "y": 480
+          "x": 1124,
+          "y": 476
         }
       ]
     },

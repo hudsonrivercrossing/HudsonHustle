@@ -95,3 +95,4 @@
 - Station names are written in full with umlauts on both the board and the tickets.
 - Basemap `berlin-cold-war-reference-v5.png`: the same picture as v4 with the dark vignette at the edges mostly lifted and the whole sheet a little lighter, so it sits closer to the New York board.
 - Short routes are drawn with a curve so their spaces are closer in size to the rest: Spandau to Jungfernheide, Neukölln to Flughafen BER, Neukölln to Tempelhof, Schöneberg to Westkreuz, Schönhauser Allee to Pankow and Potsdamer Platz to Brandenburger Tor. Zoologischer Garten and Tempelhof moved slightly to even out their neighbours. Lengths are unchanged; a space is now between about 52 and 143 map units long, from 45 to 153.
+- Second pass on space sizes: Hauptbahnhof, Potsdamer Platz, Ostkreuz and Wannsee moved slightly, all on their own side of the wall. The longest space is now about 112 map units, the shortest about 52.

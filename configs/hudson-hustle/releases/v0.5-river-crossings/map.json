@@ -17,11 +17,11 @@
       "tier": "anchor",
       "lat": 40.789,
       "lon": -74.0635,
-      "boardX": 168,
-      "boardY": 224,
-      "labelDx": 0,
-      "labelDy": -22,
-      "labelAnchor": "middle",
+      "boardX": 200,
+      "boardY": 226,
+      "labelDx": -16,
+      "labelDy": 6,
+      "labelAnchor": "end",
       "authorityRef": {
         "source": "nj-transit-official",
         "reference": "Secaucus Junction",
@@ -61,8 +61,8 @@
       "tier": "anchor",
       "lat": 40.7168,
       "lon": -74.0345,
-      "boardX": 338,
-      "boardY": 456,
+      "boardX": 346,
+      "boardY": 468,
       "labelDx": -24,
       "labelDy": 38,
       "labelAnchor": "start",
@@ -83,10 +83,10 @@
       "tier": "first-ring",
       "lat": 40.719622,
       "lon": -74.043151,
-      "boardX": 210,
-      "boardY": 512,
-      "labelDx": 16,
-      "labelDy": 22,
+      "boardX": 200,
+      "boardY": 440,
+      "labelDx": 26,
+      "labelDy": -4,
       "labelAnchor": "start",
       "authorityRef": {
         "source": "panynj-path-official",
@@ -105,7 +105,7 @@
       "lat": 40.7347,
       "lon": -74.1645,
       "boardX": 124,
-      "boardY": 676,
+      "boardY": 620,
       "labelDx": 18,
       "labelDy": 20,
       "labelAnchor": "start",
@@ -334,11 +334,11 @@
       "tier": "anchor",
       "lat": 40.69960817,
       "lon": -73.80852987,
-      "boardX": 1116,
-      "boardY": 556,
-      "labelDx": 0,
-      "labelDy": 24,
-      "labelAnchor": "middle",
+      "boardX": 1080,
+      "boardY": 560,
+      "labelDx": 16,
+      "labelDy": 8,
+      "labelAnchor": "start",
       "authorityRef": {
         "source": "mta-lirr-gtfs",
         "reference": "Jamaica"
@@ -375,10 +375,10 @@
       "tier": "anchor",
       "lat": 40.692259,
       "lon": -73.986642,
-      "boardX": 856,
-      "boardY": 752,
-      "labelDx": -18,
-      "labelDy": 18,
+      "boardX": 800,
+      "boardY": 700,
+      "labelDx": -14,
+      "labelDy": 24,
       "labelAnchor": "end",
       "authorityRef": {
         "source": "mta-subway-complexes",
@@ -397,9 +397,9 @@
       "lon": -73.97567112,
       "boardX": 936,
       "boardY": 796,
-      "labelDx": 74,
-      "labelDy": 24,
-      "labelAnchor": "end",
+      "labelDx": 18,
+      "labelDy": 10,
+      "labelAnchor": "start",
       "authorityRef": {
         "source": "mta-lirr-gtfs",
         "reference": "Atlantic Terminal"
@@ -415,11 +415,11 @@
       "tier": "first-ring",
       "lat": 40.6762,
       "lon": -74.0126,
-      "boardX": 748,
-      "boardY": 838,
-      "labelDx": 10,
-      "labelDy": -24,
-      "labelAnchor": "start",
+      "boardX": 700,
+      "boardY": 795,
+      "labelDx": 0,
+      "labelDy": 30,
+      "labelAnchor": "middle",
       "authorityRef": {
         "source": "mta-subway-complexes",
         "reference": "Smith-9 Sts",
@@ -458,12 +458,12 @@
       "notes": [],
       "waypoints": [
         {
-          "x": 300,
+          "x": 330,
           "y": 204
         },
         {
-          "x": 462,
-          "y": 210
+          "x": 470,
+          "y": 212
         }
       ]
     },
@@ -494,7 +494,12 @@
       "color": "obsidian",
       "type": "normal",
       "notes": [],
-      "waypoints": []
+      "waypoints": [
+        {
+          "x": 272,
+          "y": 484
+        }
+      ]
     },
     {
       "id": "hoboken-grove-st",
@@ -517,12 +522,12 @@
       "twinGroup": "exchange-world",
       "waypoints": [
         {
-          "x": 400,
-          "y": 428
+          "x": 404,
+          "y": 436
         },
         {
-          "x": 466,
-          "y": 410
+          "x": 468,
+          "y": 412
         }
       ]
     },
@@ -537,12 +542,12 @@
       "twinGroup": "exchange-world",
       "waypoints": [
         {
-          "x": 402,
-          "y": 472
+          "x": 408,
+          "y": 480
         },
         {
-          "x": 470,
-          "y": 458
+          "x": 472,
+          "y": 460
         }
       ]
     },
@@ -651,8 +656,8 @@
       "locomotiveCost": 1,
       "waypoints": [
         {
-          "x": 568,
-          "y": 762
+          "x": 578,
+          "y": 704
         }
       ]
     },
@@ -682,12 +687,7 @@
       "color": "obsidian",
       "type": "normal",
       "notes": [],
-      "waypoints": [
-        {
-          "x": 840,
-          "y": 832
-        }
-      ]
+      "waypoints": []
     },
     {
       "id": "midtown-west-grand-central",
@@ -852,12 +852,7 @@
       "color": "amber",
       "type": "normal",
       "notes": [],
-      "waypoints": [
-        {
-          "x": 1130,
-          "y": 380
-        }
-      ]
+      "waypoints": []
     }
   ]
 }
