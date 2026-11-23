@@ -1,6 +1,6 @@
 ---
 name: hudson-hustle-engineering-manager
-description: Use when managing Hudson Hustle engineering work across coding, debugging, testing, delivery, subagent orchestration, and promotion through working branches, develop, and main.
+description: Use when managing Hudson Hustle engineering work across coding, debugging, testing, delivery, subagent orchestration, and release from a working branch, through its pull request preview, to main.
 ---
 
 # Hudson Hustle Engineering Manager
@@ -11,7 +11,7 @@ Use this skill when the task is not only to write code, but to manage the engine
 - debugging across client/server/platform boundaries
 - deciding merge gates
 - verifying deploy health
-- promoting work through `develop` and `main`
+- taking work from a branch, through its preview, to `main`
 
 This is a role-like orchestration skill.
 Use smaller workflow skills for adjacent jobs:
@@ -31,12 +31,12 @@ Manager responsibilities:
 Do not delegate the immediate blocking fix and then wait idly for it.
 
 ## When To Use
-- staging-only or production-only bugs
+- preview-only or production-only bugs
 - ambiguous regressions that could be client, server, or platform
-- deciding whether a branch is ready for `develop` or `main`
+- deciding whether a branch is ready for `main`
 - coordinating code review before merges
 - planning a debug or hardening cycle
-- deciding what to test locally vs. on staging vs. on production
+- deciding what to test locally vs. on the pull request preview vs. on production
 
 ## Use This Instead Of `roadmap-manager` When
 - the task is about delivery, debugging, runtime verification, merge readiness, or deploy health
@@ -78,7 +78,7 @@ Ask each subagent for:
 
 2. Narrow the failing layer before changing code.
 - if `/health` works but the app is broken, do not start by rewriting unrelated UI
-- if local works but staging fails, compare env, proxy, and deploy behavior before broad refactors
+- if local works but the preview fails, compare env, proxy, and deploy behavior before broad refactors
 
 3. Rank hypotheses.
 - keep one leading hypothesis
@@ -93,7 +93,7 @@ Ask each subagent for:
 - targeted tests
 - build
 - direct backend probes
-- staging/browser smoke
+- preview/browser smoke
 - only then consider promotion
 
 6. If the likely fix is a non-trivial refactor, stop and write a short refactor note first:
@@ -113,7 +113,7 @@ Prefer this order:
 - `/health`
 - key API routes
 - handshake endpoints when relevant
-4. deployed staging smoke
+4. smoke on the pull request preview
 5. production checks after merge
 
 Test observable behavior first.
@@ -121,7 +121,7 @@ Test observable behavior first.
 - one failing deterministic behavior test is worth more than many internal hunches
 - when reproducing regressions, lock the smallest test that proves the bug before broadening the fix
 
-Do not treat `CI green` as equivalent to `staging works`.
+Do not treat `CI green` as equivalent to `the preview works`.
 
 For browser-heavy bugs:
 - one small real browser flow is worth more than many assumptions
@@ -143,27 +143,21 @@ Bad examples:
 - hide presence, desync, or transport failures
 
 ## Branch and Delivery Rules
-Use the repo ladder:
-- working branch -> `develop`
-- `develop` -> `main`
+There is one long-lived branch, `main`. Merging to it deploys production: the web app on Vercel and
+the `api` service on Railway. There is no staging environment and no `develop` branch.
 
-### Before Merge To `develop`
-- run a code review pass
-- review docs that are affected by the change
-- run local validation
-- merge only when staging is the correct next test surface
+- working branch -> pull request -> `main`
 
-### After Merge To `develop`
-- check `Vercel` preview / `develop`
-- check `Railway` `api-develop`
-- check staging `/health`
-- run or request a staging smoke pass if runtime behavior changed
+Every pull request gets a Vercel preview of the web app. The preview talks to the **production**
+API, so a room made there is a real room, and server changes are not exercised until they are merged.
 
 ### Before Merge To `main`
 - run a code review pass
 - review docs that are affected by the change
-- require trusted `develop` validation
-- prefer at least one real browser or remote smoke result
+- run local validation: `pnpm typecheck`, `pnpm test`, `pnpm css:debt`, and the end-to-end tests when a flow changed
+- smoke the pull request preview in a real browser when the change is visible
+- for server or database changes, run the Postgres integration tests against a disposable database, since the preview cannot show them
+- check whether the change carries a migration; a migration runs when the server next starts and cannot be taken back by reverting the merge
 
 ### After Merge To `main`
 - check `Vercel` production
@@ -188,7 +182,7 @@ If no findings exist, say so explicitly and still mention remaining test gaps.
 - gameplay logic belongs in shared code, not in React components
 - UI changes must not silently change gameplay behavior
 - `Offline` with working HTTP room flow usually points to realtime, not room creation
-- `local works / staging fails` usually means env, proxy, deploy, handshake, or auth
+- `local works / preview fails` usually means env, proxy, deploy, handshake, or auth
 - use subagents to widen evidence, not to duplicate the same hunch
 
 ## Deliverables
@@ -198,7 +192,6 @@ A good manager turn should leave behind:
 - one validation result
 - one explicit recommendation:
   - not ready
-  - ready for `develop`
   - ready for `main`
 
 ## References

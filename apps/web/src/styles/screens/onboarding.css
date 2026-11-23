@@ -4,7 +4,8 @@
   position: fixed;
   right: max(var(--space-stack-md), env(safe-area-inset-right));
   bottom: max(var(--space-stack-md), env(safe-area-inset-bottom));
-  z-index: var(--z-popover);
+  /* Below the build panel: advice gives way to the thing being decided. */
+  z-index: var(--z-dropdown);
   display: grid;
   gap: var(--space-stack-xs);
   width: min(var(--rail, 280px), calc(100vw - 2 * var(--space-stack-md)));

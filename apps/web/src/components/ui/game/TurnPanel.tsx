@@ -30,7 +30,7 @@ export function TurnPanel({ state, className = "" }: TurnPanelProps): JSX.Elemen
         {state.kind === "finished" ? (
           <>
             <p className="turn-panel__lead">{state.summary ?? "Your action is locked in."}</p>
-            <p className="turn-panel__note">Check your hand, then hand the laptop over.</p>
+            <p className="turn-panel__note">Check your hand, then hand the screen over.</p>
           </>
         ) : null}
       </div>

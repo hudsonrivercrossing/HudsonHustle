@@ -110,7 +110,7 @@ export function SetupScreen({
     <SetupShell
       eyebrow="Local table"
       title="Pass-and-play"
-      lead="Seat the rivals, pass the laptop, and keep every private hand off-screen."
+      lead="Seat the rivals, pass the screen, and keep every private hand off-screen."
       backgroundImageUrl={setupHeroImageUrl}
       backAction={onBack ? <SetupBackButton onClick={onBack}>Back</SetupBackButton> : undefined}
       preflight={localPreflight}

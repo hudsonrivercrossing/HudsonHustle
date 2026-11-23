@@ -9,7 +9,8 @@ interface DialogFocusOptions {
 }
 
 /**
- * Moves focus into a dialog when it opens and gives it back to whatever had it when the dialog closes.
+ * Moves focus into a dialog when it opens and gives it back to whatever had it when the dialog closes,
+ * or to the element marked `data-focus-fallback` when that is no longer on the page.
  * With `trap`, Tab cycles inside the dialog, so the page behind cannot be reached by keyboard.
  */
 export function useDialogFocus(containerRef: RefObject<HTMLElement>, { trap = false, onEscape }: DialogFocusOptions = {}): void {
@@ -23,10 +24,14 @@ export function useDialogFocus(containerRef: RefObject<HTMLElement>, { trap = fa
     first.focus({ preventScroll: true });
 
     return () => {
-      // Only hand focus back if it is still inside the dialog; the user may have moved on already.
-      if (previous && previous.isConnected && (container.contains(document.activeElement) || document.activeElement === document.body)) {
-        previous.focus({ preventScroll: true });
+      // Only move focus if it is still inside the dialog; the user may have moved on already.
+      if (!container.contains(document.activeElement) && document.activeElement !== document.body) {
+        return;
       }
+      // Back to whatever opened the dialog. If that is gone (the button that ended a turn does not
+      // survive the handover) focus goes to the page's marked landing place, not to the top of the page.
+      const target = previous && previous.isConnected ? previous : document.querySelector<HTMLElement>("[data-focus-fallback]");
+      target?.focus({ preventScroll: true });
     };
   }, [containerRef]);
 

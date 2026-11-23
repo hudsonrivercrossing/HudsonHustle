@@ -12,6 +12,19 @@ const PANEL_WIDTH = 340;
 const PANEL_OFFSET = 16;
 const VIEWPORT_PAD = 12;
 
+/**
+ * The height that is on screen for certain. iOS Safari can report the taller height it would have
+ * with its toolbar tucked away while the toolbar is showing; the small viewport never includes it.
+ */
+function visibleHeight(): number {
+  const probe = document.createElement("div");
+  probe.style.cssText = "position:fixed;top:0;width:0;height:100svh;visibility:hidden;pointer-events:none";
+  document.body.appendChild(probe);
+  const small = probe.offsetHeight;
+  probe.remove();
+  return small > 0 ? Math.min(small, window.innerHeight) : window.innerHeight;
+}
+
 export function FloatingBuildPanel({ children, onClose, anchor = null, className = "" }: FloatingBuildPanelProps): JSX.Element {
   const ref = useRef<HTMLDivElement | null>(null);
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
@@ -24,16 +37,17 @@ export function FloatingBuildPanel({ children, onClose, anchor = null, className
     const rect = ref.current.getBoundingClientRect();
     const w = rect.width || PANEL_WIDTH;
     const h = rect.height || 200;
+    const viewHeight = visibleHeight();
     let left = anchor.x + PANEL_OFFSET;
     let top = anchor.y + PANEL_OFFSET;
     if (left + w + VIEWPORT_PAD > window.innerWidth) {
       left = anchor.x - w - PANEL_OFFSET;
     }
-    if (top + h + VIEWPORT_PAD > window.innerHeight) {
+    if (top + h + VIEWPORT_PAD > viewHeight) {
       top = anchor.y - h - PANEL_OFFSET;
     }
     left = Math.max(VIEWPORT_PAD, Math.min(left, window.innerWidth - w - VIEWPORT_PAD));
-    top = Math.max(VIEWPORT_PAD, Math.min(top, window.innerHeight - h - VIEWPORT_PAD));
+    top = Math.max(VIEWPORT_PAD, Math.min(top, viewHeight - h - VIEWPORT_PAD));
     setPos({ top, left });
   }, [anchor?.x, anchor?.y]);
 

@@ -34,6 +34,8 @@
 
 .floating-build-panel__close {
   position: absolute;
+  /* The card's header and body are raised one step; the button has to be above them to take the tap. */
+  z-index: var(--z-raised-2);
   top: var(--space-stack-xs, 4px);
   right: var(--space-stack-xs, 4px);
   width: var(--hit-target-min);

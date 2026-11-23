@@ -102,6 +102,11 @@
   white-space: nowrap;
 }
 
+/* The table takes focus only by script, after a dialog closes; it is a place to start from, not a control. */
+.tabletop__table:focus {
+  outline: none;
+}
+
 .tabletop__table {
   display: grid;
   grid-template-columns: var(--rail) minmax(0, 1fr) var(--rail);
@@ -188,6 +193,10 @@
   .tabletop {
     --card-w: 56px;
     --supply-card-w: 56px;
+    /* The table never scrolls the page, so Safari keeps its toolbar up; after a scrolled screen it can
+       still report the taller, toolbar-less height. The small viewport is the one that is always on screen. */
+    height: 100svh;
+    max-height: 100svh;
     grid-template-rows: auto minmax(0, 1fr) auto auto auto;
     grid-template-areas:
       "top"
@@ -246,7 +255,7 @@
   .tabletop__left,
   .tabletop__right {
     grid-area: tray;
-    max-height: 26dvh;
+    max-height: 26svh;
     overflow-y: auto;
   }
 
@@ -273,12 +282,12 @@
 
   /* With a chat under the cards the tray is given more room, so the input shows without scrolling. */
   .tabletop__right:has(.chat-panel) {
-    max-height: 38dvh;
+    max-height: 38svh;
   }
 
   /* Choosing tickets needs room for four of them and the button. */
   .tabletop__left:has(.ticket-choice) {
-    max-height: 46dvh;
+    max-height: 46svh;
   }
 
   .tabletop[data-tray="cards"] .tabletop__left,

@@ -105,7 +105,7 @@ const guideSteps: GuideStep[] = [
     rule: "Bot seats follow the same rules and score the same way as people.",
     points: [
       "Bots take their turns by themselves, in a local game and online.",
-      "In a local game the laptop is passed only between the people at the table.",
+      "In a local game the screen is passed only between the people at the table.",
       "Online, a player who drops out can come back to the same seat from the same browser."
     ],
     note: "Use bot seats to fill the table without changing the game rules."

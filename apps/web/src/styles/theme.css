@@ -1,12 +1,3 @@
-/* Until Fraunces arrives, headings are set in Georgia narrowed to Fraunces's width (measured: bold
-   Fraunces sets the same text at 82% of Georgia's width), so they do not reflow when it swaps in.
-   IBM Plex Sans is within two percent of Arial and needs no such stand-in. */
-@font-face {
-  font-family: "Fraunces Fallback";
-  src: local("Georgia Bold"), local("Georgia");
-  size-adjust: 82%;
-}
-
 :root {
   /* The whole app is one dark theme. There is no light variant and the OS setting does not change it. */
   color-scheme: dark;

@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { coachHints, markMomentSeen, readSeenMoments, turnOffTips, type CoachMoment } from "./coachHints";
 
 const RING_PADDING = 6;
+const PHONE = "(max-width: 760px)";
+const TIP_GAP = 8;
 
 interface Ring {
   top: number;
@@ -26,6 +28,8 @@ export function CoachHint({ moment, resetToken = 0 }: CoachHintProps): JSX.Eleme
   const [seen, setSeen] = useState(() => readSeenMoments());
   const [ring, setRing] = useState<Ring | null>(null);
   const shownRef = useRef<CoachMoment | null>(null);
+  const tipRef = useRef<HTMLElement>(null);
+  const [phoneTop, setPhoneTop] = useState<number | null>(null);
   const active = moment && !seen.has(moment) ? moment : null;
   const hint = active ? coachHints[active] : null;
 
@@ -75,6 +79,28 @@ export function CoachHint({ moment, resetToken = 0 }: CoachHintProps): JSX.Eleme
     };
   }, [target]);
 
+  // On a phone the tip spans the width of the screen, so it can land on the very thing it explains.
+  // When it would, it moves to sit just above that thing, or just below when there is no room above.
+  useLayoutEffect(() => {
+    const tip = tipRef.current;
+    if (!tip || !ring || !window.matchMedia(PHONE).matches) {
+      setPhoneTop(null);
+      return;
+    }
+    const applied = tip.style.top;
+    tip.style.top = "";
+    const natural = tip.getBoundingClientRect();
+    tip.style.top = applied;
+    const ringBottom = ring.top + ring.height;
+    if (natural.bottom <= ring.top || natural.top >= ringBottom) {
+      setPhoneTop(null);
+      return;
+    }
+    const above = ring.top - TIP_GAP - natural.height;
+    const below = ringBottom + TIP_GAP;
+    setPhoneTop(above >= TIP_GAP ? above : below + natural.height <= window.innerHeight - TIP_GAP ? below : null);
+  }, [active, ring]);
+
   if (!active || !hint) {
     return null;
   }
@@ -82,7 +108,7 @@ export function CoachHint({ moment, resetToken = 0 }: CoachHintProps): JSX.Eleme
   return (
     <>
       {ring ? <div className="table-tip__ring" style={ring} aria-hidden="true" /> : null}
-      <aside className="table-tip" role="status" aria-live="polite">
+      <aside ref={tipRef} className="table-tip" role="status" aria-live="polite" style={phoneTop === null ? undefined : { top: phoneTop }}>
         <p className="table-tip__eyebrow">Tip · {hint.eyebrow}</p>
         <h2 className="table-tip__title">{hint.title}</h2>
         <p className="table-tip__body">{hint.body}</p>

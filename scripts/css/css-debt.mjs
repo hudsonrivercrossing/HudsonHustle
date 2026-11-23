@@ -120,7 +120,8 @@ const metrics = {
     .filter((entry) => /\boklch\(\s*[\d.]/i.test(entry.value))
     .map((entry) => `${where(entry)} ${entry.property}: ${entry.value}`),
   literalFontWeights: allDeclarations
-    .filter((entry) => entry.property === "font-weight" && /^\d/.test(entry.value))
+    // A range of two weights is only valid in @font-face, where it describes the file, not a style.
+    .filter((entry) => entry.property === "font-weight" && /^\d/.test(entry.value) && !/^\d+\s+\d+$/.test(entry.value))
     .map((entry) => `${where(entry)} ${entry.value}`),
   literalFontSizes: allDeclarations
     .filter((entry) => entry.property === "font-size" && /^[\d.]/.test(entry.value))

@@ -285,6 +285,7 @@ export function GameplayScreen({
   return (
     <div className="app-shell app-shell--gameplay-hud tabletop" data-config-theme={visuals.theme} data-tray={shownTray}>
       <header className="tabletop__top" {...behindSheet}>
+        <h1 className="visually-hidden">{config.name} game table</h1>
         <div className="tabletop__seats" data-tour-target="roster">
           <TableSeats
             seats={seats}
@@ -311,7 +312,7 @@ export function GameplayScreen({
         </p>
       ) : null}
 
-      <main className="tabletop__table" {...behindSheet}>
+      <main className="tabletop__table" tabIndex={-1} data-focus-fallback {...behindSheet}>
         <aside className="tabletop__left" data-tour-target="tickets">
           {choosingTickets ? (
             <TicketChoice
@@ -361,40 +362,6 @@ export function GameplayScreen({
             onSelectRoute={selectRoute}
             onSelectCity={selectCity}
           />
-
-          {(currentRoute || currentCity) && game.phase === "main" && !privateInfoHidden ? (
-            <FloatingBuildPanel anchor={buildAnchor} onClose={clearSelection}>
-              {currentRoute ? (
-                <RouteBuildPanel
-                  route={currentRoute}
-                  config={config}
-                  options={routeOptions}
-                  unavailableReason={routeUnavailableReason}
-                  cardPalette={cardPalette}
-                  disabled={!canTakeTurnAction}
-                  claimedByName={currentRouteOwner?.name ?? null}
-                  costSummary={describeRouteCost(currentRoute)}
-                  onClaim={(color) => onAction({ type: "claim_route", routeId: currentRoute.id, color })}
-                  onPaymentPreviewEnter={setPaymentPreview}
-                  onPaymentPreviewLeave={() => setPaymentPreview(null)}
-                />
-              ) : currentCity ? (
-                <StationBuildPanel
-                  city={currentCity}
-                  config={config}
-                  options={stationOptions}
-                  cityOccupied={currentCityOccupied}
-                  stationCost={stationCost}
-                  cardPalette={cardPalette}
-                  disabled={!canTakeTurnAction}
-                  turnStage={game.turn.stage}
-                  onBuild={(color) => onAction({ type: "build_station", cityId: currentCity.id, color })}
-                  onPaymentPreviewEnter={setPaymentPreview}
-                  onPaymentPreviewLeave={() => setPaymentPreview(null)}
-                />
-              ) : null}
-            </FloatingBuildPanel>
-          ) : null}
         </div>
 
         <aside className="tabletop__right" data-tour-target="market">
@@ -472,6 +439,41 @@ export function GameplayScreen({
             </Button>
           </div>
         </ModalShell>
+      ) : null}
+
+      {/* Outside the board: on a phone the board scrolls, and Safari loses taps on a fixed panel inside a scroller. */}
+      {(currentRoute || currentCity) && game.phase === "main" && !privateInfoHidden ? (
+        <FloatingBuildPanel anchor={buildAnchor} onClose={clearSelection}>
+          {currentRoute ? (
+            <RouteBuildPanel
+              route={currentRoute}
+              config={config}
+              options={routeOptions}
+              unavailableReason={routeUnavailableReason}
+              cardPalette={cardPalette}
+              disabled={!canTakeTurnAction}
+              claimedByName={currentRouteOwner?.name ?? null}
+              costSummary={describeRouteCost(currentRoute)}
+              onClaim={(color) => onAction({ type: "claim_route", routeId: currentRoute.id, color })}
+              onPaymentPreviewEnter={setPaymentPreview}
+              onPaymentPreviewLeave={() => setPaymentPreview(null)}
+            />
+          ) : currentCity ? (
+            <StationBuildPanel
+              city={currentCity}
+              config={config}
+              options={stationOptions}
+              cityOccupied={currentCityOccupied}
+              stationCost={stationCost}
+              cardPalette={cardPalette}
+              disabled={!canTakeTurnAction}
+              turnStage={game.turn.stage}
+              onBuild={(color) => onAction({ type: "build_station", cityId: currentCity.id, color })}
+              onPaymentPreviewEnter={setPaymentPreview}
+              onPaymentPreviewLeave={() => setPaymentPreview(null)}
+            />
+          ) : null}
+        </FloatingBuildPanel>
       ) : null}
 
       <NotificationPipe notifications={notifications} />

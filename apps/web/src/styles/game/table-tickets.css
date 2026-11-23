@@ -193,4 +193,11 @@
   .ticket-choice {
     gap: var(--space-stack-sm);
   }
+
+  /* The list scrolls inside the tray; the button stays in reach at its lower edge. */
+  .ticket-choice__confirm {
+    position: sticky;
+    bottom: 0;
+    box-shadow: 0 -8px 12px var(--hud-wood);
+  }
 }
