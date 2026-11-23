@@ -1,85 +1,13 @@
+import { fileURLToPath } from "node:url";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
+import { migrate } from "drizzle-orm/postgres-js/migrator";
 import postgres from "postgres";
 import { gameEventsTable, gameHistoryCheckpointsTable, gameSnapshotsTable, roomsTable, roomSeatsTable } from "../db/schema.js";
 import type { RoomRepository, SaveRoomOptions, StoredGameHistory, StoredGameHistoryUpdate, StoredRoomRecord } from "./types.js";
 
-async function ensureSchema(sql: postgres.Sql): Promise<void> {
-  await sql`
-    create table if not exists rooms (
-      room_code text primary key,
-      status text not null,
-      host_seat_id text not null,
-      player_count integer not null,
-      config_id text not null,
-      config_version text not null,
-      config_summary text not null,
-      map_name text not null,
-      turn_time_limit_seconds integer not null,
-      created_at timestamptz not null,
-      updated_at timestamptz not null,
-      deadline_at timestamptz
-    )
-  `;
-  await sql`alter table rooms add column if not exists deadline_at timestamptz`;
-  await sql`
-    create table if not exists room_seats (
-      room_code text not null,
-      seat_id text not null,
-      player_id text,
-      player_name text,
-      player_secret text,
-      controller_type text not null,
-      controller_state jsonb not null,
-      ready boolean not null,
-      connected boolean not null,
-      joined_at timestamptz not null,
-      updated_at timestamptz not null,
-      primary key (room_code, seat_id)
-    )
-  `;
-  await sql`alter table room_seats alter column player_secret drop not null`;
-  await sql`alter table room_seats add column if not exists controller_state jsonb`;
-  await sql`
-    update room_seats
-    set controller_state = '{"ownership":"client","authStrategy":"player_secret"}'::jsonb
-    where controller_state is null
-  `;
-  await sql`alter table room_seats alter column controller_state set not null`;
-  await sql`
-    create table if not exists game_snapshots (
-      room_code text primary key,
-      snapshot_version integer not null,
-      snapshot jsonb not null,
-      updated_at timestamptz not null
-    )
-  `;
-  await sql`
-    create table if not exists game_events (
-      id integer generated always as identity primary key,
-      room_code text not null,
-      sequence integer not null,
-      event_type text not null,
-      payload jsonb not null,
-      created_at timestamptz not null
-    )
-  `;
-  await sql`
-    create table if not exists game_history_checkpoints (
-      room_code text not null,
-      snapshot_version integer not null,
-      checkpoint_type text not null,
-      snapshot jsonb not null,
-      created_at timestamptz not null,
-      primary key (room_code, snapshot_version)
-    )
-  `;
-  await sql`
-    create unique index if not exists game_events_canonical_room_sequence_idx
-    on game_events (room_code, sequence)
-    where event_type <> 'room_saved'
-  `;
-}
+/** `drizzle/` sits beside `src/` in development and beside `dist/` once built. */
+const migrationsFolder = fileURLToPath(new URL("../../drizzle", import.meta.url));
 
 export class PostgresRoomRepository implements RoomRepository {
   private readonly sql: postgres.Sql;
@@ -89,9 +17,10 @@ export class PostgresRoomRepository implements RoomRepository {
   private ready: Promise<void>;
 
   constructor(databaseUrl: string) {
-    this.sql = postgres(databaseUrl, { max: 1 });
+    // `onnotice` is silenced because the idempotent baseline migration reports every table it skips.
+    this.sql = postgres(databaseUrl, { max: 1, onnotice: () => undefined });
     this.db = drizzle(this.sql);
-    this.ready = ensureSchema(this.sql);
+    this.ready = migrate(this.db, { migrationsFolder });
   }
 
   async saveRoom(record: StoredRoomRecord, historyUpdate?: StoredGameHistoryUpdate, options?: SaveRoomOptions): Promise<void> {
@@ -100,25 +29,13 @@ export class PostgresRoomRepository implements RoomRepository {
     const createdAt = new Date(record.createdAt);
     const deadlineAt = record.deadlineAt ? new Date(record.deadlineAt) : null;
 
-    await this.db
-      .insert(roomsTable)
-      .values({
-        roomCode: record.roomCode,
-        status: record.status,
-        hostSeatId: record.hostSeatId,
-        playerCount: record.playerCount,
-        configId: record.configId,
-        configVersion: record.configVersion,
-        configSummary: record.configSummary,
-        mapName: record.mapName,
-        turnTimeLimitSeconds: record.turnTimeLimitSeconds,
-        createdAt,
-        updatedAt,
-        deadlineAt
-      })
-      .onConflictDoUpdate({
-        target: roomsTable.roomCode,
-        set: {
+    // One transaction per save: a crash or a failed statement leaves the room as it was,
+    // never with its seats deleted and not yet rewritten.
+    await this.db.transaction(async (tx) => {
+      await tx
+        .insert(roomsTable)
+        .values({
+          roomCode: record.roomCode,
           status: record.status,
           hostSeatId: record.hostSeatId,
           playerCount: record.playerCount,
@@ -127,82 +44,98 @@ export class PostgresRoomRepository implements RoomRepository {
           configSummary: record.configSummary,
           mapName: record.mapName,
           turnTimeLimitSeconds: record.turnTimeLimitSeconds,
+          createdAt,
           updatedAt,
           deadlineAt
-        }
-      });
-
-    await this.db.delete(roomSeatsTable).where(eq(roomSeatsTable.roomCode, record.roomCode));
-    if (record.seats.length > 0) {
-      await this.db.insert(roomSeatsTable).values(
-        record.seats.map((seat) => ({
-          roomCode: record.roomCode,
-          seatId: seat.seatId,
-          playerId: seat.playerId,
-          playerName: seat.playerName,
-          playerSecret: seat.playerSecret,
-          controllerType: seat.controllerType,
-          controllerState: seat.controllerState,
-          ready: seat.ready,
-          connected: seat.connected,
-          joinedAt: new Date(seat.joinedAt),
-          updatedAt: new Date(seat.updatedAt)
-        }))
-      );
-    }
-
-    if (record.game) {
-      await this.db
-        .insert(gameSnapshotsTable)
-        .values({
-          roomCode: record.roomCode,
-          snapshotVersion: record.snapshotVersion,
-          snapshot: record.game,
-          updatedAt
         })
         .onConflictDoUpdate({
-          target: gameSnapshotsTable.roomCode,
+          target: roomsTable.roomCode,
           set: {
+            status: record.status,
+            hostSeatId: record.hostSeatId,
+            playerCount: record.playerCount,
+            configId: record.configId,
+            configVersion: record.configVersion,
+            configSummary: record.configSummary,
+            mapName: record.mapName,
+            turnTimeLimitSeconds: record.turnTimeLimitSeconds,
+            updatedAt,
+            deadlineAt
+          }
+        });
+
+      await tx.delete(roomSeatsTable).where(eq(roomSeatsTable.roomCode, record.roomCode));
+      if (record.seats.length > 0) {
+        await tx.insert(roomSeatsTable).values(
+          record.seats.map((seat) => ({
+            roomCode: record.roomCode,
+            seatId: seat.seatId,
+            playerId: seat.playerId,
+            playerName: seat.playerName,
+            playerSecret: seat.playerSecret,
+            controllerType: seat.controllerType,
+            controllerState: seat.controllerState,
+            ready: seat.ready,
+            connected: seat.connected,
+            joinedAt: new Date(seat.joinedAt),
+            updatedAt: new Date(seat.updatedAt)
+          }))
+        );
+      }
+
+      if (record.game) {
+        await tx
+          .insert(gameSnapshotsTable)
+          .values({
+            roomCode: record.roomCode,
             snapshotVersion: record.snapshotVersion,
             snapshot: record.game,
             updatedAt
-          }
-        });
-    } else {
-      await this.db.delete(gameSnapshotsTable).where(eq(gameSnapshotsTable.roomCode, record.roomCode));
-    }
-
-    if (options?.replaceHistory) {
-      await this.db.delete(gameEventsTable).where(eq(gameEventsTable.roomCode, record.roomCode));
-      await this.db.delete(gameHistoryCheckpointsTable).where(eq(gameHistoryCheckpointsTable.roomCode, record.roomCode));
-    }
-
-    if (historyUpdate && historyUpdate.events.length > 0) {
-      await this.db.insert(gameEventsTable).values(
-        historyUpdate.events.map((event) => ({
-          roomCode: event.roomCode,
-          sequence: event.sequence,
-          eventType: event.eventType,
-          payload: event.payload,
-          createdAt: new Date(event.createdAt)
-        }))
-      );
-    }
-
-    if (historyUpdate && historyUpdate.checkpoints.length > 0) {
-      for (const checkpoint of historyUpdate.checkpoints) {
-        await this.db
-          .insert(gameHistoryCheckpointsTable)
-          .values({
-            roomCode: checkpoint.roomCode,
-            snapshotVersion: checkpoint.snapshotVersion,
-            checkpointType: checkpoint.checkpointType,
-            snapshot: checkpoint.snapshot,
-            createdAt: new Date(checkpoint.createdAt)
           })
-          .onConflictDoNothing();
+          .onConflictDoUpdate({
+            target: gameSnapshotsTable.roomCode,
+            set: {
+              snapshotVersion: record.snapshotVersion,
+              snapshot: record.game,
+              updatedAt
+            }
+          });
+      } else {
+        await tx.delete(gameSnapshotsTable).where(eq(gameSnapshotsTable.roomCode, record.roomCode));
       }
-    }
+
+      if (options?.replaceHistory) {
+        await tx.delete(gameEventsTable).where(eq(gameEventsTable.roomCode, record.roomCode));
+        await tx.delete(gameHistoryCheckpointsTable).where(eq(gameHistoryCheckpointsTable.roomCode, record.roomCode));
+      }
+
+      if (historyUpdate && historyUpdate.events.length > 0) {
+        await tx.insert(gameEventsTable).values(
+          historyUpdate.events.map((event) => ({
+            roomCode: event.roomCode,
+            sequence: event.sequence,
+            eventType: event.eventType,
+            payload: event.payload,
+            createdAt: new Date(event.createdAt)
+          }))
+        );
+      }
+
+      if (historyUpdate && historyUpdate.checkpoints.length > 0) {
+        for (const checkpoint of historyUpdate.checkpoints) {
+          await tx
+            .insert(gameHistoryCheckpointsTable)
+            .values({
+              roomCode: checkpoint.roomCode,
+              snapshotVersion: checkpoint.snapshotVersion,
+              checkpointType: checkpoint.checkpointType,
+              snapshot: checkpoint.snapshot,
+              createdAt: new Date(checkpoint.createdAt)
+            })
+            .onConflictDoNothing();
+        }
+      }
+    });
   }
 
   async getRoom(roomCode: string): Promise<StoredRoomRecord | null> {

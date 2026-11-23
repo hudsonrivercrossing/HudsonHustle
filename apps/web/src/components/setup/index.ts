@@ -1,3 +1,4 @@
+export { BotDifficultyField } from "./BotDifficultyField";
 export { SeatPlan } from "./SeatPlan";
 export type { SeatRow } from "./SeatPlan";
 export {

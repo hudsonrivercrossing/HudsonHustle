@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { HudsonHustleReleasedConfigSummary } from "@hudson-hustle/game-data";
-import type { ReconnectState, RoomSummary } from "@hudson-hustle/game-core";
+import type { BotDifficulty, ReconnectState, RoomSummary } from "@hudson-hustle/game-core";
 import { StateSurface } from "../ui/primitives/StateSurface";
 import {
   ModeSwitch,
@@ -26,6 +26,8 @@ interface OnlineSetupScreenProps {
   roomPreview: RoomSummary | null;
   error: string | null;
   isCreatingRoom?: boolean;
+  /** Room code from a shared link; opens the join flow with it filled in. */
+  initialJoinRoomCode?: string;
   onOpenLocal?: () => void;
   onBack?: () => void;
   onClearRoomPreview?: () => void;
@@ -40,6 +42,7 @@ export function OnlineSetupScreen({
   roomPreview,
   error,
   isCreatingRoom = false,
+  initialJoinRoomCode,
   onBack,
   onClearRoomPreview,
   onPreviewRoom,
@@ -55,15 +58,16 @@ export function OnlineSetupScreen({
   const [configId, setConfigId] = useState(latestConfigId);
   const [turnTimeLimitSeconds, setTurnTimeLimitSeconds] = useState(0);
   const [botSeatIds, setBotSeatIds] = useState<string[]>([]);
+  const [botDifficulty, setBotDifficulty] = useState<BotDifficulty>("standard");
 
   // Join form state
-  const [joinRoomCode, setJoinRoomCode] = useState("");
+  const [joinRoomCode, setJoinRoomCode] = useState(initialJoinRoomCode ?? "");
   const [joinPlayerName, setJoinPlayerName] = useState("Player");
   const [preferredSeatId, setPreferredSeatId] = useState<string | undefined>(undefined);
 
   // Navigation state
   const [stage, setStage] = useState<OnlineSetupStage>(() =>
-    reconnectState === "attempting-reconnect" || reconnectState === "reconnect-failed" ? "join" : "gateway"
+    initialJoinRoomCode || reconnectState === "attempting-reconnect" || reconnectState === "reconnect-failed" ? "join" : "gateway"
   );
   const [createStep, setCreateStep] = useState<SetupFlowStep>(0);
   const [joinStep, setJoinStep] = useState<SetupFlowStep>(0);
@@ -220,6 +224,8 @@ export function OnlineSetupScreen({
           configId={configId}
           turnTimeLimitSeconds={turnTimeLimitSeconds}
           botSeatIds={botSeatIds}
+          botDifficulty={botDifficulty}
+          onChangeBotDifficulty={setBotDifficulty}
           setupSeatIds={setupSeatIds}
           plannedBotCount={plannedBotCount}
           plannedHumanOpenSeats={plannedHumanOpenSeats}

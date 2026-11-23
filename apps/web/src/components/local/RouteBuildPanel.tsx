@@ -26,6 +26,8 @@ interface RouteBuildPanelProps {
   onPaymentPreviewEnter: (preview: { color: TrainCardColor; totalCost: number; minimumLocomotives?: number }) => void;
   onPaymentPreviewLeave: () => void;
   claimedByName?: string | null;
+  /** The route's price in plain words, shown while it is still open. */
+  costSummary: string;
 }
 
 export function RouteBuildPanel({
@@ -38,7 +40,8 @@ export function RouteBuildPanel({
   onClaim,
   onPaymentPreviewEnter,
   onPaymentPreviewLeave,
-  claimedByName
+  claimedByName,
+  costSummary
 }: RouteBuildPanelProps): JSX.Element {
   return (
     <SurfaceCard
@@ -57,7 +60,7 @@ export function RouteBuildPanel({
           ) : null}
         </div>
         <p className="detail-card__prompt">
-          {claimedByName ? `Claimed by ${claimedByName}.` : "Choose payment color."}
+          {claimedByName ? `Claimed by ${claimedByName}.` : costSummary}
         </p>
       </div>
       <div className="detail-card__decision-shelf chip-row">

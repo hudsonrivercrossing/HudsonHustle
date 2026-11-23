@@ -68,7 +68,7 @@ Stable text roles:
 ## Layout Rules
 
 Stable layout rhythm now lives in:
-- [Layout Rhythm](/Users/djfan/Workspace/HudsonHustle/docs/product/layout-rhythm.md)
+- [Layout Rhythm](layout-rhythm.md)
 
 ### Global
 - board remains the dominant visual region in active play

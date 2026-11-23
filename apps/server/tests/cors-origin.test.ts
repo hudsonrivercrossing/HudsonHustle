@@ -35,6 +35,17 @@ describe("createSocketIoCorsOriginMatcher", () => {
   });
 });
 
+describe("an empty origin list", () => {
+  it("allows no browser origin, for HTTP and for sockets", async () => {
+    expect(await resolveOriginCheck(createCorsOriginMatcher([]), "https://example.com")).toBe(false);
+    expect(await resolveOriginCheck(createSocketIoCorsOriginMatcher([]), "https://example.com")).toBe(false);
+  });
+
+  it("still serves requests that are not from a browser page", async () => {
+    expect(await resolveOriginCheck(createSocketIoCorsOriginMatcher([]), undefined)).toBe(true);
+  });
+});
+
 function resolveOriginCheck(
   matcher:
     | true
@@ -47,7 +58,8 @@ function resolveOriginCheck(
   }
 
   if (matcher.length <= 1) {
-    return Promise.resolve(matcher(origin)).then((result) => Boolean(result));
+    const promiseMatcher = matcher as (origin: string | undefined) => Promise<string | boolean>;
+    return promiseMatcher(origin).then((result) => Boolean(result));
   }
 
   return new Promise<boolean>((resolve, reject) => {

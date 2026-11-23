@@ -2,14 +2,14 @@
 
 ## Status
 - `1` is now completed:
-  - the first playable small-map station set has been reached and frozen into [v0.4-flushing-newark-airport](/Users/djfan/Workspace/HudsonHustle/configs/hudson-hustle/releases/v0.4-flushing-newark-airport)
+  - the first playable small-map station set has been reached and frozen into [v0.4-flushing-newark-airport](../../../configs/hudson-hustle/releases/v0.4-flushing-newark-airport)
 - `2` is now completed:
   - playtest and balance work has been recorded through:
-    - [balance-review.md](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v0.4/balance-review.md)
-    - [keep-tune-cut.md](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v0.4/keep-tune-cut.md)
-    - [tuning-candidates.md](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v0.4/tuning-candidates.md)
-    - [2p-central-choke-checklist.md](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v0.4/2p-central-choke-checklist.md)
-    - [agent-vs-agent-playtest.md](/Users/djfan/Workspace/HudsonHustle/docs/playtests/v0.4/agent-vs-agent-playtest.md)
+    - [balance-review.md](../../playtests/v0.4/balance-review.md)
+    - [keep-tune-cut.md](../../playtests/v0.4/keep-tune-cut.md)
+    - [tuning-candidates.md](../../playtests/v0.4/tuning-candidates.md)
+    - [2p-central-choke-checklist.md](../../playtests/v0.4/2p-central-choke-checklist.md)
+    - [agent-vs-agent-playtest.md](../../playtests/v0.4/agent-vs-agent-playtest.md)
 - `3` is now completed:
   - the board responds to `backdropMode`
   - the board responds to `boardLabelMode`

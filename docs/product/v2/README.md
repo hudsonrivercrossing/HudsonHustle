@@ -3,51 +3,51 @@
 This folder groups the multiplayer-specific product and engineering docs for `v2`.
 
 ## Files
-- [V2 MVP Architecture](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2-mvp-architecture.md)
-- [V2 Multiplayer Flow](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2-multiplayer-flow.md)
-- [V2 Deployment](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2-deployment.md)
-- [V2.1 Design Lock](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.1-design-lock.md)
-- [V2.1 Design Critique And Reference](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.1-design-critique-and-reference.md)
-- [V2.1 Shell Design Direction](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.1-shell-design-direction.md)
-- [V2.1 Shell Review Memo](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.1-shell-review-memo.md)
-- [V2.2 System Player PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-system-player-prd.md)
-- [V2.2 System Player Plan](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-system-player-plan.md)
-- [V2.2 Slice 1 Bot Seat Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-1-bot-seat-implementation-prd.md)
-- [V2.2 Slice 1 Bot Seat Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-1-bot-seat-issues.md)
-- [V2.2 Slice 2 Public Bot Setup Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-2-public-bot-setup-implementation-prd.md)
-- [V2.2 Slice 2 Public Bot Setup Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-2-public-bot-setup-issues.md)
-- [V2.2 Slice 3 Bot Quality Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-3-bot-quality-implementation-prd.md)
-- [V2.2 Slice 3 Bot Quality Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-3-bot-quality-issues.md)
-- [V2.2 Slice 4 Lifecycle Hardening Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-4-lifecycle-hardening-implementation-prd.md)
-- [V2.2 Slice 4 Lifecycle Hardening Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-4-lifecycle-hardening-issues.md)
-- [V2.2 Slice 5 Freeze And Doc Alignment Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-5-freeze-and-doc-alignment-implementation-prd.md)
-- [V2.2 Slice 5 Freeze And Doc Alignment Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-5-freeze-and-doc-alignment-issues.md)
-- [V2.2 Slice 5 Freeze Review](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-5-freeze-review.md)
-- [V2.2 System Agent Architecture](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-system-agent-architecture.md)
+- [V2 MVP Architecture](v2-mvp-architecture.md)
+- [V2 Multiplayer Flow](v2-multiplayer-flow.md)
+- [V2 Deployment](v2-deployment.md)
+- [V2.1 Design Lock](../../archive/v2-slices/v2.1-design-lock.md)
+- [V2.1 Design Critique And Reference](../../archive/v2-slices/v2.1-design-critique-and-reference.md)
+- [V2.1 Shell Design Direction](../../archive/v2-slices/v2.1-shell-design-direction.md)
+- [V2.1 Shell Review Memo](../../archive/v2-slices/v2.1-shell-review-memo.md)
+- [V2.2 System Player PRD](../../archive/v2-slices/v2.2-system-player-prd.md)
+- [V2.2 System Player Plan](../../archive/v2-slices/v2.2-system-player-plan.md)
+- [V2.2 Slice 1 Bot Seat Implementation PRD](../../archive/v2-slices/v2.2-slice-1-bot-seat-implementation-prd.md)
+- [V2.2 Slice 1 Bot Seat Issues](../../archive/v2-slices/v2.2-slice-1-bot-seat-issues.md)
+- [V2.2 Slice 2 Public Bot Setup Implementation PRD](../../archive/v2-slices/v2.2-slice-2-public-bot-setup-implementation-prd.md)
+- [V2.2 Slice 2 Public Bot Setup Issues](../../archive/v2-slices/v2.2-slice-2-public-bot-setup-issues.md)
+- [V2.2 Slice 3 Bot Quality Implementation PRD](../../archive/v2-slices/v2.2-slice-3-bot-quality-implementation-prd.md)
+- [V2.2 Slice 3 Bot Quality Issues](../../archive/v2-slices/v2.2-slice-3-bot-quality-issues.md)
+- [V2.2 Slice 4 Lifecycle Hardening Implementation PRD](../../archive/v2-slices/v2.2-slice-4-lifecycle-hardening-implementation-prd.md)
+- [V2.2 Slice 4 Lifecycle Hardening Issues](../../archive/v2-slices/v2.2-slice-4-lifecycle-hardening-issues.md)
+- [V2.2 Slice 5 Freeze And Doc Alignment Implementation PRD](../../archive/v2-slices/v2.2-slice-5-freeze-and-doc-alignment-implementation-prd.md)
+- [V2.2 Slice 5 Freeze And Doc Alignment Issues](../../archive/v2-slices/v2.2-slice-5-freeze-and-doc-alignment-issues.md)
+- [V2.2 Slice 5 Freeze Review](../../archive/v2-slices/v2.2-slice-5-freeze-review.md)
+- [V2.2 System Agent Architecture](../../archive/v2-slices/v2.2-system-agent-architecture.md)
 
 ## How To Use These
-- Start with [V2 MVP Architecture](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2-mvp-architecture.md) for scope and system boundaries.
-- Use [V2 Multiplayer Flow](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2-multiplayer-flow.md) for room UX, reconnect, and player-facing session flow.
-- Use [V2 Deployment](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2-deployment.md) for `Vercel` / `Railway` setup and branch-to-environment behavior.
-- Use [Design System](/Users/djfan/Workspace/HudsonHustle/docs/product/design-system.md) for stable top-level design-system truth.
-- Use [Design Showcases](/Users/djfan/Workspace/HudsonHustle/docs/product/showcase/README.md) when you want the lightweight HTML review artifacts for fonts and system components.
-- Use [V2.1 Design Lock](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.1-design-lock.md) for the minimum system decisions that should stay fixed while the first `v2.1` design slice is implemented.
-- Use [V2.1 Design Critique And Reference](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.1-design-critique-and-reference.md) and [V2.1 Shell Design Direction](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.1-shell-design-direction.md) for the current shell-first design-system work.
-- Use [V2.1 Shell Review Memo](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.1-shell-review-memo.md) for the latest multi-agent review findings and the concrete `v2.1` shell corrections they led to.
-- Use [V2.2 System Player PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-system-player-prd.md) for the first bounded `v2.2` product requirement around a built-in system-owned player seat.
-- Use [V2.2 System Player Plan](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-system-player-plan.md) for the phased implementation order and validation path for that first `v2.2` milestone.
-- Use [V2.2 Slice 1 Bot Seat Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-1-bot-seat-implementation-prd.md) when starting the first architecture-proof implementation slice.
-- Use [V2.2 Slice 1 Bot Seat Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-1-bot-seat-issues.md) for task-sized breakdown of that first slice.
-- Use [V2.2 Slice 2 Public Bot Setup Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-2-public-bot-setup-implementation-prd.md) when turning the internal bot-seat proof into normal multiplayer setup work.
-- Use [V2.2 Slice 2 Public Bot Setup Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-2-public-bot-setup-issues.md) for task-sized breakdown of the first public bot-setup slice.
-- Use [V2.2 Slice 3 Bot Quality Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-3-bot-quality-implementation-prd.md) when improving the bot from legal baseline to competent baseline quality.
-- Use [V2.2 Slice 3 Bot Quality Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-3-bot-quality-issues.md) for task-sized breakdown of the first bot-quality slice.
-- Use [V2.2 Slice 4 Lifecycle Hardening Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-4-lifecycle-hardening-implementation-prd.md) when hardening timer, reconnect, and mixed-room lifecycle behavior.
-- Use [V2.2 Slice 4 Lifecycle Hardening Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-4-lifecycle-hardening-issues.md) for task-sized breakdown of the lifecycle hardening slice.
-- Use [V2.2 Slice 5 Freeze And Doc Alignment Implementation PRD](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-5-freeze-and-doc-alignment-implementation-prd.md) when closing the first public system-player milestone without reopening scope.
-- Use [V2.2 Slice 5 Freeze And Doc Alignment Issues](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-5-freeze-and-doc-alignment-issues.md) for the final freeze-review and docs-alignment tasks.
-- Use [V2.2 Slice 5 Freeze Review](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-slice-5-freeze-review.md) for the final findings-first closeout note.
-- Use [V2.2 System Agent Architecture](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-system-agent-architecture.md) for the first system-player recommendation path.
+- Start with [V2 MVP Architecture](v2-mvp-architecture.md) for scope and system boundaries.
+- Use [V2 Multiplayer Flow](v2-multiplayer-flow.md) for room UX, reconnect, and player-facing session flow.
+- Use [V2 Deployment](v2-deployment.md) for `Vercel` / `Railway` setup and branch-to-environment behavior.
+- Use [Design System](../design-system.md) for stable top-level design-system truth.
+- Use [Design Showcases](../showcase/README.md) when you want the lightweight HTML review artifacts for fonts and system components.
+- Use [V2.1 Design Lock](../../archive/v2-slices/v2.1-design-lock.md) for the minimum system decisions that should stay fixed while the first `v2.1` design slice is implemented.
+- Use [V2.1 Design Critique And Reference](../../archive/v2-slices/v2.1-design-critique-and-reference.md) and [V2.1 Shell Design Direction](../../archive/v2-slices/v2.1-shell-design-direction.md) for the current shell-first design-system work.
+- Use [V2.1 Shell Review Memo](../../archive/v2-slices/v2.1-shell-review-memo.md) for the latest multi-agent review findings and the concrete `v2.1` shell corrections they led to.
+- Use [V2.2 System Player PRD](../../archive/v2-slices/v2.2-system-player-prd.md) for the first bounded `v2.2` product requirement around a built-in system-owned player seat.
+- Use [V2.2 System Player Plan](../../archive/v2-slices/v2.2-system-player-plan.md) for the phased implementation order and validation path for that first `v2.2` milestone.
+- Use [V2.2 Slice 1 Bot Seat Implementation PRD](../../archive/v2-slices/v2.2-slice-1-bot-seat-implementation-prd.md) when starting the first architecture-proof implementation slice.
+- Use [V2.2 Slice 1 Bot Seat Issues](../../archive/v2-slices/v2.2-slice-1-bot-seat-issues.md) for task-sized breakdown of that first slice.
+- Use [V2.2 Slice 2 Public Bot Setup Implementation PRD](../../archive/v2-slices/v2.2-slice-2-public-bot-setup-implementation-prd.md) when turning the internal bot-seat proof into normal multiplayer setup work.
+- Use [V2.2 Slice 2 Public Bot Setup Issues](../../archive/v2-slices/v2.2-slice-2-public-bot-setup-issues.md) for task-sized breakdown of the first public bot-setup slice.
+- Use [V2.2 Slice 3 Bot Quality Implementation PRD](../../archive/v2-slices/v2.2-slice-3-bot-quality-implementation-prd.md) when improving the bot from legal baseline to competent baseline quality.
+- Use [V2.2 Slice 3 Bot Quality Issues](../../archive/v2-slices/v2.2-slice-3-bot-quality-issues.md) for task-sized breakdown of the first bot-quality slice.
+- Use [V2.2 Slice 4 Lifecycle Hardening Implementation PRD](../../archive/v2-slices/v2.2-slice-4-lifecycle-hardening-implementation-prd.md) when hardening timer, reconnect, and mixed-room lifecycle behavior.
+- Use [V2.2 Slice 4 Lifecycle Hardening Issues](../../archive/v2-slices/v2.2-slice-4-lifecycle-hardening-issues.md) for task-sized breakdown of the lifecycle hardening slice.
+- Use [V2.2 Slice 5 Freeze And Doc Alignment Implementation PRD](../../archive/v2-slices/v2.2-slice-5-freeze-and-doc-alignment-implementation-prd.md) when closing the first public system-player milestone without reopening scope.
+- Use [V2.2 Slice 5 Freeze And Doc Alignment Issues](../../archive/v2-slices/v2.2-slice-5-freeze-and-doc-alignment-issues.md) for the final freeze-review and docs-alignment tasks.
+- Use [V2.2 Slice 5 Freeze Review](../../archive/v2-slices/v2.2-slice-5-freeze-review.md) for the final findings-first closeout note.
+- Use [V2.2 System Agent Architecture](../../archive/v2-slices/v2.2-system-agent-architecture.md) for the first system-player recommendation path.
 
 ## Current V2.2 Slice 1 Status
 - authoritative room model now supports server-owned `bot` seats

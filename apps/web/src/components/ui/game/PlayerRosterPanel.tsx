@@ -29,11 +29,13 @@ interface PlayerRosterProps {
   activePlayerIndex: number;
   playerPalette: Record<string, string>;
   timer?: PlayerRosterTimer;
+  /** Show placeholders up to four seats. Off once a game is under way, when nobody else can sit down. */
+  showOpenSeats?: boolean;
   className?: string;
 }
 
-export function PlayerRoster({ players, activePlayerIndex, playerPalette, timer = null, className = "" }: PlayerRosterProps): JSX.Element {
-  const rosterSlots = Array.from({ length: 4 }, (_, index) => players[index] ?? null);
+export function PlayerRoster({ players, activePlayerIndex, playerPalette, timer = null, showOpenSeats = true, className = "" }: PlayerRosterProps): JSX.Element {
+  const rosterSlots = showOpenSeats ? Array.from({ length: 4 }, (_, index) => players[index] ?? null) : players;
   const timerLabel = timer?.activePlayerIndex === activePlayerIndex ? formatRosterTimer(timer.secondsRemaining) : null;
 
   return (

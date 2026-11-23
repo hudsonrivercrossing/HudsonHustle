@@ -6,6 +6,11 @@ const CALLOUT_WIDTH = 320;
 const CALLOUT_GAP = 14;
 const SPOTLIGHT_PADDING = 8;
 
+/** Makes the tour eligible to show again. */
+export function resetTourSeen(): void {
+  localStorage.removeItem(TOUR_SEEN_KEY);
+}
+
 export function shouldShowTour(): boolean {
   return !localStorage.getItem(TOUR_SEEN_KEY);
 }

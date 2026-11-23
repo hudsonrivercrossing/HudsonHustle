@@ -8,8 +8,8 @@ Use them when you want to:
 - sanity-check shell language without running the whole game
 
 Files:
-- [Font Showcase](/Users/djfan/Workspace/HudsonHustle/docs/product/showcase/font-showcase.html)
-- [System Showcase](/Users/djfan/Workspace/HudsonHustle/docs/product/showcase/system-showcase.html)
+- [Font Showcase](font-showcase.html)
+- [System Showcase](system-showcase.html)
 
 Notes:
 - these are design review tools, not runtime app code

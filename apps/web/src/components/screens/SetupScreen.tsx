@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import {
+  BotDifficultyField,
   MapThumbnail,
   SeatPlan,
   SetupActions,
@@ -15,11 +16,14 @@ import {
 import { Button } from "../ui/primitives/Button";
 import { FormField } from "../ui/primitives/FormField";
 import { TimerPicker } from "../ui/primitives/TimerPicker";
+import type { BotDifficulty } from "@hudson-hustle/game-core";
 import type { HudsonHustleReleasedConfigSummary } from "@hudson-hustle/game-data";
+import { readLastLocalSetup, saveLastLocalSetup } from "../local";
 
 interface LocalStartSetup {
   playerNames: string[];
   botSeatIds: string[];
+  botDifficulty: BotDifficulty;
   configId: string;
   turnTimeLimitSeconds: number;
 }
@@ -43,11 +47,14 @@ export function SetupScreen({
   releasedConfigs,
   initialConfigId
 }: SetupScreenProps): JSX.Element {
-  const [playerCount, setPlayerCount] = useState(2);
-  const [names, setNames] = useState(["Player 1", "Player 2", "Player 3", "Player 4"]);
-  const [botSeatIds, setBotSeatIds] = useState<string[]>([]);
-  const [configId, setConfigId] = useState(initialConfigId);
-  const [turnTimeLimitSeconds, setTurnTimeLimitSeconds] = useState(0);
+  // Start from the last game's choices; a group that plays again should not retype them.
+  const [lastSetup] = useState(() => readLastLocalSetup(releasedConfigs.map((config) => config.configId)));
+  const [playerCount, setPlayerCount] = useState<number>(lastSetup?.playerCount ?? 2);
+  const [names, setNames] = useState<string[]>(lastSetup?.names ?? ["Player 1", "Player 2", "Player 3", "Player 4"]);
+  const [botSeatIds, setBotSeatIds] = useState<string[]>(lastSetup?.botSeatIds ?? []);
+  const [botDifficulty, setBotDifficulty] = useState<BotDifficulty>(lastSetup?.botDifficulty ?? "standard");
+  const [configId, setConfigId] = useState(lastSetup?.configId ?? initialConfigId);
+  const [turnTimeLimitSeconds, setTurnTimeLimitSeconds] = useState(lastSetup?.turnTimeLimitSeconds ?? 0);
   const [step, setStep] = useState<0 | 1 | 2>(0);
 
   const setupSeatIds = useMemo(() => Array.from({ length: playerCount }, (_, index) => `seat-${index + 1}`), [playerCount]);
@@ -189,6 +196,7 @@ export function SetupScreen({
                 };
               })}
             />
+            {plannedBotCount > 0 ? <BotDifficultyField value={botDifficulty} onChange={setBotDifficulty} /> : null}
           </SetupStepPanel>
         ) : null}
 
@@ -239,14 +247,23 @@ export function SetupScreen({
                 <Button onClick={() => setStep(1)}>Back</Button>
                 <Button
                   variant="primary"
-                  onClick={() =>
+                  onClick={() => {
+                    saveLastLocalSetup({
+                      playerCount: playerCount as 2 | 3 | 4,
+                      names: [names[0], names[1], names[2], names[3]],
+                      botSeatIds,
+                      botDifficulty,
+                      configId,
+                      turnTimeLimitSeconds
+                    });
                     onStart({
                       playerNames: activeNames.map((name, index) => name.trim() || `Player ${index + 1}`),
                       botSeatIds: botSeatIds.filter((seatId) => setupSeatIds.includes(seatId)),
+                      botDifficulty,
                       configId,
                       turnTimeLimitSeconds
-                    })
-                  }
+                    });
+                  }}
                 >
                   Start local game
                 </Button>

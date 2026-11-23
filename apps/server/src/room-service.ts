@@ -1,11 +1,16 @@
-import { randomBytes, randomUUID } from "node:crypto";
+import { createHash, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
 import {
+  botDifficulties,
   chooseBotAction,
+  type BotDifficulty,
   getCurrentPlayer,
   type ControllerType,
   type GameAction,
   type GameActionPayload,
+  parseGameAction,
   reduceGame,
+  toPrivateState,
+  toPublicGameState,
   startGame,
   type CreateRoomRequest,
   type CreateRoomResponse,
@@ -13,7 +18,6 @@ import {
   type JoinRoomRequest,
   type JoinRoomResponse,
   type PublicGameState,
-  type PublicPlayerState,
   type RejoinRoomRequest,
   type RejoinRoomResponse,
   type RestartRoomRequest,
@@ -79,10 +83,23 @@ interface ServerRoom {
   deadlineAt: number | null;
 }
 
-interface RoomAuth {
+/** What a client presents: the seat it claims and the secret issued for it. */
+interface SeatCredentials {
   seatId: string;
   playerSecret: string;
 }
+
+/**
+ * Proof that a connection already presented valid credentials for a seat.
+ * It carries the stored hash, not the secret, so it stops working the moment the seat
+ * is given up or handed to someone else.
+ */
+export interface SeatSession {
+  seatId: string;
+  secretHash: string;
+}
+
+type RoomAuth = SeatCredentials | SeatSession;
 
 export interface RoomGameHistoryReviewCheckpoint {
   roomCode: string;
@@ -146,6 +163,25 @@ function invariant(condition: unknown, message: string, statusCode = 400, code =
   }
 }
 
+const MAX_PLAYER_NAME_LENGTH = 24;
+const MAX_TURN_TIME_LIMIT_SECONDS = 3600;
+
+function assertPlayerName(value: unknown, label: string): asserts value is string {
+  invariant(typeof value === "string" && value.length <= MAX_PLAYER_NAME_LENGTH, `${label} must be text of at most ${MAX_PLAYER_NAME_LENGTH} characters.`);
+}
+
+/** Actions a seat may send. Returning drawn tickets is refused because it would reveal three tickets for free. */
+function parseClientAction(input: unknown): GameAction {
+  let action: GameAction;
+  try {
+    action = parseGameAction(input);
+  } catch (error) {
+    throw new RoomServiceError(error instanceof Error ? error.message : "Invalid action.", 400, "invalid_action");
+  }
+  invariant(action.type !== "cancel_ticket_draw", "That action is not available in online play.", 400, "invalid_action");
+  return action;
+}
+
 function nowIso(): string {
   return new Date().toISOString();
 }
@@ -159,6 +195,19 @@ function createPlayerSecret(): string {
   return randomUUID();
 }
 
+const SECRET_HASH_PREFIX = "sha256:";
+
+/** Seat secrets are random 122-bit tokens, so a plain fast hash is enough: there is nothing to brute-force. */
+function hashSecret(secret: string): string {
+  return SECRET_HASH_PREFIX + createHash("sha256").update(secret).digest("hex");
+}
+
+function sameText(left: string, right: string): boolean {
+  const a = Buffer.from(left);
+  const b = Buffer.from(right);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
 function createClientControllerState() {
   return {
     ownership: "client",
@@ -166,10 +215,11 @@ function createClientControllerState() {
   } as const;
 }
 
-function createBotControllerState() {
+function createBotControllerState(difficulty: BotDifficulty = "standard") {
   return {
     ownership: "server",
-    controllerKey: "internal:bot"
+    controllerKey: "internal:bot",
+    difficulty
   } as const;
 }
 
@@ -191,54 +241,11 @@ function seatCanOwnHostPrivileges(seat: StoredSeatRecord | null): boolean {
   return Boolean(seat?.playerName && seat.controllerState.ownership === "client" && seat.playerSecret);
 }
 
-function buildPublicGameState(game: GameState): PublicGameState {
-  return {
-    version: game.version,
-    mapId: game.mapId,
-    players: game.players.map<PublicPlayerState>((player) => ({
-      id: player.id,
-      name: player.name,
-      color: player.color,
-      score: player.score,
-      trainsLeft: player.trainsLeft,
-      stationsLeft: player.stationsLeft,
-      handCount: player.hand.length,
-      ticketCount: player.tickets.length,
-      pendingTicketCount: player.pendingTickets.length,
-      endgame: player.endgame
-    })),
-    activePlayerIndex: game.activePlayerIndex,
-    phase: game.phase,
-    routeClaims: game.routeClaims,
-    stations: game.stations,
-    market: game.market,
-    discardCount: game.discardPile.length,
-    trainDeckCount: game.trainDeck.length,
-    regularTicketsCount: game.regularTickets.length,
-    longTicketsCount: game.longTickets.length,
-    discardedTicketsCount: game.discardedTickets.length,
-    turn: game.turn,
-    finalRoundRemaining: game.finalRoundRemaining,
-    finalRoundTriggeredBy: game.finalRoundTriggeredBy,
-    log: game.log
-  };
-}
-
 function buildPrivateState(room: ServerRoom, seat: StoredSeatRecord): SeatPrivateState | null {
   if (!room.game || !seat.playerId) {
     return null;
   }
-  const player = room.game.players.find((entry) => entry.id === seat.playerId);
-  if (!player) {
-    return null;
-  }
-  return {
-    seatId: seat.seatId,
-    playerId: seat.playerId,
-    hand: player.hand,
-    tickets: player.tickets,
-    pendingTickets: player.pendingTickets
-  };
+  return toPrivateState(room.game, seat.playerId, seat.seatId);
 }
 
 function buildRoomSummary(room: ServerRoom): RoomSummary {
@@ -509,16 +516,87 @@ export class RoomService {
     private readonly repository: RoomRepository,
     private readonly releasedConfigs: HudsonHustleReleasedConfigSummary[],
     private readonly onRoomChanged?: (roomCode: string) => void,
-    private readonly onTimerChanged?: RoomTimerCallback
+    private readonly onTimerChanged?: RoomTimerCallback,
+    private readonly onError?: (context: string, error: unknown) => void
   ) {}
+
+  /** The tail of each room's work queue. A room's requests run strictly one after another. */
+  private readonly queues = new Map<string, Promise<unknown>>();
+
+  private readonly lastUsedAt = new Map<string, number>();
+
+  /**
+   * Runs `task` once everything already queued for the room has finished.
+   * Two requests for one room would otherwise interleave at every await: both could load
+   * the room, both could mutate it, and their saves could overwrite each other.
+   */
+  private exclusive<T>(roomCode: string, task: () => Promise<T>): Promise<T> {
+    this.lastUsedAt.set(roomCode, Date.now());
+    const previous = this.queues.get(roomCode) ?? Promise.resolve();
+    const run = previous.then(task, task);
+    const tail = run.catch(() => undefined);
+    this.queues.set(roomCode, tail);
+    void tail.then(() => {
+      if (this.queues.get(roomCode) === tail) {
+        this.queues.delete(roomCode);
+      }
+    });
+    return run;
+  }
+
+  /**
+   * Forgets rooms nobody has touched for `idleMs` and nobody is connected to.
+   * They stay in storage and load again on the next request. Returns the codes dropped.
+   */
+  evictIdleRooms(idleMs: number): string[] {
+    const cutoff = Date.now() - idleMs;
+    const evicted: string[] = [];
+    for (const [roomCode, room] of this.rooms) {
+      const busy = this.queues.has(roomCode) || room.seats.some((seat) => seat.connected && seat.controllerState.ownership === "client");
+      if (busy || (this.lastUsedAt.get(roomCode) ?? 0) > cutoff) {
+        continue;
+      }
+      clearTimeout(this.timeouts.get(roomCode));
+      this.timeouts.delete(roomCode);
+      this.rooms.delete(roomCode);
+      this.lastUsedAt.delete(roomCode);
+      evicted.push(roomCode);
+    }
+    return evicted;
+  }
+
+  /** Cancels every pending turn timer so the process can exit. */
+  dispose(): void {
+    for (const timeout of this.timeouts.values()) {
+      clearTimeout(timeout);
+    }
+    this.timeouts.clear();
+  }
 
   listReleasedConfigs(): HudsonHustleReleasedConfigSummary[] {
     return this.releasedConfigs;
   }
 
   async createRoom(request: CreateRoomRequest): Promise<CreateRoomResponse> {
-    invariant(request.playerCount >= 2 && request.playerCount <= 4, "Rooms support 2-4 players.");
-    invariant(request.turnTimeLimitSeconds >= 0, "Turn timer cannot be negative.");
+    invariant(typeof request === "object" && request !== null, "Room request is missing.");
+    assertPlayerName(request.hostName, "Host name");
+    invariant(Number.isInteger(request.playerCount) && request.playerCount >= 2 && request.playerCount <= 4, "Rooms support 2-4 players.");
+    invariant(
+      Number.isInteger(request.turnTimeLimitSeconds) &&
+        request.turnTimeLimitSeconds >= 0 &&
+        request.turnTimeLimitSeconds <= MAX_TURN_TIME_LIMIT_SECONDS,
+      `Turn timer must be a whole number of seconds between 0 and ${MAX_TURN_TIME_LIMIT_SECONDS}.`
+    );
+    invariant(typeof request.configId === "string", "Unknown released config.");
+    invariant(
+      request.botSeatIds === undefined ||
+        (Array.isArray(request.botSeatIds) && request.botSeatIds.every((seatId) => typeof seatId === "string")),
+      "Bot seats must be a list of seat ids."
+    );
+    invariant(
+      request.botDifficulty === undefined || (botDifficulties as readonly string[]).includes(request.botDifficulty),
+      `Bot difficulty must be one of: ${botDifficulties.join(", ")}.`
+    );
 
     const bundle = getHudsonHustleReleasedConfigBundle(request.configId);
     invariant(bundle, "Unknown released config.");
@@ -530,6 +608,7 @@ export class RoomService {
 
     const timestamp = nowIso();
     const botSeatIds = buildBotSeatIds(request.playerCount, request.botSeatIds);
+    const hostSecret = createPlayerSecret();
     const hostSeat: StoredSeatRecord = {
       seatId: "seat-1",
       playerId: null,
@@ -538,7 +617,7 @@ export class RoomService {
       ready: false,
       connected: false,
       isHost: true,
-      playerSecret: createPlayerSecret(),
+      playerSecret: hashSecret(hostSecret),
       controllerState: createClientControllerState(),
       joinedAt: timestamp,
       updatedAt: timestamp
@@ -557,7 +636,7 @@ export class RoomService {
         connected: isBotSeat,
         isHost: false,
         playerSecret: null,
-        controllerState: isBotSeat ? createBotControllerState() : createClientControllerState(),
+        controllerState: isBotSeat ? createBotControllerState(request.botDifficulty) : createClientControllerState(),
         joinedAt: timestamp,
         updatedAt: timestamp
       });
@@ -586,16 +665,21 @@ export class RoomService {
     };
 
     await this.saveRoom(room);
-    invariant(hostSeat.playerSecret, "Host seat is missing player credentials.", 500, "invalid_room_state");
     return {
       roomCode,
       seatId: hostSeat.seatId,
-      playerSecret: hostSeat.playerSecret,
+      playerSecret: hostSecret,
       snapshot: this.buildSnapshot(room, hostSeat.seatId)
     };
   }
 
-  async joinRoom(roomCode: string, request: JoinRoomRequest): Promise<JoinRoomResponse> {
+  joinRoom(roomCode: string, request: JoinRoomRequest): Promise<JoinRoomResponse> {
+    return this.exclusive(roomCode, () => this.joinRoomNow(roomCode, request));
+  }
+
+  private async joinRoomNow(roomCode: string, request: JoinRoomRequest): Promise<JoinRoomResponse> {
+    invariant(typeof request === "object" && request !== null, "Join request is missing.");
+    assertPlayerName(request.playerName, "Player name");
     const room = await this.getRoomOrThrow(roomCode);
     invariant(room.status === "lobby", "The room has already started.");
 
@@ -613,7 +697,8 @@ export class RoomService {
 
     const timestamp = nowIso();
     targetSeat.playerName = request.playerName.trim() || targetSeat.seatId;
-    targetSeat.playerSecret = createPlayerSecret();
+    const issuedSecret = createPlayerSecret();
+    targetSeat.playerSecret = hashSecret(issuedSecret);
     targetSeat.controllerType = "human";
     targetSeat.controllerState = createClientControllerState();
     const currentHost = room.seats.find((seat) => seat.seatId === room.hostSeatId) ?? null;
@@ -627,16 +712,19 @@ export class RoomService {
 
     room.updatedAt = timestamp;
     await this.saveRoom(room);
-    invariant(targetSeat.playerSecret, "Joined seat is missing player credentials.", 500, "invalid_room_state");
     return {
       roomCode: room.roomCode,
       seatId: targetSeat.seatId,
-      playerSecret: targetSeat.playerSecret,
+      playerSecret: issuedSecret,
       snapshot: this.buildSnapshot(room, targetSeat.seatId)
     };
   }
 
-  async assignBotSeat(roomCode: string, seatId: string, botName = "System Bot"): Promise<RoomSnapshot> {
+  assignBotSeat(roomCode: string, seatId: string, botName = "System Bot"): Promise<RoomSnapshot> {
+    return this.exclusive(roomCode, () => this.assignBotSeatNow(roomCode, seatId, botName));
+  }
+
+  private async assignBotSeatNow(roomCode: string, seatId: string, botName = "System Bot"): Promise<RoomSnapshot> {
     const room = await this.getRoomOrThrow(roomCode);
     invariant(room.status === "lobby", "Bot seats can only be assigned before the game starts.");
     const seat = room.seats.find((entry) => entry.seatId === seatId) ?? null;
@@ -658,19 +746,35 @@ export class RoomService {
     return this.buildSnapshot(room, null);
   }
 
-  async rejoinRoom(roomCode: string, request: RejoinRoomRequest): Promise<RejoinRoomResponse> {
+  rejoinRoom(roomCode: string, request: RejoinRoomRequest): Promise<RejoinRoomResponse> {
+    return this.exclusive(roomCode, () => this.rejoinRoomNow(roomCode, request));
+  }
+
+  private async rejoinRoomNow(roomCode: string, request: RejoinRoomRequest): Promise<RejoinRoomResponse> {
     const room = await this.getRoomOrThrow(roomCode);
     const seat = this.getAuthorizedSeat(room, request);
-    invariant(seat.playerSecret, "Joined seat is missing player credentials.", 500, "invalid_room_state");
     return {
       roomCode: room.roomCode,
       seatId: seat.seatId,
-      playerSecret: seat.playerSecret,
+      // The server no longer knows the secret; the client keeps using the one it just proved.
+      playerSecret: request.playerSecret,
       snapshot: this.buildSnapshot(room, seat.seatId)
     };
   }
 
-  async getSnapshot(roomCode: string, auth?: RoomAuth): Promise<RoomSnapshot> {
+  /** Checks credentials once and returns a session the connection can act with from then on. */
+  openSeatSession(roomCode: string, credentials: SeatCredentials): Promise<SeatSession> {
+    return this.exclusive(roomCode, async () => {
+      const seat = this.getAuthorizedSeat(await this.getRoomOrThrow(roomCode), credentials);
+      return { seatId: seat.seatId, secretHash: seat.playerSecret as string };
+    });
+  }
+
+  getSnapshot(roomCode: string, auth?: RoomAuth): Promise<RoomSnapshot> {
+    return this.exclusive(roomCode, () => this.getSnapshotNow(roomCode, auth));
+  }
+
+  private async getSnapshotNow(roomCode: string, auth?: RoomAuth): Promise<RoomSnapshot> {
     const room = await this.getRoomOrThrow(roomCode);
     if (!auth) {
       return this.buildSnapshot(room, null);
@@ -679,12 +783,33 @@ export class RoomService {
     return this.buildSnapshot(room, seat.seatId);
   }
 
-  async getGameHistory(roomCode: string): Promise<StoredGameHistory> {
+  /**
+   * Every seated player's private state, for the server's own broadcasts.
+   * Unauthenticated on purpose: never return this to a client.
+   */
+  getPrivateStates(roomCode: string): Promise<SeatPrivateState[]> {
+    return this.exclusive(roomCode, () => this.getPrivateStatesNow(roomCode));
+  }
+
+  private async getPrivateStatesNow(roomCode: string): Promise<SeatPrivateState[]> {
+    const room = await this.getRoomOrThrow(roomCode);
+    return room.seats.flatMap((seat) => buildPrivateState(room, seat) ?? []);
+  }
+
+  getGameHistory(roomCode: string): Promise<StoredGameHistory> {
+    return this.exclusive(roomCode, () => this.getGameHistoryNow(roomCode));
+  }
+
+  private async getGameHistoryNow(roomCode: string): Promise<StoredGameHistory> {
     const room = await this.getRoomOrThrow(roomCode);
     return cloneStoredHistory(room.history);
   }
 
-  async getReviewHistory(roomCode: string, auth: RoomAuth): Promise<RoomGameHistoryReview> {
+  getReviewHistory(roomCode: string, auth: RoomAuth): Promise<RoomGameHistoryReview> {
+    return this.exclusive(roomCode, () => this.getReviewHistoryNow(roomCode, auth));
+  }
+
+  private async getReviewHistoryNow(roomCode: string, auth: RoomAuth): Promise<RoomGameHistoryReview> {
     const room = await this.getRoomOrThrow(roomCode);
     this.getAuthorizedSeat(room, auth);
     invariant(room.status === "finished", "Game history is only available after the game ends.", 409, "history_not_ready");
@@ -714,7 +839,11 @@ export class RoomService {
     };
   }
 
-  async startRoom(roomCode: string, request: StartRoomRequest): Promise<StartRoomResponse> {
+  startRoom(roomCode: string, request: StartRoomRequest): Promise<StartRoomResponse> {
+    return this.exclusive(roomCode, () => this.startRoomNow(roomCode, request));
+  }
+
+  private async startRoomNow(roomCode: string, request: StartRoomRequest): Promise<StartRoomResponse> {
     const room = await this.getRoomOrThrow(roomCode);
     const hostSeat = this.getAuthorizedSeat(room, { seatId: room.hostSeatId, playerSecret: request.playerSecret });
     invariant(hostSeat.isHost, "Only the host can start the room.");
@@ -753,7 +882,11 @@ export class RoomService {
     };
   }
 
-  async restartRoom(roomCode: string, request: RestartRoomRequest): Promise<RestartRoomResponse> {
+  restartRoom(roomCode: string, request: RestartRoomRequest): Promise<RestartRoomResponse> {
+    return this.exclusive(roomCode, () => this.restartRoomNow(roomCode, request));
+  }
+
+  private async restartRoomNow(roomCode: string, request: RestartRoomRequest): Promise<RestartRoomResponse> {
     const room = await this.getRoomOrThrow(roomCode);
     const hostSeat = this.getAuthorizedSeat(room, { seatId: room.hostSeatId, playerSecret: request.playerSecret });
     invariant(hostSeat.isHost, "Only the host can restart the room.");
@@ -794,7 +927,11 @@ export class RoomService {
     };
   }
 
-  async setReady(roomCode: string, auth: RoomAuth, ready: boolean): Promise<RoomSnapshot> {
+  setReady(roomCode: string, auth: RoomAuth, ready: boolean): Promise<RoomSnapshot> {
+    return this.exclusive(roomCode, () => this.setReadyNow(roomCode, auth, ready));
+  }
+
+  private async setReadyNow(roomCode: string, auth: RoomAuth, ready: boolean): Promise<RoomSnapshot> {
     const room = await this.getRoomOrThrow(roomCode);
     invariant(room.status === "lobby", "You can only change ready state in the lobby.");
     const seat = this.getAuthorizedSeat(room, auth);
@@ -805,7 +942,11 @@ export class RoomService {
     return this.buildSnapshot(room, seat.seatId);
   }
 
-  async connectSeat(roomCode: string, auth: RoomAuth): Promise<RoomSnapshot> {
+  connectSeat(roomCode: string, auth: RoomAuth): Promise<RoomSnapshot> {
+    return this.exclusive(roomCode, () => this.connectSeatNow(roomCode, auth));
+  }
+
+  private async connectSeatNow(roomCode: string, auth: RoomAuth): Promise<RoomSnapshot> {
     const room = await this.getRoomOrThrow(roomCode);
     const seat = this.getAuthorizedSeat(room, auth);
     seat.connected = true;
@@ -815,7 +956,11 @@ export class RoomService {
     return this.buildSnapshot(room, seat.seatId);
   }
 
-  async disconnectSeat(roomCode: string, seatId: string): Promise<void> {
+  disconnectSeat(roomCode: string, seatId: string): Promise<void> {
+    return this.exclusive(roomCode, () => this.disconnectSeatNow(roomCode, seatId));
+  }
+
+  private async disconnectSeatNow(roomCode: string, seatId: string): Promise<void> {
     const room = await this.getRoomOrThrow(roomCode);
     const seat = room.seats.find((entry) => entry.seatId === seatId);
     if (!seat) {
@@ -827,7 +972,11 @@ export class RoomService {
     await this.saveRoom(room);
   }
 
-  async leaveRoom(roomCode: string, auth: RoomAuth): Promise<void> {
+  leaveRoom(roomCode: string, auth: RoomAuth): Promise<void> {
+    return this.exclusive(roomCode, () => this.leaveRoomNow(roomCode, auth));
+  }
+
+  private async leaveRoomNow(roomCode: string, auth: RoomAuth): Promise<void> {
     const room = await this.getRoomOrThrow(roomCode);
     const seat = this.getAuthorizedSeat(room, auth);
 
@@ -868,19 +1017,24 @@ export class RoomService {
     await this.saveRoom(room);
   }
 
-  async applyAction(roomCode: string, auth: RoomAuth, payload: GameActionPayload): Promise<RoomSnapshot> {
+  applyAction(roomCode: string, auth: RoomAuth, payload: GameActionPayload): Promise<RoomSnapshot> {
+    return this.exclusive(roomCode, () => this.applyActionNow(roomCode, auth, payload));
+  }
+
+  private async applyActionNow(roomCode: string, auth: RoomAuth, payload: GameActionPayload): Promise<RoomSnapshot> {
     const room = await this.getRoomOrThrow(roomCode);
     invariant(room.status === "active", "The game has not started yet.");
     invariant(room.game, "Missing game state.");
 
     const seat = this.getAuthorizedSeat(room, auth);
+    const action = parseClientAction(payload?.action);
     const beforeGame = structuredClone(room.game) as GameState;
-    this.applySeatAction(room, seat, payload.action);
+    this.applySeatAction(room, seat, action);
     const historyUpdate = this.buildHistoryUpdate(room, {
       beforeGame,
       seat,
       source: "human_request",
-      action: payload.action,
+      action,
       eventType: room.game?.phase === "gameOver" ? "game_finished" : "action_applied",
       createdAt: room.updatedAt
     });
@@ -889,7 +1043,11 @@ export class RoomService {
     return this.buildSnapshot(room, seat.seatId);
   }
 
-  private async handleTimeout(roomCode: string): Promise<void> {
+  private handleTimeout(roomCode: string): Promise<void> {
+    return this.exclusive(roomCode, () => this.handleTimeoutNow(roomCode));
+  }
+
+  private async handleTimeoutNow(roomCode: string): Promise<void> {
     try {
       const room = await this.getRoomOrThrow(roomCode);
       if (!room.game || room.status !== "active") {
@@ -937,7 +1095,8 @@ export class RoomService {
       });
       await this.saveRoom(room, historyUpdate);
       await this.resumeServerControlledTurnsIfNeeded(room);
-    } catch {
+    } catch (error) {
+      this.onError?.(`Turn timer for room ${roomCode} failed`, error);
       this.timeouts.delete(roomCode);
       this.onTimerChanged?.(roomCode, null);
     }
@@ -966,16 +1125,23 @@ export class RoomService {
   }
 
   private getAuthorizedSeat(room: ServerRoom, auth: RoomAuth): StoredSeatRecord {
-    const seat = room.seats.find((entry) => entry.seatId === auth.seatId);
-    invariant(
-      seat &&
-        seat.controllerState.ownership === "client" &&
-        seat.playerSecret &&
-        seat.playerSecret === auth.playerSecret,
-      "Room credentials do not match.",
-      403,
-      "invalid_credentials"
-    );
+    const seat = room.seats.find((entry) => entry.seatId === auth?.seatId);
+    const stored = seat?.controllerState.ownership === "client" ? seat.playerSecret : null;
+    let authorized = false;
+    if (seat && stored) {
+      if ("secretHash" in auth) {
+        authorized = typeof auth.secretHash === "string" && sameText(stored, auth.secretHash);
+      } else if (typeof auth.playerSecret === "string" && auth.playerSecret.length > 0) {
+        if (stored.startsWith(SECRET_HASH_PREFIX)) {
+          authorized = sameText(stored, hashSecret(auth.playerSecret));
+        } else if (sameText(stored, auth.playerSecret)) {
+          // Saved by a server that kept secrets as issued: accept it once and hash it from here on.
+          seat.playerSecret = hashSecret(auth.playerSecret);
+          authorized = true;
+        }
+      }
+    }
+    invariant(seat && authorized, "Room credentials do not match.", 403, "invalid_credentials");
     return seat;
   }
 
@@ -984,7 +1150,7 @@ export class RoomService {
     const seat = seatId ? room.seats.find((entry) => entry.seatId === seatId) ?? null : null;
     return {
       room: roomSummary,
-      game: room.game ? buildPublicGameState(room.game) : null,
+      game: room.game ? toPublicGameState(room.game) : null,
       privateState: seat ? buildPrivateState(room, seat) : null
     };
   }
@@ -1100,8 +1266,9 @@ export class RoomService {
 
     return chooseBotAction({
       config: getHudsonHustleMapByConfigId(room.configId),
-      game: buildPublicGameState(room.game),
-      privateState
+      game: toPublicGameState(room.game),
+      privateState,
+      difficulty: seat.controllerState.ownership === "server" ? seat.controllerState.difficulty : undefined
     });
   }
 

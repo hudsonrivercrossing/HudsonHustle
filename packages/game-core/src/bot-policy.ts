@@ -1,25 +1,19 @@
+import { trainCardColors, type GameAction, type MapConfig, type RouteDef, type TrainCard, type TrainCardColor } from "./types.js";
+import type { PublicGameState } from "./multiplayer.js";
+import { chooseHardAction } from "./bot-hard.js";
 import {
-  trainCardColors,
-  type GameAction,
-  type MapConfig,
-  type RouteDef,
-  type TrainCard,
-  type TrainCardColor
-} from "./types.js";
-import type { PublicGameState, SeatPrivateState } from "./multiplayer.js";
+  canAffordRoute,
+  canDrawCard,
+  combinations,
+  countHand,
+  drawBlindOrLastResort,
+  findShortestPath,
+  getAvailableRoutes,
+  type BotDecisionContext,
+  type SeatTicket
+} from "./bot-shared.js";
 
-export interface BotDecisionContext {
-  config: MapConfig;
-  game: PublicGameState;
-  privateState: SeatPrivateState;
-}
-
-interface PathEdge {
-  route: RouteDef;
-  to: string;
-}
-
-type SeatTicket = SeatPrivateState["tickets"][number];
+export { botDifficulties, type BotDecisionContext, type BotDifficulty } from "./bot-shared.js";
 
 interface TicketPlan {
   ticket: SeatTicket;
@@ -34,7 +28,74 @@ interface RouteDemand {
   ticketIds: Set<string>;
 }
 
+/** Above this many cards even the easy bot stops waiting for its ticket routes and builds something. */
+const EASY_HAND_LIMIT = 12;
+
 export function chooseBotAction(context: BotDecisionContext): GameAction {
+  const difficulty = context.difficulty ?? "standard";
+  if (difficulty === "easy") {
+    return chooseEasyAction(context);
+  }
+  // The hard bot plans from its own seat; without one it has nothing to plan and plays standard.
+  return (difficulty === "hard" ? chooseHardAction(context) : null) ?? chooseStandardAction(context);
+}
+
+/**
+ * A beginner: keeps three opening tickets, always the ones worth most, draws only from the deck,
+ * builds along its tickets, and lets about every other turn it could have built on go by.
+ */
+function chooseEasyAction(context: BotDecisionContext): GameAction {
+  const { config, game, privateState } = context;
+  if (game.phase === "initialTickets") {
+    return { type: "select_initial_tickets", keptTicketIds: chooseDearestTickets(privateState.pendingTickets, 3) };
+  }
+  if (game.phase === "ticketChoice") {
+    return { type: "keep_drawn_tickets", keptTicketIds: chooseDearestTickets(privateState.pendingTickets, 1) };
+  }
+  if (game.phase !== "main") {
+    throw new Error(`Unsupported bot phase: ${game.phase}`);
+  }
+
+  if (game.turn.stage === "idle") {
+    const demand = buildRouteDemand(context);
+    // Variety without randomness: the same state always hesitates, different states do not.
+    const hesitates = canDrawCard(game) && stateNumber(context) % 2 === 0;
+    // With no ticket route left to build, or a hand too big to keep growing, any route will do.
+    const anyRouteWillDo = demand.length === 0 || privateState.hand.length >= EASY_HAND_LIMIT || !canDrawCard(game);
+    const claim = hesitates ? null : chooseTicketAlignedClaim(context, demand) ?? (anyRouteWillDo ? chooseShortestClaim(context) : null);
+    if (claim) {
+      return claim;
+    }
+  }
+  return drawBlindOrLastResort(context);
+}
+
+/** A number that differs from one game state to the next but is always the same for the same state. */
+function stateNumber(context: BotDecisionContext): number {
+  const { game, privateState } = context;
+  const mixed = game.logSequence * 31 + privateState.hand.length * 17 + game.routeClaims.length * 13 + game.trainDeckCount * 7 + game.discardCount * 3;
+  return (mixed ^ (mixed >>> 3)) >>> 0;
+}
+
+/** Beginners go for the big numbers: the tickets worth most, whatever they take to build. */
+function chooseDearestTickets(tickets: SeatTicket[], keepCount: number): string[] {
+  return [...tickets]
+    .sort((left, right) => right.points - left.points || left.id.localeCompare(right.id))
+    .slice(0, keepCount)
+    .map((ticket) => ticket.id);
+}
+
+/** The smallest route the hand can pay for: cheap to take, and worth little. */
+function chooseShortestClaim(context: BotDecisionContext): GameAction | null {
+  const trainsLeft = context.game.players[context.game.activePlayerIndex]?.trainsLeft ?? 0;
+  const candidates = getAvailableRoutes(context.config, context.game)
+    .map((route) => ({ route, color: chooseAffordableColor(route, context.privateState.hand, trainsLeft) }))
+    .filter((candidate): candidate is { route: RouteDef; color: TrainCardColor } => candidate.color !== null)
+    .sort((left, right) => left.route.length - right.route.length || left.route.id.localeCompare(right.route.id));
+  return candidates[0] ? { type: "claim_route", routeId: candidates[0].route.id, color: candidates[0].color } : null;
+}
+
+function chooseStandardAction(context: BotDecisionContext): GameAction {
   if (context.game.phase === "initialTickets") {
     return {
       type: "select_initial_tickets",
@@ -216,26 +277,7 @@ function chooseDrawAction(context: BotDecisionContext, demand: RouteDemand[]): G
     };
   }
 
-  if (context.game.trainDeckCount > 0 || context.game.discardCount > 0) {
-    return {
-      type: "draw_card",
-      source: "deck"
-    };
-  }
-
-  const firstLegalMarketIndex = context.game.market.findIndex((card) => {
-    return !(context.game.turn.drawsTaken === 1 && card.color === "locomotive");
-  });
-
-  if (firstLegalMarketIndex >= 0) {
-    return {
-      type: "draw_card",
-      source: "market",
-      marketIndex: firstLegalMarketIndex
-    };
-  }
-
-  throw new Error("No legal bot draw action is available.");
+  return drawBlindOrLastResort(context);
 }
 
 function getDesiredColorScores(context: BotDecisionContext, demand: RouteDemand[]): Map<TrainCardColor, number> {
@@ -339,19 +381,6 @@ function paymentWaste(route: RouteDef, color: TrainCardColor, hand: TrainCard[])
   return totalLocosUsed + Math.max(0, colored - baseNeed);
 }
 
-function canAffordRoute(route: RouteDef, color: TrainCardColor, hand: TrainCard[]): boolean {
-  const counts = countHand(hand);
-  const colored = counts.get(color) ?? 0;
-  const locomotives = counts.get("locomotive") ?? 0;
-  const baseNeed = route.length;
-  const locoNeed = route.locomotiveCost ?? 0;
-  if (locomotives < locoNeed) {
-    return false;
-  }
-  const usableLocomotives = locomotives;
-  return colored + usableLocomotives >= baseNeed;
-}
-
 function buildTicketPlans(config: MapConfig, routes: RouteDef[], tickets: SeatTicket[]): TicketPlan[] {
   return [...tickets]
     .map((ticket) => {
@@ -402,24 +431,6 @@ function scoreTicketSelection(selection: TicketPlan[]): number {
   return score;
 }
 
-function combinations<T>(items: T[], size: number): T[][] {
-  if (size <= 0 || size > items.length) {
-    return [];
-  }
-  if (size === 1) {
-    return items.map((item) => [item]);
-  }
-
-  const result: T[][] = [];
-  for (let index = 0; index <= items.length - size; index += 1) {
-    const head = items[index]!;
-    for (const tail of combinations(items.slice(index + 1), size - 1)) {
-      result.push([head, ...tail]);
-    }
-  }
-  return result;
-}
-
 function ticketIdKey(selection: TicketPlan[]): string {
   return selection
     .map((plan) => plan.ticket.id)
@@ -429,14 +440,6 @@ function ticketIdKey(selection: TicketPlan[]): string {
 
 function highestColorScore(scores: Map<TrainCardColor, number>): number {
   return [...scores.values()].sort((left, right) => right - left)[0] ?? 0;
-}
-
-function countHand(hand: TrainCard[]): Map<TrainCard["color"], number> {
-  const counts = new Map<TrainCard["color"], number>();
-  for (const card of hand) {
-    counts.set(card.color, (counts.get(card.color) ?? 0) + 1);
-  }
-  return counts;
 }
 
 function isTicketCompleted(context: BotDecisionContext, from: string, to: string): boolean {
@@ -474,28 +477,6 @@ function isTicketCompleted(context: BotDecisionContext, from: string, to: string
   return false;
 }
 
-function getAvailableRoutes(config: MapConfig, game: PublicGameState): RouteDef[] {
-  const claimedRouteIds = new Set(game.routeClaims.map((claim) => claim.routeId));
-  const blockedTwinGroups =
-    game.players.length <= 3
-      ? new Set(
-          game.routeClaims
-            .map((claim) => config.routes.find((route) => route.id === claim.routeId)?.twinGroup ?? null)
-            .filter((group): group is string => group !== null)
-        )
-      : new Set<string>();
-
-  return config.routes.filter((route) => {
-    if (claimedRouteIds.has(route.id)) {
-      return false;
-    }
-    if (route.twinGroup && blockedTwinGroups.has(route.twinGroup)) {
-      return false;
-    }
-    return true;
-  });
-}
-
 function getTicketChoiceRoutes(config: MapConfig, game: PublicGameState, playerId: string | null): RouteDef[] {
   if (!playerId) {
     return getAvailableRoutes(config, game);
@@ -506,57 +487,4 @@ function getTicketChoiceRoutes(config: MapConfig, game: PublicGameState, playerI
   );
 
   return getAvailableRoutes(config, game).concat(config.routes.filter((route) => claimedByPlayer.has(route.id)));
-}
-
-function findShortestPath(config: MapConfig, routes: RouteDef[], from: string, to: string): RouteDef[] {
-  const adjacency = new Map<string, PathEdge[]>();
-  for (const route of routes) {
-    adjacency.set(route.from, [...(adjacency.get(route.from) ?? []), { route, to: route.to }]);
-    adjacency.set(route.to, [...(adjacency.get(route.to) ?? []), { route, to: route.from }]);
-  }
-
-  const distances = new Map<string, number>(config.cities.map((city) => [city.id, Number.POSITIVE_INFINITY]));
-  const previous = new Map<string, { city: string; route: RouteDef }>();
-  const queue = new Set(config.cities.map((city) => city.id));
-  distances.set(from, 0);
-
-  while (queue.size > 0) {
-    const current = [...queue].sort((left, right) => (distances.get(left) ?? Number.POSITIVE_INFINITY) - (distances.get(right) ?? Number.POSITIVE_INFINITY))[0];
-    if (!current || distances.get(current) === Number.POSITIVE_INFINITY) {
-      break;
-    }
-    queue.delete(current);
-    if (current === to) {
-      break;
-    }
-    for (const edge of adjacency.get(current) ?? []) {
-      if (!queue.has(edge.to)) {
-        continue;
-      }
-      const candidateDistance =
-        (distances.get(current) ?? Number.POSITIVE_INFINITY) +
-        edge.route.length +
-        (edge.route.type === "tunnel" ? 2 : 0);
-      if (candidateDistance < (distances.get(edge.to) ?? Number.POSITIVE_INFINITY)) {
-        distances.set(edge.to, candidateDistance);
-        previous.set(edge.to, { city: current, route: edge.route });
-      }
-    }
-  }
-
-  if (!previous.has(to)) {
-    return [];
-  }
-
-  const path: RouteDef[] = [];
-  let cursor = to;
-  while (cursor !== from) {
-    const step = previous.get(cursor);
-    if (!step) {
-      return [];
-    }
-    path.unshift(step.route);
-    cursor = step.city;
-  }
-  return path;
 }

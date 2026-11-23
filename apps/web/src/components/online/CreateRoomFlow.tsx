@@ -1,8 +1,10 @@
+import type { BotDifficulty } from "@hudson-hustle/game-core";
 import type { HudsonHustleReleasedConfigSummary } from "@hudson-hustle/game-data";
 import { FormField } from "../ui/primitives/FormField";
 import { Button } from "../ui/primitives/Button";
 import { TimerPicker } from "../ui/primitives/TimerPicker";
 import {
+  BotDifficultyField,
   MapThumbnail,
   SeatPlan,
   SetupActions,
@@ -21,6 +23,7 @@ interface CreateRoomFlowProps {
   configId: string;
   turnTimeLimitSeconds: number;
   botSeatIds: string[];
+  botDifficulty: BotDifficulty;
   setupSeatIds: string[];
   plannedBotCount: number;
   plannedHumanOpenSeats: number;
@@ -31,6 +34,7 @@ interface CreateRoomFlowProps {
   onChangeConfigId: (v: string) => void;
   onChangeTurnTimeLimit: (v: number) => void;
   onToggleBotSeat: (seatId: string) => void;
+  onChangeBotDifficulty: (difficulty: BotDifficulty) => void;
   onCreateRoom: (form: CreateRoomForm) => void;
 }
 
@@ -43,6 +47,7 @@ export function CreateRoomFlow({
   configId,
   turnTimeLimitSeconds,
   botSeatIds,
+  botDifficulty,
   setupSeatIds,
   plannedBotCount,
   plannedHumanOpenSeats,
@@ -53,6 +58,7 @@ export function CreateRoomFlow({
   onChangeConfigId,
   onChangeTurnTimeLimit,
   onToggleBotSeat,
+  onChangeBotDifficulty,
   onCreateRoom
 }: CreateRoomFlowProps): JSX.Element {
   return (
@@ -122,6 +128,7 @@ export function CreateRoomFlow({
               };
             })}
           />
+          {plannedBotCount > 0 ? <BotDifficultyField value={botDifficulty} onChange={onChangeBotDifficulty} /> : null}
         </SetupStepPanel>
       ) : null}
 
@@ -181,7 +188,8 @@ export function CreateRoomFlow({
                     playerCount,
                     configId,
                     turnTimeLimitSeconds,
-                    botSeatIds: botSeatIds.filter((seatId) => setupSeatIds.includes(seatId))
+                    botSeatIds: botSeatIds.filter((seatId) => setupSeatIds.includes(seatId)),
+                    botDifficulty
                   })
                 }
               >

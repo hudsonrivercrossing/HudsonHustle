@@ -49,7 +49,7 @@ Use platform CLIs to verify the production path:
 ## GitHub Actions
 This repo keeps GitHub Actions for CI only:
 
-- [.github/workflows/ci.yml](/Users/djfan/Workspace/HudsonHustle/.github/workflows/ci.yml)
+- [.github/workflows/ci.yml](../../../.github/workflows/ci.yml)
   - runs on pushes to `main` and `develop`
   - runs on PRs targeting `main` or `develop`
   - installs dependencies, runs `pnpm test`, then `pnpm build`
@@ -57,7 +57,7 @@ This repo keeps GitHub Actions for CI only:
 Deployments are handled by the hosting platforms directly, not by GitHub Actions.
 
 ## Frontend
-The web app is deployed from the repo root with [vercel.json](/Users/djfan/Workspace/HudsonHustle/vercel.json).
+The web app is deployed from the repo root with [vercel.json](../../../vercel.json).
 
 ### Build
 - install: `pnpm install --frozen-lockfile`
@@ -94,7 +94,7 @@ Current configured staging backend for `develop` preview:
 Because deployment is platform-native, GitHub Actions secrets for Vercel are no longer required.
 
 ## Backend
-The server is deployed from the repo root with [railway.json](/Users/djfan/Workspace/HudsonHustle/railway.json).
+The server is deployed from the repo root with [railway.json](../../../railway.json).
 
 ### Build
 - install dependencies
@@ -151,9 +151,9 @@ Because deployment is platform-native, GitHub Actions secrets for Railway are no
 
 ## Local Development
 Copy env examples as needed:
-- [apps/server/.env.example](/Users/djfan/Workspace/HudsonHustle/apps/server/.env.example)
-- [apps/web/.env.example](/Users/djfan/Workspace/HudsonHustle/apps/web/.env.example)
-- [.env.example](/Users/djfan/Workspace/HudsonHustle/.env.example)
+- [apps/server/.env.example](../../../apps/server/.env.example)
+- [apps/web/.env.example](../../../apps/web/.env.example)
+- [.env.example](../../../.env.example)
 
 Run:
 ```bash

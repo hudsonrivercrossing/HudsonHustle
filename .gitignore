@@ -15,4 +15,5 @@ packages/*/src/*.d.ts.map
 tmp/
 storybook-static
 apps/web/storybook-static
-.superpowers/*
+.superpowers/*.claude/worktrees/
+.claude/launch.json

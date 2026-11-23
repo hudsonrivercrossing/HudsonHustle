@@ -25,3 +25,5 @@ export type { TicketSlipStatus } from "./TicketSlip";
 export { TransitCard } from "./TransitCard";
 export type { TransitCardColor } from "./TransitCard";
 export { TurnIndicator } from "./TurnIndicator";
+export { TurnPanel } from "./TurnPanel";
+export type { TurnPanelState } from "./TurnPanel";

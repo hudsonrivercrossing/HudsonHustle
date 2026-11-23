@@ -1,0 +1,379 @@
+<title>Hudson Hustle 整改方案</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500..700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one reading column (max 1080px) of sections; each section opens with a claim, then evidence drawn as diagrams. Uses the game's own paper / ink / line-blue / brass system. */
+:root{
+  --bg:#f0e8d6; --surface:#fbf6ea; --sunk:#e6dcc6; --ink:#2e2317; --muted:#6a5a48;
+  --line:rgba(68,51,34,.17); --accent:#2a6fb6; --accent-soft:rgba(42,111,182,.12);
+  --brass:#8f6524; --danger:#a13d2f; --danger-soft:rgba(161,61,47,.11); --ok:#2f7350; --ok-soft:rgba(47,115,80,.12); --warn:#8d5a1c; --warn-soft:rgba(151,97,37,.13);
+  --board:#d9c9a4; --water:#9dbfca;
+  --display:"Fraunces","Songti SC","Noto Serif SC",Georgia,serif;
+  --body:"IBM Plex Sans","PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
+  --mono:"IBM Plex Mono","SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#191510; --surface:#231d14; --sunk:#14110c; --ink:#f0e6d0; --muted:#b29c82;
+  --line:#3b3125; --accent:#74abdc; --accent-soft:rgba(116,171,220,.14);
+  --brass:#d2a65e; --danger:#e07f6c; --danger-soft:rgba(224,127,108,.13); --ok:#86c29c; --ok-soft:rgba(134,194,156,.13); --warn:#d9a25a; --warn-soft:rgba(217,162,90,.13);
+  --board:#5a4f3a; --water:#3d5964; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#191510; --surface:#231d14; --sunk:#14110c; --ink:#f0e6d0; --muted:#b29c82;
+  --line:#3b3125; --accent:#74abdc; --accent-soft:rgba(116,171,220,.14);
+  --brass:#d2a65e; --danger:#e07f6c; --danger-soft:rgba(224,127,108,.13); --ok:#86c29c; --ok-soft:rgba(134,194,156,.13); --warn:#d9a25a; --warn-soft:rgba(217,162,90,.13);
+  --board:#5a4f3a; --water:#3d5964; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.65 var(--body);padding-block:0 72px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:64px}
+h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.2;margin:0;text-wrap:balance}
+h1{font-size:clamp(2rem,5vw,3.1rem);letter-spacing:-.015em}
+h2{font-size:1.7rem}
+h3{font-size:1.12rem;font-family:var(--body);font-weight:600}
+p{margin:0;max-width:68ch}
+code,.mono{font-family:var(--mono);font-size:.86em}
+code{background:var(--sunk);padding:1px 5px;border-radius:4px;overflow-wrap:anywhere}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.eyebrow{font:500 12px/1.2 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--brass)}
+.muted{color:var(--muted)}
+.stack{display:flex;flex-direction:column;gap:14px}
+.stack-lg{display:flex;flex-direction:column;gap:24px}
+header.top{padding-block:56px 0;display:flex;flex-direction:column;gap:18px}
+nav.toc{display:flex;flex-wrap:wrap;gap:6px 18px;border-block:1px solid var(--line);padding-block:12px;font-size:14px}
+nav.toc a{text-decoration:none;color:var(--muted)} nav.toc a:hover{color:var(--accent)}
+section{display:flex;flex-direction:column;gap:24px;scroll-margin-top:16px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.g5{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.stat b{font:600 2rem/1 var(--display);font-variant-numeric:tabular-nums}
+.stat span{font-size:13px;color:var(--muted)}
+.stat.bad b{color:var(--danger)} .stat.good b{color:var(--ok)}
+.tag{display:inline-block;font:500 11.5px/1 var(--mono);padding:4px 7px;border-radius:4px;white-space:nowrap}
+.t-p0{background:var(--danger-soft);color:var(--danger)} .t-p1{background:var(--warn-soft);color:var(--warn)} .t-p2{background:var(--accent-soft);color:var(--accent)} .t-ok{background:var(--ok-soft);color:var(--ok)}
+ul{margin:0;padding-left:1.15em;display:flex;flex-direction:column;gap:6px} li{max-width:70ch}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:14px}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font:500 12px/1.3 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:var(--sunk)}
+tr:last-child td{border-bottom:0}
+td.n{font-variant-numeric:tabular-nums;font-family:var(--mono);white-space:nowrap}
+/* flow diagram */
+.flow{display:flex;flex-wrap:wrap;gap:6px;align-items:stretch}
+.step{flex:1 1 104px;border:1px solid var(--line);border-radius:6px;padding:9px 10px;font-size:13px;line-height:1.35;background:var(--bg)}
+.step small{display:block;font:500 11px var(--mono);color:var(--muted);margin-bottom:3px}
+.step.modal{border-color:var(--danger);background:var(--danger-soft)}
+.step.keep{border-color:var(--ok);background:var(--ok-soft)}
+/* wireframes */
+.wf{aspect-ratio:16/10;max-width:100%;background:var(--sunk);border:1px solid var(--line);border-radius:8px;padding:8px;display:grid;gap:6px;font:500 11px/1.25 var(--mono);color:var(--muted)}
+.wf>div{border:1px dashed var(--line);border-radius:5px;padding:6px;display:flex;align-items:center;justify-content:center;text-align:center;min-width:0;background:var(--surface)}
+.wf .board{background:var(--board);color:var(--ink);border-style:solid;font-weight:600}
+.wf .waste{background:var(--danger-soft);color:var(--danger);border-color:var(--danger)}
+.wf .new{background:var(--ok-soft);color:var(--ok);border-color:var(--ok)}
+.wf-before{grid-template-columns:1fr 3.3fr 1fr;grid-template-rows:auto 1.1fr 1.1fr .5fr}
+.wf-after{grid-template-columns:4fr 1.15fr;grid-template-rows:auto 1.4fr 1fr .55fr}
+/* bars */
+.bar{display:grid;grid-template-columns:110px 1fr 56px;gap:10px;align-items:center;font-size:13px}
+.bar i{display:block;height:14px;border-radius:3px;background:var(--danger)}
+.bar .track{background:var(--sunk);border-radius:3px}
+.bar .n{font:500 12.5px var(--mono);text-align:right;font-variant-numeric:tabular-nums}
+/* arch */
+.arch{display:grid;gap:8px}
+.box{border:1px solid var(--line);border-radius:6px;padding:9px 11px;font-size:13px;line-height:1.4;background:var(--bg)}
+.box b{font-family:var(--mono);font-weight:500;font-size:12.5px}
+.box.hot{border-color:var(--danger);background:var(--danger-soft)} .box.cool{border-color:var(--ok);background:var(--ok-soft)}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+/* roadmap */
+.road{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.phase{border-top:3px solid var(--accent);background:var(--surface);border-radius:0 0 10px 10px;padding:14px;display:flex;flex-direction:column;gap:8px;border-inline:1px solid var(--line);border-bottom:1px solid var(--line)}
+.phase:first-child{border-top-color:var(--danger)}
+.phase h3{font-size:1rem} .phase ul{font-size:13.5px}
+.note{border-left:0;background:var(--accent-soft);border-radius:8px;padding:12px 16px;font-size:14px}
+.verdict{font:600 1.05rem var(--body);color:var(--danger)}
+footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+@media (max-width:560px){.cols2{grid-template-columns:1fr}.bar{grid-template-columns:84px 1fr 48px}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <span class="eyebrow">Hudson Hustle · 项目审查 · 2026-11-22</span>
+  <h1>引擎是好的，外壳需要重做一遍</h1>
+  <p>审查范围：全部代码（web / server / game-core / game-data）、全部文档、实际在浏览器里走完一局的开局。结论是规则引擎扎实、可复用，但它外面的三层——客户端结构、对局交互、设计系统纪律——都已经偏离了项目自己写下的原则。下面是证据和按顺序可执行的整改方案。</p>
+  <nav class="toc" aria-label="目录">
+    <a href="#now">现状</a><a href="#thesis">五个判断</a><a href="#ux">对局体验</a><a href="#product">功能与产品</a><a href="#eng">代码工程</a><a href="#emil">Emil 的意见</a><a href="#road">路线图</a><a href="#cleanup">清理清单</a>
+  </nav>
+</header>
+
+<section id="now">
+  <span class="eyebrow">出发点与现状</span>
+  <h2>它想成为什么，现在是什么</h2>
+  <p>PRD 的定位很清楚：一款原创的纽约/新泽西通勤线路策略游戏，“你和朋友在一台笔记本上玩”，要 tactile、social、easy to teach；设计原则第一条是 “map-first, never dashboard-first”。之后扩展出了联机、Bot、历史记录、聊天和柏林地图，最新 tag 是 v2.5.0。</p>
+  <div class="grid g5">
+    <div class="card stat good"><b>88</b><span>单元测试全部通过（引擎 44 + 服务端 44），四个包类型检查通过</span></div>
+    <div class="card stat bad"><b>1,228</b><span><code>App.tsx</code> 行数：同时是路由、API 客户端、socket 客户端和联机对局屏</span></div>
+    <div class="card stat bad"><b>6</b><span>“抽两张牌”这个最高频回合需要的点击次数，其中 2 次是阻断弹窗</span></div>
+    <div class="card stat bad"><b>44%</b><span>1440×900 下棋盘占视口面积；1280×720 时牌市与按钮重叠</span></div>
+    <div class="card stat bad"><b>1,320</b><span>CSS 中不引用任何 token 的声明数，另有 194 个 <code>!important</code></span></div>
+  </div>
+  <p class="muted">数字来源：本次实际运行 <code>pnpm test</code>、<code>tsc --noEmit</code>、<code>pnpm build</code>，对 CSS 全量 grep，以及在浏览器内量取 DOM 尺寸。</p>
+</section>
+
+<section id="thesis">
+  <span class="eyebrow">诊断</span>
+  <h2>五个判断</h2>
+  <div class="grid g2">
+    <div class="card"><h3>一、最常做的事最费劲</h3><p>抽牌是全局发生次数最多的动作，却每张牌弹一个全屏 “You drew Crimson” 要求点 Continue，然后再过两道交接弹窗。一局大约 60–80 个回合，光确认就多点几百次。</p></div>
+    <div class="card"><h3>二、同一个对局屏写了两遍，而且已经走样</h3><p>联机对局在 <code>App.tsx:948-1227</code>，本地对局在 <code>LocalPlayScreen.tsx:426-673</code>，九类逻辑重复。走样已经发生：本地模式没有禁用“第二张不能拿明牌机车”，联机模式不显示隧道翻牌。</p></div>
+    <div class="card"><h3>三、联机可以作弊</h3><p>服务端不校验任何客户端输入。审计中实际复现：发送 <code>source:"bogus"</code> 的抽牌动作可以连拿两张明牌机车。还可以免费偷看三张票再放回。</p></div>
+    <div class="card"><h3>四、规则写了，但没有东西在执行</h3><p>“只用 token” 对 1,320 条声明不成立；“release 冻结” 之后 release 仍被直接修改；README 说 v2.0 尚未完成而 v2.5 已发布；CLAUDE.md 引用的 <code>screens/gameplay/</code> 目录不存在。CI 只跑测试和构建，没有 lint。</p></div>
+    <div class="card"><h3>五、棋盘不是主角</h3><p>本地双人局里，屏幕上有两个 “Open seat” 空位、一个无人可聊的 Chat 面板、九个颜色槽（多数为 0），棋盘只占 44%，而且没有任何地方告诉当前玩家 “这回合你可以做哪三件事”。</p></div>
+    <div class="card"><h3>没有问题的部分</h3><p><code>reduceGame</code> 是纯函数、确定性、可种子复现；配置快照体系（draft / release / registry）设计合理；视觉语言（站牌搪瓷、票根、黄铜）有辨识度，不需要推翻。整改是换骨架，不是换皮。</p></div>
+  </div>
+</section>
+
+<section id="ux">
+  <span class="eyebrow">产品设计 · UI / UX</span>
+  <h2>对局体验：把回合从 6 次点击降到 3 次</h2>
+
+  <div class="card stack">
+    <h3>现在：抽两张牌的一个回合</h3>
+    <div class="flow">
+      <div class="step"><small>点击 1</small>Draw from deck</div>
+      <div class="step modal"><small>点击 2 · 弹窗</small>You drew Crimson → Continue</div>
+      <div class="step"><small>点击 3</small>Draw from deck</div>
+      <div class="step modal"><small>点击 4 · 弹窗</small>You drew … → Continue</div>
+      <div class="step modal"><small>点击 5 · 弹窗</small>Pass the laptop → I'm done</div>
+      <div class="step modal"><small>点击 6 · 弹窗</small>Player 2, take over → I'm ready</div>
+    </div>
+    <h3>整改后</h3>
+    <div class="flow">
+      <div class="step keep"><small>点击 1</small>抽牌：牌直接飞入手牌，对应色槽高亮 600ms</div>
+      <div class="step keep"><small>点击 2</small>抽牌：回合自动结束，私密信息立即遮蔽</div>
+      <div class="step keep"><small>点击 3 · 唯一弹窗</small>“交给 Player 2” → 我是 Player 2，开始</div>
+    </div>
+    <p class="muted">两道交接弹窗合并成一道：上家动作完成即遮蔽，下家点一次确认身份。联机模式没有交接，回合是 2 次点击。隧道翻牌是唯一保留确认的抽牌类反馈，因为它有输赢。</p>
+  </div>
+
+  <div class="grid g2">
+    <div class="stack">
+      <h3>现在的 HUD（1440×900 实测）</h3>
+      <div class="wf wf-before" role="img" aria-label="当前布局线框：左栏玩家和车票，中间棋盘，右栏聊天和牌市，底部手牌">
+        <div style="grid-column:1/4;border:0;background:none;padding:0">Player 1 active（22px 图标按钮）</div>
+        <div>玩家 ×2<br><span class="waste" style="padding:2px 4px;border-radius:3px;margin-top:4px">空座位 ×2</span></div>
+        <div class="board" style="grid-row:2/4">棋盘 886×646<br>占视口 44%</div>
+        <div class="waste">Chat（本地局无人可聊）</div>
+        <div>Tickets</div>
+        <div>Market<br>每张牌上印着无意义的 “1”</div>
+        <div style="grid-column:1/2;border:0;background:none"></div>
+        <div>Hand：9 个色槽，多数为 0</div>
+        <div style="border:0;background:none"></div>
+      </div>
+    </div>
+    <div class="stack">
+      <h3>整改后的 HUD</h3>
+      <div class="wf wf-after" role="img" aria-label="目标布局线框：棋盘占左侧大部分，右侧一条窄栏放玩家、车票，底部一条托盘放手牌和牌市">
+        <div class="new" style="grid-column:1/3">你的回合：抽牌 · 占线 · 换票　｜　剩余 24 车厢　｜　？ 规则　⚙</div>
+        <div class="board" style="grid-row:2/4">棋盘：占满剩余空间<br>目标 ≥ 62% 视口</div>
+        <div>玩家（含公开分数、车厢、手牌数）<br>只显示实际入座的人</div>
+        <div>我的车票<br>已连通 / 未连通</div>
+        <div class="new" style="grid-column:1/3">一条托盘：手牌（只显示持有的颜色）　＋　牌市 5 张　＋　牌堆 97</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tbl"><table>
+    <thead><tr><th>位置</th><th>现在</th><th>改成</th><th>级别</th></tr></thead>
+    <tbody>
+    <tr><td>点击线路</td><td>买不起时浮层只写 “Choose payment color.”，下面是空的；浮层盖住被点的线路；Esc 关不掉</td><td>写明价格和差额：“需要 3 张 Cobalt（隧道，可能加价），你有 0 张 + 1 机车”；浮层锚定在线路旁不遮挡；Esc 与点击空白关闭</td><td><span class="tag t-p0">P0</span></td></tr>
+    <tr><td>回合引导</td><td>顶部只有 “Player 1 active”</td><td>常驻一行动作提示，抽完第一张后变为 “再抽一张（不能拿明牌机车）”</td><td><span class="tag t-p0">P0</span></td></tr>
+    <tr><td>交接文案</td><td>“The board is safe to look at”，但棋盘此时被模糊</td><td>二选一：不模糊棋盘（它本来就是公开信息），或改文案。建议不模糊，只遮手牌和车票</td><td><span class="tag t-p1">P1</span></td></tr>
+    <tr><td>开局设置</td><td>三步向导，每步只有一个控件，右侧摘要卡把 “2 human / 0 bot” 重复两遍；开局 4 次点击</td><td>一屏完成：座位、地图、计时器并排，一个 “开始” 按钮；记住上次设置；开局 2 次点击</td><td><span class="tag t-p1">P1</span></td></tr>
+    <tr><td>计时器</td><td>帮助文字写 “Enter seconds. 0 = untimed”，实际只有 −15 / +15 两个按钮；本地模式计时归零后什么都不发生</td><td>分段选择：不限时 / 30s / 60s / 90s；本地归零自动跳过回合或至少提示</td><td><span class="tag t-p1">P1</span></td></tr>
+    <tr><td>地图名称</td><td>默认地图叫 “Hudson Hustle Anchor Prototype”，在下拉框里被截断</td><td>面向玩家的名字：“NYC / NJ” 与 “Berlin 1961”，版本号放进副标题</td><td><span class="tag t-p1">P1</span></td></tr>
+    <tr><td>新手引导</td><td>开局选票之前先弹 9 步气泡导览；另有一套 9 步 Guidebook；两套内容各自维护</td><td>删掉气泡导览，改成 “带着走完第一回合”：三个情境提示，分别在第一次抽牌、第一次点线路、第一次换票时出现</td><td><span class="tag t-p1">P1</span></td></tr>
+    <tr><td>小屏</td><td>1280×720：牌市标题被裁、按钮压住第五张牌；768 宽：牌市溢出；375 宽：棋盘缩成拇指大小</td><td>以内容断点重排（容器查询）；手机宽度给出明确的 “请用平板或电脑” 页，联机邀请链接尤其会被手机打开</td><td><span class="tag t-p0">P0</span></td></tr>
+    <tr><td>本地模式残留</td><td>关闭按钮的 aria-label 是 “Leave room”；显示 Chat 和空座位</td><td>本地模式隐藏 Chat 与空座位，文案改为 “结束本局”</td><td><span class="tag t-p2">P2</span></td></tr>
+    </tbody></table></div>
+</section>
+
+<section id="product">
+  <span class="eyebrow">功能</span>
+  <h2>功能与产品：先修会让对局出错的，再补缺的</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>级别</th><th>事项</th><th>证据</th><th>方案</th></tr></thead>
+    <tbody>
+    <tr><td><span class="tag t-p0">P0</span></td><td>联机动作未校验</td><td><code>app.ts:261-267</code> 把 socket payload 直接交给 <code>reduceGame</code>；<code>game.ts:508-510</code> 的 else 分支被非法 source 利用</td><td>新建 <code>packages/protocol</code>，用 zod 定义每个 HTTP body 与 socket 事件；<code>reduceGame</code> 的 switch 加穷尽性默认分支；服务端拒绝 <code>cancel_ticket_draw</code></td></tr>
+    <tr><td><span class="tag t-p0">P0</span></td><td>提示在开局几回合后失效</td><td>日志上限 18 条（<code>game.ts:42</code>），而提示靠 <code>log.length</code> 差分（<code>App.tsx:530</code>）。实测 30 次抽牌后长度停在 18，此后不再有任何提示</td><td>引擎返回 <code>{ state, events }</code>，UI 订阅结构化事件，不再用正则解析英文日志</td></tr>
+    <tr><td><span class="tag t-p0">P0</span></td><td>盲抽的牌被广播给所有人</td><td><code>game.ts:516, 526</code> 把牌堆抽到的颜色写进公开日志，客户端再弹给全房间</td><td>需要你拍板。建议：牌堆抽牌对他人只显示 “抽了一张牌”，事件带 <code>visibility</code> 字段</td></tr>
+    <tr><td><span class="tag t-p0">P0</span></td><td>本地存档恢复有三个问题</td><td>恢复时直接可见，跳过隐私遮蔽（<code>LocalPlayScreen.tsx:272</code>）；用正则 <code>/^Bot\s+\d+/</code> 从名字推断 Bot；不存地图配置和计时器</td><td>存档加版本号与校验，显式保存 configId、座位类型、计时器；恢复后先进交接屏</td></tr>
+    <tr><td><span class="tag t-p1">P1</span></td><td>可分享的房间链接</td><td>没有 URL 路由，路由是 <code>App.tsx:832-917</code> 的 if 阶梯</td><td>加路由：<code>/local</code>、<code>/room/:code</code>、<code>/guide</code>。邀请从 “念 6 位码” 变成 “发链接”</td></tr>
+    <tr><td><span class="tag t-p1">P1</span></td><td>再来一局</td><td>只有联机终局有 “Play again”；设置刷新即丢</td><td>本地终局也提供 “同样设置再来一局”；首页显示 “继续上一局 / 用上次设置开局”</td></tr>
+    <tr><td><span class="tag t-p1">P1</span></td><td>复盘</td><td><code>game_events</code> 与 <code>game_history_checkpoints</code> 两张表已在写入，没有任何界面读取</td><td>终局页加 “回放本局”：拖动时间轴看线路占领顺序与分数曲线。数据已经有了，只差展示</td></tr>
+    <tr><td><span class="tag t-p1">P1</span></td><td>平衡性</td><td>全部证据是两局 2 人 Bot 对战（40–14、33–24）；32 条线路里 20 条长度为 2；柏林地图零测试记录</td><td>把 <code>scripts/playtests</code> 接成 <code>pnpm sim</code>，每张图跑 1,000 个种子 × 2/3/4 人，输出每条线路的占领率和每张票的完成率；柏林同样跑一遍</td></tr>
+    <tr><td><span class="tag t-p2">P2</span></td><td>Bot 难度</td><td>只有一个确定性 Bot</td><td>三档：新手（不堵人）、标准（现有）、激进（抢咽喉线路）。先用上面的模拟器给每档定胜率</td></tr>
+    <tr><td><span class="tag t-p2">P2</span></td><td>规则速查</td><td>玩家指南没写车厢数（NYC 24 / Berlin 28）、车站分值、最长线路奖励、线路计分表</td><td>从 <code>rules.json</code> 生成速查卡，游戏内 “？” 和文档共用一份</td></tr>
+    </tbody></table></div>
+</section>
+
+<section id="eng">
+  <span class="eyebrow">代码工程</span>
+  <h2>一个对局屏，两个控制器</h2>
+  <div class="grid g2">
+    <div class="card stack">
+      <h3>现在</h3>
+      <div class="arch">
+        <div class="box hot"><b>App.tsx · 1,228 行</b><br>路由 + HTTP + socket + 会话 + 联机对局 HUD + 内联的建造面板与终局表（22 个 useState，约 12 个 effect）</div>
+        <div class="box hot"><b>LocalPlayScreen.tsx · 674 行</b><br>本地对局 HUD + Bot 循环 + 提示批处理 + 存档</div>
+        <div class="cols2">
+          <div class="box"><b>localGame.utils.ts</b><br>逐行复制了服务端的 <code>buildPublicGameState</code></div>
+          <div class="box"><b>room-service.ts · 1,213 行</b><br>房间 + 计时 + Bot + 历史 + 投影</div>
+        </div>
+        <div class="box cool"><b>game-core</b>　纯函数规则引擎，确定性</div>
+      </div>
+    </div>
+    <div class="card stack">
+      <h3>目标</h3>
+      <div class="arch">
+        <div class="box"><b>app/</b>　只有 Provider 与路由</div>
+        <div class="box cool"><b>features/gameplay/GameplayScreen</b><br>唯一的 HUD。输入：<code>view</code>、<code>capabilities</code>、<code>dispatch</code></div>
+        <div class="cols2">
+          <div class="box"><b>OnlineGameController</b><br>快照 → view；dispatch = socket emit</div>
+          <div class="box"><b>LocalGameController</b><br>useReducer(reduceGame)；交接状态机</div>
+        </div>
+        <div class="cols2">
+          <div class="box"><b>packages/protocol</b>（新）<br>DTO + zod schema，前后端共用</div>
+          <div class="box cool"><b>game-core</b><br>+ events、projection、runBotTurns</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid g2">
+    <div class="card stack">
+      <h3>CSS：不引用 token 的声明占比</h3>
+      <div class="bar"><span><code>setup.css</code></span><div class="track"><i style="width:45%"></i></div><span class="n">45%</span></div>
+      <div class="bar"><span><code>game.css</code></span><div class="track"><i style="width:31%"></i></div><span class="n">31%</span></div>
+      <div class="bar"><span><code>ui.css</code></span><div class="track"><i style="width:27%"></i></div><span class="n">27%</span></div>
+      <p class="muted" style="font-size:13.5px">另外：185 个 token 中 58 个从未被引用；6 个被使用的 token 没有定义（如 <code>--font-sans</code>、<code>--hud-type-sm</code>），对应声明静默失效；174 个 class 在多个文件里被重复定义；<code>game.css</code> 里同一个选择器 <code>.app-shell--gameplay-hud .inspector-dock</code> 被重新声明 9 次。死选择器只占 5–8%，真正的债是层层覆盖。</p>
+    </div>
+    <div class="card stack">
+      <h3>CSS 整改</h3>
+      <ul>
+        <li>接入 stylelint：颜色、间距、字号、z-index 必须是 <code>var()</code>；禁止 <code>!important</code>；禁止未定义的自定义属性。进 CI，存量用基线文件逐步清零。</li>
+        <li>按组件拆文件，组件自己 import。文件归属由结构保证，不再靠文档约定。</li>
+        <li>用 <code>@layer base, components, screens</code> 取代 <code>.app-shell--gameplay-hud</code> 覆盖层，目标 <code>!important</code> 归零。</li>
+        <li>断点现有 6 个互不相同的值（1120 / 1040 / 1024 / 980 / 820 / 720），收敛为容器查询加三档。</li>
+        <li>z-index 现有 9999、9500、9000、7000 等字面量，改用已定义但没人用的 <code>--z-*</code> 六档。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="tbl"><table>
+    <thead><tr><th>领域</th><th>问题</th><th>方案</th><th>级别</th></tr></thead>
+    <tbody>
+    <tr><td>服务端并发</td><td>房间操作无队列；<code>saveRoom</code> 是 5–8 条独立语句且先删全部座位再插入，无事务；连接池 <code>max: 1</code>；建表靠启动时的 DDL</td><td>每房间一个 async 队列（load → apply → persist → emit）；事务加 upsert；快照带版本号做乐观锁；drizzle-kit 迁移</td><td><span class="tag t-p0">P0</span></td></tr>
+    <tr><td>服务端内存</td><td>房间、聊天、计时 Map 从不清理；无 SIGTERM 处理；<code>handleTimeout</code> 用空 catch 吞掉所有错误</td><td>房间注册表加 TTL 与 LRU；优雅关闭；错误记录日志</td><td><span class="tag t-p1">P1</span></td></tr>
+    <tr><td>鉴权</td><td><code>playerSecret</code> 明文入库，每条 socket 消息重发，可出现在 GET 查询串并被日志记录；无限流；空 <code>CORS_ORIGIN</code> 放行所有来源</td><td>握手时鉴权一次并绑定到 <code>socket.data</code>；secret 存哈希；加限流与 payload 上限；CORS 必须显式配置</td><td><span class="tag t-p1">P1</span></td></tr>
+    <tr><td>包解析</td><td>Vite 与 vitest 指向 <code>src</code>，tsc 与运行时指向 <code>dist</code>；测试文件不参与类型检查，<code>cors-origin.test.ts:50</code> 有一个没人发现的类型错误</td><td>统一为 source-first 或 project references 之一；每个包加 <code>tsconfig.test.json</code></td><td><span class="tag t-p1">P1</span></td></tr>
+    <tr><td>CI</td><td>只有 test 与 build。无 lint、无独立 typecheck、12 个 Playwright 用例不在 CI 里跑、无 registry 漂移检查</td><td>加 biome、typecheck、web 单测（vitest + RTL）、Playwright 冒烟、<code>config:registry</code> 后 diff 必须为空、stylelint</td><td><span class="tag t-p1">P1</span></td></tr>
+    <tr><td>引擎测试</td><td>未覆盖：隧道加价成功与失败、渡轮机车成本、灰线选色、车站借线计分、最长线路与平局、终局计分、牌堆重洗</td><td>按规则表补齐；地图数据类测试（约 32 个）从 game-core 移到 game-data</td><td><span class="tag t-p1">P1</span></td></tr>
+    <tr><td>性能</td><td><code>getHudsonHustleMapByConfigId</code> 每次调用都重建并重投影地图；<code>App.tsx:394-399</code> 让每个快照都重渲染整个 <code>BoardMap</code>（676 个 SVG 节点，0 个 memo）</td><td>按 configId 缓存；<code>BoardMap</code> 拆成静态底图层与动态占领层，后者 memo</td><td><span class="tag t-p2">P2</span></td></tr>
+    <tr><td>资源</td><td>三张在用的 PNG 共 7.5 MB，未压缩，无 WebP/AVIF；单一 JS chunk 437 kB</td><td>底图转 AVIF 加响应式尺寸；设置流程与对局分 chunk；六份配置里只把 release 打进客户端</td><td><span class="tag t-p2">P2</span></td></tr>
+    </tbody></table></div>
+</section>
+
+<section id="emil">
+  <span class="eyebrow">Emil · design-foundations → ui-review</span>
+  <h2>Emil 的意见</h2>
+  <p>按你的约定，先用 <code>emil-ask-emil</code> 路由，选了两项技能顺序执行：<code>emil-design-foundations</code>（结构是否对）和 <code>emil-ui-review</code>（按伤害程度排序的审查）。以下是按这两项技能的标准得出的结论。</p>
+  <p class="verdict">结论：Blocked。有四项触及交互正确性和无障碍底线，必须先修。</p>
+
+  <h3>Blocking</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Before</th><th>After</th><th>Why</th></tr></thead>
+    <tbody>
+    <tr><td>线路与城市是 SVG 元素上的 <code>onClick</code>（<code>BoardMap.tsx:485, 518</code>），外层 <code>role="img"</code>（<code>:218</code>）；整张图没有任何 <code>tabindex</code> 或 role</td><td>每条线路是可聚焦的 <code>role="button"</code>，<code>aria-label="Secaucus 到 Penn District，3 格，Cobalt，隧道"</code>，Enter 与空格触发；外层改 <code>role="group"</code></td><td>游戏的核心动作只有鼠标能做。<code>role="img"</code> 还会把里面的交互对读屏整体隐藏</td></tr>
+    <tr><td>顶栏三个图标按钮实测 22×22px；车票翻页按钮 24×26px</td><td>可见尺寸可以不变，用伪元素把点击区扩到 44×44</td><td>44px 是底线。22px 在触控板上都容易点偏</td></tr>
+    <tr><td>输入框计算字号 12px（玩家名、聊天框）</td><td>输入框不低于 16px</td><td>iOS 在聚焦小于 16px 的输入框时会放大整页，联机邀请链接正是在手机上被打开</td></tr>
+    <tr><td>每次抽牌弹出全屏模态并带入场动画</td><td>不弹窗；牌原位翻开后移入手牌，只动 <code>transform</code> 与 <code>opacity</code>，180ms</td><td>一局发生上百次的动作不该有阻断和动画仪式。频率越高，反馈越要轻</td></tr>
+    </tbody></table></div>
+
+  <h3>Should fix</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Before</th><th>After</th><th>Why</th></tr></thead>
+    <tbody>
+    <tr><td>屏幕上同时出现 8 种字重：400、650、700、740、780、820、840、900。加载的 IBM Plex Sans 是静态字重，请求到 800，而该字体最重只有 700</td><td>三档：400 / 500 / 600。Fraunces 是可变字体，可单独用 600–700</td><td>不存在的字重由浏览器合成，笔画发糊。八档字重也说明层级靠 “加粗” 在撑，而不是靠大小和留白</td></tr>
+    <tr><td>页面上出现 12.16px、14.4px、16.32px 这类字号；token 里有 13 级字号，其中 6px 和 8px</td><td>UI 字号收敛到 6–7 级，最小 12px；地图标注单独一套并随缩放</td><td>带小数的字号来自 em 相乘，说明字号不是从 token 取的。10px 的正文级文字在笔记本上读不清</td></tr>
+    <tr><td>34 处 <code>:hover</code>，没有一处包在 <code>@media (hover: hover)</code> 里；<code>:active</code> 只有 5 处</td><td>hover 样式进 hover 媒体查询；所有按钮、牌、车票加按压态（<code>scale(0.97)</code>，约 100ms）</td><td>触屏上 hover 会粘住。没有按压态的按钮感觉是死的，卡牌游戏尤其需要 “按下去” 的手感</td></tr>
+    <tr><td>过渡曲线统一用内置 <code>ease</code>；9 个 keyframes 只有 2 处 <code>prefers-reduced-motion</code></td><td>入场用 <code>cubic-bezier(0.22, 1, 0.36, 1)</code> 一类的强 ease-out，退场更快；全局一条 reduced-motion 规则兜底</td><td>内置曲线太弱，动效显得含糊。时长（140–220ms）本身是对的，不用改</td></tr>
+    <tr><td><code>100vh</code> 出现 10 次，没有 <code>dvh</code>，没有 <code>safe-area-inset</code></td><td>单屏应用用 <code>100dvh</code>，底部托盘加 <code>env(safe-area-inset-bottom)</code></td><td>移动浏览器的地址栏会让 <code>100vh</code> 溢出一截，底部按钮被切掉</td></tr>
+    <tr><td>圆角 token 有 12 个不同的值（1 / 2 / 3 / 4 / 6 / 8 / 10 / 12 / 14 / 16 / 18 / 24px），对局屏上实际出现 8 种</td><td>四档：4（芯片）/ 8（控件、牌）/ 12（面板）/ 16（弹窗）。嵌套时内圆角 = 外圆角 − 内边距</td><td>面板套卡片套芯片时各用各的圆角，转角处间隙不均。这是 “看着有点不对但说不出来” 的主要来源</td></tr>
+    <tr><td>手牌区显示全部 9 个颜色槽，数量为 0 的也占位；牌市每张牌上有一个永远是 “1” 的数字</td><td>手牌只显示持有的颜色，按数量排序；牌市去掉数字</td><td>层级靠减法。五个 “0” 和五个 “1” 是噪音，把真正要看的三个数字淹没了</td></tr>
+    <tr><td>颜色 token 是 hex 与 rgba 混用，表面色靠半透明叠加（<code>rgba(250,244,233,0.9)</code>），另有 1,028 处 rgba 字面量散落在组件 CSS 里</td><td>token 迁到 OKLCH；表面色用不透明实色，按层级定三档明度；hover 用 <code>color-mix(in oklch, …)</code> 派生</td><td>半透明表面叠在照片背景上，实际颜色不可控，对比度无法保证。暗色模式下 alpha 边框会发光，应改实色</td></tr>
+    <tr><td>设置页是居中的小卡片，两侧各挂一张说明卡；1440 宽下主体只占约 300px 宽</td><td>一屏式设置，主体放宽到约 720px，摘要并入主体</td><td>三张卡同等视觉重量，不知道该看哪张。每屏应只有一个主要动作</td></tr>
+    </tbody></table></div>
+
+  <h3>Nits</h3>
+  <ul>
+    <li><code>index.html</code> 没有 description、OG 图、favicon、<code>theme-color</code>。分享房间链接时预览是空白的。</li>
+    <li>文案：“0 bot · 1 human open” 读不懂；“Hudson Hustle Anchor Prototype” 是内部命名；计时器帮助文字与控件不符。按钮用具体结果命名是对的（“Keep 2 tickets” 很好），保持。</li>
+    <li>数字只有 7 处用了 <code>tabular-nums</code>。牌堆数、车厢数、分数这些会跳动的数字都应该用。</li>
+    <li>字体通过 Google Fonts 加载，<code>display=swap</code>，后备字体没有做度量匹配，首屏标题会跳一下。考虑自托管 woff2 并预加载。</li>
+    <li><code>--easing-expressive</code>（带回弹）只用了一次。要么删掉，要么明确只用于终局庆祝。</li>
+  </ul>
+
+  <div class="note"><b>Emil 的整改顺序：</b>先过底线（键盘可达、点击区、输入字号），再砍掉抽牌弹窗并补按压态，然后做棋盘优先的布局，最后才是 token 收敛和抛光。布局没定之前做抛光会白做。发布前跑一次 <code>emil-prep-for-prod</code>。</div>
+</section>
+
+<section id="road">
+  <span class="eyebrow">执行顺序</span>
+  <h2>路线图</h2>
+  <p class="muted">时长是按单人全职估算的量级，不是承诺。每个阶段结束都可以独立发布。</p>
+  <div class="road">
+    <div class="phase"><span class="eyebrow">阶段 0 · 约 2 天</span><h3>止血</h3><ul><li>服务端 zod 校验，堵住机车作弊与偷看车票</li><li>提示失效 bug 的临时修复（按日志序号差分）</li><li>1280×720 牌市重叠</li><li>44px 点击区、输入框 16px、Esc 关浮层</li><li>CI 加 typecheck，含测试文件</li></ul></div>
+    <div class="phase"><span class="eyebrow">阶段 1 · 1–2 周</span><h3>一个对局屏</h3><ul><li>引擎返回结构化事件</li><li>projection 与 Bot 循环收进 game-core</li><li><code>GameplayScreen</code> 加两个控制器，删掉 <code>App.tsx</code> 内联的对局部分</li><li>URL 路由</li><li>web 加 vitest</li></ul></div>
+    <div class="phase"><span class="eyebrow">阶段 2 · 1–2 周</span><h3>对局体验</h3><ul><li>回合 6 → 3 次点击</li><li>棋盘优先的 HUD</li><li>线路浮层说明差额</li><li>一屏式设置，记住上次配置</li><li>线路键盘可达</li><li>情境式新手引导</li></ul></div>
+    <div class="phase"><span class="eyebrow">阶段 3 · 约 1 周</span><h3>设计系统收敛</h3><ul><li>stylelint 进 CI</li><li>按组件拆 CSS，<code>@layer</code>，<code>!important</code> 清零</li><li>字重、字号、圆角收档</li><li>token 迁 OKLCH</li><li>同步到唯一的 <code>hudsonhustle.pen</code></li></ul></div>
+    <div class="phase"><span class="eyebrow">阶段 4 · 持续</span><h3>加固与增量</h3><ul><li>房间队列、事务、迁移、TTL、限流</li><li>平衡性模拟器，柏林首测</li><li>复盘回放</li><li>再来一局、房间链接预览</li><li>Bot 三档难度</li></ul></div>
+  </div>
+</section>
+
+<section id="cleanup">
+  <span class="eyebrow">冗余文件</span>
+  <h2>清理清单</h2>
+  <div class="grid g2">
+    <div class="card stack">
+      <h3>已在本工作树完成（未提交）</h3>
+      <ul>
+        <li>删除 6 张未被任何代码或配置引用的底图 PNG，约 30 MB。重新构建后 <code>apps/web/dist</code> 从 38 MB 降到 8.1 MB。</li>
+        <li>3 份 <code>*.prompt.md</code> 从 <code>public/</code>（会被部署）移到 <code>docs/archive/specs/basemap-prompts/</code>。</li>
+        <li>删除一次性截图脚本 <code>apps/web/shot-nyc.cjs</code>。</li>
+        <li>取消跟踪 4 个被误提交的 <code>.claude/worktrees/*</code> gitlink，并加入 <code>.gitignore</code>。</li>
+        <li>删除 <code>docs/playtests/mvp2/</code>（内容是 <code>v2.0/</code> 的子集）。</li>
+        <li>删除 <code>docs/superpowers/plans/</code> 三份执行脚本（工作已上线，但 140 个复选框 0 个勾选）和一份已被取代的结构 spec；另外两份 spec 归档。</li>
+        <li>四份已完成的设计 pass 文档与过期的平衡笔记移入 <code>docs/archive/</code>。</li>
+        <li>180 处 <code>/Users/djfan/…</code> 绝对路径链接改为相对路径，修复 6 处断链，更新两份 README 的索引。docs 与根目录 Markdown 现在断链为 0。</li>
+      </ul>
+    </div>
+    <div class="card stack">
+      <h3>需要你决定，我没有动</h3>
+      <ul>
+        <li><b>三个弃用的 .pen</b>（tokens / components / layout）：CLAUDE.md 说已弃用，但仍被跟踪，<code>pencil-sync</code> 技能还在引用。需先在 Pencil 里确认 <code>hudsonhustle.pen</code> 是超集。</li>
+        <li><b><code>.claude/commands</code> 与 <code>.codex/skills</code></b>：23 对文件逐字节相同，没有同步机制，Claude 这边还有 25 处指向不存在的 reference 文件。建议留一棵树，另一棵用脚本生成。</li>
+        <li><b>三份 draft 配置</b>：玩法文件与对应 release 相同或更旧；但 <code>config:export</code> 写死了 <code>drafts/current-working</code>，且六份配置都被打进客户端。</li>
+        <li><b>死组件</b>：<code>InspectorDock</code>、<code>SideTabRail</code>、<code>TicketPicker</code> 只被 story 和 barrel 引用，连带一批 CSS。它们在 CLAUDE.md 和 pen 里仍被列为现役。</li>
+        <li><b><code>.research/</code> 两份 Ticket to Ride 调研报告</b>（82 KB）：与 AGENTS.md 的原创性立场放在同一个仓库里不太合适，建议移出仓库。</li>
+        <li><b>README 四张封面图</b>共 29 MB，都在用，建议压缩到 2 MB 以内。</li>
+        <li><b><code>docs/archive/v2-slices/</code></b> 24 份可压到约 8 份（每版留 PRD、计划、冻结评审）。</li>
+        <li><b><code>.claude/settings.json</code></b> 含 84 处本机绝对路径，建议移到 <code>settings.local.json</code>。</li>
+        <li><b>文档内容矛盾</b>：当前里程碑（v2.0 / v2.1 / 实际 v2.5）、AGENTS.md 与 CLAUDE.md 谁是准、间距档位三种说法。建议新增一份 <code>docs/status.md</code> 作为唯一状态页。</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  未验证的部分：Playwright 端到端与 Storybook 没有运行；服务端并发问题来自读代码，未在真实 Postgres 上压测复现；.pen 文件按约定未读取。机车作弊与提示失效两项是实际运行复现的。
+</footer>
+</div>

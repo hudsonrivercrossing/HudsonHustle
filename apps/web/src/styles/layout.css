@@ -9,6 +9,31 @@
   padding: var(--space-page-y) var(--space-page-x);
 }
 
+/* Board-first sizing. The board is 4:3 and on every laptop screen its height is what
+   limits it, so the gameplay shell spends as little height as it can on everything else. */
+.app-shell--gameplay-hud {
+  padding: var(--space-stack-sm) var(--space-stack-md) var(--space-stack-md);
+}
+
+.app-shell--gameplay-hud .topbar--gameplay-actions {
+  height: auto;
+  min-height: calc(var(--control-size-icon) + var(--space-stack-sm));
+  max-height: none;
+}
+
+/* Hand: label beside the cards instead of above them, saving a row. The label keeps a
+   fixed width so the cards do not shift when it changes to "Drew …". */
+.app-shell--gameplay-hud .private-hand-rail {
+  grid-template-columns: var(--hand-label-width) minmax(0, 1fr);
+  grid-template-rows: auto;
+  align-items: center;
+}
+
+.app-shell--gameplay-hud .private-hand-rail .section-header {
+  grid-template-columns: minmax(0, 1fr);
+  margin: 0;
+}
+
 /* Game layout — 3-column visual structure via nested grids:
    .game-layout = left-rail | board-column
    .board-column = map-col | right-col
@@ -24,10 +49,11 @@
   min-height: 0;
 }
 
-/* Left column: 40/60 split — roster (40% top), tickets + draw button (60% bottom) */
+/* Left column: the roster is as tall as its players; tickets take the rest.
+   The roster is capped so four players never squeeze the tickets out. */
 .side-panel {
   display: grid;
-  grid-template-rows: 40fr 60fr;
+  grid-template-rows: fit-content(40%) minmax(0, 1fr);
   gap: var(--space-stack-sm);
   height: 100%;
   min-height: 0;
@@ -77,10 +103,11 @@
   align-self: end;
 }
 
-/* Right column: 50/50 split — chat top (50%), market bottom (50%) */
+/* Right column: the market keeps its natural height so all five cards and the
+   draw button always fit; chat takes whatever is left. */
 .right-col {
   display: grid;
-  grid-template-rows: 50fr 50fr;
+  grid-template-rows: minmax(0, 1fr) auto;
   gap: var(--space-stack-sm);
   height: 100%;
   min-height: 0;

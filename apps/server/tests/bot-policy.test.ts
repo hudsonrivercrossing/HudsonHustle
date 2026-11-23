@@ -82,6 +82,7 @@ function buildGame(overrides: Partial<PublicGameState> = {}): PublicGameState {
     finalRoundRemaining: null,
     finalRoundTriggeredBy: null,
     log: [],
+    logSequence: 0,
     ...overrides
   };
 }

@@ -4,6 +4,88 @@ import { MemoryRoomRepository } from "../src/persistence/memory-room-repository"
 import { RoomService } from "../src/room-service";
 
 describe("RoomService", () => {
+
+  it("gives the server each seat's private state without client credentials", async () => {
+    const service = new RoomService(new MemoryRoomRepository(), hudsonHustleReleasedConfigs);
+    const created = await service.createRoom({
+      hostName: "Ava",
+      playerCount: 2,
+      configId: "v0.4-flushing-newark-airport",
+      turnTimeLimitSeconds: 0
+    });
+    const joined = await service.joinRoom(created.roomCode, { playerName: "Beau" });
+    expect(await service.getPrivateStates(created.roomCode)).toEqual([]);
+
+    await service.setReady(created.roomCode, { seatId: created.seatId, playerSecret: created.playerSecret }, true);
+    await service.setReady(created.roomCode, { seatId: joined.seatId, playerSecret: joined.playerSecret }, true);
+    await service.startRoom(created.roomCode, { playerSecret: created.playerSecret });
+
+    const states = await service.getPrivateStates(created.roomCode);
+    expect(states.map((state) => [state.seatId, state.playerId])).toEqual([
+      ["seat-1", "player-1"],
+      ["seat-2", "player-2"]
+    ]);
+    const guest = await service.getSnapshot(created.roomCode, { seatId: joined.seatId, playerSecret: joined.playerSecret });
+    expect(states[1]).toEqual(guest.privateState);
+  });
+
+  it("rejects malformed and client-forbidden game actions", async () => {
+    const service = new RoomService(new MemoryRoomRepository(), hudsonHustleReleasedConfigs);
+    const created = await service.createRoom({
+      hostName: "Ava",
+      playerCount: 2,
+      configId: "v0.4-flushing-newark-airport",
+      turnTimeLimitSeconds: 0
+    });
+    const joined = await service.joinRoom(created.roomCode, { playerName: "Beau" });
+    const hostAuth = { seatId: created.seatId, playerSecret: created.playerSecret };
+    const guestAuth = { seatId: joined.seatId, playerSecret: joined.playerSecret };
+    await service.setReady(created.roomCode, hostAuth, true);
+    await service.setReady(created.roomCode, guestAuth, true);
+    const started = await service.startRoom(created.roomCode, { playerSecret: created.playerSecret });
+
+    const send = (auth: typeof hostAuth, action: unknown) =>
+      service.applyAction(created.roomCode, auth, { roomCode: created.roomCode, ...auth, action } as never);
+
+    await send(hostAuth, {
+      type: "select_initial_tickets",
+      keptTicketIds: started.snapshot.privateState?.pendingTickets.slice(0, 2).map((ticket) => ticket.id) ?? []
+    });
+    const guestSnapshot = await service.getSnapshot(created.roomCode, guestAuth);
+    const main = await send(guestAuth, {
+      type: "select_initial_tickets",
+      keptTicketIds: guestSnapshot.privateState?.pendingTickets.slice(0, 2).map((ticket) => ticket.id) ?? []
+    });
+    expect(main.game?.phase).toBe("main");
+    const handBefore = (await service.getSnapshot(created.roomCode, hostAuth)).privateState?.hand.length;
+
+    await expect(send(hostAuth, { type: "draw_card", source: "bogus", marketIndex: 0 })).rejects.toMatchObject({ statusCode: 400 });
+    await expect(send(hostAuth, { type: "teleport" })).rejects.toMatchObject({ statusCode: 400 });
+    await expect(send(hostAuth, undefined)).rejects.toMatchObject({ statusCode: 400 });
+    await expect(send(hostAuth, { type: "advance_turn" })).rejects.toThrow(/not ready to advance/);
+
+    await send(hostAuth, { type: "draw_tickets" });
+    await expect(send(hostAuth, { type: "cancel_ticket_draw" })).rejects.toMatchObject({ statusCode: 400 });
+
+    const after = await service.getSnapshot(created.roomCode, hostAuth);
+    expect(after.game?.phase).toBe("ticketChoice");
+    expect(after.privateState?.hand.length).toBe(handBefore);
+  });
+
+  it("rejects malformed room creation requests", async () => {
+    const service = new RoomService(new MemoryRoomRepository(), hudsonHustleReleasedConfigs);
+    const valid = { hostName: "Ava", playerCount: 2, configId: "v0.4-flushing-newark-airport", turnTimeLimitSeconds: 0 };
+    const create = (overrides: Record<string, unknown>) => service.createRoom({ ...valid, ...overrides } as never);
+
+    await expect(service.createRoom(undefined as never)).rejects.toMatchObject({ statusCode: 400 });
+    await expect(create({ hostName: undefined })).rejects.toMatchObject({ statusCode: 400 });
+    await expect(create({ hostName: "x".repeat(200) })).rejects.toMatchObject({ statusCode: 400 });
+    await expect(create({ playerCount: 2.5 })).rejects.toMatchObject({ statusCode: 400 });
+    await expect(create({ turnTimeLimitSeconds: 1.5 })).rejects.toMatchObject({ statusCode: 400 });
+    await expect(create({ turnTimeLimitSeconds: 999999 })).rejects.toMatchObject({ statusCode: 400 });
+    await expect(create({ botSeatIds: "seat-2" })).rejects.toMatchObject({ statusCode: 400 });
+    await expect(create({})).resolves.toMatchObject({ seatId: "seat-1" });
+  });
   it("creates, joins, starts, and projects a multiplayer room", async () => {
     const service = new RoomService(new MemoryRoomRepository(), hudsonHustleReleasedConfigs);
 
@@ -305,7 +387,8 @@ describe("RoomService", () => {
     expect(room.seats[1]?.playerSecret).toBeNull();
     expect(room.seats[1]?.controllerState).toEqual({
       ownership: "server",
-      controllerKey: "internal:bot"
+      controllerKey: "internal:bot",
+      difficulty: "standard"
     });
 
     await expect(

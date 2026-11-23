@@ -23,10 +23,10 @@ We also need a human-readable record of:
 That is what the snapshot system is for.
 
 ## Folder Model
-Use [configs/hudson-hustle](/Users/djfan/Workspace/HudsonHustle/configs/hudson-hustle) as the home for all Hudson Hustle snapshots.
+Use [configs/hudson-hustle](../../configs/hudson-hustle) as the home for all Hudson Hustle snapshots.
 
 Main parts:
-- [current.json](/Users/djfan/Workspace/HudsonHustle/configs/hudson-hustle/current.json)
+- [current.json](../../configs/hudson-hustle/current.json)
   - the active runtime pointer
 - `drafts/`
   - active experiments and work-in-progress versions

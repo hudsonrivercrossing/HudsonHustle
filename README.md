@@ -128,11 +128,11 @@ docs/
   map/
     cartography-workflow.md
     hudson-map-rubric.md
-    map-balance-notes.md
   config/
     config-snapshot-guide.md
   planning/
-    v1-status.md
+    v2-status.md
+  archive/       finished passes, slices, specs
   playtests/
     v0.4/
     v2.0/
@@ -159,13 +159,13 @@ scripts/
 - [V2 MVP Architecture](docs/product/v2/v2-mvp-architecture.md)
 - [V2 Multiplayer Flow](docs/product/v2/v2-multiplayer-flow.md)
 - [V2 Deployment](docs/product/v2/v2-deployment.md)
-- [V1 Status](docs/planning/v1-status.md)
+- [V1 Status](docs/archive/planning/v1-status.md)
 - [V2 Status](docs/planning/v2-status.md)
 - [Player Guide](docs/gameplay/player-guide.md)
 - [Onboarding Script](docs/gameplay/onboarding-script.md)
 - [Config Snapshot Guide](docs/config/config-snapshot-guide.md)
 - [Design System](docs/product/design-system.md)
-- [Map And Balance Notes](docs/map/map-balance-notes.md)
+- [Map And Balance Notes](docs/archive/planning/map-balance-notes-2026-03.md)
 - [V2.0 Staging Smoke Checklist](docs/playtests/v2.0/staging-smoke-checklist.md)
 - [Agent Operating Guide](AGENTS.md)
 

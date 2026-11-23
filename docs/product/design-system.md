@@ -4,7 +4,7 @@
 
 This is the stable design-system home for Hudson Hustle.
 
-If you need the shortest entrypoint first, start with [DESIGN.md](/Users/djfan/Workspace/HudsonHustle/DESIGN.md).
+If you need the shortest entrypoint first, start with [DESIGN.md](../../DESIGN.md).
 
 Use it for:
 - design principles that should stay true across `v2.x`
@@ -13,8 +13,8 @@ Use it for:
 - the validated implementation backlog
 
 Do not use this file for exploratory notes or version-specific rationale. Those belong in:
-- [V2 Docs Index](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/README.md)
-- [.research/](/Users/djfan/Workspace/HudsonHustle/.research)
+- [V2 Docs Index](v2/README.md)
+- [.research/](../../.research)
 
 ## Current Phase
 
@@ -43,25 +43,25 @@ Locked decisions:
 ## Structure
 
 Stable design-system docs:
-- [Design Principles](/Users/djfan/Workspace/HudsonHustle/docs/product/design-principles.md)
-- [Color System](/Users/djfan/Workspace/HudsonHustle/docs/product/color-system.md)
-- [Typography And Layout](/Users/djfan/Workspace/HudsonHustle/docs/product/typography-and-layout.md)
-- [Layout Rhythm](/Users/djfan/Workspace/HudsonHustle/docs/product/layout-rhythm.md)
-- [Component System](/Users/djfan/Workspace/HudsonHustle/docs/product/component-system.md)
-- [Map Language Boundary](/Users/djfan/Workspace/HudsonHustle/docs/product/map-language-boundary.md)
-- [Design Implementation Backlog](/Users/djfan/Workspace/HudsonHustle/docs/product/design-implementation-backlog.md)
-- [Design Showcases](/Users/djfan/Workspace/HudsonHustle/docs/product/showcase/README.md)
-- [System Design Revamp Plan](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/system-design-revamp-plan.md)
+- [Design Principles](design-principles.md)
+- [Color System](color-system.md)
+- [Typography And Layout](typography-and-layout.md)
+- [Layout Rhythm](layout-rhythm.md)
+- [Component System](component-system.md)
+- [Map Language Boundary](map-language-boundary.md)
+- [Design Implementation Backlog](../archive/design-passes/design-implementation-backlog.md)
+- [Design Showcases](showcase/README.md)
+- [System Design Revamp Plan](v2/system-design-revamp-plan.md)
 
 Versioned rationale and decision trail:
-- [V2.1 Design Lock](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.1-design-lock.md)
-- [V2.1 Design Critique And Reference](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.1-design-critique-and-reference.md)
-- [V2.1 Shell Design Direction](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.1-shell-design-direction.md)
-- [V2.2 System Agent Architecture](/Users/djfan/Workspace/HudsonHustle/docs/product/v2/v2.2-system-agent-architecture.md)
+- [V2.1 Design Lock](../archive/v2-slices/v2.1-design-lock.md)
+- [V2.1 Design Critique And Reference](../archive/v2-slices/v2.1-design-critique-and-reference.md)
+- [V2.1 Shell Design Direction](../archive/v2-slices/v2.1-shell-design-direction.md)
+- [V2.2 System Agent Architecture](../archive/v2-slices/v2.2-system-agent-architecture.md)
 
 Exploratory research:
-- [.research/design-system-in-the-ai-agent-era.md](/Users/djfan/Workspace/HudsonHustle/.research/design-system-in-the-ai-agent-era.md)
-- [.research/hudson-hustle-design-system-recommendation-and-todo.md](/Users/djfan/Workspace/HudsonHustle/.research/hudson-hustle-design-system-recommendation-and-todo.md)
+- [.research/design-system-in-the-ai-agent-era.md](../../.research/design-system-in-the-ai-agent-era.md)
+- [.research/hudson-hustle-design-system-recommendation-and-todo.md](../../.research/hudson-hustle-design-system-recommendation-and-todo.md)
 
 ## Governance
 

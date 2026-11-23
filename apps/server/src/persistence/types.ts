@@ -1,4 +1,4 @@
-import type { ControllerType, GameAction, GamePhase, GameState, RoomSeatSummary, RoomStatus } from "@hudson-hustle/game-core";
+import type { ControllerType, GameAction, GamePhase, GameState, RoomSeatSummary, RoomStatus, BotDifficulty } from "@hudson-hustle/game-core";
 
 export type StoredSeatControllerState =
   | {
@@ -8,6 +8,8 @@ export type StoredSeatControllerState =
   | {
       ownership: "server";
       controllerKey: "internal:bot";
+      /** Absent on seats saved before difficulty existed; those play as "standard". */
+      difficulty?: BotDifficulty;
     };
 
 export interface StoredSeatRecord extends RoomSeatSummary {

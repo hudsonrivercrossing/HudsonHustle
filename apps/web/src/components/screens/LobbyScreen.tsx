@@ -10,6 +10,7 @@ import {
 } from "../setup";
 import { Badge } from "../ui/primitives/Badge";
 import { Button } from "../ui/primitives/Button";
+import { InviteLinkButton } from "../online/InviteLinkButton";
 import { StateSurface } from "../ui/primitives/StateSurface";
 
 interface LobbyScreenProps {
@@ -111,6 +112,7 @@ export function LobbyScreen({
         <SetupSummaryRow label="Seats" value={`${occupiedCount}/${room.playerCount}`} detail={`${readyCount} ready`} />
         <SetupSummaryRow label="Timer" value={room.turnTimeLimitSeconds === 0 ? "Untimed" : `${room.turnTimeLimitSeconds}s`} />
       </div>
+      <InviteLinkButton roomCode={room.roomCode} />
     </div>
   );
 
@@ -164,6 +166,8 @@ export function LobbyScreen({
                 key={seat.seatId}
                 className={`seat-row ${isSelf ? "seat-row--self" : ""} ${isEmpty ? "seat-row--open" : ""}`}
                 data-testid={`seat-row-${seat.seatId}`}
+                data-host={seat.isHost}
+                data-connection={isEmpty ? "open" : seat.controllerType === "bot" ? "server" : seat.connected ? "connected" : "offline"}
               >
                 <img
                   className={`seat-avatar ${isEmpty ? "seat-avatar--empty" : ""}`}

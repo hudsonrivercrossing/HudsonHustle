@@ -13,6 +13,16 @@ export default defineConfig({
     }
   },
   test: {
-    include: ["tests/**/*.test.ts"]
+    include: ["tests/**/*.test.ts"],
+    // Tests must never reach a real database. A developer's shell often exports these for
+    // psql or a deploy tool, and the server would otherwise connect and write test rooms there.
+    env: {
+      DATABASE_URL: "",
+      PGHOST: "",
+      PGPORT: "",
+      PGUSER: "",
+      PGPASSWORD: "",
+      PGDATABASE: ""
+    }
   }
 });

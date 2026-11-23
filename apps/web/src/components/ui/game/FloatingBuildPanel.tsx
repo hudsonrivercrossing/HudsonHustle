@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 
 interface FloatingBuildPanelProps {
   children: ReactNode;
@@ -35,6 +35,19 @@ export function FloatingBuildPanel({ children, onClose, anchor = null, className
     top = Math.max(VIEWPORT_PAD, Math.min(top, window.innerHeight - h - VIEWPORT_PAD));
     setPos({ top, left });
   }, [anchor?.x, anchor?.y]);
+
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  useEffect(() => {
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        onCloseRef.current();
+      }
+    }
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, []);
 
   const style: React.CSSProperties = pos
     ? { position: "fixed", top: pos.top, left: pos.left, width: PANEL_WIDTH }

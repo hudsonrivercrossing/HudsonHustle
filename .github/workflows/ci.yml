@@ -32,6 +32,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Typecheck (sources and tests)
+        run: pnpm typecheck
+
+      - name: CSS token debt must not grow
+        run: pnpm css:debt
+
       - name: Run tests
         run: pnpm test
 

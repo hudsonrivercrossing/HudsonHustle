@@ -4,6 +4,14 @@ import { decodeReconnectToken } from "../src/reconnect-token";
 const SESSION_KEY = "hudson-hustle-multiplayer-session-v2";
 const API_BASE_URL = "http://127.0.0.1:8787";
 
+/**
+ * The first-run tour covers the ticket chooser until it is dismissed. These tests are about the
+ * game flow, so every page starts as a returning player who has already seen it.
+ */
+async function skipFirstRunTour(page: Page): Promise<void> {
+  await page.addInitScript(() => window.localStorage.setItem("hh-tour-seen-v2", "1"));
+}
+
 async function waitForApi(page: Page): Promise<void> {
   await expect
     .poll(async () => {
@@ -33,6 +41,7 @@ async function clearInitialTicketChoice(page: Page): Promise<void> {
 }
 
 async function openMultiplayerSetup(page: Page): Promise<void> {
+  await skipFirstRunTour(page);
   await page.goto("/");
   await waitForApi(page);
   await expect(page.getByRole("heading", { name: "Hudson Hustle" })).toBeVisible();
@@ -44,6 +53,7 @@ async function openMultiplayerSetup(page: Page): Promise<void> {
 }
 
 async function openLocalSetup(page: Page): Promise<void> {
+  await skipFirstRunTour(page);
   await page.goto("/");
   await waitForApi(page);
   await page.getByTestId("gateway-local").click();
@@ -81,7 +91,7 @@ async function createRoom(
   await expect(createPanel.locator(".timer-picker__value")).toHaveText(expectedTimerText);
   await createPanel.getByRole("button", { name: "Create room" }).click();
   await expect(page.getByTestId("lobby-status-banner")).toBeVisible({ timeout: 10000 });
-  await expect(page.getByTestId("seat-connected-seat-1")).toHaveText("Connected");
+  await expect(page.getByTestId("seat-row-seat-1")).toHaveAttribute("data-connection", "connected");
 
   const session = await page.evaluate((key) => window.localStorage.getItem(key), SESSION_KEY);
   expect(session).not.toBeNull();
@@ -104,7 +114,7 @@ async function joinRoom(
   await joinPanel.getByLabel("Your name").fill(playerName);
   await joinPanel.getByRole("button", { name: "Join room" }).click();
   await expect(page.getByTestId("lobby-status-banner")).toBeVisible({ timeout: 10000 });
-  await expect(page.getByTestId(`seat-connected-${seatId}`)).toHaveText("Connected");
+  await expect(page.getByTestId(`seat-row-${seatId}`)).toHaveAttribute("data-connection", "connected");
 
   const session = await page.evaluate((key) => window.localStorage.getItem(key), SESSION_KEY);
   expect(session).not.toBeNull();
@@ -119,12 +129,12 @@ test("multiplayer room lifecycle covers connected badges, private state, reconne
 
   await openMultiplayerSetup(hostPage);
   const hostSession = await createRoom(hostPage);
-  await expect(hostPage.getByTestId("seat-connected-seat-1")).toHaveText("Connected");
+  await expect(hostPage.getByTestId("seat-row-seat-1")).toHaveAttribute("data-connection", "connected");
 
   await openMultiplayerSetup(guestPage);
   const guestSession = await joinRoom(guestPage, hostSession.roomCode);
-  await expect(guestPage.getByTestId("seat-connected-seat-2")).toHaveText("Connected");
-  await expect(hostPage.getByTestId("seat-connected-seat-2")).toHaveText("Connected");
+  await expect(guestPage.getByTestId("seat-row-seat-2")).toHaveAttribute("data-connection", "connected");
+  await expect(hostPage.getByTestId("seat-row-seat-2")).toHaveAttribute("data-connection", "connected");
 
   await hostPage.getByRole("button", { name: "Mark ready" }).click();
   await guestPage.getByRole("button", { name: "Mark ready" }).click();
@@ -134,7 +144,7 @@ test("multiplayer room lifecycle covers connected badges, private state, reconne
   await clearInitialTicketChoice(guestPage);
 
   await expect(hostPage.getByTestId("turn-status-banner")).toContainText("Your turn");
-  await expect(hostPage.locator(".player-roster--top")).toBeVisible();
+  await expect(hostPage.locator(".player-roster")).toBeVisible();
   await expect(hostPage.getByRole("button", { name: "Guide" })).toBeVisible();
   await expect(hostPage.getByRole("button", { name: "Score" })).toBeVisible();
   await expect(hostPage.getByRole("button", { name: "Leave room" })).toBeVisible();
@@ -144,12 +154,12 @@ test("multiplayer room lifecycle covers connected badges, private state, reconne
   await hostPage.waitForTimeout(1500);
   await expect(hostTimerBadge).toHaveText(/^(Timer 30s|\d+s left)$/);
 
-  const hostPrivate = await hostPage.request.get(
-    `${API_BASE_URL}/rooms/${hostSession.roomCode}?seatId=${hostSession.seatId}&playerSecret=${hostSession.playerSecret}`
-  );
-  const guestPrivate = await guestPage.request.get(
-    `${API_BASE_URL}/rooms/${hostSession.roomCode}?seatId=${guestSession.seatId}&playerSecret=${guestSession.playerSecret}`
-  );
+  const hostPrivate = await hostPage.request.post(`${API_BASE_URL}/rooms/${hostSession.roomCode}/snapshot`, {
+    data: { seatId: hostSession.seatId, playerSecret: hostSession.playerSecret }
+  });
+  const guestPrivate = await guestPage.request.post(`${API_BASE_URL}/rooms/${hostSession.roomCode}/snapshot`, {
+    data: { seatId: guestSession.seatId, playerSecret: guestSession.playerSecret }
+  });
   const hostJson = (await hostPrivate.json()) as {
     privateState: { playerId: string | null; hand: unknown[]; tickets: unknown[] };
   };
@@ -182,6 +192,7 @@ test("invalid saved reconnect tokens fall back to the gateway instead of crashin
   }, SESSION_KEY);
   const page = await context.newPage();
 
+  await skipFirstRunTour(page);
   await page.goto("/");
   await waitForApi(page);
   await expect(page.getByRole("heading", { name: "Hudson Hustle" })).toBeVisible();
@@ -367,7 +378,7 @@ test("host can leave the lobby without stranding the room", async ({ browser }) 
   const session = await hostPage.evaluate((key) => window.localStorage.getItem(key), SESSION_KEY);
   expect(session).toBeNull();
   await expect(guestPage.getByTestId("seat-row-seat-1").getByText("Open seat")).toBeVisible();
-  await expect(guestPage.getByTestId("seat-row-seat-2")).toContainText("host");
+  await expect(guestPage.getByTestId("seat-row-seat-2")).toHaveAttribute("data-host", "true");
 
   await openMultiplayerSetup(replacementPage);
   await joinRoom(replacementPage, roomCode, {
@@ -389,7 +400,7 @@ test("normal setup can create a room with one bot seat and start with the host a
   await createRoom(page, { botSeats: ["seat-2"] });
 
   await expect(page.getByTestId("seat-row-seat-2")).toContainText("Bot 1");
-  await expect(page.getByTestId("seat-connected-seat-2")).toHaveText("Server");
+  await expect(page.getByTestId("seat-row-seat-2")).toHaveAttribute("data-connection", "server");
 
   await page.getByRole("button", { name: "Mark ready" }).click();
   await expect(page.getByRole("button", { name: "Start game" })).toBeEnabled();
@@ -492,6 +503,7 @@ test("guidebook opens from gateway and local setup without old tutorial chrome",
   const context = await browser.newContext();
   const page = await context.newPage();
 
+  await skipFirstRunTour(page);
   await page.goto("/");
   await waitForApi(page);
   await page.getByTestId("gateway-onboarding").click();
@@ -536,7 +548,7 @@ test("guidebook opens from gateway and local setup without old tutorial chrome",
   await page.getByRole("button", { name: "Guide" }).click();
   await expect(page.getByTestId("guidebook-screen")).toBeVisible();
   await page.getByRole("button", { name: "Back" }).click();
-  await expect(page.locator(".player-roster--top")).toBeVisible();
+  await expect(page.locator(".player-roster")).toBeVisible();
 
   await context.close();
 });

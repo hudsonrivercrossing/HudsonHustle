@@ -1,7 +1,10 @@
+import { parseGameAction } from "./actions.js";
 import { shuffleWithSeed } from "./random.js";
 import {
   type CityDef,
   type GameAction,
+  type GameEvent,
+  type GameEventInput,
   type GameSetup,
   type GameState,
   type MapConfig,
@@ -38,8 +41,33 @@ function invariant(condition: unknown, message: string): asserts condition {
   }
 }
 
+const VISIBLE_LOG_LENGTH = 18;
+
 function appendLog(state: GameState, message: string): void {
-  state.log = [...state.log, message].slice(-18);
+  state.logSequence = (state.logSequence ?? state.log.length) + 1;
+  state.log = [...state.log, message].slice(-VISIBLE_LOG_LENGTH);
+}
+
+const RECENT_EVENT_LIMIT = 32;
+
+function recordEvent(state: GameState, event: GameEventInput): void {
+  const events = state.events ?? [];
+  const seq = (events.at(-1)?.seq ?? 0) + 1;
+  state.events = [...events, { ...event, seq } as GameEvent].slice(-RECENT_EVENT_LIMIT);
+}
+
+/** Events with a sequence number above `lastSeenSeq`, oldest first. */
+export function getEventsSince(game: { events?: GameEvent[] }, lastSeenSeq: number): GameEvent[] {
+  return (game.events ?? []).filter((event) => event.seq > lastSeenSeq);
+}
+
+/**
+ * Log entries appended after `lastSeenSequence`. Comparing `log.length` cannot do this:
+ * the log is trimmed, so its length stops growing once it is full.
+ */
+export function getLogEntriesSince(game: { log: string[]; logSequence?: number }, lastSeenSequence: number): string[] {
+  const added = (game.logSequence ?? game.log.length) - lastSeenSequence;
+  return added > 0 ? game.log.slice(-Math.min(added, game.log.length)) : [];
 }
 
 function buildTrainDeck(): TrainCard[] {
@@ -157,6 +185,20 @@ function getAvailableClaimColors(state: GameState, config: MapConfig, playerId: 
 
   const candidateColors = route.color === "gray" ? [...trainCardColors] : [route.color];
   return candidateColors.filter((color) => canPay(player.hand, color, route.length, route.locomotiveCost ?? 0));
+}
+
+/** Whether the active player can do anything at all at the start of their turn. */
+function hasLegalAction(state: GameState, config: MapConfig): boolean {
+  const player = getPlayer(state);
+  if (state.trainDeck.length + state.discardPile.length + state.market.length > 0 || state.regularTickets.length > 0) {
+    return true;
+  }
+  const stationCost = config.settings.stationsPerPlayer - player.stationsLeft + 1;
+  const canBuildStation =
+    player.stationsLeft > 0 &&
+    state.stations.length < config.cities.length &&
+    trainCardColors.some((color) => canPay(player.hand, color, stationCost, 0));
+  return canBuildStation || config.routes.some((route) => getAvailableClaimColors(state, config, player.id, route.id).length > 0);
 }
 
 function isRouteOpen(state: GameState, config: MapConfig, route: RouteDef): boolean {
@@ -382,6 +424,7 @@ function finishGame(state: GameState, config: MapConfig): GameState {
   }
 
   appendLog(nextState, "Final scoring complete.");
+  recordEvent(nextState, { type: "game_over" });
   return nextState;
 }
 
@@ -397,6 +440,7 @@ function maybeTriggerFinalRound(state: GameState, config: MapConfig, player: Pla
     state.finalRoundRemaining = state.players.length - 1;
     state.finalRoundTriggeredBy = player.id;
     appendLog(state, `${player.name} triggered the final round.`);
+    recordEvent(state, { type: "final_round_triggered", playerId: player.id });
   }
 }
 
@@ -447,7 +491,10 @@ export function startGame(config: MapConfig, setup: GameSetup): GameState {
     rngState: regularTickets.nextState,
     finalRoundRemaining: null,
     finalRoundTriggeredBy: null,
-    log: ["Game setup complete."]
+    log: ["Game setup complete."],
+    logSequence: 1,
+    events: [],
+    moves: []
   };
 
   for (const player of state.players) {
@@ -465,7 +512,8 @@ export function startGame(config: MapConfig, setup: GameSetup): GameState {
   return state;
 }
 
-export function reduceGame(state: GameState, action: GameAction, config: MapConfig): GameState {
+export function reduceGame(state: GameState, untrustedAction: GameAction, config: MapConfig): GameState {
+  const action = parseGameAction(untrustedAction);
   const nextState = structuredClone(state) as GameState;
   const player = getPlayer(nextState);
 
@@ -480,6 +528,7 @@ export function reduceGame(state: GameState, action: GameAction, config: MapConf
       nextState.discardedTickets.push(...player.pendingTickets.filter((ticket) => !action.keptTicketIds.includes(ticket.id)));
       player.pendingTickets = [];
       appendLog(nextState, `${player.name} locked in starting tickets.`);
+      recordEvent(nextState, { type: "tickets_kept", playerId: player.id, count: kept.length, initial: true });
 
       const nextPendingIndex = nextState.players.findIndex((candidate) => candidate.pendingTickets.length > 0);
       if (nextPendingIndex >= 0) {
@@ -513,17 +562,30 @@ export function reduceGame(state: GameState, action: GameAction, config: MapConf
       player.hand.push(drawn);
       nextState.turn.stage = "drawing";
       nextState.turn.drawsTaken += 1;
-      nextState.turn.summary = `${player.name} drew ${drawn.color}.`;
+      // Log, summary and event are all readable by every player, so a blind draw never names its color.
+      const drawDescription =
+        action.source === "market" ? `${player.name} took a face-up ${drawn.color} card.` : `${player.name} drew a card from the deck.`;
+      nextState.turn.summary = drawDescription;
 
       if (action.source === "market" && drawn.color === "locomotive") {
         nextState.turn.tookFaceUpLocomotive = true;
       }
 
-      if (nextState.turn.tookFaceUpLocomotive || nextState.turn.drawsTaken >= 2) {
+      // When players hold nearly every card there may be nothing left for a second draw.
+      // The draw then ends after one card instead of leaving the turn impossible to finish.
+      const secondCardExists =
+        nextState.trainDeck.length + nextState.discardPile.length > 0 || nextState.market.some((card) => card.color !== "locomotive");
+      if (nextState.turn.tookFaceUpLocomotive || nextState.turn.drawsTaken >= 2 || !secondCardExists) {
         beginAwaitingHandoff(nextState, `${player.name} finished drawing cards.`);
       }
 
-      appendLog(nextState, `${player.name} drew a ${drawn.color} card.`);
+      appendLog(nextState, drawDescription);
+      recordEvent(
+        nextState,
+        action.source === "market"
+          ? { type: "card_drawn", playerId: player.id, source: "market", color: drawn.color }
+          : { type: "card_drawn", playerId: player.id, source: "deck" }
+      );
       return nextState;
     }
     case "claim_route": {
@@ -545,18 +607,25 @@ export function reduceGame(state: GameState, action: GameAction, config: MapConf
       let tunnelExtraCost = 0;
       const tunnelReveal: TrainCardFace[] = [];
       if (route.type === "tunnel") {
-        for (let index = 0; index < 3; index += 1) {
+        // Late in a game the deck and discard pile can both be empty because players hold the cards.
+        // Then fewer than three are revealed (possibly none) and only those can add to the cost.
+        // Revealed cards reach the discard pile only after the reveal, so a reshuffle during it
+        // cannot turn the same card over twice.
+        const revealedCards: TrainCard[] = [];
+        for (let index = 0; index < 3 && nextState.trainDeck.length + nextState.discardPile.length > 0; index += 1) {
           const card = drawCardFromDeck(nextState);
-          nextState.discardPile.push(card);
+          revealedCards.push(card);
           tunnelReveal.push(card.color);
           if (card.color === action.color || card.color === "locomotive") {
             tunnelExtraCost += 1;
           }
         }
+        nextState.discardPile.push(...revealedCards);
         nextState.turn.latestTunnelReveal = tunnelReveal;
         if (!canPay(player.hand, action.color, route.length + tunnelExtraCost, route.locomotiveCost ?? 0)) {
           beginAwaitingHandoff(nextState, `${player.name} could not cover the tunnel surcharge.`);
           appendLog(nextState, `${player.name} failed to claim ${route.id} after a tunnel reveal.`);
+          recordEvent(nextState, { type: "tunnel_failed", playerId: player.id, routeId: route.id });
           return nextState;
         }
       } else {
@@ -569,7 +638,7 @@ export function reduceGame(state: GameState, action: GameAction, config: MapConf
       player.trainsLeft -= route.length;
       nextState.discardPile.push(
         ...payment.spent.map((color, index) => ({
-          id: `spent-${route.id}-${index}-${nextState.log.length}`,
+          id: `spent-${route.id}-${index}-${nextState.logSequence ?? nextState.log.length}`,
           color
         }))
       );
@@ -583,6 +652,11 @@ export function reduceGame(state: GameState, action: GameAction, config: MapConf
       maybeTriggerFinalRound(nextState, config, player);
       beginAwaitingHandoff(nextState, `${player.name} claimed ${route.id}.`);
       appendLog(nextState, `${player.name} claimed ${route.id} for ${routeScoreTable[route.length] ?? route.length * 2} points.`);
+      recordEvent(nextState, { type: "route_claimed", playerId: player.id, routeId: route.id, points: routeScoreTable[route.length] ?? route.length * 2 });
+      nextState.moves = [
+        ...(nextState.moves ?? []),
+        { type: "route_claimed", playerId: player.id, routeId: route.id, points: routeScoreTable[route.length] ?? route.length * 2 }
+      ];
       return nextState;
     }
     case "draw_tickets": {
@@ -593,6 +667,7 @@ export function reduceGame(state: GameState, action: GameAction, config: MapConf
       nextState.phase = "ticketChoice";
       nextState.turn.summary = `${player.name} is choosing tickets.`;
       appendLog(nextState, `${player.name} drew ${player.pendingTickets.length} tickets.`);
+      recordEvent(nextState, { type: "tickets_drawn", playerId: player.id, count: player.pendingTickets.length });
       return nextState;
     }
     case "cancel_ticket_draw": {
@@ -615,6 +690,7 @@ export function reduceGame(state: GameState, action: GameAction, config: MapConf
       player.pendingTickets = [];
       nextState.phase = "main";
       beginAwaitingHandoff(nextState, `${player.name} kept ${kept.length} new tickets.`);
+      recordEvent(nextState, { type: "tickets_kept", playerId: player.id, count: kept.length, initial: false });
       return nextState;
     }
     case "build_station": {
@@ -631,7 +707,7 @@ export function reduceGame(state: GameState, action: GameAction, config: MapConf
       player.stationsLeft -= 1;
       nextState.discardPile.push(
         ...payment.spent.map((color, index) => ({
-          id: `station-${action.cityId}-${index}-${nextState.log.length}`,
+          id: `station-${action.cityId}-${index}-${nextState.logSequence ?? nextState.log.length}`,
           color
         }))
       );
@@ -641,30 +717,46 @@ export function reduceGame(state: GameState, action: GameAction, config: MapConf
       });
       beginAwaitingHandoff(nextState, `${player.name} built a station in ${action.cityId}.`);
       appendLog(nextState, `${player.name} built a station in ${action.cityId}.`);
+      recordEvent(nextState, { type: "station_built", playerId: player.id, cityId: action.cityId });
+      nextState.moves = [...(nextState.moves ?? []), { type: "station_built", playerId: player.id, cityId: action.cityId }];
       return nextState;
     }
     case "advance_turn": {
       invariant(nextState.turn.stage === "awaitingHandoff", "The current turn is not ready to advance.");
       nextState.turn.latestTunnelReveal = [];
 
-      if (nextState.finalRoundRemaining === 0) {
-        return finishGame(nextState, config);
-      }
+      // Normally this runs once. It repeats only to pass over players who cannot do anything at all,
+      // which happens when nearly every card is in hands; if that is everyone, the game is over.
+      for (let passed = 0; ; passed += 1) {
+        if (nextState.finalRoundRemaining === 0) {
+          return finishGame(nextState, config);
+        }
 
-      nextState.activePlayerIndex = (nextState.activePlayerIndex + 1) % nextState.players.length;
-      nextState.turn = {
-        stage: "idle",
-        drawsTaken: 0,
-        tookFaceUpLocomotive: false,
-        summary: null,
-        latestTunnelReveal: []
-      };
+        nextState.activePlayerIndex = (nextState.activePlayerIndex + 1) % nextState.players.length;
+        nextState.turn = {
+          stage: "idle",
+          drawsTaken: 0,
+          tookFaceUpLocomotive: false,
+          summary: null,
+          latestTunnelReveal: []
+        };
 
-      if (nextState.finalRoundRemaining !== null && nextState.finalRoundRemaining > 0) {
-        nextState.finalRoundRemaining -= 1;
+        if (nextState.finalRoundRemaining !== null && nextState.finalRoundRemaining > 0) {
+          nextState.finalRoundRemaining -= 1;
+        }
+
+        if (hasLegalAction(nextState, config)) {
+          break;
+        }
+        if (passed + 1 >= nextState.players.length) {
+          appendLog(nextState, "No player has a legal move left.");
+          return finishGame(nextState, config);
+        }
+        appendLog(nextState, `${nextState.players[nextState.activePlayerIndex].name} has no legal move and passes.`);
       }
 
       appendLog(nextState, `${nextState.players[nextState.activePlayerIndex].name}'s turn started.`);
+      recordEvent(nextState, { type: "turn_started", playerId: nextState.players[nextState.activePlayerIndex].id });
       return nextState;
     }
   }
