@@ -14,10 +14,10 @@
   align-items: center;
   gap: 8px;
   padding: 10px 12px;
-  border-radius: var(--radius-md);
   border: 1px solid color-mix(in oklch, var(--border-warm-solid) 14%, transparent);
   background: linear-gradient(180deg, oklch(99.2% 0.0073 80.72 / 0.96), oklch(94.5% 0.0229 84.59 / 0.88));
   box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.46), 0 8px 18px color-mix(in oklch, var(--shadow-warm-solid) 5%, transparent);
+  border-radius: var(--radius-control);
 }
 
 .seat-plan__row--bot {
@@ -315,7 +315,7 @@ Action rows */
 
 .setup-mode-selector__button {
   appearance: none;
-  min-height: 38px;
+  min-height: var(--hit-target-min);
   padding: 9px 14px;
   border: 1px solid transparent;
   border-radius: var(--radius-xs);
@@ -476,7 +476,7 @@ Action rows */
 .setup-step-panel input,
 .setup-step-panel select {
   width: 100%;
-  min-height: 40px;
+  min-height: var(--hit-target-min);
   border-radius: var(--radius-control);
   border: 1px solid oklch(94.28% 0.0234 82.12 / 0.18);
   background: linear-gradient(180deg, oklch(36.48% 0.0168 234.27 / 0.94), oklch(28.71% 0.0167 237.36 / 0.94)), var(--setup-ticket-field);
@@ -529,18 +529,8 @@ Action rows */
 .setup-step-panel .chip-button,
 .setup-board-shell .token-button {
   border-radius: var(--radius-control);
-}
-
-.setup-step-panel .chip-button::before,
-.setup-step-panel .system-chip::before,
-.setup-board-shell .token-button::before {
-  display: none;
-}
-
-.setup-step-panel .chip-button,
-.setup-board-shell .token-button {
   min-width: 88px;
-  min-height: 38px;
+  min-height: var(--hit-target-min);
   padding: 8px 13px;
   background: oklch(82.64% 0.0282 83.53 / 0.11);
   border: 1px solid oklch(94.28% 0.0234 82.12 / 0.2);
@@ -550,6 +540,12 @@ Action rows */
   font-weight: var(--weight-bold);
   letter-spacing: 0.02em;
   line-height: 1;
+}
+
+.setup-step-panel .chip-button::before,
+.setup-step-panel .system-chip::before,
+.setup-board-shell .token-button::before {
+  display: none;
 }
 
 .setup-step-panel .chip-button--selected,
@@ -608,7 +604,7 @@ Action rows */
   display: inline-flex;
   align-items: center;
   width: 100%;
-  min-height: 40px;
+  min-height: var(--hit-target-min);
   padding: 0 12px;
   border-radius: var(--radius-control);
   border: 1px dashed oklch(94.28% 0.0234 82.12 / 0.16);
@@ -899,7 +895,7 @@ Action rows */
   display: grid;
   place-items: center;
   border-radius: var(--radius-xs);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--setup-departure-cell) 84%, oklch(24.64% 0.0247 246.43)), var(--setup-departure-cell));
+  background: linear-gradient(180deg, color-mix(in oklch, var(--setup-departure-cell) 84%, oklch(24.64% 0.0247 246.43)), var(--setup-departure-cell));
   color: var(--setup-departure-letter);
   font-size: var(--type-lg);
   font-weight: var(--weight-bold);
@@ -1121,10 +1117,6 @@ Action rows */
 
 .room-preview--ticket .map-thumbnail {
   min-height: 150px;
-}
-
-.seat-plan__row {
-  border-radius: var(--radius-control);
 }
 
 .seat-choice-row {

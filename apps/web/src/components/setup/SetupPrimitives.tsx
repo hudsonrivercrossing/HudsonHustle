@@ -175,6 +175,7 @@ export function ModeSwitch<T extends string>({ options, value, onChange, label =
           key={option.value}
           type="button"
           className={option.value === value ? "setup-mode-selector__button setup-mode-selector__button--active" : "setup-mode-selector__button"}
+          aria-pressed={option.value === value}
           onClick={() => onChange(option.value)}
         >
           {option.label}
@@ -254,7 +255,7 @@ export function TokenButton({
   }
 
   return (
-    <button type="button" className={classes} disabled={disabled} data-testid={testId} onClick={onClick}>
+    <button type="button" className={classes} disabled={disabled} aria-pressed={selected} data-testid={testId} onClick={onClick}>
       {label}
     </button>
   );

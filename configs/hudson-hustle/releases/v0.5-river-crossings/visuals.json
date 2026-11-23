@@ -7,7 +7,7 @@
   "boardLabelMode": "station-only",
   "backdrop": {
     "image": {
-      "href": "/basemaps/nyc-hudson-ai-reference-v2.png",
+      "href": "/basemaps/nyc-hudson-ai-reference-v2.webp",
       "opacity": 1,
       "preserveAspectRatio": "none"
     },

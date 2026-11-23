@@ -55,7 +55,8 @@
 
 .notification-pipe {
   position: fixed;
-  bottom: max(var(--space-stack-lg), env(safe-area-inset-bottom));
+  /* Under the bar and under the connection notice, clear of the hand and the cards. */
+  top: max(7rem, calc(env(safe-area-inset-top) + 7rem));
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -71,5 +72,24 @@
 @media (prefers-reduced-motion: reduce) {
   .notification-pipe__item {
     animation: none;
+  }
+}
+
+/* On a wide screen ordinary news is written in the top bar; only warnings pop up. */
+@media (min-width: 761px) {
+  .notification-pipe__item:not(.notification-pipe__item--warning) {
+    display: none;
+  }
+}
+
+/* On a phone only the newest notice shows, as one small line, so the board is not buried under a stack. */
+@media (max-width: 760px) {
+  .notification-pipe__item {
+    padding: var(--space-stack-xs) var(--space-stack-md);
+    font-size: var(--type-xs);
+  }
+
+  .notification-pipe__item:not(:last-child) {
+    display: none;
   }
 }

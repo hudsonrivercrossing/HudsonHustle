@@ -81,6 +81,7 @@ export function ReplayScreen({ game, config, visuals, onClose }: ReplayScreenPro
           selectedRouteId={null}
           selectedCityId={null}
           highlightedCityIds={[]}
+          interactive={false}
           onSelectRoute={() => undefined}
           onSelectCity={() => undefined}
         />

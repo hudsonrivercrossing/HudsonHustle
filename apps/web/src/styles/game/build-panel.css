@@ -5,9 +5,9 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 340px;
+  width: min(340px, calc(100vw - 24px));
   background: var(--hud-grain), linear-gradient(180deg, oklch(24.35% 0.0172 74.79 / 0.97), oklch(14.65% 0.0057 69.2 / 0.97));
-  border: 1px solid color-mix(in srgb, var(--hud-brass) 52%, oklch(0% 0 0 / 0.34));
+  border: 1px solid color-mix(in oklch, var(--hud-brass) 52%, oklch(0% 0 0 / 0.34));
   border-radius: var(--radius-sm);
   padding: 14px 16px 14px 18px;
   z-index: var(--z-popover);
@@ -36,8 +36,8 @@
   position: absolute;
   top: var(--space-stack-xs, 4px);
   right: var(--space-stack-xs, 4px);
-  width: 28px;
-  height: 28px;
+  width: var(--hit-target-min);
+  height: var(--hit-target-min);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -89,13 +89,12 @@
   font-weight: var(--weight-medium);
   color: color-mix(in oklch, var(--hud-paper-solid) 82%, transparent);
   margin: 4px 0 8px;
-  white-space: nowrap;
 }
 
 .floating-build-panel .choice-chip-button {
   font-size: var(--type-xs) !important;
   padding: 6px 12px !important;
-  min-height: 32px;
+  min-height: var(--hit-target-min);
 }
 
 /* Build popup typography overrides — smaller and tighter for the compact 280px card

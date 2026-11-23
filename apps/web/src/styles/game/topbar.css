@@ -4,7 +4,6 @@
 /* Gameplay HUD visual refinement. Rail widths defined in layout.css on .game-layout. */
 
 .app-shell--gameplay-hud .turn-indicator {
-  grid-column: 2;
   display: flex;
   align-items: center;
   gap: 8px;

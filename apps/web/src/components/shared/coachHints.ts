@@ -22,13 +22,13 @@ export const coachHints: Record<CoachMoment, CoachHintCopy> = {
   "choose-tickets": {
     eyebrow: "Tickets",
     title: "Pick your destinations",
-    body: "Each ticket names two stations. Connect them with your own routes to score its points; an unfinished ticket costs you the same points at the end. Keep the ones that share a path.",
+    body: "Each ticket names two stations. Connect them with your routes to score its points; a ticket you keep and do not finish costs you the same points at the end. Keep the ones that share a path.",
     target: "tickets"
   },
   "your-turn": {
     eyebrow: "Your turn",
     title: "One action per turn",
-    body: "Draw two cards, claim a route by clicking it on the map, build a station by clicking a city, or draw new tickets. Then the turn passes.",
+    body: "Draw two cards, claim a route by choosing it on the map, build a station by choosing a city, or draw new tickets. Then the turn passes.",
     target: "turn"
   },
   "second-card": {
@@ -40,19 +40,19 @@ export const coachHints: Record<CoachMoment, CoachHintCopy> = {
   "route-selected": {
     eyebrow: "Claiming",
     title: "Pay with matching cards",
-    body: "A route costs one card per space, all in one colour. Locomotives stand in for any colour. Grey routes take any single colour. Tunnels can cost up to three extra cards.",
+    body: "A route costs one card per space, all in one color. Locomotives stand in for any color, and gray routes take any single color. A tunnel can cost up to three extra cards; a ferry needs the locomotives it asks for.",
     target: "hand"
   },
   "city-selected": {
     eyebrow: "Stations",
     title: "A station borrows a rival's route",
-    body: "Build one in a city to use a single route another player owns there when your tickets are scored. Each station you keep unbuilt is worth points at the end.",
+    body: "Build one in a city to count a single route another player owns there toward your tickets. The first station costs one card, the second two, the third three. Each one you never build is worth 4 points at the end.",
     target: "hand"
   },
   "final-round": {
     eyebrow: "Final round",
-    title: "Everyone gets one last turn",
-    body: "A player is down to two trains or fewer. After the last turn, tickets, stations and the longest network are scored.",
+    title: "Every other player gets one last turn",
+    body: "A player is down to two trains or fewer, or no route is left to claim. After those last turns, tickets, stations and the longest network are scored.",
     target: "roster"
   }
 };

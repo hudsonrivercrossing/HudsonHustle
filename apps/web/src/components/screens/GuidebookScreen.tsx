@@ -26,12 +26,12 @@ const guideSteps: GuideStep[] = [
     title: "Take one action",
     rule: "On your turn, choose exactly one major move.",
     points: [
-      "Draw transit cards.",
+      "Draw two transit cards. A face-up locomotive counts as both.",
       "Claim one route.",
       "Draw new destination tickets.",
       "Build one station."
     ],
-    note: "After the move is committed, pass play to the next seat."
+    note: "Once the move is made, play passes to the next seat."
   },
   {
     eyebrow: "Tickets",
@@ -40,7 +40,7 @@ const guideSteps: GuideStep[] = [
     points: [
       "At setup, keep at least 2 of your 4 starting tickets.",
       "Later ticket draws make you keep at least 1 and spend the turn.",
-      "Pending means not connected yet. Connected means your owned network already reaches it."
+      "A ticket is stamped Done once your network connects its two stations."
     ],
     note: "Do not take more tickets unless you have time and routes left to finish them."
   },
@@ -53,7 +53,7 @@ const guideSteps: GuideStep[] = [
       "Gray routes still need one single color set.",
       "Longer routes spend more trains and score more points."
     ],
-    note: "Locomotives can help pay routes, but some route types reserve them."
+    note: "Locomotives count as any color. A ferry needs a set number of them."
   },
   {
     eyebrow: "Open routes",
@@ -71,20 +71,20 @@ const guideSteps: GuideStep[] = [
     title: "Check tunnels and ferries",
     rule: "Some routes change the payment before you can claim them.",
     points: [
-      "Tunnels reveal cards after you try to claim; matching colors and locomotives add extra cost.",
-      "If you cannot cover a tunnel surcharge, the claim fails and your turn is spent.",
-      "Ferries require locomotives as part of the payment."
+      "A tunnel turns over three cards when you try to claim it. Each one in your color, and each locomotive, costs one more card.",
+      "If you cannot pay the extra, the claim fails, you keep your cards and the turn is spent.",
+      "A ferry needs locomotives as part of the payment; the route says how many."
     ],
     note: "Do not enter a tunnel with the exact minimum unless you accept the gamble."
   },
   {
     eyebrow: "Stations",
     title: "Rescue one connection",
-    rule: "Stations help tickets at the end, not route claims during play.",
+    rule: "A station helps your tickets. It does not help you claim routes.",
     points: [
       "Each station can borrow exactly 1 adjacent rival route for ticket scoring.",
       "A station does not borrow a rival's whole network.",
-      "Unused stations score bonus points, so building one is a tradeoff."
+      "The first station costs 1 card, the second 2, the third 3, all one color. Each station you never build scores 4 points."
     ],
     note: "Use a station when it saves a big ticket or bypasses a closed crossing."
   },
@@ -102,11 +102,11 @@ const guideSteps: GuideStep[] = [
   {
     eyebrow: "Table modes",
     title: "Bots play the same rules",
-    rule: "Bot seats follow the same route, ticket, and scoring rules as humans.",
+    rule: "Bot seats follow the same rules and score the same way as people.",
     points: [
-      "Local bots advance automatically on the shared laptop.",
-      "Online bots are server-owned and do not use reconnect tokens.",
-      "Human seats keep the normal private hand and reconnect flow."
+      "Bots take their turns by themselves, in a local game and online.",
+      "In a local game the laptop is passed only between the people at the table.",
+      "Online, a player who drops out can come back to the same seat from the same browser."
     ],
     note: "Use bot seats to fill the table without changing the game rules."
   }
@@ -127,7 +127,7 @@ export function GuidebookScreen({ onBack, onReplayTour }: GuidebookScreenProps):
     <main
       className="guidebook-shell"
       style={{
-        ["--setup-gateway-image" as string]: `url("/setup/landing-bg.png")`
+        ["--setup-gateway-image" as string]: `url("/setup/landing-bg.webp")`
       }}
       data-testid="guidebook-screen"
     >
@@ -146,7 +146,7 @@ export function GuidebookScreen({ onBack, onReplayTour }: GuidebookScreenProps):
             </strong>
           </div>
 
-          <article className="guidebook-copy">
+          <article className="guidebook-copy" aria-live="polite">
             <h1 id="guidebook-step-title">{step.title}</h1>
             <p className="guidebook-rule">{step.rule}</p>
             <ul>

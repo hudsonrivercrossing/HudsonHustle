@@ -9,12 +9,13 @@ interface TurnIndicatorProps extends HTMLAttributes<HTMLDivElement> {
 
 export function TurnIndicator({ label, timerLabel = null, ...rest }: TurnIndicatorProps): JSX.Element {
   return (
-    <div className="turn-indicator" role="status" {...rest}>
-      <span className="turn-indicator__name" data-testid="turn-status-banner">
+    <div className="turn-indicator" {...rest}>
+      {/* Only whose turn it is is announced; the clock changes every second and would never stop talking. */}
+      <span className="turn-indicator__name" role="status" data-testid="turn-status-banner">
         {label}
       </span>
       {timerLabel ? (
-        <span className="turn-indicator__timer" data-testid="turn-timer-badge">
+        <span className="turn-indicator__timer" role="timer" aria-live="off" data-testid="turn-timer-badge">
           {timerLabel}
         </span>
       ) : null}

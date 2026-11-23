@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   getAffordableRouteColors,
   getAffordableStationColors,
@@ -208,6 +208,63 @@ export function GameplayScreen({
   );
   const routeUnavailableReason = currentRoute ? getRouteUnavailableReason({ game, config, routeId: currentRoute.id, canAct }) : null;
 
+  const canTakeTurnAction = canAct && game.phase === "main" && game.turn.stage === "idle";
+  const currentRouteClaim = currentRoute ? game.routeClaims.find((claim) => claim.routeId === currentRoute.id) : null;
+  const currentRouteOwner = currentRouteClaim ? game.players.find((player) => player.id === currentRouteClaim.playerId) : null;
+  const currentCityOccupied = currentCity ? game.stations.some((station) => station.cityId === currentCity.id) : false;
+  const stationCost = ruleStationCost(config.settings.stationsPerPlayer, viewer.stationsLeft);
+  const highlightedTicket = focusedTicket ?? pinnedTicket;
+  const highlightedCityIds = useMemo(() => (highlightedTicket ? [highlightedTicket.from, highlightedTicket.to] : []), [highlightedTicket]);
+
+  // The board is handed values that only change when the game does, so the once-a-second timer
+  // tick re-renders this screen without redrawing the map.
+  const boardGame = useMemo(
+    () => ({
+      players: game.players.map((player) => ({ id: player.id, name: player.name, color: player.color })),
+      activePlayerIndex: game.activePlayerIndex,
+      routeClaims: game.routeClaims,
+      stations: game.stations
+    }),
+    [game.players, game.activePlayerIndex, game.routeClaims, game.stations]
+  );
+  const scoreKey = game.players.map((player) => `${player.id}:${player.score}`).join("|");
+  const boardScores = useMemo(() => game.players.map((player) => ({ playerId: player.id, score: player.score })), [scoreKey]);
+  const selectRoute = useCallback((routeId: string, position?: { x: number; y: number }) => {
+    setSelectedRouteId(routeId);
+    setSelectedCityId(null);
+    setPaymentPreview(null);
+    setBuildAnchor(position ?? null);
+  }, []);
+  const selectCity = useCallback((cityId: string, position?: { x: number; y: number }) => {
+    setSelectedCityId(cityId);
+    setSelectedRouteId(null);
+    setPaymentPreview(null);
+    setBuildAnchor(position ?? null);
+  }, []);
+  const cardPalette = visuals.palettes.cards;
+  const playerPalette = visuals.palettes.players;
+  const isInitialTickets = game.phase === "initialTickets";
+  const choosingTickets = pendingTickets.length > 0 && !privateInfoHidden && !ticketChoiceSuppressed;
+  // While tickets are being chosen, a phone shows the ticket tray whichever tab was open.
+  const shownTray = choosingTickets ? "tickets" : tray;
+  const endgameLedgers = game.phase === "gameOver" ? buildEndgameLedgers(game.players, config) : [];
+  // Every player's lines are read out in step; totals wait for the longest list to finish.
+  const endgameTotalBeat = Math.max(0, ...endgameLedgers.map((ledger) => 3 + ledger.completed.length + ledger.failed.length));
+
+  // What just happened is written in the bar and stays there until the next thing happens. Only
+  // something the player must not miss (a refused move, the clock) pops up over the table.
+  const latestNews = notifications.filter((notification) => notification.tone !== "warning").at(-1)?.message ?? null;
+  const [lastMove, setLastMove] = useState<string | null>(null);
+  if (latestNews && latestNews !== lastMove) {
+    setLastMove(latestNews);
+  }
+
+  // The final scoreboard covers the table. What is under it must not take focus or be read out.
+  // React 18 passes `inert` through only as a string attribute.
+  const behindSheet: object = game.phase === "gameOver" ? { inert: "" } : {};
+
+  // These two take over the whole screen. They come after every hook above, so the hooks run in the
+  // same order whichever screen is showing.
   if (guideOpen) {
     return (
       <GuidebookScreen
@@ -225,27 +282,6 @@ export function GameplayScreen({
     return <ReplayScreen game={game} config={config} visuals={visuals} onClose={() => setReplayOpen(false)} />;
   }
 
-  const canTakeTurnAction = canAct && game.phase === "main" && game.turn.stage === "idle";
-  const currentRouteClaim = currentRoute ? game.routeClaims.find((claim) => claim.routeId === currentRoute.id) : null;
-  const currentRouteOwner = currentRouteClaim ? game.players.find((player) => player.id === currentRouteClaim.playerId) : null;
-  const currentCityOccupied = currentCity ? game.stations.some((station) => station.cityId === currentCity.id) : false;
-  const stationCost = ruleStationCost(config.settings.stationsPerPlayer, viewer.stationsLeft);
-  const highlightedTicket = focusedTicket ?? pinnedTicket;
-  const highlightedCityIds = highlightedTicket ? [highlightedTicket.from, highlightedTicket.to] : [];
-  const cardPalette = visuals.palettes.cards;
-  const playerPalette = visuals.palettes.players;
-  const isInitialTickets = game.phase === "initialTickets";
-  const choosingTickets = pendingTickets.length > 0 && !privateInfoHidden && !ticketChoiceSuppressed;
-  // While tickets are being chosen, a phone shows the ticket tray whichever tab was open.
-  const shownTray = choosingTickets ? "tickets" : tray;
-  const endgameLedgers = game.phase === "gameOver" ? buildEndgameLedgers(game.players, config) : [];
-  // Every player's lines are read out in step; totals wait for the longest list to finish.
-  const endgameTotalBeat = Math.max(0, ...endgameLedgers.map((ledger) => 3 + ledger.completed.length + ledger.failed.length));
-
-  // The final scoreboard covers the table. What is under it must not take focus or be read out.
-  // React 18 passes `inert` through only as a string attribute.
-  const behindSheet: object = game.phase === "gameOver" ? { inert: "" } : {};
-
   return (
     <div className="app-shell app-shell--gameplay-hud tabletop" data-config-theme={visuals.theme} data-tray={shownTray}>
       <header className="tabletop__top" {...behindSheet}>
@@ -258,6 +294,9 @@ export function GameplayScreen({
             finalRound={game.finalRoundRemaining !== null && game.phase === "main"}
           />
         </div>
+        <p className="tabletop__news" title={lastMove ?? undefined} aria-live="polite">
+          {lastMove}
+        </p>
         <TurnIndicator label={turnLabel} timerLabel={timerLabel} data-tour-target="turn" />
         <div className="tabletop__menu">
           <Button className="tabletop__menu-button" onClick={() => setGuideOpen(true)}>Guide</Button>
@@ -314,28 +353,13 @@ export function GameplayScreen({
             cardPalette={cardPalette}
             playerPalette={playerPalette}
             viewerPlayerId={viewer.id}
-            game={{
-              players: game.players.map((player) => ({ id: player.id, name: player.name, color: player.color })),
-              activePlayerIndex: game.activePlayerIndex,
-              routeClaims: game.routeClaims,
-              stations: game.stations
-            }}
-            scores={game.players.map((player) => ({ playerId: player.id, score: player.score }))}
+            game={boardGame}
+            scores={boardScores}
             selectedRouteId={selectedRouteId}
             selectedCityId={selectedCityId}
             highlightedCityIds={highlightedCityIds}
-            onSelectRoute={(routeId, position) => {
-              setSelectedRouteId(routeId);
-              setSelectedCityId(null);
-              setPaymentPreview(null);
-              setBuildAnchor(position ?? null);
-            }}
-            onSelectCity={(cityId, position) => {
-              setSelectedCityId(cityId);
-              setSelectedRouteId(null);
-              setPaymentPreview(null);
-              setBuildAnchor(position ?? null);
-            }}
+            onSelectRoute={selectRoute}
+            onSelectCity={selectCity}
           />
 
           {(currentRoute || currentCity) && game.phase === "main" && !privateInfoHidden ? (

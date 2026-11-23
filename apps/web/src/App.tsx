@@ -72,6 +72,7 @@ export default function App(): JSX.Element {
           onLeaveRoom={() => void leaveRoom()}
           timer={room.timer}
           isStarting={room.pendingRequest === "start"}
+          error={room.error}
           realtimeReady={room.realtimeStatus === "subscribed"}
           realtimeMessage={realtimeMessages[room.realtimeStatus]}
         />

@@ -73,9 +73,9 @@
 
 ### Release Layout
 - Example:
-  - `configs/hudson-hustle/releases/v0.1-anchor-prototype/`
-  - `configs/hudson-hustle/releases/v0.2-chelsea-williamsburg/`
-  - `configs/hudson-hustle/releases/v0.3-atlantic-hoboken/`
+  - `configs/hudson-hustle/releases/v0.4-flushing-newark-airport/` (archived)
+  - `configs/hudson-hustle/releases/v0.5-river-crossings/`
+  - `configs/hudson-hustle/releases/berlin/`
 - A release folder should contain the same file set as a draft:
   - `meta.json`
   - `map.json`
@@ -130,9 +130,9 @@
 {
   "schemaVersion": 1,
   "gameId": "hudson-hustle",
-  "activeConfigId": "current-working",
-  "activeConfigPath": "configs/hudson-hustle/drafts/current-working",
-  "mode": "draft"
+  "activeConfigId": "v0.5-river-crossings",
+  "activeConfigPath": "configs/hudson-hustle/releases/v0.5-river-crossings",
+  "mode": "release"
 }
 ```
 

@@ -9,7 +9,7 @@
 - `Battery Park` was drawn on the Brooklyn shore; it is now at the tip of Manhattan.
 - `newark-airport-hudson-yards` keeps its length, colour and type. It used to run along the left and top edges of the board, where it read as a frame; it now curves through New Jersey a little inside the edge.
 - Board labels show full station names, matching tickets.
-- Uses basemap `nyc-hudson-ai-reference-v2.png`: the band that was painted along the left and top edges of v1 is removed.
+- Uses basemap `nyc-hudson-ai-reference-v2.webp`: the band that was painted along the left and top edges of v1 is removed.
 
 ## Space Sizes
 - Stations were nudged so the spaces on different routes are closer in size; lengths are unchanged. Downtown Brooklyn and Red Hook sit nearer the harbor mouth, Grove St nearer Hoboken, Newark Penn and Jamaica a little closer in.

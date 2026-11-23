@@ -1,3 +1,12 @@
+/* Until Fraunces arrives, headings are set in Georgia narrowed to Fraunces's width (measured: bold
+   Fraunces sets the same text at 82% of Georgia's width), so they do not reflow when it swaps in.
+   IBM Plex Sans is within two percent of Arial and needs no such stand-in. */
+@font-face {
+  font-family: "Fraunces Fallback";
+  src: local("Georgia Bold"), local("Georgia");
+  size-adjust: 82%;
+}
+
 :root {
   /* The whole app is one dark theme. There is no light variant and the OS setting does not change it. */
   color-scheme: dark;
@@ -9,7 +18,6 @@
   --color-ink-strong: oklch(92.7% 0.0311 86.46);
   --color-ink-muted: oklch(69.47% 0.0443 66.99);
   --color-border-subtle: oklch(81.74% 0.0633 74.68 / 0.13);
-  --color-accent-base: oklch(66.62% 0.1038 246.04);
   --color-accent-strong: oklch(58.78% 0.1144 251.04);
   --color-setup-station-enamel: oklch(19.15% 0.0162 244.65 / 0.94);
   --color-setup-station-enamel-soft: oklch(24.64% 0.0186 241.89 / 0.9);
@@ -40,17 +48,17 @@
   --radius-xs: var(--radius-1);
   --radius-card: 6px;        /* transit cards and ticket stubs */
   --radius-map-tile: 3px;    /* transit route tile segments */
-  --radius-map-line: 2px;    /* transit line end caps */
   --radius-map-marker: 1px;  /* ferry / tunnel micro markers */
 
   /* --- Border Width --- */
   --border-thin: 1px;
   --border-medium: 2px;
+  --state-danger-ink: oklch(42% 0.15 28);     /* a failed ticket or a refused tunnel, written on paper */
   --focus-ring: oklch(83.88% 0.0602 81.93);   /* keyboard focus on any dark surface */
 
   /* --- Control Sizing --- */
-  --control-height-row: 38px;      /* compact button/row variant */
-  --control-height-base: 42px;     /* standard interactive control (matches system-button) */
+  --control-height-row: 40px;      /* compact button/row variant */
+  --control-height-base: 44px;     /* standard interactive control, and the smallest comfortable touch target */
   --hit-target-min: 44px;          /* smallest pointer target; small controls extend to it with a pseudo-element */
 
   /* --- Motion Scale --- */
@@ -70,9 +78,9 @@
   --space-panel-md: 16px;
 
   /* --- Font Families --- */
-  --font-display: "Fraunces", Georgia, serif;
-  --font-body: "IBM Plex Sans", "Segoe UI", sans-serif;
-  --font-setup: "IBM Plex Sans", "Segoe UI", sans-serif;
+  --font-display: "Fraunces", "Fraunces Fallback", Georgia, serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-setup: var(--font-body);
 
   /* --- Type Scale (major-second 1.125) --- */
   --type-2xs: 0.6875rem;     /* 11px  — HUD micro-labels, badge counters, tight indicators */
@@ -98,12 +106,12 @@
   --type-utility-xs: var(--type-xs);
 
   /* --- Font Weight Scale --- only weights the loaded fonts really have; anything else is synthesized and blurry */
+  --weight-regular: 400;    /* running text */
   --weight-medium: 500;     /* labels, emphasized body */
   --weight-semibold: 600;   /* buttons, titles */
   --weight-bold: 700;       /* headings, numerals, eyebrows */
 
   /* --- Line Height Scale --- */
-  --lh-snug: 1.2;           /* small titles, compact headings */
   --lh-normal: 1.4;         /* body text, labels */
 
   /* --- Letter Spacing Scale --- */
@@ -132,7 +140,6 @@
   --danger: var(--color-danger);
   --radius-ticket: var(--radius-2);
   --radius-slot: var(--radius-2);
-  --radius-panel: var(--radius-3);
   /* Stacking order, lowest to highest. Only the order matters; add new layers by name, never by number. */
   --z-behind-2: -2;
   --z-behind: -1;

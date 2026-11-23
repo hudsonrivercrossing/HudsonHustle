@@ -596,7 +596,7 @@ describe("New York Harbor layout", () => {
     const landmarks = hudsonHustleBackdrop.landmarks ?? [];
     const themeLines = hudsonHustleBackdrop.themeLines ?? [];
 
-    expect(hudsonHustleBackdrop.image?.href).toBe("/basemaps/nyc-hudson-ai-reference-v2.png");
+    expect(hudsonHustleBackdrop.image?.href).toBe("/basemaps/nyc-hudson-ai-reference-v2.webp");
     expect(hudsonHustleBackdrop.image?.opacity ?? 1).toBeLessThanOrEqual(1);
     expect(hudsonHustleBackdrop.image?.preserveAspectRatio).toBe("none");
     expect(existsSync(path.resolve("../../apps/web/public", hudsonHustleBackdrop.image!.href.slice(1)))).toBe(true);

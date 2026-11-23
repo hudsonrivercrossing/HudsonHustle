@@ -312,13 +312,23 @@
   outline: none;
 }
 
+/* Dark ink with a pale glow, so focus shows on the light and the dark parts of either map. */
 .route-hitbox:focus-visible {
-  stroke: color-mix(in srgb, var(--color-accent-base) 55%, transparent);
+  stroke: color-mix(in oklch, var(--hud-ink) 62%, transparent);
+  filter: drop-shadow(0 0 3px var(--hud-paper-bright));
 }
 
 .city-hitbox:focus-visible {
-  stroke: var(--color-accent-base);
-  stroke-width: 6;
+  stroke: var(--hud-ink);
+  stroke-width: 7;
+  filter: drop-shadow(0 0 3px var(--hud-paper-bright));
+}
+
+/* A board that is only looked at takes no clicks. */
+.board-map--static .route-hitbox,
+.board-map--static .city-hitbox,
+.board-map--static .city-touch {
+  pointer-events: none;
 }
 
 /* The score track frames the board, as on a printed one. */
@@ -410,5 +420,17 @@
   from {
     opacity: 0;
     transform: translateY(-10px) scale(1.12);
+  }
+}
+
+.city-touch {
+  fill: transparent;
+  cursor: pointer;
+}
+
+/* Under a finger a route's target is wider than under a mouse. */
+@media (pointer: coarse) {
+  .route-hitbox {
+    stroke-width: 44px;
   }
 }

@@ -112,8 +112,8 @@ export function CreateRoomFlow({
               const isBotSeat = botSeatIds.includes(seatId);
               return {
                 id: seatId,
-                title: seatId,
-                meta: isHostSeat ? "Host seat" : isBotSeat ? `Bot ${index}` : "Open human seat",
+                title: `Seat ${index + 1}`,
+                meta: isHostSeat ? "You, the host" : isBotSeat ? "Played by a bot" : "Open for a friend to join",
                 isBot: isBotSeat,
                 testId: `seat-plan-${seatId}`,
                 action: isHostSeat ? (

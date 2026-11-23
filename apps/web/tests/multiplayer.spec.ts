@@ -83,7 +83,7 @@ async function createRoom(
     await createPanel.getByTestId(`seat-plan-toggle-${seatId}`).click();
   }
   for (let index = 0; index < timerAdjustments; index += 1) {
-    await createPanel.getByRole("button", { name: "+15" }).click();
+    await createPanel.getByRole("button", { name: "15 seconds more" }).click();
   }
   await expect(createPanel.locator(".timer-picker__value")).toHaveText(expectedTimerText);
   await createPanel.getByRole("button", { name: "Create room" }).click();
@@ -105,8 +105,8 @@ async function joinRoom(
   const playerName = options?.playerName ?? "Guest";
   await joinPanel.getByLabel("Room code").fill(roomCode);
   await joinPanel.getByRole("button", { name: "Preview" }).click();
-  await expect(page.getByRole("button", { name: seatId })).toBeVisible();
-  await page.getByRole("button", { name: seatId }).click();
+  await expect(page.getByRole("button", { name: `Seat ${seatId.replace("seat-", "")}` })).toBeVisible();
+  await page.getByRole("button", { name: `Seat ${seatId.replace("seat-", "")}` }).click();
   await joinPanel.getByRole("button", { name: "Enter table" }).click();
   await joinPanel.getByLabel("Your name").fill(playerName);
   await joinPanel.getByRole("button", { name: "Join room" }).click();
@@ -233,7 +233,7 @@ test("join flow clears stale seat selections when previewing a different room", 
   const joinPanel = await openJoinRoomPanel(guestPage);
   await joinPanel.getByLabel("Room code").fill(firstRoom.roomCode);
   await joinPanel.getByRole("button", { name: "Preview" }).click();
-  const seatThreeButton = guestPage.getByRole("button", { name: "seat-3" });
+  const seatThreeButton = guestPage.getByRole("button", { name: "Seat 3" });
   await seatThreeButton.click();
   await expect(seatThreeButton).toHaveClass(/chip-button--selected/);
 
@@ -247,7 +247,7 @@ test("join flow clears stale seat selections when previewing a different room", 
 
   await expect(guestPage.getByText("1 open").first()).toBeVisible();
   await expect(guestPage.getByTestId("join-room-panel").getByRole("button", { name: "Enter table" })).toBeDisabled();
-  await expect(guestPage.getByRole("button", { name: "seat-2" })).toBeVisible();
+  await expect(guestPage.getByRole("button", { name: "Seat 2" })).toBeVisible();
 
   await hostOneContext.close();
   await hostTwoContext.close();
@@ -432,10 +432,10 @@ test("normal setup can create a mixed room with multiple bot seats and only leav
   const joinPanel = await openJoinRoomPanel(guestPage);
   await joinPanel.getByLabel("Room code").fill(roomCode);
   await joinPanel.getByRole("button", { name: "Preview" }).click();
-  await expect(guestPage.getByRole("button", { name: "seat-4" })).toBeVisible();
-  await expect(guestPage.getByRole("button", { name: "seat-2" })).toHaveCount(0);
-  await expect(guestPage.getByRole("button", { name: "seat-3" })).toHaveCount(0);
-  await guestPage.getByRole("button", { name: "seat-4" }).click();
+  await expect(guestPage.getByRole("button", { name: "Seat 4" })).toBeVisible();
+  await expect(guestPage.getByRole("button", { name: "Seat 2" })).toHaveCount(0);
+  await expect(guestPage.getByRole("button", { name: "Seat 3" })).toHaveCount(0);
+  await guestPage.getByRole("button", { name: "Seat 4" }).click();
   await joinPanel.getByRole("button", { name: "Enter table" }).click();
   await joinPanel.getByLabel("Your name").fill("Guest");
   await joinPanel.getByRole("button", { name: "Join room" }).click();

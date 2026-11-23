@@ -69,7 +69,7 @@ export function OnlineGameScreen({ room, snapshot, playerId, notices, onLeave }:
       avatarSeed={roomCode}
       turnLabel={activePlayer?.id === playerId ? "Your turn" : `Waiting for ${activePlayerName}`}
       timerLabel={secondsRemaining !== null ? `${secondsRemaining}s left` : turnTimeLimitSeconds > 0 ? `Timer ${turnTimeLimitSeconds}s` : null}
-      sidePanel={<ChatPanel messages={room.chatMessages} onSendMessage={room.sendChatMessage} />}
+      sidePanel={<ChatPanel messages={room.chatMessages} ownSeatId={room.credentials?.seatId ?? null} onSendMessage={room.sendChatMessage} canSend={!offline} />}
       notifications={[...notifications, ...notices]}
       connectionNotice={offline ? "Connection lost. Reconnecting…" : null}
       onAction={room.sendGameAction}

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { memo, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { getCityName, type MapConfig } from "@hudson-hustle/game-core";
 import { labelAnchorPoint, pathLength, pathNormal, pointAlong, routePath, routeSpaces, type BoardBackdrop, type BoardPoint2, type SnapshotVisuals } from "@hudson-hustle/game-data";
 import { ColorMark, colorMarkInk } from "./ColorMark";
@@ -30,6 +30,33 @@ interface BoardMapProps {
   scores?: Array<{ playerId: string; score: number }>;
   onSelectRoute: (routeId: string, position?: { x: number; y: number }) => void;
   onSelectCity: (cityId: string, position?: { x: number; y: number }) => void;
+  /** False for a board that is only looked at, as in a replay: nothing on it takes focus or clicks. */
+  interactive?: boolean;
+}
+
+const ARROWS: Record<string, { dx: number; dy: number }> = {
+  ArrowLeft: { dx: -1, dy: 0 },
+  ArrowRight: { dx: 1, dy: 0 },
+  ArrowUp: { dx: 0, dy: -1 },
+  ArrowDown: { dx: 0, dy: 1 }
+};
+
+/** The nearest target lying in the direction of an arrow key, preferring ones straight ahead. */
+function nextTarget<T extends { id: string; x: number; y: number }>(targets: T[], from: T, direction: { dx: number; dy: number }): T | null {
+  let best: T | null = null;
+  let bestCost = Number.POSITIVE_INFINITY;
+  for (const target of targets) {
+    if (target.id === from.id) continue;
+    const ahead = (target.x - from.x) * direction.dx + (target.y - from.y) * direction.dy;
+    const aside = Math.abs((target.x - from.x) * direction.dy) + Math.abs((target.y - from.y) * direction.dx);
+    if (ahead <= 0 || aside > ahead * 1.5) continue;
+    const cost = ahead + aside * 2;
+    if (cost < bestCost) {
+      best = target;
+      bestCost = cost;
+    }
+  }
+  return best;
 }
 
 /** Enter or Space on a route or station opens its panel, anchored to the element's centre. */
@@ -42,7 +69,11 @@ function activateFromKeyboard(event: KeyboardEvent<SVGElement>, activate: (posit
   activate({ x: box.left + box.width / 2, y: box.top + box.height / 2 });
 }
 
-export function BoardMap({
+/**
+ * The board. It is memoised: the table re-renders every second while a turn timer runs, and the
+ * board, with its hundred-odd train cars, only needs to when the game or the selection changes.
+ */
+export const BoardMap = memo(function BoardMap({
   config,
   backdrop,
   backdropMode,
@@ -56,8 +87,38 @@ export function BoardMap({
   highlightedCityIds = [],
   scores,
   onSelectRoute,
-  onSelectCity
+  onSelectCity,
+  interactive = true
 }: BoardMapProps): JSX.Element {
+  // The board is one stop in the tab order. Inside it the arrow keys move between stations and
+  // routes by where they are on the map, and Enter or Space opens the one in focus.
+  const navTargets = useMemo(
+    () => [
+      ...config.cities.map((city) => ({ id: `city:${city.id}`, x: city.x, y: city.y })),
+      ...config.routes.map((route) => {
+        const path = routePath(route, config);
+        return { id: `route:${route.id}`, ...pointAlong(path, pathLength(path) / 2) };
+      })
+    ],
+    [config]
+  );
+  const [navId, setNavId] = useState(() => navTargets[0]?.id ?? "");
+  const svgRef = useRef<SVGSVGElement>(null);
+  const moveFocus = (event: KeyboardEvent<SVGSVGElement>) => {
+    const direction = ARROWS[event.key];
+    const from = navTargets.find((target) => target.id === navId);
+    if (!direction || !from) return;
+    event.preventDefault();
+    const next = nextTarget(navTargets, from, direction);
+    if (next) {
+      setNavId(next.id);
+      svgRef.current?.querySelector<SVGElement>(`[data-nav-id="${next.id}"]`)?.focus();
+    }
+  };
+  /** What makes a route or station reachable: one of them holds the tab stop, the rest wait for the arrows. */
+  const navProps = (id: string) =>
+    interactive ? { tabIndex: navId === id ? 0 : -1, role: "button", "data-nav-id": id, onFocus: () => setNavId(id) } : { "aria-hidden": true };
+
   const activePlayerId = game.players[game.activePlayerIndex]?.id;
   const claimViewerPlayerId = viewerPlayerId ?? activePlayerId;
   const boardWidth = 1200;
@@ -109,10 +170,12 @@ export function BoardMap({
   return (
     <div className="board-shell">
       <svg
-        className={`board-map board-map--${backdropMode}`}
+        ref={svgRef}
+        className={`board-map board-map--${backdropMode}${interactive ? "" : " board-map--static"}`}
         viewBox={`${-frame} ${-frame} ${boardWidth + frame * 2} ${boardHeight + frame * 2}`}
         role="group"
-        aria-label="Board map: routes and stations"
+        aria-label={interactive ? "Board map. Arrow keys move between stations and routes; Enter opens one." : "Board map"}
+        onKeyDown={interactive ? moveFocus : undefined}
       >
         {scores ? (
           <g className="score-track" aria-hidden="true">
@@ -418,8 +481,7 @@ export function BoardMap({
                 strokeLinecap="round"
                 onClick={(event) => onSelectRoute(route.id, { x: event.clientX, y: event.clientY })}
                 onKeyDown={(event) => activateFromKeyboard(event, (position) => onSelectRoute(route.id, position))}
-                tabIndex={0}
-                role="button"
+                {...navProps(`route:${route.id}`)}
                 aria-label={[
                   `${getCityName(config, route.from)} to ${getCityName(config, route.to)}`,
                   `${route.length} train${route.length === 1 ? "" : "s"}`,
@@ -454,6 +516,8 @@ export function BoardMap({
                   className="city-highlight-ring"
                 />
               ) : null}
+              {/* A wider, unseen target under the station, so a finger does not have to land on a 12-unit dot. */}
+              <circle cx={city.x} cy={city.y} r="24" className="city-touch" onClick={(event) => onSelectCity(city.id, { x: event.clientX, y: event.clientY })} />
               <circle
                 cx={city.x}
                 cy={city.y}
@@ -463,8 +527,7 @@ export function BoardMap({
                 strokeWidth="3"
                 onClick={(event) => onSelectCity(city.id, { x: event.clientX, y: event.clientY })}
                 onKeyDown={(event) => activateFromKeyboard(event, (position) => onSelectCity(city.id, position))}
-                tabIndex={0}
-                role="button"
+                {...navProps(`city:${city.id}`)}
                 aria-label={`${city.name} station${station ? ", station built" : ""}`}
                 aria-pressed={selected}
                 className="city-hitbox"
@@ -517,4 +580,4 @@ export function BoardMap({
       ) : null}
     </div>
   );
-}
+});

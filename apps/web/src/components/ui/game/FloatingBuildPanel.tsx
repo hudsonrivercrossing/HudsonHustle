@@ -41,7 +41,7 @@ export function FloatingBuildPanel({ children, onClose, anchor = null, className
   useDialogFocus(ref, { onEscape: onClose });
 
   const style: React.CSSProperties = pos
-    ? { position: "fixed", top: pos.top, left: pos.left, width: PANEL_WIDTH }
+    ? { position: "fixed", top: pos.top, left: pos.left }
     : {};
 
   return (

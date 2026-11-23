@@ -81,10 +81,9 @@ Implementation rules:
 ## Code Direction
 
 When design implementation is in progress, code should organize around:
-- `apps/web/src/design/tokens.ts`
-- `apps/web/src/design/theme.css`
-- `apps/web/src/components/system/`
-- `apps/web/src/components/system/game/`
+- `apps/web/src/styles/theme.css` — every token, the single source of truth
+- `apps/web/src/components/ui/primitives/` — game-agnostic pieces
+- `apps/web/src/components/ui/game/` — board, cards, tickets, seats
 - `apps/web/src/components/setup/`
 
 Only extract primitives proven necessary by the current slice:

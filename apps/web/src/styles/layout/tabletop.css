@@ -17,10 +17,22 @@
 
 .tabletop__top {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto auto;
   gap: var(--space-stack-md);
   align-items: center;
   min-height: var(--hit-target-min);
+}
+
+/* The last thing that happened at the table, said once in the bar instead of popping up over the board. */
+.tabletop__news {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--hud-paper-soft);
+  font-size: var(--type-sm);
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* The bar sits above the table, so what opens from it (the scoring note) is not covered by the board or the cards. */
@@ -191,6 +203,11 @@
     grid-area: top;
     grid-template-columns: minmax(0, 1fr) auto;
     gap: var(--space-stack-xs);
+  }
+
+  /* A phone has no spare line in the bar, so there the news still pops up. */
+  .tabletop__news {
+    display: none;
   }
 
   .tabletop__seats {

@@ -103,6 +103,7 @@
 .endgame-card--winner {
   outline: 3px solid var(--hud-brass);
   outline-offset: 3px;
+  animation: winner-frame 320ms cubic-bezier(0.32, 0.72, 0, 1) both;
 }
 
 .endgame-card__header {
@@ -199,7 +200,7 @@
 
 .endgame-breakdown__row--failed dt,
 .endgame-breakdown__row--failed dd {
-  color: var(--state-danger-ink, var(--hud-ink));
+  color: var(--state-danger-ink);
 }
 
 .endgame-breakdown__row--total {
@@ -232,10 +233,6 @@
 .endgame-card__rank,
 .endgame-score {
   animation: ledger-line 260ms cubic-bezier(0.32, 0.72, 0, 1) both;
-}
-
-.endgame-card--winner {
-  animation: winner-frame 320ms cubic-bezier(0.32, 0.72, 0, 1) both;
 }
 
 .game-over-layer--settled * {

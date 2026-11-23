@@ -50,6 +50,33 @@ function declarations() {
   return found;
 }
 
+/** Selectors written more than once at the top level of a file (rules inside @media are not compared). */
+function repeatedSelectors(file) {
+  const seen = new Set();
+  const repeated = [];
+  let depth = 0;
+  let buffer = "";
+  for (const character of file.text) {
+    if (character === "{") {
+      const selector = buffer.replace(/\s+/g, " ").trim();
+      if (depth === 0 && selector && !selector.startsWith("@")) {
+        if (seen.has(selector)) repeated.push(`${file.name} ${selector.slice(0, 80)}`);
+        seen.add(selector);
+      }
+      depth += 1;
+      buffer = "";
+    } else if (character === "}") {
+      depth -= 1;
+      buffer = "";
+    } else if (character === ";") {
+      buffer = "";
+    } else {
+      buffer += character;
+    }
+  }
+  return repeated;
+}
+
 const allDeclarations = declarations();
 const definedTokens = new Set();
 for (const file of cssFiles) {
@@ -107,6 +134,14 @@ const metrics = {
   literalSpacing: allDeclarations
     .filter((entry) => /^(gap|row-gap|column-gap|padding|margin)(-|$)/.test(entry.property) && /\b[3-9]px|\b\d{2,}px/.test(entry.value) && !entry.value.includes("var("))
     .map((entry) => `${where(entry)} ${entry.property}: ${entry.value}`),
+  // Tints are mixed in OKLCH; a mix in sRGB drifts in hue and is not allowed to spread.
+  srgbMixes: allDeclarations.filter((entry) => /color-mix\(\s*in\s+srgb/i.test(entry.value)).map((entry) => `${where(entry)} ${entry.property}`),
+  // A token reached only through a fallback is a token nobody defined: the fallback is all that ever applies.
+  fallbackOnlyTokens: [...usedTokens.entries()]
+    .filter(([token, uses]) => !definedTokens.has(token) && uses.some((use) => use.hasFallback))
+    .map(([token, uses]) => `${where(uses.find((use) => use.hasFallback))} ${token}`),
+  // One rule per selector per file.
+  duplicateSelectors: componentCss.flatMap((file) => repeatedSelectors(file)),
   transitionAll: allDeclarations
     .filter((entry) => entry.property === "transition" && /^all\b/.test(entry.value))
     .map((entry) => `${where(entry)}`)

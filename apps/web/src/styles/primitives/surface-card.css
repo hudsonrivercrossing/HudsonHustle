@@ -44,7 +44,7 @@
   letter-spacing: 0.16em;
   font-size: var(--type-utility-xs);
   font-weight: var(--weight-bold);
-  color: color-mix(in srgb, var(--accent-strong) 34%, var(--ink-soft) 66%);
+  color: color-mix(in oklch, var(--accent-strong) 34%, var(--ink-soft) 66%);
 }
 
 .surface-card__row {
@@ -123,7 +123,7 @@
   border-radius: var(--radius-pill);
   background: linear-gradient(180deg, oklch(99.2% 0.0073 80.72 / 0.98), oklch(93.35% 0.0246 83.42 / 0.88));
   border: 1px solid color-mix(in oklch, var(--border-warm-solid) 12%, transparent);
-  color: color-mix(in srgb, var(--ink-soft) 80%, var(--accent-strong) 20%);
+  color: color-mix(in oklch, var(--ink-soft) 80%, var(--accent-strong) 20%);
   font-size: var(--type-sm);
   font-weight: var(--weight-bold);
   letter-spacing: 0.01em;

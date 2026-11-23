@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import type { RoomSummary } from "@hudson-hustle/game-core";
 import { FormField } from "../ui/primitives/FormField";
 import { Button } from "../ui/primitives/Button";
@@ -45,8 +46,20 @@ export function JoinRoomFlow({
 }: JoinRoomFlowProps): JSX.Element {
   const codeComplete = joinRoomCode.length >= ROOM_CODE_LENGTH;
 
+  // Each step replaces the last one on screen. Focus goes with it, to the step's first control,
+  // instead of falling back to the top of the page.
+  const rootRef = useRef<HTMLDivElement>(null);
+  const firstRender = useRef(true);
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    rootRef.current?.querySelector<HTMLElement>("input, .token-button, button:not([disabled])")?.focus();
+  }, [step]);
+
   return (
-    <div className="setup-flow-grid setup-flow-grid--join" data-testid="join-room-panel">
+    <div className="setup-flow-grid setup-flow-grid--join" data-testid="join-room-panel" ref={rootRef}>
       {step === 0 ? (
         <SetupStepPanel eyebrow="Now" title="Room code" meta="Check the table before choosing a seat">
           <form
@@ -109,7 +122,7 @@ export function JoinRoomFlow({
               {openSeats.map((seat) => (
                 <TokenButton
                   key={seat.seatId}
-                  label={seat.seatId}
+                  label={`Seat ${seat.seatId.replace("seat-", "")}`}
                   tone="open"
                   selected={preferredSeatId === seat.seatId}
                   onClick={() => onChangePreferredSeatId(seat.seatId)}

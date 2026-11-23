@@ -24,6 +24,8 @@ interface LobbyScreenProps {
   realtimeMessage: string | null;
   /** The start request is on its way. */
   isStarting?: boolean;
+  /** Why the last thing the player tried here did not work. */
+  error?: string | null;
 }
 
 type SeatStatus = { label: string; tone: "neutral" | "info" | "danger" | "success" | "warning" };
@@ -73,18 +75,21 @@ export function LobbyScreen({
   timer,
   realtimeReady,
   realtimeMessage,
-  isStarting = false
+  isStarting = false,
+  error = null
 }: LobbyScreenProps): JSX.Element {
-  const setupHeroImageUrl = "/setup/landing-bg.png";
+  const setupHeroImageUrl = "/setup/landing-bg.webp";
   const localSeat = room.seats.find((seat) => seat.seatId === localSeatId);
   const seatAvatars = shuffleAvatars(room.roomCode, room.seats.length);
   const canStart = realtimeReady && localSeat?.isHost && room.seats.every((seat) => seat.playerName) && room.seats.every((seat) => seat.ready);
   const occupiedCount = room.seats.filter((seat) => seat.playerName).length;
   const readyCount = room.seats.filter((seat) => seat.ready).length;
-  const lobbyTone = realtimeMessage ? "danger" : canStart ? "active" : "waiting";
+  const lobbyTone = realtimeMessage || error ? "danger" : canStart ? "active" : "waiting";
   const { headline: lobbyHeadline, copy: lobbyCopy } = realtimeMessage
     ? { headline: "Connection lost.", copy: realtimeMessage }
-    : describeLobby(room, localSeat, Boolean(canStart));
+    : error
+      ? { headline: "That did not work.", copy: error }
+      : describeLobby(room, localSeat, Boolean(canStart));
   const lobbyPreflight = (
     <div className="setup-preflight-card">
       <span className="setup-preflight-card__eyebrow">Room board</span>
@@ -153,7 +158,7 @@ export function LobbyScreen({
                 <img
                   className={`seat-avatar ${isEmpty ? "seat-avatar--empty" : ""}`}
                   src={`/avatars/avatar-${avatarName}.svg`}
-                  alt={`${seat.playerName || "Open seat"} avatar`}
+                  alt=""
                 />
                 <div className="row-object__main">
                   <strong className="row-object__title">
