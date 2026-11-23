@@ -362,20 +362,6 @@
       "labelDx": -16,
       "labelDy": 6,
       "labelAnchor": "end"
-    },
-    {
-      "id": "huangchuan",
-      "name": "潢川",
-      "label": "潢川",
-      "active": true,
-      "tier": "other",
-      "lat": 32.13,
-      "lon": 115.05,
-      "boardX": 1010,
-      "boardY": 800,
-      "labelDx": 18,
-      "labelDy": 6,
-      "labelAnchor": "start"
     }
   ],
   "routes": [
@@ -703,15 +689,6 @@
       "waypoints": []
     },
     {
-      "id": "xinyang-huangchuan",
-      "from": "xinyang",
-      "to": "huangchuan",
-      "length": 4,
-      "color": "amber",
-      "type": "normal",
-      "waypoints": []
-    },
-    {
       "id": "xinyang-zhumadian",
       "from": "xinyang",
       "to": "zhumadian",
@@ -808,15 +785,6 @@
       "to": "shangqiu",
       "length": 4,
       "color": "ivory",
-      "type": "normal",
-      "waypoints": []
-    },
-    {
-      "id": "shangqiu-huangchuan",
-      "from": "shangqiu",
-      "to": "huangchuan",
-      "length": 6,
-      "color": "violet",
       "type": "normal",
       "waypoints": []
     },

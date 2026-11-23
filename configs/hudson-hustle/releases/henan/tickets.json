@@ -250,20 +250,6 @@
       "notes": []
     },
     {
-      "id": "t-huangchuan-zhoukou",
-      "from": "huangchuan",
-      "to": "zhoukou",
-      "points": 10,
-      "notes": []
-    },
-    {
-      "id": "t-huangchuan-zhumadian",
-      "from": "huangchuan",
-      "to": "zhumadian",
-      "points": 6,
-      "notes": []
-    },
-    {
       "id": "t-lankao-xinxiang",
       "from": "lankao",
       "to": "xinxiang",
@@ -352,6 +338,20 @@
       "from": "xixia",
       "to": "luoyang",
       "points": 5,
+      "notes": []
+    },
+    {
+      "id": "t-zhumadian-kaifeng",
+      "from": "zhumadian",
+      "to": "kaifeng",
+      "points": 8,
+      "notes": []
+    },
+    {
+      "id": "t-zhoukou-luoyang",
+      "from": "zhoukou",
+      "to": "luoyang",
+      "points": 8,
       "notes": []
     }
   ]

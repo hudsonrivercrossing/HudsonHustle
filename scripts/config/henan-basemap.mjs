@@ -15,6 +15,8 @@ import { fileURLToPath } from "node:url";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const outPath = path.join(rootDir, "apps/web/public/basemaps/henan-central-plains-v1.webp");
+/** The names on the sheet are set in LXGW WenKai, from the subset the app serves (see henan-font-subset.mjs). */
+const fontPath = path.join(rootDir, "apps/web/public/fonts/lxgw-wenkai-henan-medium.woff2");
 const WIDTH = 1200;
 const HEIGHT = 900;
 const SCALE = 4 / 3; // rendered at 1600 x 1200
@@ -75,7 +77,7 @@ const ranges = [
 ];
 
 // Names written on the sheet. Kept clear of routes and station names; `--preview` shows any that are not.
-const names = [
+export const names = [
   { text: "黄河", x: 250, y: 300, size: 19, rotate: -1, tone: "water" },
   { text: "黄河", x: 884, y: 276, size: 19, rotate: 1, tone: "water" },
   { text: "淮河", x: 906, y: 742, size: 16, rotate: -4, tone: "water" },
@@ -189,8 +191,9 @@ function compass() {
 export function basemapSvg() {
   const provincePath = smoothPath(province, true);
   const river = smoothPath(yellowRiver);
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${WIDTH} ${HEIGHT}" width="${WIDTH * SCALE}" height="${HEIGHT * SCALE}" font-family="'Kaiti SC','STKaiti','KaiTi','Songti SC',serif">
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${WIDTH} ${HEIGHT}" width="${WIDTH * SCALE}" height="${HEIGHT * SCALE}" font-family="'LXGW WenKai','Kaiti SC','STKaiti','KaiTi','Songti SC',serif">
   <defs>
+    <style>@font-face { font-family: "LXGW WenKai"; src: url("data:font/woff2;base64,${readFileSync(fontPath).toString("base64")}") format("woff2"); }</style>
     <filter id="paper" x="0" y="0" width="100%" height="100%">
       <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="4" seed="7" result="cloud"/>
       <feColorMatrix in="cloud" type="matrix" values="0 0 0 0 0.45  0 0 0 0 0.36  0 0 0 0 0.2  0.9 0.2 0 0 -0.42" result="stain"/>

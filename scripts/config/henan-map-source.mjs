@@ -40,8 +40,7 @@ export const stations = [
   S("xixia", "西峡", "other", 33.3, 111.48, 160, 645, 0, 34, "middle"),
   S("laojun-mountain", "老君山", "other", 33.75, 111.6, 205, 515, -16, 6, "end"),
   S("xinyang", "信阳", "anchor", 32.15, 114.09, 760, 830, 14, 30, "start"),
-  S("jigong-mountain", "鸡公山", "other", 31.8, 114.07, 640, 870, -16, 6, "end"),
-  S("huangchuan", "潢川", "other", 32.13, 115.05, 1010, 800, 18, 6, "start")
+  S("jigong-mountain", "鸡公山", "other", 31.8, 114.07, 640, 870, -16, 6, "end")
 ];
 
 // from, to, length, colour, type, options: { twin, bend, via, loco }
@@ -75,7 +74,6 @@ export const routes = [
   R("pingdingshan", "nanyang", 3, "ivory"),
   R("nanyang", "xinyang", 5, "obsidian", "tunnel"),
   R("xinyang", "jigong-mountain", 2, "gray", "tunnel"),
-  R("xinyang", "huangchuan", 4, "amber"),
   R("xinyang", "zhumadian", 2, "cobalt"),
   R("zhumadian", "luohe", 2, "violet", "normal", { twin: "zhumadian-luohe", bend: 14, suffix: "a" }),
   R("zhumadian", "luohe", 2, "rose", "normal", { twin: "zhumadian-luohe", bend: -14, suffix: "b" }),
@@ -85,7 +83,6 @@ export const routes = [
   R("xuchang", "pingdingshan", 3, "cobalt"),
   // East
   R("zhoukou", "shangqiu", 4, "ivory"),
-  R("shangqiu", "huangchuan", 6, "violet"),
   R("shangqiu", "lankao", 3, "rose"),
   R("lankao", "kaifeng", 2, "obsidian"),
   R("lankao", "puyang", 4, "crimson", "ferry", { loco: 1 }),
@@ -195,8 +192,6 @@ export const regularTickets = [
   T("laojun-mountain", "nanyang"),
   T("xixia", "pingdingshan"),
   T("jigong-mountain", "luohe"),
-  T("huangchuan", "zhoukou"),
-  T("huangchuan", "zhumadian"),
   T("lankao", "xinxiang"),
   T("luoyang", "shangqiu"),
   T("xinxiang", "nanyang"),
@@ -209,7 +204,9 @@ export const regularTickets = [
   T("shaolin-temple", "xinyang"),
   T("yuntai-mountain", "kaifeng"),
   T("jigong-mountain", "zhengzhou"),
-  T("xixia", "luoyang")
+  T("xixia", "luoyang"),
+  T("zhumadian", "kaifeng"),
+  T("zhoukou", "luoyang")
 ];
 
 /** The fewest spaces, and the fewest routes, between every two stations. */
