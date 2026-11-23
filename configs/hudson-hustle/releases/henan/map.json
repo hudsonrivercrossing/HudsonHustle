@@ -231,10 +231,10 @@
       "tier": "first-ring",
       "lat": 34.04,
       "lon": 113.85,
-      "boardX": 715,
-      "boardY": 472,
+      "boardX": 692,
+      "boardY": 480,
       "labelDx": 18,
-      "labelDy": 6,
+      "labelDy": 8,
       "labelAnchor": "start"
     },
     {
@@ -435,16 +435,16 @@
       "twinGroup": "zhengzhou-xuchang",
       "waypoints": [
         {
-          "x": 679,
-          "y": 370
+          "x": 672,
+          "y": 375
         },
         {
-          "x": 697,
-          "y": 401
+          "x": 684,
+          "y": 408
         },
         {
-          "x": 711,
-          "y": 434
+          "x": 693,
+          "y": 443
         }
       ]
     },
@@ -458,16 +458,16 @@
       "twinGroup": "zhengzhou-xuchang",
       "waypoints": [
         {
-          "x": 654,
-          "y": 383
+          "x": 649,
+          "y": 382
         },
         {
-          "x": 668,
-          "y": 416
+          "x": 658,
+          "y": 417
         },
         {
-          "x": 686,
-          "y": 447
+          "x": 670,
+          "y": 450
         }
       ]
     },

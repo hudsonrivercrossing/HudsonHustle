@@ -1,9 +1,9 @@
-// The Henan map, written once as a table and turned into the snapshot's map.json.
-//   node scripts/config/henan-map-source.mjs            write map.json and tickets.json in configs/hudson-hustle/releases/henan
-//   node scripts/config/henan-map-source.mjs --report   also print each route's drawn length per space
-// Stations carry their real latitude and longitude; the board position starts from one projection
-// (see `project`) and is then nudged by hand where names or routes would collide. The basemap
-// script reads the same projection, so rivers and mountains land where the stations expect them.
+// The Henan map, written once as tables and turned into the snapshot's map.json and tickets.json.
+//   node scripts/config/henan-map-source.mjs
+// Stations carry their real latitude and longitude for reference. Their board positions follow the
+// same relative layout, stretched east to west and nudged by hand so names and routes do not collide.
+// The basemap (henan-basemap.mjs) is drawn around these board positions, so a station moved across
+// the Yellow River here needs the river moved there.
 import { writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -12,13 +12,6 @@ const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../.
 const outDir = path.join(rootDir, "configs/hudson-hustle/releases/henan");
 
 export const board = { width: 1200, height: 900, padX: 90, padY: 90 };
-
-/** Zhengzhou sits at y 370; the north is drawn a little taller than the south because it is denser. */
-export function project(lon, lat) {
-  const x = 80 + (lon - 111.05) * 225;
-  const y = lat >= 34.75 ? 370 - (lat - 34.75) * 213 : 370 + (34.75 - lat) * 163;
-  return { x: Math.round(x), y: Math.round(y) };
-}
 
 // id, name, tier, lat, lon, board x/y, label dx/dy/anchor
 const S = (id, name, tier, lat, lon, x, y, dx, dy, anchor) => ({ id, name, tier, lat, lon, x, y, dx, dy, anchor });
@@ -38,7 +31,7 @@ export const stations = [
   S("yuntai-mountain", "云台山", "other", 35.43, 113.38, 610, 135, 0, -20, "middle"),
   S("red-flag-canal", "红旗渠", "other", 36.08, 113.82, 705, 70, -16, 6, "end"),
   S("shaolin-temple", "少林寺", "other", 34.51, 112.94, 515, 432, 0, 34, "middle"),
-  S("xuchang", "许昌", "first-ring", 34.04, 113.85, 715, 472, 18, 6, "start"),
+  S("xuchang", "许昌", "first-ring", 34.04, 113.85, 692, 480, 18, 8, "start"),
   S("pingdingshan", "平顶山", "first-ring", 33.77, 113.19, 540, 560, -16, 6, "end"),
   S("luohe", "漯河", "first-ring", 33.58, 114.02, 765, 590, -16, 26, "end"),
   S("zhoukou", "周口", "first-ring", 33.63, 114.65, 930, 560, 18, 6, "start"),
@@ -59,8 +52,8 @@ export const routes = [
   // The 米 spokes out of Zhengzhou
   R("zhengzhou", "kaifeng", 2, "amber", "normal", { twin: "zhengzhou-kaifeng", bend: 16, suffix: "a" }),
   R("zhengzhou", "kaifeng", 2, "cobalt", "normal", { twin: "zhengzhou-kaifeng", bend: -16, suffix: "b" }),
-  R("zhengzhou", "xuchang", 2, "crimson", "normal", { twin: "zhengzhou-xuchang", bend: 16, suffix: "a" }),
-  R("zhengzhou", "xuchang", 2, "ivory", "normal", { twin: "zhengzhou-xuchang", bend: -16, suffix: "b" }),
+  R("zhengzhou", "xuchang", 2, "crimson", "normal", { twin: "zhengzhou-xuchang", bend: 14, suffix: "a" }),
+  R("zhengzhou", "xuchang", 2, "ivory", "normal", { twin: "zhengzhou-xuchang", bend: -14, suffix: "b" }),
   R("zhengzhou", "xinxiang", 2, "emerald", "ferry", { twin: "zhengzhou-xinxiang", bend: 13, suffix: "a", loco: 1 }),
   R("zhengzhou", "xinxiang", 2, "violet", "ferry", { twin: "zhengzhou-xinxiang", bend: -13, suffix: "b", loco: 1 }),
   R("zhengzhou", "luoyang", 4, "obsidian"),

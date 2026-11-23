@@ -69,7 +69,7 @@
   --space-panel-md: 16px;
 
   /* --- Font Families --- */
-  --font-display: "Fraunces", "Fraunces Fallback", Georgia, serif;
+  --font-display: "Fraunces", "Fraunces Fallback", Georgia, "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", "SimSun", serif;
   --font-body: "IBM Plex Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --font-setup: var(--font-body);
 
