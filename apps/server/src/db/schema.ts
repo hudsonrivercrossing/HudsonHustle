@@ -1,5 +1,4 @@
-import { sql } from "drizzle-orm";
-import { boolean, integer, jsonb, pgTable, primaryKey, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+import { boolean, integer, jsonb, pgTable, primaryKey, text, timestamp } from "drizzle-orm/pg-core";
 
 export const roomsTable = pgTable("rooms", {
   roomCode: text("room_code").primaryKey(),
@@ -42,38 +41,3 @@ export const gameSnapshotsTable = pgTable("game_snapshots", {
   snapshot: jsonb("snapshot").notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull()
 });
-
-// The two tables below held a server-side game history that nothing read. The server no longer
-// writes or reads them. They stay defined, and stay in the database, until a migration drops them:
-// that deletes stored rows, so it is a decision to take on purpose.
-export const gameEventsTable = pgTable(
-  "game_events",
-  {
-    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-    roomCode: text("room_code").notNull(),
-    sequence: integer("sequence").notNull(),
-    eventType: text("event_type").notNull(),
-    payload: jsonb("payload").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull()
-  },
-  (table) => ({
-    // One canonical event per sequence number in a room; "room_saved" bookkeeping rows may repeat.
-    canonicalRoomSequence: uniqueIndex("game_events_canonical_room_sequence_idx")
-      .on(table.roomCode, table.sequence)
-      .where(sql`${table.eventType} <> 'room_saved'`)
-  })
-);
-
-export const gameHistoryCheckpointsTable = pgTable(
-  "game_history_checkpoints",
-  {
-    roomCode: text("room_code").notNull(),
-    snapshotVersion: integer("snapshot_version").notNull(),
-    checkpointType: text("checkpoint_type").notNull(),
-    snapshot: jsonb("snapshot").notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true }).notNull()
-  },
-  (table) => ({
-    primaryKey: primaryKey({ columns: [table.roomCode, table.snapshotVersion] })
-  })
-);

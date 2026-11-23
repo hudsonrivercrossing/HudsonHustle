@@ -112,17 +112,8 @@ describe.skipIf(!serverUrl)("PostgresRoomRepository against a real database", ()
 
     const stored = (await repository.getRoom(roomCode))!;
     expect(stored.seats).toHaveLength(2);
-    const sql = postgres(`${serverUrl}/hh_fresh`, { max: 1 });
-    try {
-      const [counts] = await sql`
-        select count(*)::int as events, count(distinct sequence)::int as sequences
-        from game_events where room_code = ${roomCode} and event_type <> 'room_saved'
-      `;
-      expect(counts.events).toBeGreaterThan(0);
-      expect(counts.events).toBe(counts.sequences);
-    } finally {
-      await sql.end();
-    }
+    // Two draws were accepted and one refused: the stored game is two versions on, with both cards in hand.
+    expect(stored.game?.players[0].hand).toHaveLength(6);
     service.dispose();
   });
 });

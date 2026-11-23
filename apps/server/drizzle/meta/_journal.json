@@ -8,6 +8,13 @@
       "when": 1795388917428,
       "tag": "0000_baseline",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1795454877661,
+      "tag": "0001_drop_game_history",
+      "breakpoints": true
     }
   ]
 }
