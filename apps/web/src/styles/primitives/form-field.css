@@ -17,7 +17,7 @@
   letter-spacing: 0.12em;
   font-size: var(--type-utility-xs);
   font-weight: var(--weight-bold);
-  color: color-mix(in srgb, var(--accent-strong) 22%, var(--ink-soft) 78%);
+  color: color-mix(in oklch, var(--accent-strong) 22%, var(--ink-soft) 78%);
 }
 
 .form-field__control {
@@ -52,11 +52,13 @@
   transition: border-color var(--duration-fast) var(--easing-standard), box-shadow var(--duration-fast) var(--easing-standard), background-color var(--duration-fast) var(--easing-standard), transform var(--duration-fast) var(--easing-standard);
 }
 
-.form-field input:hover,
+@media (hover: hover) and (pointer: fine) {
+  .form-field input:hover,
 .form-field select:hover,
 .field input:hover,
 .field select:hover {
-  border-color: color-mix(in oklch, var(--border-warm-solid) 24%, transparent);
+    border-color: color-mix(in oklch, var(--border-warm-solid) 24%, transparent);
+  }
 }
 
 .form-field input:focus-visible,
@@ -105,7 +107,7 @@
   justify-content: center;
   min-width: 88px;
   padding: 0 6px;
-  color: color-mix(in srgb, var(--accent-strong) 30%, var(--ink) 70%);
+  color: color-mix(in oklch, var(--accent-strong) 30%, var(--ink) 70%);
   font-family: var(--font-body);
   font-size: var(--type-md);
   font-weight: var(--weight-bold);

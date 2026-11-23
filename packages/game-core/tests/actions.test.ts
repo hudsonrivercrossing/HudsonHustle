@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { parseGameAction } from "../src/actions";
 import { getLogEntriesSince, reduceGame, startGame } from "../src/game";
+import { gameFitsMap, restoreGameState } from "../src/restore";
 import type { GameAction, GameState } from "../src/types";
 import { hudsonHustleMap } from "../../game-data/src";
 
@@ -102,11 +103,36 @@ describe("log sequence", () => {
     expect(getLogEntriesSince(state, state.logSequence + 5)).toEqual([]);
   });
 
-  it("treats a state saved before log sequences existed as fully seen", () => {
-    const legacy = mainPhaseState() as Partial<GameState> & { log: string[] };
+  it("restores a state saved before log sequences and events existed, and plays on from it", () => {
+    const legacy = JSON.parse(JSON.stringify(mainPhaseState())) as Record<string, unknown>;
     delete legacy.logSequence;
-    expect(getLogEntriesSince(legacy, legacy.log.length)).toEqual([]);
-    const next = reduceGame(legacy as GameState, { type: "draw_card", source: "deck" }, hudsonHustleMap);
-    expect(next.logSequence).toBe(legacy.log.length + 1);
+    delete legacy.events;
+
+    const restored = restoreGameState(legacy);
+    expect(restored).not.toBeNull();
+    expect(restored!.logSequence).toBe(restored!.log.length);
+    expect(restored!.events).toEqual([]);
+    expect(getLogEntriesSince(restored!, restored!.log.length)).toEqual([]);
+
+    const next = reduceGame(restored!, { type: "draw_card", source: "deck" }, hudsonHustleMap);
+    expect(next.logSequence).toBe(restored!.log.length + 1);
+  });
+
+  it("refuses stored values that are not a game this build can continue", () => {
+    const good = JSON.parse(JSON.stringify(mainPhaseState()));
+    expect(restoreGameState(good)).not.toBeNull();
+    expect(restoreGameState(null)).toBeNull();
+    expect(restoreGameState("{}")).toBeNull();
+    expect(restoreGameState({ ...good, version: 2 })).toBeNull();
+    expect(restoreGameState({ ...good, players: [] })).toBeNull();
+    expect(restoreGameState({ ...good, activePlayerIndex: 9 })).toBeNull();
+    expect(restoreGameState({ ...good, market: undefined })).toBeNull();
+  });
+
+  it("tells whether a game's routes and stations exist on a map", () => {
+    const state = mainPhaseState();
+    expect(gameFitsMap(state, hudsonHustleMap)).toBe(true);
+    expect(gameFitsMap({ ...state, routeClaims: [{ ...({} as GameState["routeClaims"][number]), routeId: "no-such-route", playerId: state.players[0].id }] }, hudsonHustleMap)).toBe(false);
+    expect(gameFitsMap({ ...state, mapId: "atlantis" }, hudsonHustleMap)).toBe(false);
   });
 });

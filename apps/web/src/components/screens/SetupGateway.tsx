@@ -8,7 +8,7 @@ interface SetupGatewayProps {
 }
 
 export function SetupGateway({ onChooseLocal, onChooseOnline, onOpenGuide }: SetupGatewayProps): JSX.Element {
-  const setupHeroImageUrl = "/setup/landing-bg.png";
+  const setupHeroImageUrl = "/setup/landing-bg.webp";
 
   return (
     <SetupShell
@@ -46,7 +46,6 @@ export function SetupGateway({ onChooseLocal, onChooseOnline, onOpenGuide }: Set
         className="setup-guide-link"
         onClick={onOpenGuide}
         data-testid="gateway-onboarding"
-        aria-label="Open the guide"
       >
         First time? Open the rulebook →
       </Button>

@@ -24,6 +24,7 @@ interface OnlineSetupScreenProps {
   roomPreview: RoomSummary | null;
   error: string | null;
   isCreatingRoom?: boolean;
+  pendingRequest?: "preview" | "join" | "start" | "restart" | null;
   /** Room code from a shared link; opens the join flow with it filled in. */
   initialJoinRoomCode?: string;
   onOpenLocal?: () => void;
@@ -40,6 +41,7 @@ export function OnlineSetupScreen({
   roomPreview,
   error,
   isCreatingRoom = false,
+  pendingRequest = null,
   initialJoinRoomCode,
   onBack,
   onClearRoomPreview,
@@ -47,7 +49,7 @@ export function OnlineSetupScreen({
   onCreateRoom,
   onJoinRoom
 }: OnlineSetupScreenProps): JSX.Element {
-  const setupHeroImageUrl = "/setup/landing-bg.png";
+  const setupHeroImageUrl = "/setup/landing-bg.webp";
   const latestConfigId = releasedConfigs.at(-1)?.configId ?? "v0.4-flushing-newark-airport";
 
   // Create form state
@@ -116,14 +118,15 @@ export function OnlineSetupScreen({
   const showBanner =
     Boolean(error) || (stage === "join" && (reconnectState === "attempting-reconnect" || reconnectState === "reconnect-failed"));
   const bannerTone = error || reconnectState === "reconnect-failed" ? "danger" : reconnectState === "attempting-reconnect" ? "waiting" : "neutral";
-  const bannerEyebrow = error || reconnectState === "reconnect-failed" ? "Connection issue" : reconnectState === "attempting-reconnect" ? "Reconnect" : "Separate-device multiplayer";
+  const bannerEyebrow = error || reconnectState === "reconnect-failed" ? "Problem" : reconnectState === "attempting-reconnect" ? "Rejoining" : "Online play";
   const bannerHeadline =
-    error || reconnectState === "reconnect-failed" ? "Multiplayer setup needs attention." :
-    reconnectState === "attempting-reconnect" ? "Attempting to restore your room." : "Create a room or join a table.";
+    error ? "That did not work." :
+    reconnectState === "reconnect-failed" ? "Could not get back into your room." :
+    reconnectState === "attempting-reconnect" ? "Taking you back to your room…" : "Create a room or join a table.";
   const bannerCopy =
     error ? error :
-    reconnectState === "reconnect-failed" ? "Saved room recovery failed. Enter the room code again to board." :
-    reconnectState === "attempting-reconnect" ? "Checking the saved room session first." : "Host a table or join one by room code.";
+    reconnectState === "reconnect-failed" ? "The room may have ended. Enter its code to try again, or start a new one." :
+    reconnectState === "attempting-reconnect" ? "This browser was seated at a table. Checking that it is still there." : "Host a table or join one by room code.";
 
   const title = stage === "gateway" ? "Online" : stage === "create" ? "Start game" : "Join room";
   const subtitle =
@@ -214,7 +217,7 @@ export function OnlineSetupScreen({
         />
       ) : null}
 
-      {stage === "join" ? (
+      {stage === "join" && reconnectState !== "attempting-reconnect" ? (
         <JoinRoomFlow
           step={joinStep}
           roomPreview={roomPreview}
@@ -228,6 +231,7 @@ export function OnlineSetupScreen({
           onChangePreferredSeatId={setPreferredSeatId}
           onPreviewRoom={onPreviewRoom}
           onJoinRoom={onJoinRoom}
+          pending={pendingRequest === "preview" || pendingRequest === "join" ? pendingRequest : null}
         />
       ) : null}
     </SetupShell>

@@ -1,14 +1,8 @@
-import type { GameState, MapConfig, RouteDef, TrainCard } from "@hudson-hustle/game-core";
+import { drawsRemaining, type GameState, type MapConfig, type RouteDef, type TrainCard } from "@hudson-hustle/game-core";
 
 /** Whether the viewer may take a card from the market or deck right now. */
 export function canDrawCards(game: GameState, canAct: boolean): boolean {
-  return (
-    canAct &&
-    game.phase === "main" &&
-    (game.turn.stage === "idle" || game.turn.stage === "drawing") &&
-    !game.turn.tookFaceUpLocomotive &&
-    game.turn.drawsTaken < 2
-  );
+  return canAct && drawsRemaining(game) > 0;
 }
 
 /** Why the selected route offers no claim buttons, in the order a player would want to hear it. */

@@ -15,7 +15,7 @@ This directory holds versioned game-design snapshots for Hudson Hustle.
 
 ## Current Pointer
 - `current.json` currently points to:
-  - `configs/hudson-hustle/releases/v0.4-flushing-newark-airport`
+  - `configs/hudson-hustle/releases/v0.5-river-crossings`
 
 ## Drafts
 - `drafts/current-working/`
@@ -29,6 +29,12 @@ This directory holds versioned game-design snapshots for Hudson Hustle.
 - `releases/v0.4-flushing-newark-airport/`
   - the first tuned small-map playtest candidate
   - captures the expanded `v0.4` station set with the stronger Flushing and Newark Airport outer-node identity
+
+- `releases/v0.5-river-crossings/`
+  - the `v0.4` station set laid out to follow the harbor: stations on their own shores, routes crossing the Hudson and the East River
+  - same stations, routes and tickets as `v0.4`; the basemap no longer has the band painted along its edge
+- `releases/berlin/`
+  - Cold War Berlin; every `Border Crossing` route crosses the wall on the board
 
 ## Snapshot Files
 - Each snapshot folder should contain:

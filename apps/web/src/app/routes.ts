@@ -33,6 +33,24 @@ export function routePath(route: Route): string {
   }
 }
 
+const SITE_NAME = "Hudson Hustle";
+
+/** What the tab and the history list call a route. */
+export function routeTitle(route: Route): string {
+  switch (route.name) {
+    case "local":
+      return `Local game · ${SITE_NAME}`;
+    case "online":
+      return `Play online · ${SITE_NAME}`;
+    case "guide":
+      return `Rulebook · ${SITE_NAME}`;
+    case "room":
+      return `Room ${route.roomCode} · ${SITE_NAME}`;
+    default:
+      return SITE_NAME;
+  }
+}
+
 /** The current route, kept in step with the address bar and the back button. */
 export function useRoute(): [Route, (route: Route, options?: { replace?: boolean }) => void] {
   const [route, setRoute] = useState<Route>(() => parseRoute(window.location.pathname));
@@ -42,6 +60,22 @@ export function useRoute(): [Route, (route: Route, options?: { replace?: boolean
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
+
+  const title = routeTitle(route);
+  const isRoom = route.name === "room";
+  useEffect(() => {
+    document.title = title;
+    // A room link is a private invitation; search engines are asked not to keep it.
+    let robots = document.querySelector<HTMLMetaElement>('meta[name="robots"]');
+    if (isRoom && !robots) {
+      robots = document.createElement("meta");
+      robots.name = "robots";
+      document.head.append(robots);
+    }
+    if (robots) {
+      robots.content = isRoom ? "noindex" : "index, follow";
+    }
+  }, [title, isRoom]);
 
   const navigate = useCallback((next: Route, options?: { replace?: boolean }) => {
     const path = routePath(next);

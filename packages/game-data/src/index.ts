@@ -2,7 +2,8 @@ import type { MapConfig } from "@hudson-hustle/game-core";
 import { projectGeoDiagramCities } from "./cartography.js";
 import type { BoardPoint, GeoDiagramCitySeed } from "./cartography.js";
 import { activeHudsonHustleConfig, hudsonHustleConfigRegistry, hudsonHustleCurrentPointer } from "./config-registry.js";
-import type { BoardBackdrop, SnapshotMeta, StationAuthorityRef } from "./config-types.js";
+import type { BoardBackdrop, StationAuthorityRef } from "./config-types.js";
+import { findSnapshotProblems } from "./map-validation.js";
 
 export interface HudsonHustleReleasedConfigSummary {
   configId: string;
@@ -14,6 +15,11 @@ export interface HudsonHustleReleasedConfigSummary {
 }
 
 function buildHudsonHustleMap(bundle: typeof activeHudsonHustleConfig): MapConfig {
+  const problems = findSnapshotProblems(bundle.map, bundle.tickets, bundle.rules);
+  if (problems.length > 0) {
+    throw new Error(`Map config "${bundle.configId}" cannot be used:\n- ${problems.join("\n- ")}`);
+  }
+
   const activeStations = bundle.map.stations.filter((station) => station.active);
   const boardFrame = {
     width: bundle.map.board.width,
@@ -38,6 +44,7 @@ function buildHudsonHustleMap(bundle: typeof activeHudsonHustleConfig): MapConfi
   return {
     id: bundle.map.mapId,
     name: bundle.map.name,
+    ...(bundle.map.typeLabelOverrides ? { typeLabelOverrides: bundle.map.typeLabelOverrides } : {}),
     settings: {
       trainsPerPlayer: bundle.rules.trainsPerPlayer,
       stationsPerPlayer: bundle.rules.stationsPerPlayer,
@@ -98,12 +105,21 @@ export const hudsonHustleReleasedConfigs: HudsonHustleReleasedConfigSummary[] = 
     routeCount: bundle.map.routes.length
   }));
 
+const builtMaps = new Map<string, MapConfig>();
+
+/** The playable map for a config. Built and checked once; later calls return the same object, so do not change it. */
 export function getHudsonHustleMapByConfigId(configId: string): MapConfig {
+  const built = builtMaps.get(configId);
+  if (built) {
+    return built;
+  }
   const bundle = getHudsonHustleRegisteredConfig(configId);
   if (!bundle) {
     throw new Error(`Unknown Hudson Hustle config: ${configId}`);
   }
-  return buildHudsonHustleMap(bundle);
+  const map = buildHudsonHustleMap(bundle);
+  builtMaps.set(configId, map);
+  return map;
 }
 
 export function getHudsonHustleVisualsByConfigId(configId: string) {
@@ -117,12 +133,6 @@ export function getHudsonHustleVisualsByConfigId(configId: string) {
 const activeStations = activeHudsonHustleConfig.map.stations.filter((station) => station.active);
 
 export const hudsonHustleCurrentConfigId = hudsonHustleCurrentPointer.activeConfigId;
-export const hudsonHustleCurrentConfigPath = hudsonHustleCurrentPointer.activeConfigPath;
-export const hudsonHustleAvailableConfigIds = Object.keys(hudsonHustleConfigRegistry);
-export const hudsonHustleCurrentConfigMeta: SnapshotMeta = activeHudsonHustleConfig.meta;
-export const hudsonHustleCurrentTheme = activeHudsonHustleConfig.visuals.theme;
-export const hudsonHustleCurrentBackdropMode = activeHudsonHustleConfig.visuals.backdropMode;
-export const hudsonHustleCurrentBoardLabelMode = activeHudsonHustleConfig.visuals.boardLabelMode;
 
 export const hudsonHustleBoardFrame = {
   width: activeHudsonHustleConfig.map.board.width,
@@ -162,36 +172,19 @@ export const hudsonHustleGeoCities: GeoDiagramCitySeed[] = activeStations.map((s
   labelAnchor: station.labelAnchor
 }));
 
-const { cities: hudsonHustleCities, bounds: hudsonHustleGeoBounds } = projectGeoDiagramCities(
-  hudsonHustleGeoCities,
-  hudsonHustleBoardFrame
-);
-
-export { hudsonHustleGeoBounds };
 export const hudsonHustleBackdrop: BoardBackdrop = activeHudsonHustleConfig.visuals.backdrop;
 
-export const hudsonHustleMap: MapConfig = buildHudsonHustleMap(activeHudsonHustleConfig);
+export const hudsonHustleMap: MapConfig = getHudsonHustleMapByConfigId(activeHudsonHustleConfig.configId);
 
 export const cardColorPalette: Record<string, string> = activeHudsonHustleConfig.visuals.palettes.cards;
 
 export const playerColorPalette: Record<string, string> = activeHudsonHustleConfig.visuals.palettes.players;
 
-// ghost and blocked are reserved for future use (tutorial highlights, double-route locks)
-export type RouteDisplayState = "unclaimed" | "mine" | "opponent" | "ghost" | "blocked";
-
-export function resolveRouteDisplayState(
-  routeId: string,
-  viewerPlayerId: string | null,
-  routeClaims: ReadonlyArray<{ routeId: string; playerId: string }>
-): RouteDisplayState {
-  const claim = routeClaims.find((c) => c.routeId === routeId);
-  if (!claim) return "unclaimed";
-  if (!viewerPlayerId) return "opponent";
-  return claim.playerId === viewerPlayerId ? "mine" : "opponent";
-}
-
-export { createGeoProjector, projectGeoDiagramCities } from "./cartography.js";
+export { projectGeoDiagramCities } from "./cartography.js";
 export { buildBasemapProtectedZones } from "./basemap-protection.js";
+export { findSnapshotProblems } from "./map-validation.js";
+export { labelAnchorPoint, labelBox, pathLength, pathNormal, pointAlong, routePath, routeSpaces } from "./board-geometry.js";
+export type { BoardBox, BoardPoint2, RouteSpace } from "./board-geometry.js";
 export { activeHudsonHustleConfig, hudsonHustleConfigRegistry, hudsonHustleCurrentPointer } from "./config-registry.js";
 export type {
   BasemapBoardFrame,

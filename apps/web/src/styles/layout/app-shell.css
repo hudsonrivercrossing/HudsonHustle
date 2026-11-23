@@ -1,52 +1,7 @@
 /* Right-col is the positioning anchor for the ticket choice overlay */
-.app-shell--gameplay-hud .right-col {
-  position: relative;
-}
 
 /* right-col is a transparent column container; ChatPanel and SupplyDock
    each render their own dark panel — each fills its grid row. */
-.app-shell--gameplay-hud .right-col > * {
-  width: 100%;
-  min-height: 0;
-  box-sizing: border-box;
-}
-
-@media (max-width: 1024px) {
-  .app-shell--gameplay-hud .game-layout {
-    grid-template-columns: minmax(200px, 220px) minmax(0, 1fr);
-    gap: 10px;
-  }
-}
-
-.app-shell--gameplay-hud::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: var(--z-behind-2);
-  background: linear-gradient(90deg, oklch(14.18% 0.0116 244.94 / 0.9), oklch(16.46% 0.0142 243.8 / 0.58) 38%, oklch(14.25% 0.0086 245.72 / 0.86)), url("/setup/landing-bg.png") center / cover no-repeat;
-  filter: saturate(0.92) contrast(1.04);
-}
-
-.app-shell--gameplay-hud::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: var(--z-behind);
-  background: radial-gradient(circle at 50% 38%, oklch(80.48% 0.1149 84.21 / 0.12), transparent 32%), linear-gradient(180deg, oklch(14.18% 0.0116 244.94 / 0.18), oklch(14.18% 0.0116 244.94 / 0.66));
-}
-
-.notification-pipe {
-  position: fixed;
-  top: clamp(76px, 12vh, 128px);
-  left: 50%;
-  width: min(520px, calc(100vw - 32px));
-  display: grid;
-  gap: 10px;
-  pointer-events: none;
-  transform: translateX(-50%);
-}
 
 .app-shell--gameplay-hud > * {
   position: relative;
@@ -55,18 +10,6 @@
 
 /* Game-layout fills remaining viewport
 Layout definition lives at the top of this file (flex column with 0 gap). */
-.app-shell--gameplay-hud .game-layout {
-  flex: 1 1 auto;
-  height: 100%;
-  min-height: 0;
-  align-items: stretch;
-}
-
-.app-shell--gameplay-hud .side-panel {
-  height: 100%;
-  min-height: 0;
-  align-content: stretch;
-}
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Layout — structural / flow rules extracted from system.css.
@@ -74,7 +17,7 @@ Layout definition lives at the top of this file (flex column with 0 gap). */
 ─────────────────────────────────────────────────────────────────────────────
 Shell */
 .app-shell {
-  min-height: 100vh;
+  min-height: 100dvh;
   padding: var(--space-page-y) var(--space-page-x);
 }
 
@@ -96,8 +39,8 @@ Board-first sizing. The board is 4:3 and on every laptop screen its height is wh
   flex-direction: column;
   gap: 2px;
   /* Lock to viewport so floating overlays (notifications, modals) never trigger page scroll */
-  height: 100vh;
-  max-height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
   overflow: hidden;
   --roster-height: 192px;
   --ticket-dock-height: min(360px, 44vh);
@@ -117,7 +60,8 @@ Board-first sizing. The board is 4:3 and on every laptop screen its height is wh
   --hud-wood: oklch(17.89% 0.0141 61.53);
   --hud-wood-light: oklch(25.51% 0.0225 69.5);
   --hud-shadow: oklch(0% 0 0 / 0.42);
-  --hud-grain: linear-gradient(90deg, oklch(98.03% 0.0223 87.15 / 0.035) 1px, transparent 1px) 0 0 / 17px 17px, linear-gradient(180deg, oklch(98.03% 0.0223 87.15 / 0.035) 1px, transparent 1px) 0 0 / 17px 17px;
+  /* Panels used to carry a drawn grid. The slot stays so the many backgrounds that list it keep parsing. */
+  --hud-grain: linear-gradient(transparent, transparent);
   --hud-type-label: 0.67rem;
   --hud-type-small: 0.76rem;
   --hud-type-body: 0.9rem;
@@ -125,7 +69,7 @@ Board-first sizing. The board is 4:3 and on every laptop screen its height is wh
   font-size: var(--hud-type-body);
   font-kerning: normal;
   font-feature-settings: "kern" 1, "tnum" 1;
-  min-height: 100vh;
+  min-height: 100dvh;
   position: relative;
   isolation: isolate;
   overflow-x: hidden;
@@ -138,57 +82,14 @@ Board-first sizing. The board is 4:3 and on every laptop screen its height is wh
    .game-layout = left-rail | board-column
    .board-column = map-col | right-col
    Height is dictated by flex parent so topbar shrinkage flows down. */
-.game-layout {
-  --game-rail: clamp(233px, 17vw, 267px);
-  --game-left-rail: var(--game-rail);
-  --game-right-rail: var(--game-rail);
-  display: grid;
-  grid-template-columns: var(--game-left-rail) minmax(0, 1fr);
-  gap: var(--space-stack-sm);
-  align-items: stretch;
-  min-height: 0;
-}
 
 /* Left column: the roster is as tall as its players; tickets take the rest.
    The roster is capped so four players never squeeze the tickets out. */
-.side-panel {
-  display: grid;
-  grid-template-rows: fit-content(40%) minmax(0, 1fr);
-  gap: var(--space-stack-sm);
-  height: 100%;
-  min-height: 0;
-  align-self: stretch;
-}
-
-.side-panel__top,
-.side-panel__bottom {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  overflow: hidden;
-}
 
 /* Right column: the market keeps its natural height so all five cards and the
    draw button always fit; chat takes whatever is left. */
-.right-col {
-  display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  gap: var(--space-stack-sm);
-  height: 100%;
-  min-height: 0;
-  align-self: stretch;
-}
-
-@media (max-width: 1040px) {
-  .game-layout {
-    grid-template-columns: 1fr;
-  }
-}
 
 @media (max-width: 820px) {
-  .app-shell {
-  }
-
   .app-shell--gameplay-hud {
     padding: 12px;
   }

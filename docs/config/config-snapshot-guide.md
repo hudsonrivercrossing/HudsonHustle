@@ -66,7 +66,7 @@ That means:
 ## Standard Commands
 Historical note:
 - the example commands below intentionally use older draft ids to show the workflow shape
-- the current released small-map build is `v0.4-flushing-newark-airport`
+- the released maps are `v0.5-river-crossings` (New York Harbor, the active one) and `berlin`; `v0.3` and `v0.4` are archived
 
 List available configs:
 

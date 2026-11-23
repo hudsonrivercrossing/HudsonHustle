@@ -10,12 +10,15 @@
   font-weight: var(--weight-bold);
 }
 
+/* Opened and closed by its button. `hidden` keeps it out of the way while closed. */
 .score-guide__panel {
   position: absolute;
   right: 0;
   top: calc(100% + 10px);
   z-index: var(--z-dropdown);
   width: min(320px, 72vw);
+  max-height: calc(100dvh - 96px);
+  overflow-y: auto;
   display: grid;
   gap: 10px;
   padding: 14px 15px;
@@ -24,16 +27,18 @@
   background: radial-gradient(circle at top left, oklch(100% 0 0 / 0.22), transparent 28%), oklch(98.1% 0.0187 83.06 / 0.985);
   box-shadow: 0 16px 34px color-mix(in oklch, var(--shadow-warm-solid) 18%, transparent);
   color: var(--ink-soft);
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-4px);
-  transition: opacity var(--duration-fast) var(--easing-standard), transform var(--duration-fast) var(--easing-standard);
+  animation: score-guide-in var(--duration-fast) var(--easing-enter);
 }
 
-.score-guide:hover .score-guide__panel,
-.score-guide:focus-within .score-guide__panel {
-  opacity: 1;
-  transform: translateY(0);
+.score-guide__panel[hidden] {
+  display: none;
+}
+
+@keyframes score-guide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
 }
 
 .score-guide__eyebrow {
@@ -74,10 +79,6 @@
   box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.58), 0 5px 12px color-mix(in oklch, var(--shadow-warm-solid) 5%, transparent);
 }
 
-.app-shell--gameplay-hud .score-guide.topbar-icon-btn {
-  position: relative;
-}
-
 .app-shell--gameplay-hud .score-guide__trigger.system-button {
   border-color: oklch(70.15% 0.0832 84.6 / 0.38);
   color: var(--hud-paper);
@@ -91,22 +92,27 @@
   clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
 }
 
+/* On the table the panel hangs from the menu, so it stays under the bar on any screen. */
 .app-shell--gameplay-hud .score-guide {
-  z-index: var(--z-menu);
-  position: relative;
+  position: static;
 }
 
 .app-shell--gameplay-hud .score-guide__panel {
-  position: fixed;
-  top: 72px;
-  right: 18px;
-  z-index: var(--z-modal);
-  width: min(340px, calc(100vw - 28px));
+  top: calc(100% + var(--space-stack-sm));
+  right: 0;
+  width: min(340px, calc(100vw - 24px));
   border-radius: var(--radius-ticket);
   border-color: oklch(70.15% 0.0832 84.6 / 0.48);
-  background: var(--hud-grain), linear-gradient(180deg, oklch(21.82% 0.0162 71.13 / 0.985), oklch(13.62% 0.0065 71.35 / 0.985));
+  background: var(--hud-grain), linear-gradient(180deg, oklch(21.82% 0.0162 71.13), oklch(13.62% 0.0065 71.35));
   color: var(--hud-paper-bright);
   box-shadow: inset 0 0 0 1px oklch(96.88% 0.0372 88.46 / 0.08), 0 24px 54px oklch(0% 0 0 / 0.54);
+}
+
+@media (max-width: 760px), (orientation: landscape) and (max-height: 500px) and (min-width: 560px) {
+  .app-shell--gameplay-hud .score-guide__panel {
+    right: auto;
+    left: 0;
+  }
 }
 
 .app-shell--gameplay-hud .score-guide__eyebrow {

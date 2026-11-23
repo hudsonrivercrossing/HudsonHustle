@@ -22,37 +22,37 @@ export const coachHints: Record<CoachMoment, CoachHintCopy> = {
   "choose-tickets": {
     eyebrow: "Tickets",
     title: "Pick your destinations",
-    body: "Each ticket names two stations. Connect them with your own routes to score its points; an unfinished ticket costs you the same points at the end. Keep the ones that share a path.",
-    target: "market"
+    body: "Connect a ticket’s two stations to score it. A kept ticket you do not finish costs the same points, so keep the ones that share a path.",
+    target: "tickets"
   },
   "your-turn": {
     eyebrow: "Your turn",
     title: "One action per turn",
-    body: "Draw two cards, claim a route by clicking it on the map, build a station by clicking a city, or draw new tickets. Then the turn passes.",
+    body: "Draw two cards, tap a route to claim it, tap a city to build a station, or draw tickets. Then the turn passes.",
     target: "turn"
   },
   "second-card": {
     eyebrow: "Drawing",
     title: "Take one more card",
-    body: "You draw two cards a turn. A face-up locomotive is the exception: it counts as both, so you cannot take one as your second card.",
+    body: "A face-up locomotive counts as both of your cards, so it cannot be your second one.",
     target: "market"
   },
   "route-selected": {
     eyebrow: "Claiming",
     title: "Pay with matching cards",
-    body: "A route costs one card per space, all in one colour. Locomotives stand in for any colour. Grey routes take any single colour. Tunnels can cost up to three extra cards.",
+    body: "One card per space, all one color; locomotives are wild and gray takes any color. Tunnels may cost up to three more; ferries need their locomotives.",
     target: "hand"
   },
   "city-selected": {
     eyebrow: "Stations",
     title: "A station borrows a rival's route",
-    body: "Build one in a city to use a single route another player owns there when your tickets are scored. Each station you keep unbuilt is worth points at the end.",
+    body: "It counts one rival route in that city toward your tickets. Stations cost one, two, then three cards; each one left unbuilt scores 4.",
     target: "hand"
   },
   "final-round": {
     eyebrow: "Final round",
-    title: "Everyone gets one last turn",
-    body: "A player is down to two trains or fewer. After the last turn, tickets, stations and the longest network are scored.",
+    title: "Every other player gets one last turn",
+    body: "A player is nearly out of trains, or no route is left. After these turns, tickets, stations and the longest network are scored.",
     target: "roster"
   }
 };

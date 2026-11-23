@@ -1,153 +1,12 @@
-import type { KeyboardEvent } from "react";
-import { getCityName, type MapConfig, type RouteDef } from "@hudson-hustle/game-core";
-import type { BoardBackdrop, SnapshotVisuals } from "@hudson-hustle/game-data";
+import { memo, useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { getCityName, type MapConfig } from "@hudson-hustle/game-core";
+import { labelAnchorPoint, pathLength, pathNormal, pointAlong, routePath, routeSpaces, type BoardBackdrop, type BoardPoint2, type SnapshotVisuals } from "@hudson-hustle/game-data";
+import { ColorMark, colorMarkInk } from "./ColorMark";
+import { TRACK_CELLS, TRACK_MARGIN, placeTokens, trackCell } from "./scoreTrack";
 
-interface PathPoint {
-  x: number;
-  y: number;
-}
-
-function getPathPoints(route: RouteDef, config: MapConfig): PathPoint[] {
-  const from = config.cities.find((city) => city.id === route.from)!;
-  const to = config.cities.find((city) => city.id === route.to)!;
-  if (route.waypoints && route.waypoints.length > 0) {
-    return [{ x: from.x, y: from.y }, ...route.waypoints, { x: to.x, y: to.y }];
-  }
-
-  const dx = to.x - from.x;
-  const dy = to.y - from.y;
-  const length = Math.hypot(dx, dy) || 1;
-  const nx = -(dy / length);
-  const ny = dx / length;
-  const offset = route.offset ?? 0;
-  const ox = nx * offset;
-  const oy = ny * offset;
-
-  return [
-    { x: from.x + ox, y: from.y + oy },
-    { x: to.x + ox, y: to.y + oy }
-  ];
-}
-
-function getPathLength(points: PathPoint[]): number {
-  let total = 0;
-  for (let index = 1; index < points.length; index += 1) {
-    total += Math.hypot(points[index].x - points[index - 1].x, points[index].y - points[index - 1].y);
-  }
-  return total;
-}
-
-function getPointAlongPath(points: PathPoint[], distance: number): { x: number; y: number; angle: number } {
-  let remaining = distance;
-
-  for (let index = 1; index < points.length; index += 1) {
-    const start = points[index - 1];
-    const end = points[index];
-    const dx = end.x - start.x;
-    const dy = end.y - start.y;
-    const segmentLength = Math.hypot(dx, dy) || 1;
-    if (remaining <= segmentLength || index === points.length - 1) {
-      const ratio = Math.max(0, Math.min(1, remaining / segmentLength));
-      return {
-        x: start.x + dx * ratio,
-        y: start.y + dy * ratio,
-        angle: (Math.atan2(dy, dx) * 180) / Math.PI
-      };
-    }
-    remaining -= segmentLength;
-  }
-
-  const last = points.at(-1) ?? { x: 0, y: 0 };
-  const previous = points.at(-2) ?? last;
-  return {
-    x: last.x,
-    y: last.y,
-    angle: (Math.atan2(last.y - previous.y, last.x - previous.x) * 180) / Math.PI
-  };
-}
-
-function getPathDirection(points: PathPoint[], distance: number): { nx: number; ny: number } {
-  const before = getPointAlongPath(points, Math.max(0, distance - 2));
-  const after = getPointAlongPath(points, Math.min(getPathLength(points), distance + 2));
-  const dx = after.x - before.x;
-  const dy = after.y - before.y;
-  const length = Math.hypot(dx, dy) || 1;
-  return {
-    nx: -(dy / length),
-    ny: dx / length
-  };
-}
-
-function getAngleDelta(firstAngle: number, secondAngle: number) {
-  let delta = secondAngle - firstAngle;
-  while (delta > Math.PI) delta -= Math.PI * 2;
-  while (delta < -Math.PI) delta += Math.PI * 2;
-  return Math.abs(delta);
-}
-
-function getPathCurvature(points: PathPoint[]) {
-  if (points.length < 3) {
-    return 0;
-  }
-
-  let totalTurn = 0;
-  for (let index = 2; index < points.length; index += 1) {
-    const a = points[index - 2];
-    const b = points[index - 1];
-    const c = points[index];
-    const firstAngle = Math.atan2(b.y - a.y, b.x - a.x);
-    const secondAngle = Math.atan2(c.y - b.y, c.x - b.x);
-    totalTurn += getAngleDelta(firstAngle, secondAngle);
-  }
-
-  return Math.min(1, totalTurn / (Math.PI / 1.5));
-}
-
-function buildPathD(points: PathPoint[], closed = false): string {
+function buildPathD(points: BoardPoint2[], closed = false): string {
   const path = points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`).join(" ");
   return closed ? `${path} Z` : path;
-}
-
-function getPathSlice(points: PathPoint[], startDistance: number, endDistance: number, curvature: number): PathPoint[] {
-  const safeStart = Math.max(0, startDistance);
-  const safeEnd = Math.max(safeStart, endDistance);
-  const sliceLength = safeEnd - safeStart;
-  const sampleSpacing = 16 - curvature * 8;
-  const sampleCount = Math.max(2, Math.ceil(sliceLength / sampleSpacing));
-
-  return Array.from({ length: sampleCount + 1 }, (_, index) => {
-    const ratio = index / sampleCount;
-    const distance = safeStart + sliceLength * ratio;
-    const point = getPointAlongPath(points, distance);
-    return { x: point.x, y: point.y };
-  });
-}
-
-function getSegments(
-  route: RouteDef,
-  points: PathPoint[],
-): Array<{ pathD: string; jointPoint?: PathPoint }> {
-  const totalLength = getPathLength(points);
-  const curvature = getPathCurvature(points);
-  const outerPadding = Math.min(38, Math.max(24, totalLength * 0.14) + curvature * 8);
-  const usableLength = Math.max(36, totalLength - outerPadding * 2);
-  // Larger gap so adjacent segments (and their rounded caps) clearly separate — needed for V5 cable look.
-  const gap = Math.max(16, Math.min(22, usableLength / Math.max(4, route.length * 2.4)));
-  const segmentLength = Math.max(16, (usableLength - gap * (route.length - 1)) / route.length);
-  const start = outerPadding;
-
-  return Array.from({ length: route.length }, (_, index) => {
-    const segmentStart = start + index * (segmentLength + gap);
-    const segmentEnd = segmentStart + segmentLength;
-    const slicePoints = getPathSlice(points, segmentStart, segmentEnd, curvature);
-    const jointPoint = index < route.length - 1
-      ? getPointAlongPath(points, segmentEnd + gap / 2)
-      : undefined;
-    return {
-      pathD: buildPathD(slicePoints),
-      jointPoint,
-    };
-  });
 }
 
 interface BoardMapProps {
@@ -167,8 +26,37 @@ interface BoardMapProps {
   selectedRouteId: string | null;
   selectedCityId: string | null;
   highlightedCityIds?: string[];
+  /** Draws the score track around the board with one marker per player. Left out, the board has no frame. */
+  scores?: Array<{ playerId: string; score: number }>;
   onSelectRoute: (routeId: string, position?: { x: number; y: number }) => void;
   onSelectCity: (cityId: string, position?: { x: number; y: number }) => void;
+  /** False for a board that is only looked at, as in a replay: nothing on it takes focus or clicks. */
+  interactive?: boolean;
+}
+
+const ARROWS: Record<string, { dx: number; dy: number }> = {
+  ArrowLeft: { dx: -1, dy: 0 },
+  ArrowRight: { dx: 1, dy: 0 },
+  ArrowUp: { dx: 0, dy: -1 },
+  ArrowDown: { dx: 0, dy: 1 }
+};
+
+/** The nearest target lying in the direction of an arrow key, preferring ones straight ahead. */
+function nextTarget<T extends { id: string; x: number; y: number }>(targets: T[], from: T, direction: { dx: number; dy: number }): T | null {
+  let best: T | null = null;
+  let bestCost = Number.POSITIVE_INFINITY;
+  for (const target of targets) {
+    if (target.id === from.id) continue;
+    const ahead = (target.x - from.x) * direction.dx + (target.y - from.y) * direction.dy;
+    const aside = Math.abs((target.x - from.x) * direction.dy) + Math.abs((target.y - from.y) * direction.dx);
+    if (ahead <= 0 || aside > ahead * 1.5) continue;
+    const cost = ahead + aside * 2;
+    if (cost < bestCost) {
+      best = target;
+      bestCost = cost;
+    }
+  }
+  return best;
 }
 
 /** Enter or Space on a route or station opens its panel, anchored to the element's centre. */
@@ -181,7 +69,11 @@ function activateFromKeyboard(event: KeyboardEvent<SVGElement>, activate: (posit
   activate({ x: box.left + box.width / 2, y: box.top + box.height / 2 });
 }
 
-export function BoardMap({
+/**
+ * The board. It is memoised: the table re-renders every second while a turn timer runs, and the
+ * board, with its hundred-odd train cars, only needs to when the game or the selection changes.
+ */
+export const BoardMap = memo(function BoardMap({
   config,
   backdrop,
   backdropMode,
@@ -193,9 +85,40 @@ export function BoardMap({
   selectedRouteId,
   selectedCityId,
   highlightedCityIds = [],
+  scores,
   onSelectRoute,
-  onSelectCity
+  onSelectCity,
+  interactive = true
 }: BoardMapProps): JSX.Element {
+  // The board is one stop in the tab order. Inside it the arrow keys move between stations and
+  // routes by where they are on the map, and Enter or Space opens the one in focus.
+  const navTargets = useMemo(
+    () => [
+      ...config.cities.map((city) => ({ id: `city:${city.id}`, x: city.x, y: city.y })),
+      ...config.routes.map((route) => {
+        const path = routePath(route, config);
+        return { id: `route:${route.id}`, ...pointAlong(path, pathLength(path) / 2) };
+      })
+    ],
+    [config]
+  );
+  const [navId, setNavId] = useState(() => navTargets[0]?.id ?? "");
+  const svgRef = useRef<SVGSVGElement>(null);
+  const moveFocus = (event: KeyboardEvent<SVGSVGElement>) => {
+    const direction = ARROWS[event.key];
+    const from = navTargets.find((target) => target.id === navId);
+    if (!direction || !from) return;
+    event.preventDefault();
+    const next = nextTarget(navTargets, from, direction);
+    if (next) {
+      setNavId(next.id);
+      svgRef.current?.querySelector<SVGElement>(`[data-nav-id="${next.id}"]`)?.focus();
+    }
+  };
+  /** What makes a route or station reachable: one of them holds the tab stop, the rest wait for the arrows. */
+  const navProps = (id: string) =>
+    interactive ? { tabIndex: navId === id ? 0 : -1, role: "button", "data-nav-id": id, onFocus: () => setNavId(id) } : { "aria-hidden": true };
+
   const activePlayerId = game.players[game.activePlayerIndex]?.id;
   const claimViewerPlayerId = viewerPlayerId ?? activePlayerId;
   const boardWidth = 1200;
@@ -220,16 +143,69 @@ export function BoardMap({
         : backdrop.regionLabels;
   const regionLabelClassSuffix = boardLabelMode === "minimal-region-labels" ? " region-label--minimal" : "";
   const highlightedCitySet = new Set(highlightedCityIds);
+  const frame = scores ? TRACK_MARGIN : 0;
+  const tokens = scores ? placeTokens(scores, boardWidth, boardHeight) : [];
+
+  // Routes claimed since this board was first drawn: their trains are set down one by one.
+  // Claims already on the board when it appears are not replayed.
+  const knownClaims = useRef<Set<string> | null>(null);
+  const [freshRouteIds, setFreshRouteIds] = useState<string[]>([]);
+  const claimKey = game.routeClaims.map((claim) => claim.routeId).join("|");
+  useEffect(() => {
+    const current = game.routeClaims.map((claim) => claim.routeId);
+    if (knownClaims.current === null) {
+      knownClaims.current = new Set(current);
+      return;
+    }
+    const added = current.filter((routeId) => !knownClaims.current!.has(routeId));
+    knownClaims.current = new Set(current);
+    if (added.length === 0) {
+      return;
+    }
+    setFreshRouteIds(added);
+    const timeout = window.setTimeout(() => setFreshRouteIds([]), 1200);
+    return () => window.clearTimeout(timeout);
+  }, [claimKey]);
 
   return (
     <div className="board-shell">
       <svg
-        className={`board-map board-map--${backdropMode}`}
-        viewBox={`0 0 ${boardWidth} ${boardHeight}`}
+        ref={svgRef}
+        className={`board-map board-map--${backdropMode}${interactive ? "" : " board-map--static"}`}
+        viewBox={`${-frame} ${-frame} ${boardWidth + frame * 2} ${boardHeight + frame * 2}`}
         role="group"
-        aria-label="Board map: routes and stations"
+        aria-label={interactive ? "Board map. Arrow keys move between stations and routes; Enter opens one." : "Board map"}
+        onKeyDown={interactive ? moveFocus : undefined}
       >
-        <rect x="0" y="0" width={boardWidth} height={boardHeight} rx="12" fill="#d9c8a6" />
+        {scores ? (
+          <g className="score-track" aria-hidden="true">
+            <rect x={-frame} y={-frame} width={boardWidth + frame * 2} height={boardHeight + frame * 2} rx="18" className="score-track__frame" />
+            {Array.from({ length: TRACK_CELLS }, (_, index) => {
+              const cell = trackCell(index, boardWidth, boardHeight);
+              const milestone = index % 5 === 0;
+              return (
+                <g key={index}>
+                  <rect
+                    x={cell.x + 1.5}
+                    y={cell.y + 1.5}
+                    width={cell.width - 3}
+                    height={cell.height - 3}
+                    rx="5"
+                    className={milestone ? "score-track__cell score-track__cell--milestone" : "score-track__cell"}
+                  />
+                  {milestone ? (
+                    <text x={cell.x + cell.width / 2} y={cell.y + cell.height / 2} className="score-track__number">
+                      {index}
+                    </text>
+                  ) : (
+                    <circle cx={cell.x + cell.width / 2} cy={cell.y + cell.height / 2} r="2.4" className="score-track__tick" />
+                  )}
+                </g>
+              );
+            })}
+          </g>
+        ) : null}
+        <rect x="0" y="0" width={boardWidth} height={boardHeight} rx={scores ? 4 : 12} fill="#d9c8a6" />
 
         {backdropOpacityScale > 0 && backdrop.image ? (
           <image
@@ -339,10 +315,10 @@ export function BoardMap({
         ))}
 
         {config.routes.map((route) => {
-          const pathPoints = getPathPoints(route, config);
+          const pathPoints = routePath(route, config);
           const pathD = buildPathD(pathPoints);
-          const totalLength = getPathLength(pathPoints);
-          const segments = getSegments(route, pathPoints);
+          const totalLength = pathLength(pathPoints);
+          const segments = routeSpaces(route, config).map((space) => ({ pathD: buildPathD(space.points), midPoint: space.mid, jointPoint: space.joint }));
           const claim = game.routeClaims.find((item) => item.routeId === route.id);
           const claimedByViewer = claim?.playerId === claimViewerPlayerId;
           const claimingPlayer = claim ? game.players.find((player) => player.id === claim.playerId) : null;
@@ -352,11 +328,13 @@ export function BoardMap({
               ? "#7e7463"
               : cardPalette[route.color];
           const selected = selectedRouteId === route.id;
-          const middlePoint = getPointAlongPath(pathPoints, totalLength / 2);
-          const direction = getPathDirection(pathPoints, totalLength / 2);
+          const middlePoint = pointAlong(pathPoints, totalLength / 2);
+          const direction = pathNormal(pathPoints, totalLength / 2);
           const markerX = middlePoint.x + direction.nx * 18;
           const markerY = middlePoint.y + direction.ny * 18;
-          const fillOpacity = claim ? 0.95 : 0.78;
+          const fillOpacity = claim ? 0.95 : 0.9;
+          // An open route of a named colour carries that colour's shape on every space.
+          const marked = !claim && route.color !== "gray";
           const ownerBadge = claimingPlayer?.name.trim().charAt(0).toUpperCase() ?? "";
           // V5 Sector Cable: dark jacket → color core → inner dark hairline → brass rivets between segments
           const jacketStroke = claim ? (claimedByViewer ? "rgba(40,32,22,0.9)" : "rgba(40,30,22,0.7)") : "rgba(40,30,22,0.55)";
@@ -368,7 +346,7 @@ export function BoardMap({
           const tieCount = claim ? Math.floor(totalLength / 10) : 0;
 
           return (
-            <g key={route.id}>
+            <g key={route.id} data-route-id={route.id}>
               {selected ? (
                 <path d={pathD} className="route-selection" fill="none" />
               ) : null}
@@ -382,7 +360,13 @@ export function BoardMap({
               />
 
               {segments.map((segment, index) => (
-                <g key={`${route.id}-${index}`}>
+                <g
+                  key={`${route.id}-${index}`}
+                  className={freshRouteIds.includes(route.id) ? "route-car route-car--landing" : "route-car"}
+                  style={freshRouteIds.includes(route.id) ? { animationDelay: `${index * 45}ms` } : undefined}
+                >
+                  {/* Pale halo, so a dark route still reads on a dark part of the map */}
+                  {claim ? null : <path d={segment.pathD} fill="none" className="route-halo" strokeLinecap="round" strokeLinejoin="round" />}
                   {/* Outer dark cable jacket */}
                   <path
                     d={segment.pathD}
@@ -402,14 +386,16 @@ export function BoardMap({
                     strokeLinejoin="round"
                     opacity={fillOpacity}
                   />
-                  {/* Inner dark hairline running down centre */}
-                  <path
-                    d={segment.pathD}
-                    fill="none"
-                    stroke={innerHairlineStroke}
-                    strokeWidth={1.8}
-                    strokeLinecap="butt"
-                  />
+                  {marked ? (
+                    <g
+                      transform={`translate(${segment.midPoint.x} ${segment.midPoint.y}) scale(0.82)`}
+                      className={`route-mark route-mark--${colorMarkInk(route.color)}`}
+                    >
+                      <ColorMark color={route.color} />
+                    </g>
+                  ) : (
+                    <path d={segment.pathD} fill="none" stroke={innerHairlineStroke} strokeWidth={1.8} strokeLinecap="butt" />
+                  )}
                   {claim ? (
                     <path
                       d={segment.pathD}
@@ -448,8 +434,8 @@ export function BoardMap({
                 Array.from({ length: tieCount }, (_, i) => {
                   const dist = 6 + i * 10;
                   if (dist > totalLength - 6) return null;
-                  const pt = getPointAlongPath(pathPoints, dist);
-                  const dir = getPathDirection(pathPoints, dist);
+                  const pt = pointAlong(pathPoints, dist);
+                  const dir = pathNormal(pathPoints, dist);
                   const tieLen = 14;
                   return (
                     <line
@@ -495,13 +481,12 @@ export function BoardMap({
                 strokeLinecap="round"
                 onClick={(event) => onSelectRoute(route.id, { x: event.clientX, y: event.clientY })}
                 onKeyDown={(event) => activateFromKeyboard(event, (position) => onSelectRoute(route.id, position))}
-                tabIndex={0}
-                role="button"
+                {...navProps(`route:${route.id}`)}
                 aria-label={[
                   `${getCityName(config, route.from)} to ${getCityName(config, route.to)}`,
                   `${route.length} train${route.length === 1 ? "" : "s"}`,
                   route.color === "gray" ? "any color" : route.color,
-                  route.type === "normal" ? null : route.type,
+                  route.type === "normal" ? null : (config.typeLabelOverrides?.[route.type] ?? route.type),
                   claimingPlayer ? `claimed by ${claimingPlayer.name}` : "open"
                 ]
                   .filter(Boolean)
@@ -519,8 +504,7 @@ export function BoardMap({
           const station = game.stations.find((item) => item.cityId === city.id);
           const selected = selectedCityId === city.id;
           const highlighted = highlightedCitySet.has(city.id);
-          const labelDx = city.labelDx ?? 14;
-          const labelDy = city.labelDy ?? -14;
+          const labelPoint = labelAnchorPoint(city);
           const labelAnchor = city.labelAnchor ?? "start";
           return (
             <g key={city.id} className={highlighted ? "city-node city-node--highlighted" : "city-node"}>
@@ -532,6 +516,8 @@ export function BoardMap({
                   className="city-highlight-ring"
                 />
               ) : null}
+              {/* A wider, unseen target under the station, so a finger does not have to land on a 12-unit dot. */}
+              <circle cx={city.x} cy={city.y} r="24" className="city-touch" onClick={(event) => onSelectCity(city.id, { x: event.clientX, y: event.clientY })} />
               <circle
                 cx={city.x}
                 cy={city.y}
@@ -541,8 +527,7 @@ export function BoardMap({
                 strokeWidth="3"
                 onClick={(event) => onSelectCity(city.id, { x: event.clientX, y: event.clientY })}
                 onKeyDown={(event) => activateFromKeyboard(event, (position) => onSelectCity(city.id, position))}
-                tabIndex={0}
-                role="button"
+                {...navProps(`city:${city.id}`)}
                 aria-label={`${city.name} station${station ? ", station built" : ""}`}
                 aria-pressed={selected}
                 className="city-hitbox"
@@ -561,8 +546,8 @@ export function BoardMap({
                 />
               ) : null}
               <text
-                x={city.x + labelDx}
-                y={city.y + labelDy}
+                x={labelPoint.x}
+                y={labelPoint.y}
                 textAnchor={labelAnchor}
                 className={highlighted ? "board-label board-label--highlighted" : "board-label"}
               >
@@ -571,7 +556,28 @@ export function BoardMap({
             </g>
           );
         })}
+        {tokens.map((token) => {
+          const player = game.players.find((item) => item.id === token.playerId);
+          return (
+            <g key={token.playerId} className="score-token" style={{ transform: `translate(${token.x}px, ${token.y}px)` }}>
+              <title>{player?.name}</title>
+              <circle r="13" className="score-token__disc" fill={player ? playerPalette[player.color] : "#f0d78e"} />
+              <text className="score-token__label" dy="4.5">
+                {token.laps > 0 ? `+${token.laps * TRACK_CELLS}` : player?.name.trim().charAt(0).toUpperCase()}
+              </text>
+            </g>
+          );
+        })}
       </svg>
+      {scores ? (
+        <ul className="visually-hidden">
+          {scores.map(({ playerId, score }) => (
+            <li key={playerId}>
+              {game.players.find((item) => item.id === playerId)?.name}: {score} points
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </div>
   );
-}
+});

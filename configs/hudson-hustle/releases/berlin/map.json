@@ -37,7 +37,7 @@
       "lat": 52.503,
       "lon": 13.47,
       "boardX": 1080,
-      "boardY": 580,
+      "boardY": 560,
       "labelDx": 18,
       "labelDy": 8,
       "labelAnchor": "start",
@@ -45,7 +45,7 @@
     },
     {
       "id": "suedkreuz",
-      "name": "Suedkreuz",
+      "name": "Südkreuz",
       "label": "Südkreuz",
       "active": true,
       "tier": "anchor",
@@ -96,8 +96,8 @@
       "tier": "anchor",
       "lat": 52.525,
       "lon": 13.369,
-      "boardX": 584,
-      "boardY": 334,
+      "boardX": 590,
+      "boardY": 356,
       "labelDx": -14,
       "labelDy": -16,
       "labelAnchor": "end",
@@ -111,11 +111,11 @@
       "tier": "anchor",
       "lat": 52.521,
       "lon": 13.413,
-      "boardX": 816,
-      "boardY": 406,
-      "labelDx": 70,
-      "labelDy": 20,
-      "labelAnchor": "middle",
+      "boardX": 860,
+      "boardY": 404,
+      "labelDx": 20,
+      "labelDy": 10,
+      "labelAnchor": "start",
       "labelPreset": "top-near"
     },
     {
@@ -126,26 +126,26 @@
       "tier": "first-ring",
       "lat": 52.516,
       "lon": 13.38,
-      "boardX": 680,
-      "boardY": 429,
-      "labelDx": 118,
-      "labelDy": 20,
-      "labelAnchor": "end",
+      "boardX": 716,
+      "boardY": 452,
+      "labelDx": 16,
+      "labelDy": 8,
+      "labelAnchor": "start",
       "labelPreset": "bottom-right-near"
     },
     {
       "id": "zoologischer-garten",
       "name": "Zoologischer Garten",
-      "label": "Zoo",
+      "label": "Zoologischer Garten",
       "active": true,
       "tier": "anchor",
       "lat": 52.507,
       "lon": 13.332,
-      "boardX": 440,
-      "boardY": 390,
-      "labelDx": -14,
-      "labelDy": -16,
-      "labelAnchor": "end",
+      "boardX": 410,
+      "boardY": 410,
+      "labelDx": -10,
+      "labelDy": 30,
+      "labelAnchor": "start",
       "labelPreset": "top-left-near"
     },
     {
@@ -156,8 +156,8 @@
       "tier": "first-ring",
       "lat": 52.421,
       "lon": 13.179,
-      "boardX": 80,
-      "boardY": 820,
+      "boardX": 110,
+      "boardY": 790,
       "labelDx": 18,
       "labelDy": 8,
       "labelAnchor": "start",
@@ -173,9 +173,9 @@
       "lon": 13.198,
       "boardX": 80,
       "boardY": 320,
-      "labelDx": -20,
-      "labelDy": -25,
-      "labelAnchor": "start",
+      "labelDx": -12,
+      "labelDy": 6,
+      "labelAnchor": "end",
       "labelPreset": "top-near"
     },
     {
@@ -232,7 +232,7 @@
       "lat": 52.567,
       "lon": 13.412,
       "boardX": 793,
-      "boardY": 117,
+      "boardY": 100,
       "labelDx": 0,
       "labelDy": -16,
       "labelAnchor": "middle",
@@ -240,8 +240,8 @@
     },
     {
       "id": "schoenhauser-allee",
-      "name": "Schoenhauser Allee",
-      "label": "Schoenhauser",
+      "name": "Schönhauser Allee",
+      "label": "Schönhauser Allee",
       "active": true,
       "tier": "first-ring",
       "lat": 52.549,
@@ -261,11 +261,11 @@
       "tier": "anchor",
       "lat": 52.52,
       "lon": 13.387,
-      "boardX": 741,
-      "boardY": 372,
-      "labelDx": 0,
-      "labelDy": -10,
-      "labelAnchor": "middle",
+      "boardX": 758,
+      "boardY": 350,
+      "labelDx": -22,
+      "labelDy": -28,
+      "labelAnchor": "end",
       "labelPreset": "top-near"
     },
     {
@@ -276,11 +276,11 @@
       "tier": "first-ring",
       "lat": 52.515,
       "lon": 13.483,
-      "boardX": 1054,
-      "boardY": 410,
-      "labelDx": -23,
-      "labelDy": -3,
-      "labelAnchor": "end",
+      "boardX": 1012,
+      "boardY": 396,
+      "labelDx": 16,
+      "labelDy": -12,
+      "labelAnchor": "start",
       "labelPreset": "top-left-near"
     },
     {
@@ -291,11 +291,11 @@
       "tier": "first-ring",
       "lat": 52.47,
       "lon": 13.385,
-      "boardX": 625,
+      "boardX": 600,
       "boardY": 701,
-      "labelDx": 0,
-      "labelDy": 18,
-      "labelAnchor": "middle",
+      "labelDx": 4,
+      "labelDy": -16,
+      "labelAnchor": "end",
       "labelPreset": "bottom-near"
     },
     {
@@ -308,9 +308,9 @@
       "lon": 13.424,
       "boardX": 767,
       "boardY": 628,
-      "labelDx": -14,
-      "labelDy": -10,
-      "labelAnchor": "end",
+      "labelDx": 4,
+      "labelDy": 30,
+      "labelAnchor": "start",
       "labelPreset": "top-left-near"
     },
     {
@@ -321,7 +321,7 @@
       "tier": "anchor",
       "lat": 52.509,
       "lon": 13.376,
-      "boardX": 705,
+      "boardX": 738,
       "boardY": 540,
       "labelDx": -18,
       "labelDy": 8,
@@ -330,14 +330,14 @@
     },
     {
       "id": "warschauer-strasse",
-      "name": "Warschauer Strasse",
-      "label": "Warschauer",
+      "name": "Warschauer Straße",
+      "label": "Warschauer Straße",
       "active": true,
       "tier": "first-ring",
       "lat": 52.506,
       "lon": 13.449,
-      "boardX": 929,
-      "boardY": 491,
+      "boardX": 936,
+      "boardY": 498,
       "labelDx": 0,
       "labelDy": 18,
       "labelAnchor": "middle",
@@ -345,7 +345,7 @@
     },
     {
       "id": "neukoelln",
-      "name": "Neukoelln",
+      "name": "Neukölln",
       "label": "Neukölln",
       "active": true,
       "tier": "first-ring",
@@ -353,8 +353,8 @@
       "lon": 13.438,
       "boardX": 808,
       "boardY": 705,
-      "labelDx": -18,
-      "labelDy": 12,
+      "labelDx": -14,
+      "labelDy": -14,
       "labelAnchor": "end",
       "labelPreset": "bottom-left-near"
     },
@@ -368,21 +368,21 @@
       "lon": 13.299,
       "boardX": 256,
       "boardY": 285,
-      "labelDx": -18,
-      "labelDy": -10,
-      "labelAnchor": "end",
+      "labelDx": 16,
+      "labelDy": 22,
+      "labelAnchor": "start",
       "labelPreset": "top-left-near"
     },
     {
       "id": "schoenberg",
-      "name": "Schoenberg",
+      "name": "Schöneberg",
       "label": "Schöneberg",
       "active": true,
       "tier": "first-ring",
       "lat": 52.479,
       "lon": 13.352,
-      "boardX": 360,
-      "boardY": 650,
+      "boardX": 354,
+      "boardY": 648,
       "labelDx": -18,
       "labelDy": 8,
       "labelAnchor": "end",
@@ -447,7 +447,7 @@
       "to": "friedrichstrasse",
       "length": 2,
       "color": "rose",
-      "type": "Border Crossing",
+      "type": "ferry",
       "locomotiveCost": 1,
       "twinGroup": "hbf-friedrichstr",
       "waypoints": []
@@ -458,13 +458,13 @@
       "to": "friedrichstrasse",
       "length": 2,
       "color": "cobalt",
-      "type": "Border Crossing",
+      "type": "ferry",
       "locomotiveCost": 1,
       "twinGroup": "hbf-friedrichstr",
       "waypoints": [
         {
-          "x": 680,
-          "y": 300
+          "x": 672,
+          "y": 392
         }
       ]
     },
@@ -474,7 +474,7 @@
       "to": "brandenburger-tor",
       "length": 2,
       "color": "crimson",
-      "type": "Border Crossing",
+      "type": "ferry",
       "locomotiveCost": 1,
       "waypoints": []
     },
@@ -484,7 +484,7 @@
       "to": "brandenburger-tor",
       "length": 2,
       "color": "amber",
-      "type": "Border Crossing",
+      "type": "normal",
       "waypoints": []
     },
     {
@@ -507,8 +507,8 @@
       "twinGroup": "friedrichstr-alex",
       "waypoints": [
         {
-          "x": 770,
-          "y": 430
+          "x": 800,
+          "y": 414
         }
       ]
     },
@@ -563,8 +563,13 @@
       "to": "friedrichstrasse",
       "length": 3,
       "color": "amber",
-      "type": "Border Crossing",
-      "waypoints": []
+      "type": "ferry",
+      "waypoints": [
+        {
+          "x": 725,
+          "y": 262
+        }
+      ]
     },
     {
       "id": "gesundbrunnen-schoenhauser-allee",
@@ -572,7 +577,7 @@
       "to": "schoenhauser-allee",
       "length": 2,
       "color": "rose",
-      "type": "Border Crossing",
+      "type": "ferry",
       "locomotiveCost": 1,
       "waypoints": []
     },
@@ -582,7 +587,7 @@
       "to": "hermannplatz",
       "length": 3,
       "color": "violet",
-      "type": "Border Crossing",
+      "type": "ferry",
       "locomotiveCost": 1,
       "waypoints": []
     },
@@ -610,7 +615,7 @@
       "to": "flughafen-ber",
       "length": 5,
       "color": "cobalt",
-      "type": "Border Crossing",
+      "type": "ferry",
       "locomotiveCost": 1,
       "waypoints": []
     },
@@ -620,7 +625,7 @@
       "to": "potsdamer-platz",
       "length": 2,
       "color": "ivory",
-      "type": "Border Crossing",
+      "type": "ferry",
       "waypoints": []
     },
     {
@@ -629,8 +634,13 @@
       "to": "brandenburger-tor",
       "length": 2,
       "color": "gray",
-      "type": "Border Crossing",
-      "waypoints": []
+      "type": "normal",
+      "waypoints": [
+        {
+          "x": 776,
+          "y": 500
+        }
+      ]
     },
     {
       "id": "potsdamer-platz-suedkreuz",
@@ -638,9 +648,14 @@
       "to": "suedkreuz",
       "length": 3,
       "color": "gray",
-      "type": "Border Crossing",
+      "type": "ferry",
       "locomotiveCost": 1,
-      "waypoints": []
+      "waypoints": [
+        {
+          "x": 620,
+          "y": 596
+        }
+      ]
     },
     {
       "id": "schoenhauser-allee-pankow",
@@ -649,7 +664,12 @@
       "length": 2,
       "color": "emerald",
       "type": "normal",
-      "waypoints": []
+      "waypoints": [
+        {
+          "x": 826,
+          "y": 168
+        }
+      ]
     },
     {
       "id": "westkreuz-olympiastadion",
@@ -676,7 +696,16 @@
       "length": 4,
       "color": "rose",
       "type": "normal",
-      "waypoints": []
+      "waypoints": [
+        {
+          "x": 139,
+          "y": 248
+        },
+        {
+          "x": 197,
+          "y": 237
+        }
+      ]
     },
     {
       "id": "neukoelln-flughafen-ber",
@@ -684,9 +713,18 @@
       "to": "flughafen-ber",
       "length": 4,
       "color": "obsidian",
-      "type": "Border Crossing",
+      "type": "ferry",
       "locomotiveCost": 1,
-      "waypoints": []
+      "waypoints": [
+        {
+          "x": 897,
+          "y": 723
+        },
+        {
+          "x": 927,
+          "y": 774
+        }
+      ]
     },
     {
       "id": "schoenhauser-allee-frankfurter-allee",
@@ -704,7 +742,12 @@
       "length": 2,
       "color": "crimson",
       "type": "normal",
-      "waypoints": []
+      "waypoints": [
+        {
+          "x": 1124,
+          "y": 476
+        }
+      ]
     },
     {
       "id": "ostkreuz-neukoelln",
@@ -713,7 +756,7 @@
       "length": 3,
       "color": "gray",
       "locomotiveCost": 1,
-      "type": "Border Crossing",
+      "type": "ferry",
       "waypoints": []
     },
     {
@@ -723,7 +766,16 @@
       "length": 4,
       "color": "violet",
       "type": "normal",
-      "waypoints": []
+      "waypoints": [
+        {
+          "x": 739,
+          "y": 730
+        },
+        {
+          "x": 668,
+          "y": 728
+        }
+      ]
     },
     {
       "id": "suedkreuz-schoenberg",
@@ -741,7 +793,16 @@
       "length": 3,
       "color": "emerald",
       "type": "normal",
-      "waypoints": []
+      "waypoints": [
+        {
+          "x": 344,
+          "y": 587
+        },
+        {
+          "x": 304,
+          "y": 551
+        }
+      ]
     },
     {
       "id": "westkreuz-jungfernheide",

@@ -11,6 +11,7 @@ import { Badge } from "../ui/primitives/Badge";
 import { Button } from "../ui/primitives/Button";
 import { InviteLinkButton } from "../online/InviteLinkButton";
 import { StateSurface } from "../ui/primitives/StateSurface";
+import { shuffleAvatars } from "../ui/game";
 
 interface LobbyScreenProps {
   room: RoomSummary;
@@ -21,6 +22,10 @@ interface LobbyScreenProps {
   timer: TimerUpdate | null;
   realtimeReady: boolean;
   realtimeMessage: string | null;
+  /** The start request is on its way. */
+  isStarting?: boolean;
+  /** Why the last thing the player tried here did not work. */
+  error?: string | null;
 }
 
 type SeatStatus = { label: string; tone: "neutral" | "info" | "danger" | "success" | "warning" };
@@ -32,30 +37,33 @@ function getSeatStatus(seat: RoomSeatSummary): SeatStatus {
   return seat.ready ? { label: "Ready", tone: "success" } : { label: "Waiting", tone: "warning" };
 }
 
-const AVATAR_NAMES = [
-  "Conductor", "Milo", "Engineer", "Rosa", "Switchman",
-  "Jack", "Dispatcher", "Lily", "Caboose", "Nellie"
-];
-
-function seededRandom(seed: string): () => number {
-  let h = 0;
-  for (let i = 0; i < seed.length; i++) h = ((h << 5) - h + seed.charCodeAt(i)) | 0;
-  return () => {
-    h = (h ^ (h >>> 16)) * 0x45d9f3b | 0;
-    h = (h ^ (h >>> 16)) * 0x45d9f3b | 0;
-    h ^= h >>> 16;
-    return (h >>> 0) / 4294967296;
-  };
+function describeSeat(seat: RoomSeatSummary, isSelf: boolean): string {
+  if (seat.playerName === null) return "Waiting for a player";
+  if (seat.controllerType === "bot") return "Plays automatically";
+  const role = seat.isHost ? "Host" : "Player";
+  return isSelf ? `${role} · you` : role;
 }
 
-function shuffleAvatars(seed: string, count: number): string[] {
-  const rng = seededRandom(seed);
-  const pool = [...AVATAR_NAMES];
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [pool[i], pool[j]] = [pool[j], pool[i]];
+/** One sentence on what the lobby is waiting for, and one on what to do about it. */
+function describeLobby(room: RoomSummary, localSeat: RoomSeatSummary | undefined, canStart: boolean): { headline: string; copy: string } {
+  if (canStart) {
+    return { headline: "Everyone is ready.", copy: "Start the game when you like." };
   }
-  return pool.slice(0, count);
+  const openSeats = room.seats.filter((seat) => seat.playerName === null).length;
+  if (openSeats > 0) {
+    return {
+      headline: openSeats === 1 ? "Waiting for one more player." : `Waiting for ${openSeats} more players.`,
+      copy: "Send the invite link. Anyone who opens it can take an open seat."
+    };
+  }
+  if (localSeat && !localSeat.ready) {
+    return { headline: "Mark yourself ready.", copy: "The game can start once every seat is ready." };
+  }
+  const waitingOn = room.seats.filter((seat) => !seat.ready && seat.playerName).map((seat) => seat.playerName as string);
+  if (waitingOn.length > 0) {
+    return { headline: `Waiting for ${waitingOn.join(" and ")}.`, copy: "The game can start once every seat is ready." };
+  }
+  return { headline: "Waiting for the host to start.", copy: "Every seat is ready." };
 }
 
 export function LobbyScreen({
@@ -66,29 +74,22 @@ export function LobbyScreen({
   onLeaveRoom,
   timer,
   realtimeReady,
-  realtimeMessage
+  realtimeMessage,
+  isStarting = false,
+  error = null
 }: LobbyScreenProps): JSX.Element {
-  const setupHeroImageUrl = "/setup/landing-bg.png";
+  const setupHeroImageUrl = "/setup/landing-bg.webp";
   const localSeat = room.seats.find((seat) => seat.seatId === localSeatId);
   const seatAvatars = shuffleAvatars(room.roomCode, room.seats.length);
   const canStart = realtimeReady && localSeat?.isHost && room.seats.every((seat) => seat.playerName) && room.seats.every((seat) => seat.ready);
   const occupiedCount = room.seats.filter((seat) => seat.playerName).length;
   const readyCount = room.seats.filter((seat) => seat.ready).length;
-  const lobbyTone = realtimeMessage ? "danger" : canStart ? "active" : "waiting";
-  const lobbyHeadline = realtimeMessage
-    ? "Realtime connection needs attention."
-    : canStart
-    ? "Table is ready to start."
-    : localSeat?.isHost
-      ? "Waiting for the full table."
-      : "Waiting for host.";
-  const lobbyCopy = realtimeMessage
-    ? realtimeMessage
-    : canStart
-    ? "Everyone is seated and ready. Start the game when you want."
-    : localSeat?.isHost
-      ? `Seats occupied: ${occupiedCount}/${room.playerCount}. Ready: ${readyCount}/${room.playerCount}.`
-      : "Share the room code, mark yourself ready, and wait for the host to start.";
+  const lobbyTone = realtimeMessage || error ? "danger" : canStart ? "active" : "waiting";
+  const { headline: lobbyHeadline, copy: lobbyCopy } = realtimeMessage
+    ? { headline: "Connection lost.", copy: realtimeMessage }
+    : error
+      ? { headline: "That did not work.", copy: error }
+      : describeLobby(room, localSeat, Boolean(canStart));
   const lobbyPreflight = (
     <div className="setup-preflight-card">
       <span className="setup-preflight-card__eyebrow">Room board</span>
@@ -98,7 +99,6 @@ export function LobbyScreen({
         <SetupSummaryRow label="Seats" value={`${occupiedCount}/${room.playerCount}`} detail={`${readyCount} ready`} />
         <SetupSummaryRow label="Timer" value={room.turnTimeLimitSeconds === 0 ? "Untimed" : `${room.turnTimeLimitSeconds}s`} />
       </div>
-      <InviteLinkButton roomCode={room.roomCode} />
     </div>
   );
 
@@ -115,7 +115,7 @@ export function LobbyScreen({
       <div className="setup-counter__status">
         <StateSurface
           tone={lobbyTone}
-          eyebrow={canStart ? "Ready to start" : localSeat?.isHost ? "Host status" : "Lobby status"}
+          eyebrow={`Room ${room.roomCode}`}
           headline={lobbyHeadline}
           copy={lobbyCopy}
           testId="lobby-status-banner"
@@ -123,17 +123,18 @@ export function LobbyScreen({
       </div>
 
       <SetupStepPanel
-        eyebrow="Now"
+        eyebrow="Table"
         title="Seats"
         meta={`${occupiedCount}/${room.playerCount} occupied · ${readyCount}/${room.playerCount} ready`}
         className="lobby-seat-panel"
         actions={
           <SetupActions>
-            <Button disabled={!realtimeReady} onClick={() => onReadyChange(!localSeat?.ready)}>
+            <InviteLinkButton roomCode={room.roomCode} />
+            <Button variant={localSeat?.ready ? "secondary" : "primary"} disabled={!realtimeReady} onClick={() => onReadyChange(!localSeat?.ready)}>
               {localSeat?.ready ? "Mark not ready" : "Mark ready"}
             </Button>
             {localSeat?.isHost ? (
-              <Button variant="primary" disabled={!canStart} onClick={onStart}>
+              <Button variant={localSeat.ready ? "primary" : "secondary"} disabled={!canStart} loading={isStarting} onClick={onStart}>
                 Start game
               </Button>
             ) : null}
@@ -157,14 +158,14 @@ export function LobbyScreen({
                 <img
                   className={`seat-avatar ${isEmpty ? "seat-avatar--empty" : ""}`}
                   src={`/avatars/avatar-${avatarName}.svg`}
-                  alt={`${seat.playerName || "Open seat"} avatar`}
+                  alt=""
                 />
                 <div className="row-object__main">
                   <strong className="row-object__title">
                     {seat.playerName ?? "Open seat"}
                   </strong>
                   <p className="row-object__meta">
-                    {isEmpty ? "Waiting for player" : seat.seatId}
+                    {describeSeat(seat, isSelf)}
                   </p>
                 </div>
                 <div className="row-object__stats seat-status-stack">

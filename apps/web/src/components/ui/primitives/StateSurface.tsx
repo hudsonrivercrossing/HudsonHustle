@@ -25,7 +25,7 @@ export function StateSurface({
   const classes = ["state-surface", `state-surface--${tone}`, className].filter(Boolean).join(" ");
 
   return (
-    <section className={classes} data-testid={testId}>
+    <section className={classes} role={tone === "danger" ? "alert" : "status"} data-testid={testId}>
       <div className="state-surface__body">
         <span className="state-surface__eyebrow">{eyebrow}</span>
         <strong className="state-surface__headline">{headline}</strong>

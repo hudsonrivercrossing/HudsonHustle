@@ -9,7 +9,7 @@ import { OnlineSetupScreen } from "./components/screens/OnlineSetupScreen";
 import { SetupGateway } from "./components/screens/SetupGateway";
 import type { GameplayNotification } from "./components/ui/game";
 
-const NOTICE_LIFETIME_MS = 2000;
+const NOTICE_LIFETIME_MS = 4000;
 
 const realtimeMessages = {
   connecting: "Realtime connection is still being established. Ready and start stay disabled until the live room link is confirmed.",
@@ -71,6 +71,8 @@ export default function App(): JSX.Element {
           onStart={() => void room.startRoom()}
           onLeaveRoom={() => void leaveRoom()}
           timer={room.timer}
+          isStarting={room.pendingRequest === "start"}
+          error={room.error}
           realtimeReady={room.realtimeStatus === "subscribed"}
           realtimeMessage={realtimeMessages[room.realtimeStatus]}
         />
@@ -115,6 +117,7 @@ export default function App(): JSX.Element {
       roomPreview={room.roomPreview}
       error={room.error}
       isCreatingRoom={room.isCreatingRoom}
+      pendingRequest={room.pendingRequest}
       initialJoinRoomCode={route.name === "room" ? route.roomCode : undefined}
       onOpenLocal={() => {
         room.clearError();

@@ -1,22 +1,25 @@
+/* In over about 250ms, then perfectly still while it is read, then out in about 170ms. */
 @keyframes notification-drift {
   0% {
     opacity: 0;
-    transform: translateY(12px) scale(0.98);
+    transform: translateY(8px) scale(0.97);
+    animation-timing-function: var(--easing-enter);
   }
 
-  12% {
+  6% {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: none;
   }
 
-  78% {
+  96% {
     opacity: 1;
-    transform: translateY(-18px) scale(1);
+    transform: none;
+    animation-timing-function: ease-in;
   }
 
   100% {
     opacity: 0;
-    transform: translateY(-48px) scale(0.98);
+    transform: translateY(-8px);
   }
 }
 
@@ -35,13 +38,10 @@
   line-height: 1.25;
   text-align: center;
   text-shadow: 0 1px 2px oklch(0% 0 0 / 0.42);
-  animation: notification-drift 4.2s ease forwards;
+  animation: notification-drift 4s linear forwards;
   pointer-events: auto;
 }
 
-.notification-pipe__item:hover {
-  animation-play-state: paused;
-}
 
 .notification-pipe__item--success {
   border-color: oklch(75.77% 0.1031 155.34 / 0.42);
@@ -55,7 +55,8 @@
 
 .notification-pipe {
   position: fixed;
-  bottom: var(--space-stack-lg, 24px);
+  /* Under the bar and under the connection notice, clear of the hand and the cards. */
+  top: max(7rem, calc(env(safe-area-inset-top) + 7rem));
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -64,4 +65,31 @@
   gap: var(--space-stack-xs, 4px);
   z-index: var(--z-toast);
   pointer-events: none;
+}
+
+/* With reduced motion a notice does not fade: it is simply there until it is removed. Without this the
+   global rule would end the animation at once, on its last, invisible frame. */
+@media (prefers-reduced-motion: reduce) {
+  .notification-pipe__item {
+    animation: none;
+  }
+}
+
+/* On a wide screen ordinary news is written in the top bar; only warnings pop up. */
+@media (min-width: 761px) {
+  .notification-pipe__item:not(.notification-pipe__item--warning) {
+    display: none;
+  }
+}
+
+/* On a phone only the newest notice shows, as one small line, so the board is not buried under a stack. */
+@media (max-width: 760px), (orientation: landscape) and (max-height: 500px) and (min-width: 560px) {
+  .notification-pipe__item {
+    padding: var(--space-stack-xs) var(--space-stack-md);
+    font-size: var(--type-xs);
+  }
+
+  .notification-pipe__item:not(:last-child) {
+    display: none;
+  }
 }

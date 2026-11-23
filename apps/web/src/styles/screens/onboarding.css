@@ -1,157 +1,113 @@
-/* ─── Onboarding Tour ─────────────────────────────────────────────────── */
-@keyframes tour-fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-@keyframes tour-callout-in {
-  from { opacity: 0; transform: scale(0.96); }
-  to   { opacity: 1; transform: scale(1); }
-}
-
-/* Full-viewport layer — pointer-events off so user can still see content */
-.tour-overlay {
+/* A tip lies at the edge of the table like a rules card: bottom right, the width of the side rail,
+   never over the board. The thing it is about is ringed, and nothing is dimmed or blocked. */
+.table-tip {
   position: fixed;
-  inset: 0;
-  z-index: var(--z-chrome);
-  pointer-events: none;
-  animation: tour-fade-in var(--duration-base, 160ms) var(--easing-standard, ease) both;
+  right: max(var(--space-stack-md), env(safe-area-inset-right));
+  bottom: max(var(--space-stack-md), env(safe-area-inset-bottom));
+  /* Below the build panel: advice gives way to the thing being decided. */
+  z-index: var(--z-dropdown);
+  display: grid;
+  gap: var(--space-stack-xs);
+  width: min(var(--rail, 280px), calc(100vw - 2 * var(--space-stack-md)));
+  padding: var(--space-stack-md);
+  border-radius: var(--radius-card);
+  background: var(--hud-ticket-paper-solid, oklch(94.74% 0.0306 88.37));
+  box-shadow: 0 10px 28px oklch(0% 0 0 / 0.42);
+  color: var(--hud-ink, oklch(23.63% 0.0182 70.5));
+  animation: table-tip-in 220ms var(--easing-enter) both;
 }
 
-/* A ring around the part of the screen the tip is about. Nothing is dimmed: the game stays usable. */
-.tour-spotlight {
-  position: fixed;
-  border-radius: var(--radius-sm);
-  box-shadow: 0 0 0 var(--border-thin) var(--color-canvas-base), 0 0 0 calc(var(--border-thin) * 3) var(--color-accent-base);
-  transition: top var(--duration-base) var(--easing-standard), left var(--duration-base) var(--easing-standard), width var(--duration-base) var(--easing-standard), height var(--duration-base) var(--easing-standard);
-  pointer-events: none;
+@keyframes table-tip-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
 }
 
-/* Callout card */
-.tour-callout {
-  position: fixed;
-  width: 320px;
-  background: var(--color-canvas-base);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border-subtle);
-  padding: 20px 22px 18px;
-  box-shadow: var(--shadow-strong);
-  pointer-events: auto;
-  animation: tour-callout-in var(--duration-base, 160ms) var(--easing-standard, ease) both;
-}
-
-/* Centered fallback when target element isn't found */
-.tour-callout--centered {
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-/* Arrow pointer toward the spotlighted element */
-.tour-callout::after {
-  content: "";
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background: var(--color-canvas-base);
-  border: 1px solid var(--color-border-subtle);
-  transform: rotate(45deg);
-  pointer-events: none;
-}
-
-.tour-callout--arrow-left::after {
-  left: -6px;
-  top: 50%;
-  margin-top: -5px;
-  border-right: none;
-  border-top: none;
-}
-
-.tour-callout--arrow-right::after {
-  right: -6px;
-  top: 50%;
-  margin-top: -5px;
-  border-left: none;
-  border-bottom: none;
-}
-
-.tour-callout--arrow-bottom::after {
-  bottom: -6px;
-  left: 50%;
-  margin-left: -5px;
-  border-left: none;
-  border-top: none;
-}
-
-.tour-callout--arrow-top::after {
-  top: -6px;
-  left: 50%;
-  margin-left: -5px;
-  border-right: none;
-  border-bottom: none;
-}
-
-/* ─── Callout internals ──────────────────────────────────────────────── */
-.tour-callout__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--space-stack-sm, 8px);
-}
-
-.tour-callout__eyebrow {
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-size: var(--type-xs);
-  font-family: var(--font-body);
-  font-weight: var(--weight-semibold);
-  color: var(--color-accent-base);
-}
-
-.tour-callout__title {
-  font-family: var(--font-display);
-  font-size: var(--type-lg);
+.table-tip__eyebrow {
+  margin: 0;
+  color: var(--hud-ink-soft, oklch(44.94% 0.0296 74.86));
+  font-size: var(--type-2xs);
   font-weight: var(--weight-bold);
-  color: var(--color-ink-strong);
-  margin: 0 0 var(--space-stack-sm, 8px);
-  line-height: var(--lh-snug, 1.2);
+  letter-spacing: var(--ls-caps);
+  text-transform: uppercase;
 }
 
-.tour-callout__body {
+.table-tip__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--type-md);
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.table-tip__body {
+  margin: 0;
   font-size: var(--type-sm);
-  font-family: var(--font-body);
-  color: var(--color-ink-muted);
-  line-height: 1.55;
-  margin-bottom: 16px;
+  line-height: 1.45;
+  text-wrap: pretty;
 }
 
-/* ─── Progress dots ──────────────────────────────────────────────────── */
-
-/* ─── Footer ─────────────────────────────────────────────────────────── */
-.tour-callout__footer {
+.table-tip__actions {
   display: flex;
+  gap: var(--space-stack-md);
   align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  flex-wrap: wrap;
+  margin-top: var(--space-stack-xs);
 }
 
-/* Keep tour buttons compact so they fit within the 320px callout width */
-.tour-callout .system-button {
-  min-width: 0;
-  padding-inline: var(--space-stack-md, 16px);
-  font-size: var(--type-xs);
+.table-tip__dismiss {
+  min-height: var(--hit-target-min);
+  padding: 0 var(--space-stack-lg);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--hud-ink, oklch(23.63% 0.0182 70.5));
+  color: var(--hud-paper-bright, oklch(98.08% 0.0199 84.59));
+  font-weight: var(--weight-bold);
 }
 
-/* The tip sits on a light card even over the dark game table, so its buttons keep light-surface colours. */
-.tour-callout .system-button.primary-button {
-  background: var(--color-accent-base);
-  border-color: var(--color-accent-strong);
-  color: var(--color-canvas-base);
+.table-tip__off {
+  min-height: var(--hit-target-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--hud-ink-soft, oklch(44.94% 0.0296 74.86));
+  font-size: var(--type-sm);
+  text-decoration: underline;
 }
 
-.tour-callout .system-button.ghost-button {
-  background: transparent;
-  border-color: var(--color-border-subtle);
-  color: var(--ink-soft);
+.table-tip__dismiss:focus-visible,
+.table-tip__off:focus-visible {
+  outline: 2px solid var(--hud-ink, oklch(23.63% 0.0182 70.5));
+  outline-offset: 2px;
+}
+
+.table-tip__ring {
+  position: fixed;
+  z-index: var(--z-chrome);
+  border: 2px solid var(--hud-brass-light-solid, oklch(83.88% 0.0602 81.93));
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+}
+
+/* On a phone the bottom of the screen is the hand and the trays, so the tip goes to the top,
+   over the upper edge of the board, which can be panned out from under it. */
+@media (max-width: 760px), (orientation: landscape) and (max-height: 500px) and (min-width: 560px) {
+  .table-tip {
+    top: max(7.5rem, calc(env(safe-area-inset-top) + 7.5rem));
+    right: var(--space-stack-sm);
+    bottom: auto;
+    left: var(--space-stack-sm);
+    width: auto;
+    padding: var(--space-stack-sm) var(--space-stack-md);
+  }
+
+  .table-tip__title {
+    font-size: var(--type-body);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .table-tip {
+    animation: none;
+  }
 }

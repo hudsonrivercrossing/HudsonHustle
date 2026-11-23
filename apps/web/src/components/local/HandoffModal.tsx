@@ -12,7 +12,7 @@ interface HandoffModalProps {
 /** Shown while the laptop changes hands: private info is covered until the next player says so. */
 export function HandoffModal({ playerName, previousTurnSummary, onReady }: HandoffModalProps): JSX.Element {
   return (
-    <ModalShell variant="default" width="md" align="center">
+    <ModalShell variant="default" width="md" align="center" aria-label={`${playerName}, take over`}>
       <SectionHeader eyebrow="Next player" title={`${playerName}, take over.`} variant="ceremony" />
       {previousTurnSummary ? <p>{previousTurnSummary}</p> : null}
       <p>The board is safe to look at. Your cards and tickets stay hidden until you are ready.</p>

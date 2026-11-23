@@ -47,7 +47,7 @@ Use `roadmap-manager` instead when the task is mainly milestone reshaping across
 - code/doc areas likely affected
 - validation
 - out-of-scope guardrail
-6. Add rollout or promotion notes if the work touches `develop`, `main`, staging, or production.
+6. Add rollout or promotion notes if the work touches `main` or production (there is no staging: merging to `main` is the release).
 
 ## Hudson Hustle Defaults
 - Preserve:

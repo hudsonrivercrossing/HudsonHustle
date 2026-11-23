@@ -57,36 +57,42 @@ export function CreateRoomFlow({
   onChangeBotDifficulty,
   onCreateRoom
 }: CreateRoomFlowProps): JSX.Element {
+  const createRoom = () =>
+    onCreateRoom({
+      hostName: hostName.trim() || "Host",
+      playerCount,
+      configId,
+      turnTimeLimitSeconds,
+      botSeatIds: botSeatIds.filter((seatId) => setupSeatIds.includes(seatId)),
+      botDifficulty
+    });
+
   return (
-    <div className="setup-flow-grid setup-flow-grid--create" data-testid="create-room-panel">
+    <form
+      className="setup-flow-grid setup-flow-grid--create"
+      data-testid="create-room-panel"
+      onSubmit={(event) => {
+        event.preventDefault();
+        if (!isCreatingRoom) {
+          createRoom();
+        }
+      }}
+    >
       <SetupStepPanel
         eyebrow="Table"
         title="Set the table"
         meta={`${plannedBotCount} bot · ${plannedHumanOpenSeats} human open · ${selectedConfig?.mapName ?? "Map"}`}
         actions={
           <SetupActions>
-            <Button
-              variant="primary"
-              disabled={isCreatingRoom}
-              onClick={() =>
-                onCreateRoom({
-                  hostName: hostName.trim() || "Host",
-                  playerCount,
-                  configId,
-                  turnTimeLimitSeconds,
-                  botSeatIds: botSeatIds.filter((seatId) => setupSeatIds.includes(seatId)),
-                  botDifficulty
-                })
-              }
-            >
-              {isCreatingRoom ? "Creating room..." : "Create room"}
+            <Button type="submit" variant="primary" loading={isCreatingRoom}>
+              {isCreatingRoom ? "Creating room…" : "Create room"}
             </Button>
           </SetupActions>
         }
       >
         <SetupSection title="Host" meta="You take seat 1 and start the game when everyone is ready.">
           <FormField label="Your name">
-            <input value={hostName} maxLength={24} onChange={(e) => onChangeHostName(e.target.value)} />
+            <input value={hostName} maxLength={24} autoComplete="nickname" onChange={(e) => onChangeHostName(e.target.value)} />
           </FormField>
         </SetupSection>
 
@@ -106,8 +112,8 @@ export function CreateRoomFlow({
               const isBotSeat = botSeatIds.includes(seatId);
               return {
                 id: seatId,
-                title: seatId,
-                meta: isHostSeat ? "Host seat" : isBotSeat ? `Bot ${index}` : "Open human seat",
+                title: `Seat ${index + 1}`,
+                meta: isHostSeat ? "You, the host" : isBotSeat ? "Played by a bot" : "Open for a friend to join",
                 isBot: isBotSeat,
                 testId: `seat-plan-${seatId}`,
                 action: isHostSeat ? (
@@ -154,6 +160,6 @@ export function CreateRoomFlow({
           </FormField>
         </SetupSection>
       </SetupStepPanel>
-    </div>
+    </form>
   );
 }

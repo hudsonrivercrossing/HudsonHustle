@@ -14,6 +14,8 @@ import {
 } from "../setup";
 import { Button } from "../ui/primitives/Button";
 import { FormField } from "../ui/primitives/FormField";
+import { ModalShell } from "../ui/primitives/ModalShell";
+import { SectionHeader } from "../ui/primitives/SectionHeader";
 import { TimerPicker } from "../ui/primitives/TimerPicker";
 import type { BotDifficulty } from "@hudson-hustle/game-core";
 import type { HudsonHustleReleasedConfigSummary } from "@hudson-hustle/game-data";
@@ -70,7 +72,7 @@ export function SetupScreen({
   const selectedConfig = releasedConfigs.find((config) => config.configId === configId) ?? releasedConfigs[0];
   const plannedBotCount = botSeatIds.filter((seatId) => setupSeatIds.includes(seatId)).length;
   const plannedHumanCount = Math.max(1, playerCount - plannedBotCount);
-  const setupHeroImageUrl = "/setup/landing-bg.png";
+  const setupHeroImageUrl = "/setup/landing-bg.webp";
   const localPreflight = (
     <div className="setup-preflight-card">
       <span className="setup-preflight-card__eyebrow">Local table</span>
@@ -83,6 +85,8 @@ export function SetupScreen({
       </div>
     </div>
   );
+
+  const [confirmingStart, setConfirmingStart] = useState(false);
 
   function start() {
     saveLastLocalSetup({
@@ -106,7 +110,7 @@ export function SetupScreen({
     <SetupShell
       eyebrow="Local table"
       title="Pass-and-play"
-      lead="Seat the rivals, pass the laptop, and keep every private hand off-screen."
+      lead="Seat the rivals, pass the screen, and keep every private hand off-screen."
       backgroundImageUrl={setupHeroImageUrl}
       backAction={onBack ? <SetupBackButton onClick={onBack}>Back</SetupBackButton> : undefined}
       preflight={localPreflight}
@@ -121,7 +125,7 @@ export function SetupScreen({
             <SetupActions>
               <Button onClick={onOpenGuide}>Guide</Button>
               {canResume ? <Button onClick={onResume}>Resume saved game</Button> : null}
-              <Button variant="primary" onClick={start}>
+              <Button variant="primary" onClick={canResume ? () => setConfirmingStart(true) : start}>
                 Start local game
               </Button>
             </SetupActions>
@@ -224,6 +228,26 @@ export function SetupScreen({
           </SetupSection>
         </SetupStepPanel>
       </div>
+      {confirmingStart ? (
+        <ModalShell width="md" align="center" aria-label="Start a new game?" onDismiss={() => setConfirmingStart(false)}>
+          <SectionHeader eyebrow="Saved game" title="Start a new game?" variant="ceremony" />
+          <p>The game you saved will be replaced. This cannot be undone.</p>
+          <div className="setup-actions">
+            <Button data-autofocus onClick={() => setConfirmingStart(false)}>
+              Keep the saved game
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                setConfirmingStart(false);
+                start();
+              }}
+            >
+              Start a new game
+            </Button>
+          </div>
+        </ModalShell>
+      ) : null}
     </SetupShell>
   );
 }

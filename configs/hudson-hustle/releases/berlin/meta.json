@@ -6,7 +6,7 @@
   "status": "released",
   "basedOn": "berlin-draft-01",
   "createdAt": "2026-04-12",
-  "updatedAt": "2026-04-13T21:23:59.991Z",
+  "updatedAt": "2026-11-23T00:00:00.000Z",
   "summary": "Expanded Berlin draft with 26 active stations, full Ringbahn representation, twin core routes, Potsdamer Platz, Warschauer Strasse, dual BER access, and both Hermannplatz and Hermannstrasse.",
   "designGoals": [
     "Represent Berlin's defining Ringbahn (S41/S42) as a complete playable ring connecting all four Kreuz stations.",
@@ -23,7 +23,8 @@
     "Added twin routes at Hauptbahnhof-Friedrichstrasse and Friedrichstrasse-Alexanderplatz for core competitive tension.",
     "Added second BER access through Neukoelln (length 4 tunnel) alongside the existing Suedkreuz route.",
     "Removed three redundant direct routes (Westkreuz-Suedkreuz, Brandenburger Tor-Suedkreuz, Alexanderplatz-Ostkreuz) that are now better served by through-station paths.",
-    "Expanded ticket deck from 29 to 40 tickets (6 long + 34 regular) covering all new stations."
+    "Expanded ticket deck from 29 to 40 tickets (6 long + 34 regular) covering all new stations.",
+    "2026-11-23 layout pass, no rule changes: Brandenburger Tor and Potsdamer Platz moved off the wall to the East Berlin side; Friedrichstrasse to Brandenburger Tor and Potsdamer Platz to Brandenburger Tor are relabelled normal because both ends are in East Berlin; the core is spread out; labels and names use full station names with umlauts."
   ],
   "playtestFocus": [
     "Check whether the full Ringbahn creates meaningful ring-vs-trunk routing decisions.",

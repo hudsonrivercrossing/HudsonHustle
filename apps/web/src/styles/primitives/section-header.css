@@ -106,8 +106,7 @@
 
 .floating-build-panel .muted-copy {
   font-size: var(--type-xs);
-  color: color-mix(in oklch, var(--hud-paper-solid) 50%, transparent);
-  font-style: italic;
+  color: color-mix(in oklch, var(--hud-paper-solid) 66%, transparent);
 }
 
 /* Executed critique checklist: make every HUD family use a different physical shape. */

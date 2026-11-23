@@ -1,223 +1,112 @@
-/* Chat panel fills top half of right column */
-.app-shell--gameplay-hud .right-col .chat-panel-dock {
-  height: 100%;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+/* The room's chat, beside the table. Messages read as lines of talk, all starting at the same left edge. */
+.app-shell--gameplay-hud .chat-panel-dock {
+  border: 1px solid color-mix(in oklch, var(--hud-brass) 42%, transparent);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(180deg, oklch(24.35% 0.0172 74.79 / 0.94), oklch(14.65% 0.0057 69.2 / 0.94));
+  box-shadow: 0 18px 36px var(--hud-shadow);
+  color: var(--hud-paper-bright);
 }
 
-.app-shell--gameplay-hud .right-col .chat-panel-dock .chat-panel {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
+.chat-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: var(--space-stack-sm);
   min-height: 0;
+  font-family: var(--font-body);
 }
 
-.app-shell--gameplay-hud .right-col .chat-panel-dock .chat-panel__messages {
-  flex: 1 1 auto;
-  min-height: 0;
+.chat-panel__messages {
+  display: grid;
+  align-content: start;
+  gap: var(--space-stack-xs);
+  min-height: 3.5rem;
+  max-height: 11rem;
   overflow-y: auto;
+  overscroll-behavior: contain;
   scrollbar-width: thin;
   scrollbar-color: color-mix(in oklch, var(--hud-brass-light-solid) 35%, transparent) transparent;
 }
 
-.app-shell--gameplay-hud .right-col .chat-panel-dock .chat-panel__messages::-webkit-scrollbar {
-  width: 6px;
-}
-
-.app-shell--gameplay-hud .right-col .chat-panel-dock .chat-panel__messages::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.app-shell--gameplay-hud .right-col .chat-panel-dock .chat-panel__messages::-webkit-scrollbar-thumb {
-  background: color-mix(in oklch, var(--hud-brass-light-solid) 32%, transparent);
-  border-radius: var(--radius-1);
-}
-
-.app-shell--gameplay-hud .right-col .chat-panel-dock .chat-panel__messages::-webkit-scrollbar-thumb:hover {
-  background: color-mix(in oklch, var(--hud-brass-light-solid) 50%, transparent);
-}
-
-.app-shell--gameplay-hud .chat-panel-dock::before {
-  background: linear-gradient(135deg, oklch(89.73% 0.037 86.17 / 0.08), transparent 28%), radial-gradient(circle at 18% 0%, oklch(70.15% 0.0832 84.6 / 0.12), transparent 30%);
-  opacity: 1;
-}
-
-.app-shell--gameplay-hud .chat-panel__message {
-  border-radius: 0;
-  background: transparent;
-  color: color-mix(in oklch, var(--hud-paper-solid) 82%, transparent);
-  font-family: var(--font-body);
-  font-size: var(--type-xs);
-  line-height: 1.4;
-  padding: 2px 4px;
-  margin: 0;
-  white-space: normal;
-  word-wrap: break-word;
-}
-
-.app-shell--gameplay-hud .chat-panel__message span {
-  display: inline !important;
-}
-
-.app-shell--gameplay-hud .chat-panel__message strong {
-  display: inline !important;
-  font-family: var(--font-body);
-  font-size: var(--type-xs);
-  font-weight: var(--weight-bold);
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--hud-paper-bright, oklch(98.08% 0.0199 84.59));
-  margin: 0 4px 0 0;
-}
-
-.app-shell--gameplay-hud .chat-panel__message--system {
-  color: color-mix(in oklch, var(--hud-paper-solid) 40%, transparent);
-  font-style: italic;
-  text-align: center;
-  padding: 8px 4px;
-}
-
-.app-shell--gameplay-hud .chat-panel__composer {
-  grid-template-columns: 1fr;
-}
-
-.app-shell--gameplay-hud .chat-panel__composer input {
-  border-radius: var(--radius-map-tile);
-  border-color: oklch(70.15% 0.0832 84.6 / 0.18);
-  background: oklch(97.81% 0.0227 84.59 / 0.05);
-  color: oklch(98.03% 0.0223 87.15 / 0.78);
-  font-size: var(--type-input);
-  padding: 8px 10px;
-}
-
-.app-shell--gameplay-hud .chat-panel__composer input::placeholder {
-  color: oklch(98.03% 0.0223 87.15 / 0.32);
-  font-style: italic;
-}
-
-.chat-panel {
-  min-height: 100%;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
-  gap: 10px;
-}
-
-.chat-panel__messages {
-  min-height: 0;
-  display: grid;
-  align-content: end;
-  gap: 8px;
-  overflow-y: auto;
-  padding: 8px;
-  border: 1px solid color-mix(in oklch, var(--hud-brass-light-solid) 14%, transparent);
-  border-radius: var(--radius-panel);
-  background: oklch(97.81% 0.0227 84.59 / 0.055);
-}
-
-.chat-panel__messages:has(> :only-child) {
-  align-content: center;
-  place-items: center;
+.chat-panel__messages:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .chat-panel__message {
   margin: 0;
-  padding: 8px 10px;
-  border-radius: var(--radius-sm);
-  background: oklch(97.81% 0.0227 84.59 / 0.08);
-  color: oklch(98.03% 0.0223 87.15 / 0.78);
-  font-size: var(--type-xs);
-  line-height: 1.35;
-}
-
-.chat-panel__message span {
-  display: block;
+  color: color-mix(in oklch, var(--hud-paper-solid) 86%, transparent);
+  font-size: var(--type-sm);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  text-align: left;
 }
 
 .chat-panel__message strong {
-  display: block;
-  margin-bottom: 2px;
-  color: oklch(98.03% 0.0223 87.15 / 0.96);
-  font-size: var(--type-2xs);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  color: var(--hud-paper-bright);
+  font-weight: var(--weight-bold);
+}
+
+/* The viewer's own lines carry the brass tint, so a glance tells who is talking. */
+.chat-panel__message--own strong {
+  color: var(--hud-brass-light-solid);
+}
+
+.chat-panel__empty {
+  margin: 0;
+  color: color-mix(in oklch, var(--hud-paper-solid) 64%, transparent);
+  font-size: var(--type-sm);
+  line-height: 1.4;
+  text-align: left;
 }
 
 .chat-panel__composer {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 8px;
+  gap: var(--space-stack-sm);
 }
 
 .chat-panel__composer input {
   min-width: 0;
-  border: 1px solid color-mix(in oklch, var(--hud-brass-light-solid) 18%, transparent);
-  border-radius: var(--radius-sm);
-  background: oklch(97.81% 0.0227 84.59 / 0.08);
-  color: oklch(98.03% 0.0223 87.15 / 0.82);
-  padding: 10px 11px;
-}
-
-/* Chat panel — tight one-liner messages, scrollable list
-Chat panel: slightly more breathing room between sections */
-.app-shell--gameplay-hud .chat-panel {
-  font-family: var(--font-body);
-  gap: 10px;
-}
-
-.app-shell--gameplay-hud .chat-panel__messages {
-  border-radius: var(--radius-xs);
-  border: none;
-  background: transparent;
-  padding: 4px 2px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-/* ─── Final unified panel treatment ───────────────────────────────────────
-   All in-game container panels — roster, ticket dock, hand rail, chat,
-   market, plus the privacy "hidden" panel during handoff — render with the
-   same dark brass envelope so they read as one set. */
-.app-shell--gameplay-hud .chat-panel-dock {
-  border: 1px solid color-mix(in srgb, var(--hud-brass) 42%, oklch(0% 0 0 / 0.34));
-  border-radius: var(--radius-sm);
-  background: var(--hud-grain), linear-gradient(180deg, oklch(24.35% 0.0172 74.79 / 0.94), oklch(14.65% 0.0057 69.2 / 0.94));
-  box-shadow: inset 0 0 0 1px oklch(94.6% 0.0574 85.03 / 0.08), inset 0 10px 18px oklch(94.6% 0.0574 85.03 / 0.035), 0 18px 36px var(--hud-shadow);
-  color: var(--hud-paper-bright);
-  backdrop-filter: none;
-}
-
-/* Chat input: dark, compact, consistent with HUD panels */
-.app-shell--gameplay-hud .chat-panel-dock .chat-panel__composer {
-  display: block;
-  padding: 0;
-  margin: 0;
-}
-
-.app-shell--gameplay-hud .chat-panel-dock .chat-panel__composer input {
-  width: 100%;
-  box-sizing: border-box;
-  background: oklch(97.81% 0.0227 84.59 / 0.04);
-  border: 1px solid color-mix(in oklch, var(--hud-brass-light-solid) 22%, transparent);
+  min-height: var(--hit-target-min);
+  padding: 0 var(--space-stack-md);
+  border: 1px solid color-mix(in oklch, var(--hud-brass-light-solid) 28%, transparent);
   border-radius: var(--radius-control);
-  color: var(--hud-paper-bright, oklch(98.08% 0.0199 84.59));
+  background: color-mix(in oklch, var(--hud-paper-solid) 6%, transparent);
+  color: var(--hud-paper-bright);
   font-family: var(--font-body);
   font-size: var(--type-input);
-  font-style: normal;
-  padding: 6px 10px;
-  height: auto;
-  min-height: 0;
-  box-shadow: none;
 }
 
-.app-shell--gameplay-hud .chat-panel-dock .chat-panel__composer input::placeholder {
-  color: color-mix(in oklch, var(--hud-paper-solid) 40%, transparent);
-  font-style: normal;
+.chat-panel__composer input::placeholder {
+  color: color-mix(in oklch, var(--hud-paper-solid) 60%, transparent);
 }
 
-.app-shell--gameplay-hud .chat-panel-dock .chat-panel__composer input:focus-visible {
-  outline: none;
-  border-color: color-mix(in oklch, var(--hud-brass-light-solid) 50%, transparent);
+.chat-panel__composer input:focus-visible,
+.chat-panel__send:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.chat-panel__composer input:disabled {
+  opacity: 0.6;
+}
+
+.chat-panel__send {
+  min-height: var(--hit-target-min);
+  padding: 0 var(--space-stack-md);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--hud-brass-light-solid);
+  color: var(--hud-ink);
+  font-weight: var(--weight-bold);
+  transition: transform var(--duration-fast) var(--easing-standard);
+}
+
+.chat-panel__send:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.chat-panel__send:disabled {
+  cursor: default;
+  opacity: 0.45;
 }

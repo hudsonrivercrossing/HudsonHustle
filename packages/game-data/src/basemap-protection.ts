@@ -1,4 +1,5 @@
-import type { MapConfig, RouteDef } from "@hudson-hustle/game-core";
+import type { MapConfig } from "@hudson-hustle/game-core";
+import { labelBox, routePath } from "./board-geometry.js";
 
 export interface BasemapBounds {
   left: number;
@@ -61,39 +62,12 @@ function boundsFromPoints(points: BasemapPoint[], padding: number, width: number
   );
 }
 
-function getPathPoints(route: RouteDef, config: MapConfig): BasemapPoint[] {
-  const from = config.cities.find((city) => city.id === route.from);
-  const to = config.cities.find((city) => city.id === route.to);
-
-  if (!from || !to) {
-    throw new Error(`Route ${route.id} references a missing city`);
-  }
-
-  if (route.waypoints && route.waypoints.length > 0) {
-    return [{ x: from.x, y: from.y }, ...route.waypoints, { x: to.x, y: to.y }];
-  }
-
-  const dx = to.x - from.x;
-  const dy = to.y - from.y;
-  const length = Math.hypot(dx, dy) || 1;
-  const nx = -(dy / length);
-  const ny = dx / length;
-  const offset = route.offset ?? 0;
-  const ox = nx * offset;
-  const oy = ny * offset;
-
-  return [
-    { x: from.x + ox, y: from.y + oy },
-    { x: to.x + ox, y: to.y + oy }
-  ];
-}
-
 export function buildBasemapProtectedZones(config: MapConfig, frame: BasemapBoardFrame): BasemapProtectedZones {
   const routes = config.routes.map((route) => ({
     id: `route:${route.id}`,
     kind: "route" as const,
     routeId: route.id,
-    bounds: boundsFromPoints(getPathPoints(route, config), 34, frame.width, frame.height)
+    bounds: boundsFromPoints(routePath(route, config), 34, frame.width, frame.height)
   }));
 
   const stations = config.cities.map((city) => ({
@@ -113,31 +87,12 @@ export function buildBasemapProtectedZones(config: MapConfig, frame: BasemapBoar
     )
   }));
 
-  const labels = config.cities.map((city) => {
-    const label = city.label ?? city.name;
-    const labelX = city.x + (city.labelDx ?? 14);
-    const labelY = city.y + (city.labelDy ?? -14);
-    const textWidth = Math.max(44, label.length * 9);
-    const labelAnchor = city.labelAnchor ?? "start";
-    const left = labelAnchor === "end" ? labelX - textWidth : labelAnchor === "middle" ? labelX - textWidth / 2 : labelX;
-
-    return {
-      id: `label:${city.id}`,
-      kind: "label" as const,
-      cityId: city.id,
-      bounds: padBounds(
-        {
-          left,
-          top: labelY - 18,
-          right: left + textWidth,
-          bottom: labelY + 8
-        },
-        10,
-        frame.width,
-        frame.height
-      )
-    };
-  });
+  const labels = config.cities.map((city) => ({
+    id: `label:${city.id}`,
+    kind: "label" as const,
+    cityId: city.id,
+    bounds: padBounds(labelBox(city), 10, frame.width, frame.height)
+  }));
 
   return { routes, stations, labels };
 }

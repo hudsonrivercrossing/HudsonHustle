@@ -83,7 +83,7 @@ async function createRoom(
     await createPanel.getByTestId(`seat-plan-toggle-${seatId}`).click();
   }
   for (let index = 0; index < timerAdjustments; index += 1) {
-    await createPanel.getByRole("button", { name: "+15" }).click();
+    await createPanel.getByRole("button", { name: "15 seconds more" }).click();
   }
   await expect(createPanel.locator(".timer-picker__value")).toHaveText(expectedTimerText);
   await createPanel.getByRole("button", { name: "Create room" }).click();
@@ -105,8 +105,8 @@ async function joinRoom(
   const playerName = options?.playerName ?? "Guest";
   await joinPanel.getByLabel("Room code").fill(roomCode);
   await joinPanel.getByRole("button", { name: "Preview" }).click();
-  await expect(page.getByRole("button", { name: seatId })).toBeVisible();
-  await page.getByRole("button", { name: seatId }).click();
+  await expect(page.getByRole("button", { name: `Seat ${seatId.replace("seat-", "")}` })).toBeVisible();
+  await page.getByRole("button", { name: `Seat ${seatId.replace("seat-", "")}` }).click();
   await joinPanel.getByRole("button", { name: "Enter table" }).click();
   await joinPanel.getByLabel("Your name").fill(playerName);
   await joinPanel.getByRole("button", { name: "Join room" }).click();
@@ -141,7 +141,7 @@ test("multiplayer room lifecycle covers connected badges, private state, reconne
   await clearInitialTicketChoice(guestPage);
 
   await expect(hostPage.getByTestId("turn-status-banner")).toContainText("Your turn");
-  await expect(hostPage.locator(".player-roster")).toBeVisible();
+  await expect(hostPage.locator(".table-seats")).toBeVisible();
   await expect(hostPage.getByRole("button", { name: "Guide" })).toBeVisible();
   await expect(hostPage.getByRole("button", { name: "Score" })).toBeVisible();
   await expect(hostPage.getByRole("button", { name: "Leave room" })).toBeVisible();
@@ -233,7 +233,7 @@ test("join flow clears stale seat selections when previewing a different room", 
   const joinPanel = await openJoinRoomPanel(guestPage);
   await joinPanel.getByLabel("Room code").fill(firstRoom.roomCode);
   await joinPanel.getByRole("button", { name: "Preview" }).click();
-  const seatThreeButton = guestPage.getByRole("button", { name: "seat-3" });
+  const seatThreeButton = guestPage.getByRole("button", { name: "Seat 3" });
   await seatThreeButton.click();
   await expect(seatThreeButton).toHaveClass(/chip-button--selected/);
 
@@ -247,7 +247,7 @@ test("join flow clears stale seat selections when previewing a different room", 
 
   await expect(guestPage.getByText("1 open").first()).toBeVisible();
   await expect(guestPage.getByTestId("join-room-panel").getByRole("button", { name: "Enter table" })).toBeDisabled();
-  await expect(guestPage.getByRole("button", { name: "seat-2" })).toBeVisible();
+  await expect(guestPage.getByRole("button", { name: "Seat 2" })).toBeVisible();
 
   await hostOneContext.close();
   await hostTwoContext.close();
@@ -269,19 +269,19 @@ test("initial multiplayer ticket choices can be confirmed independently without 
   await guestPage.getByRole("button", { name: "Mark ready" }).click();
   await hostPage.getByRole("button", { name: "Start game" }).click();
 
-  const guestTickets = guestPage.locator(".ticket-row--choice");
+  const guestTickets = guestPage.locator(".ticket-stub--choice");
   await expect(guestTickets).toHaveCount(4);
   await guestTickets.nth(2).click();
   await guestTickets.nth(1).click();
-  await expect(guestTickets.nth(0)).toHaveClass(/ticket-row--selected/);
-  await expect(guestTickets.nth(1)).not.toHaveClass(/ticket-row--selected/);
-  await expect(guestTickets.nth(2)).toHaveClass(/ticket-row--selected/);
+  await expect(guestTickets.nth(0)).toHaveClass(/ticket-stub--kept/);
+  await expect(guestTickets.nth(1)).not.toHaveClass(/ticket-stub--kept/);
+  await expect(guestTickets.nth(2)).toHaveClass(/ticket-stub--kept/);
 
   await hostPage.getByRole("button", { name: /Keep 2 tickets/ }).click();
   await expect(hostPage.getByRole("button", { name: /Keep 2 tickets/ })).toHaveCount(0);
-  await expect(guestTickets.nth(0)).toHaveClass(/ticket-row--selected/);
-  await expect(guestTickets.nth(1)).not.toHaveClass(/ticket-row--selected/);
-  await expect(guestTickets.nth(2)).toHaveClass(/ticket-row--selected/);
+  await expect(guestTickets.nth(0)).toHaveClass(/ticket-stub--kept/);
+  await expect(guestTickets.nth(1)).not.toHaveClass(/ticket-stub--kept/);
+  await expect(guestTickets.nth(2)).toHaveClass(/ticket-stub--kept/);
 
   await guestPage.getByRole("button", { name: /Keep 2 tickets/ }).click();
   await expect(hostPage.getByTestId("turn-status-banner")).toContainText("Your turn");
@@ -342,7 +342,7 @@ test("drawing tickets in multiplayer offers no cancel path and still requires a 
   await expect(hostPage.getByRole("button", { name: "Back" })).toHaveCount(0);
   await expect(hostPage.getByRole("button", { name: /Keep 1 ticket/ })).toBeVisible();
 
-  const pickerCards = hostPage.locator(".ticket-row--choice");
+  const pickerCards = hostPage.locator(".ticket-stub--choice");
   await expect(pickerCards).toHaveCount(3);
   await pickerCards.nth(0).click();
   await expect(hostPage.getByRole("button", { name: /Keep 0 tickets/ })).toBeDisabled();
@@ -432,10 +432,10 @@ test("normal setup can create a mixed room with multiple bot seats and only leav
   const joinPanel = await openJoinRoomPanel(guestPage);
   await joinPanel.getByLabel("Room code").fill(roomCode);
   await joinPanel.getByRole("button", { name: "Preview" }).click();
-  await expect(guestPage.getByRole("button", { name: "seat-4" })).toBeVisible();
-  await expect(guestPage.getByRole("button", { name: "seat-2" })).toHaveCount(0);
-  await expect(guestPage.getByRole("button", { name: "seat-3" })).toHaveCount(0);
-  await guestPage.getByRole("button", { name: "seat-4" }).click();
+  await expect(guestPage.getByRole("button", { name: "Seat 4" })).toBeVisible();
+  await expect(guestPage.getByRole("button", { name: "Seat 2" })).toHaveCount(0);
+  await expect(guestPage.getByRole("button", { name: "Seat 3" })).toHaveCount(0);
+  await guestPage.getByRole("button", { name: "Seat 4" }).click();
   await joinPanel.getByRole("button", { name: "Enter table" }).click();
   await joinPanel.getByLabel("Your name").fill("Guest");
   await joinPanel.getByRole("button", { name: "Join room" }).click();
@@ -543,7 +543,7 @@ test("guidebook opens from gateway and local setup without old tutorial chrome",
   await page.getByRole("button", { name: "Guide" }).click();
   await expect(page.getByTestId("guidebook-screen")).toBeVisible();
   await page.getByRole("button", { name: "Back" }).click();
-  await expect(page.locator(".player-roster")).toBeVisible();
+  await expect(page.locator(".table-seats")).toBeVisible();
 
   await context.close();
 });

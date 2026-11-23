@@ -5,15 +5,15 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 340px;
+  width: min(340px, calc(100vw - 24px));
   background: var(--hud-grain), linear-gradient(180deg, oklch(24.35% 0.0172 74.79 / 0.97), oklch(14.65% 0.0057 69.2 / 0.97));
-  border: 1px solid color-mix(in srgb, var(--hud-brass) 52%, oklch(0% 0 0 / 0.34));
+  border: 1px solid color-mix(in oklch, var(--hud-brass) 52%, oklch(0% 0 0 / 0.34));
   border-radius: var(--radius-sm);
   padding: 14px 16px 14px 18px;
   z-index: var(--z-popover);
   color: var(--hud-paper-bright, oklch(98.08% 0.0199 84.59));
   box-shadow: inset 0 0 0 1px oklch(94.6% 0.0574 85.03 / 0.1), 0 24px 48px oklch(0% 0 0 / 0.55);
-  animation: floating-build-rise 160ms var(--easing-standard, ease) both;
+  animation: floating-build-rise 160ms var(--easing-enter) both;
 }
 
 @keyframes floating-build-rise {
@@ -24,7 +24,7 @@
 /* Inline style overrides the centered fallback when anchor is set */
 .floating-build-panel[style*="position: fixed"][style*="top:"] {
   transform: none;
-  animation: floating-build-rise-anchor 160ms var(--easing-standard, ease) both;
+  animation: floating-build-rise-anchor 160ms var(--easing-enter) both;
 }
 
 @keyframes floating-build-rise-anchor {
@@ -34,10 +34,12 @@
 
 .floating-build-panel__close {
   position: absolute;
+  /* The card's header and body are raised one step; the button has to be above them to take the tap. */
+  z-index: var(--z-raised-2);
   top: var(--space-stack-xs, 4px);
   right: var(--space-stack-xs, 4px);
-  width: 28px;
-  height: 28px;
+  width: var(--hit-target-min);
+  height: var(--hit-target-min);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -50,9 +52,11 @@
   transition: color var(--duration-fast, 100ms) ease, border-color var(--duration-fast, 100ms) ease;
 }
 
-.floating-build-panel__close:hover {
-  color: var(--hud-paper-bright);
-  border-color: color-mix(in oklch, var(--hud-brass-light-solid) 36%, transparent);
+@media (hover: hover) and (pointer: fine) {
+  .floating-build-panel__close:hover {
+    color: var(--hud-paper-bright);
+    border-color: color-mix(in oklch, var(--hud-brass-light-solid) 36%, transparent);
+  }
 }
 
 .floating-build-panel__body {
@@ -87,13 +91,12 @@
   font-weight: var(--weight-medium);
   color: color-mix(in oklch, var(--hud-paper-solid) 82%, transparent);
   margin: 4px 0 8px;
-  white-space: nowrap;
 }
 
 .floating-build-panel .choice-chip-button {
   font-size: var(--type-xs) !important;
   padding: 6px 12px !important;
-  min-height: 32px;
+  min-height: var(--hit-target-min);
 }
 
 /* Build popup typography overrides — smaller and tighter for the compact 280px card
@@ -178,4 +181,59 @@
   display: none;
   border: none;
   background: none;
+}
+
+/* On a phone the panel is a sheet along the bottom of the table: always in the same place, under the thumb.
+   It is placed against the table, not the window, because Safari's toolbar can cover the window's bottom edge. */
+.floating-build-panel.floating-build-panel--sheet {
+  position: absolute;
+  top: auto;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: auto;
+  padding-top: 0;
+  padding-bottom: max(var(--space-stack-lg), env(safe-area-inset-bottom));
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
+  transform: none;
+  transition: transform var(--duration-slow) var(--easing-enter);
+  animation: build-sheet-up var(--duration-slow) var(--easing-enter) both;
+}
+
+@keyframes build-sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+/* The strip to drag the sheet down by. */
+.floating-build-panel__grip {
+  display: grid;
+  place-items: center;
+  height: var(--space-stack-xl);
+  cursor: grab;
+  touch-action: none;
+}
+
+.floating-build-panel__grip::before {
+  content: "";
+  width: var(--space-stack-xl);
+  height: var(--space-stack-xs);
+  border-radius: var(--radius-pill);
+  background: color-mix(in oklch, var(--hud-paper-solid) 36%, transparent);
+}
+
+/* On its side the phone has no room across the bottom: the sheet keeps to the rail. */
+@media (orientation: landscape) and (max-height: 500px) and (min-width: 560px) {
+  .floating-build-panel.floating-build-panel--sheet {
+    left: auto;
+    width: clamp(272px, 40vw, 344px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .floating-build-panel.floating-build-panel--sheet {
+    animation: none;
+    transition: none;
+  }
 }

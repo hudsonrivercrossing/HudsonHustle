@@ -141,8 +141,8 @@ export interface GameState {
   log: string[];
   /** Count of every entry ever appended to `log`, which itself keeps only the most recent ones. */
   logSequence: number;
-  /** The most recent things that happened, oldest first. Absent on states saved before events existed. */
-  events?: GameEvent[];
+  /** The most recent things that happened, oldest first. */
+  events: GameEvent[];
   /**
    * Every change to the board, in order, for the whole game. Unlike `events` this is never
    * trimmed: it is what a replay steps through, and a full game has at most a few dozen entries.
@@ -159,14 +159,21 @@ export type GameMove = Extract<
   { type: "route_claimed" | "station_built" | "tickets_kept" | "card_drawn" | "tunnel_failed" }
 >;
 
+/** What a tunnel attempt turned over. The cards are face up on the table, so everyone may see them. */
+export interface TunnelReveal {
+  cards: TrainCardFace[];
+  extraCost: number;
+}
+
 type GameEventBody =
   | { type: "tickets_kept"; playerId: string; count: number; initial: boolean }
   | { type: "tickets_drawn"; playerId: string; count: number }
   // A face-up card is public knowledge; a card from the deck is known only to the player who drew it.
   | { type: "card_drawn"; playerId: string; source: "market"; color: TrainCardFace }
   | { type: "card_drawn"; playerId: string; source: "deck" }
-  | { type: "route_claimed"; playerId: string; routeId: string; points: number }
-  | { type: "tunnel_failed"; playerId: string; routeId: string }
+  // `tunnel` is present when the route was a tunnel: the cards turned over and the extra cost they added.
+  | { type: "route_claimed"; playerId: string; routeId: string; points: number; tunnel?: TunnelReveal }
+  | { type: "tunnel_failed"; playerId: string; routeId: string; tunnel?: TunnelReveal }
   | { type: "station_built"; playerId: string; cityId: string }
   | { type: "turn_started"; playerId: string }
   | { type: "final_round_triggered"; playerId: string }

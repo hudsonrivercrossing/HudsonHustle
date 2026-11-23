@@ -1,5 +1,6 @@
 import { parseGameAction } from "./actions.js";
 import { shuffleWithSeed } from "./random.js";
+import { canPay, canTakeMarketCard, isRouteOpen, longestPath, paymentSpend, routePoints, scoreTickets, stationCost } from "./rules.js";
 import {
   type CityDef,
   type GameAction,
@@ -27,15 +28,6 @@ const playerColors: PlayerState["color"][] = [
   "ferry-gold"
 ];
 
-const routeScoreTable: Record<number, number> = {
-  1: 1,
-  2: 2,
-  3: 4,
-  4: 7,
-  5: 10,
-  6: 15
-};
-
 function invariant(condition: unknown, message: string): asserts condition {
   if (!condition) {
     throw new Error(message);
@@ -45,16 +37,15 @@ function invariant(condition: unknown, message: string): asserts condition {
 const VISIBLE_LOG_LENGTH = 18;
 
 function appendLog(state: GameState, message: string): void {
-  state.logSequence = (state.logSequence ?? state.log.length) + 1;
+  state.logSequence += 1;
   state.log = [...state.log, message].slice(-VISIBLE_LOG_LENGTH);
 }
 
 const RECENT_EVENT_LIMIT = 32;
 
 function recordEvent(state: GameState, event: GameEventInput): void {
-  const events = state.events ?? [];
-  const seq = (events.at(-1)?.seq ?? 0) + 1;
-  state.events = [...events, { ...event, seq } as GameEvent].slice(-RECENT_EVENT_LIMIT);
+  const seq = (state.events.at(-1)?.seq ?? 0) + 1;
+  state.events = [...state.events, { ...event, seq } as GameEvent].slice(-RECENT_EVENT_LIMIT);
   // A game saved before moves were recorded has no list to extend; replay falls back to the final board.
   if (state.moves && isMove(event)) {
     state.moves = [...state.moves, event];
@@ -72,16 +63,16 @@ function isMove(event: GameEventInput): event is GameMove {
 }
 
 /** Events with a sequence number above `lastSeenSeq`, oldest first. */
-export function getEventsSince(game: { events?: GameEvent[] }, lastSeenSeq: number): GameEvent[] {
-  return (game.events ?? []).filter((event) => event.seq > lastSeenSeq);
+export function getEventsSince(game: { events: GameEvent[] }, lastSeenSeq: number): GameEvent[] {
+  return game.events.filter((event) => event.seq > lastSeenSeq);
 }
 
 /**
  * Log entries appended after `lastSeenSequence`. Comparing `log.length` cannot do this:
  * the log is trimmed, so its length stops growing once it is full.
  */
-export function getLogEntriesSince(game: { log: string[]; logSequence?: number }, lastSeenSequence: number): string[] {
-  const added = (game.logSequence ?? game.log.length) - lastSeenSequence;
+export function getLogEntriesSince(game: { log: string[]; logSequence: number }, lastSeenSequence: number): string[] {
+  const added = game.logSequence - lastSeenSequence;
   return added > 0 ? game.log.slice(-Math.min(added, game.log.length)) : [];
 }
 
@@ -132,46 +123,21 @@ function normalizeMarket(state: GameState): void {
   }
 }
 
-function countCards(hand: TrainCard[], color: TrainCardFace): number {
-  return hand.filter((card) => card.color === color).length;
-}
-
-function canPay(hand: TrainCard[], color: TrainCardColor, totalCost: number, minimumLocomotives = 0): boolean {
-  const matching = countCards(hand, color);
-  const locomotives = countCards(hand, "locomotive");
-  return locomotives >= minimumLocomotives && matching + locomotives >= totalCost;
-}
-
 function consumeCards(hand: TrainCard[], color: TrainCardColor, totalCost: number, minimumLocomotives = 0): { hand: TrainCard[]; spent: TrainCardFace[] } {
+  const colored = hand.filter((card) => card.color === color).length;
+  const locomotives = hand.filter((card) => card.color === "locomotive").length;
+  const spend = paymentSpend(colored, locomotives, totalCost, minimumLocomotives);
+  invariant(spend, "Not enough cards to pay.");
+
   const nextHand = [...hand];
-  const spent: TrainCardFace[] = [];
-  let locomotivesToSpend = minimumLocomotives;
-
-  while (locomotivesToSpend > 0) {
-    const index = nextHand.findIndex((card) => card.color === "locomotive");
-    invariant(index >= 0, "Not enough locomotives.");
-    nextHand.splice(index, 1);
-    spent.push("locomotive");
-    locomotivesToSpend -= 1;
-  }
-
-  let remaining = totalCost - spent.length;
-  while (remaining > 0) {
-    const matchIndex = nextHand.findIndex((card) => card.color === color);
-    if (matchIndex >= 0) {
-      nextHand.splice(matchIndex, 1);
-      spent.push(color);
-      remaining -= 1;
-      continue;
+  const take = (face: TrainCardFace, count: number) => {
+    for (let taken = 0; taken < count; taken += 1) {
+      nextHand.splice(nextHand.findIndex((card) => card.color === face), 1);
     }
-
-    const locoIndex = nextHand.findIndex((card) => card.color === "locomotive");
-    invariant(locoIndex >= 0, "Not enough cards to pay.");
-    nextHand.splice(locoIndex, 1);
-    spent.push("locomotive");
-    remaining -= 1;
-  }
-
+    return Array.from({ length: count }, () => face);
+  };
+  // Required locomotives first, then the colour, then locomotives for the rest: the order they reach the discard pile.
+  const spent = [...take("locomotive", minimumLocomotives), ...take(color, spend.colored), ...take("locomotive", spend.locomotives - minimumLocomotives)];
   return { hand: nextHand, spent };
 }
 
@@ -190,7 +156,7 @@ function getAvailableClaimColors(state: GameState, config: MapConfig, playerId: 
   const player = state.players.find((item) => item.id === playerId);
   invariant(player, "Unknown player.");
 
-  if (!isRouteOpen(state, config, route)) {
+  if (!isRouteOpen(route, state.routeClaims, state.players.length, config)) {
     return [];
   }
 
@@ -208,29 +174,16 @@ function hasLegalAction(state: GameState, config: MapConfig): boolean {
   if (state.trainDeck.length + state.discardPile.length + state.market.length > 0 || state.regularTickets.length > 0) {
     return true;
   }
-  const stationCost = config.settings.stationsPerPlayer - player.stationsLeft + 1;
+  const cost = stationCost(config.settings.stationsPerPlayer, player.stationsLeft);
   const canBuildStation =
     player.stationsLeft > 0 &&
     state.stations.length < config.cities.length &&
-    trainCardColors.some((color) => canPay(player.hand, color, stationCost, 0));
+    trainCardColors.some((color) => canPay(player.hand, color, cost, 0));
   return canBuildStation || config.routes.some((route) => getAvailableClaimColors(state, config, player.id, route.id).length > 0);
 }
 
-function isRouteOpen(state: GameState, config: MapConfig, route: RouteDef): boolean {
-  if (state.routeClaims.some((claim) => claim.routeId === route.id)) {
-    return false;
-  }
-
-  if (route.twinGroup && state.players.length <= 3) {
-    const twinIds = config.routes.filter((item) => item.twinGroup === route.twinGroup).map((item) => item.id);
-    return !state.routeClaims.some((claim) => twinIds.includes(claim.routeId));
-  }
-
-  return true;
-}
-
 function hasOpenRoute(state: GameState, config: MapConfig): boolean {
-  return config.routes.some((route) => isRouteOpen(state, config, route));
+  return config.routes.some((route) => isRouteOpen(route, state.routeClaims, state.players.length, config));
 }
 
 function drawTickets(state: GameState, count: number, bucket: "regular" | "long"): TicketDef[] {
@@ -245,169 +198,35 @@ function drawTickets(state: GameState, count: number, bucket: "regular" | "long"
   return drawn;
 }
 
+const cityLookups = new WeakMap<MapConfig, Map<string, CityDef>>();
+
+/** A map's cities by id, built once per map. */
 function cityLookup(config: MapConfig): Map<string, CityDef> {
-  return new Map(config.cities.map((city) => [city.id, city]));
-}
-
-function buildAdjacency(routeClaims: RouteClaim[], config: MapConfig): Map<string, Array<{ to: string; routeId: string; length: number }>> {
-  const adjacency = new Map<string, Array<{ to: string; routeId: string; length: number }>>();
-
-  const push = (from: string, to: string, routeId: string, length: number) => {
-    const entry = adjacency.get(from) ?? [];
-    entry.push({ to, routeId, length });
-    adjacency.set(from, entry);
-  };
-
-  for (const claim of routeClaims) {
-    const route = config.routes.find((item) => item.id === claim.routeId);
-    if (!route) {
-      continue;
-    }
-    push(route.from, route.to, route.id, route.length);
-    push(route.to, route.from, route.id, route.length);
+  let lookup = cityLookups.get(config);
+  if (!lookup) {
+    lookup = new Map(config.cities.map((city) => [city.id, city]));
+    cityLookups.set(config, lookup);
   }
-
-  return adjacency;
-}
-
-function canReach(adjacency: Map<string, Array<{ to: string; routeId: string; length: number }>>, from: string, to: string): boolean {
-  if (from === to) {
-    return true;
-  }
-
-  const queue = [from];
-  const visited = new Set<string>([from]);
-
-  while (queue.length > 0) {
-    const current = queue.shift()!;
-    const edges = adjacency.get(current) ?? [];
-    for (const edge of edges) {
-      if (edge.to === to) {
-        return true;
-      }
-      if (!visited.has(edge.to)) {
-        visited.add(edge.to);
-        queue.push(edge.to);
-      }
-    }
-  }
-
-  return false;
-}
-
-function enumerateStationOptions(playerId: string, stations: StationPlacement[], routeClaims: RouteClaim[], config: MapConfig): RouteClaim[][] {
-  const playerStations = stations.filter((station) => station.playerId === playerId);
-  const candidateLists = playerStations.map((station) => {
-    const edges = routeClaims.filter((claim) => {
-      if (claim.playerId === playerId) {
-        return false;
-      }
-      const route = config.routes.find((item) => item.id === claim.routeId);
-      return route && (route.from === station.cityId || route.to === station.cityId);
-    });
-    return [null, ...edges];
-  });
-
-  const results: RouteClaim[][] = [];
-
-  const visit = (index: number, picked: RouteClaim[]) => {
-    if (index >= candidateLists.length) {
-      results.push([...picked]);
-      return;
-    }
-
-    for (const option of candidateLists[index]) {
-      if (option) {
-        picked.push(option);
-      }
-      visit(index + 1, picked);
-      if (option) {
-        picked.pop();
-      }
-    }
-  };
-
-  visit(0, []);
-  return results.length > 0 ? results : [[]];
+  return lookup;
 }
 
 function evaluateTickets(player: PlayerState, state: GameState, config: MapConfig): { total: number; completed: string[]; failed: string[] } {
-  const ownedRoutes = state.routeClaims.filter((claim) => claim.playerId === player.id);
-  const stationOptions = enumerateStationOptions(player.id, state.stations, state.routeClaims, config);
-  let bestTotal = Number.NEGATIVE_INFINITY;
-  let bestCompleted: string[] = [];
-  let bestFailed: string[] = [];
-
-  for (const option of stationOptions) {
-    const adjacency = buildAdjacency([...ownedRoutes, ...option], config);
-    let total = 0;
-    const completed: string[] = [];
-    const failed: string[] = [];
-
-    for (const ticket of player.tickets) {
-      if (canReach(adjacency, ticket.from, ticket.to)) {
-        total += ticket.points;
-        completed.push(ticket.id);
-      } else {
-        total -= ticket.points;
-        failed.push(ticket.id);
-      }
-    }
-
-    if (total > bestTotal) {
-      bestTotal = total;
-      bestCompleted = completed;
-      bestFailed = failed;
-    }
-  }
-
-  return { total: bestTotal, completed: bestCompleted, failed: bestFailed };
+  const { total, completedIds } = scoreTickets(config, state.routeClaims, state.stations, player.id, player.tickets);
+  return {
+    total,
+    completed: player.tickets.filter((ticket) => completedIds.has(ticket.id)).map((ticket) => ticket.id),
+    failed: player.tickets.filter((ticket) => !completedIds.has(ticket.id)).map((ticket) => ticket.id)
+  };
 }
 
+/** Which of a player's tickets count as connected right now, by the same rule the final scoring uses:
+ * their own routes, plus one rival route borrowed through each station they have built. */
 export function getTicketProgress(state: GameState, config: MapConfig, playerId: string): Array<{ ticket: TicketDef; completed: boolean }> {
   const player = state.players.find((entry) => entry.id === playerId);
   invariant(player, "Unknown player.");
-  const ownedRoutes = state.routeClaims.filter((claim) => claim.playerId === player.id);
-  const adjacency = buildAdjacency(ownedRoutes, config);
+  const completed = new Set(evaluateTickets(player, state, config).completed);
 
-  return player.tickets.map((ticket) => ({
-    ticket,
-    completed: canReach(adjacency, ticket.from, ticket.to)
-  }));
-}
-
-function longestRouteLength(playerId: string, state: GameState, config: MapConfig): number {
-  const claims = state.routeClaims.filter((claim) => claim.playerId === playerId);
-  const adjacency = buildAdjacency(claims, config);
-  const routeLengths = new Map<string, number>();
-  for (const claim of claims) {
-    const route = config.routes.find((item) => item.id === claim.routeId);
-    if (!route) {
-      continue;
-    }
-    routeLengths.set(route.id, route.length);
-  }
-
-  let best = 0;
-
-  const dfs = (cityId: string, usedEdges: Set<string>, totalLength: number): void => {
-    best = Math.max(best, totalLength);
-    const edges = adjacency.get(cityId) ?? [];
-    for (const edge of edges) {
-      if (usedEdges.has(edge.routeId)) {
-        continue;
-      }
-      usedEdges.add(edge.routeId);
-      dfs(edge.to, usedEdges, totalLength + (routeLengths.get(edge.routeId) ?? 0));
-      usedEdges.delete(edge.routeId);
-    }
-  };
-
-  for (const city of config.cities) {
-    dfs(city.id, new Set<string>(), 0);
-  }
-
-  return best;
+  return player.tickets.map((ticket) => ({ ticket, completed: completed.has(ticket.id) }));
 }
 
 function finishGame(state: GameState, config: MapConfig): GameState {
@@ -418,7 +237,7 @@ function finishGame(state: GameState, config: MapConfig): GameState {
 
   const longestByPlayer = new Map<string, number>();
   for (const player of nextState.players) {
-    longestByPlayer.set(player.id, longestRouteLength(player.id, nextState, config));
+    longestByPlayer.set(player.id, longestPath(config, nextState.routeClaims, player.id));
   }
   const longestWinningLength = Math.max(...longestByPlayer.values(), 0);
 
@@ -563,7 +382,7 @@ export function reduceGame(state: GameState, untrustedAction: GameAction, config
       if (action.source === "market") {
         invariant(typeof action.marketIndex === "number", "Market draw requires an index.");
         invariant(action.marketIndex >= 0 && action.marketIndex < nextState.market.length, "Invalid market index.");
-        invariant(!(nextState.turn.drawsTaken === 1 && nextState.market[action.marketIndex]?.color === "locomotive"), "You cannot take a face-up locomotive as your second draw.");
+        invariant(canTakeMarketCard(nextState.turn, nextState.market[action.marketIndex]), "You cannot take a face-up locomotive as your second draw.");
       }
 
       let drawn: TrainCard;
@@ -640,7 +459,7 @@ export function reduceGame(state: GameState, untrustedAction: GameAction, config
         if (!canPay(player.hand, action.color, route.length + tunnelExtraCost, route.locomotiveCost ?? 0)) {
           beginAwaitingHandoff(nextState, `${player.name} could not cover the tunnel surcharge.`);
           appendLog(nextState, `${player.name} failed to claim ${route.id} after a tunnel reveal.`);
-          recordEvent(nextState, { type: "tunnel_failed", playerId: player.id, routeId: route.id });
+          recordEvent(nextState, { type: "tunnel_failed", playerId: player.id, routeId: route.id, tunnel: { cards: tunnelReveal, extraCost: tunnelExtraCost } });
           return nextState;
         }
       } else {
@@ -649,11 +468,11 @@ export function reduceGame(state: GameState, untrustedAction: GameAction, config
 
       const payment = consumeCards(player.hand, action.color, route.length + tunnelExtraCost, route.locomotiveCost ?? 0);
       player.hand = payment.hand;
-      player.score += routeScoreTable[route.length] ?? route.length * 2;
+      player.score += routePoints(route.length);
       player.trainsLeft -= route.length;
       nextState.discardPile.push(
         ...payment.spent.map((color, index) => ({
-          id: `spent-${route.id}-${index}-${nextState.logSequence ?? nextState.log.length}`,
+          id: `spent-${route.id}-${index}-${nextState.logSequence}`,
           color
         }))
       );
@@ -665,9 +484,15 @@ export function reduceGame(state: GameState, untrustedAction: GameAction, config
         tunnelExtraCost
       });
       maybeTriggerFinalRound(nextState, config, player);
-      beginAwaitingHandoff(nextState, `${player.name} claimed ${route.id}.`);
-      appendLog(nextState, `${player.name} claimed ${route.id} for ${routeScoreTable[route.length] ?? route.length * 2} points.`);
-      recordEvent(nextState, { type: "route_claimed", playerId: player.id, routeId: route.id, points: routeScoreTable[route.length] ?? route.length * 2 });
+      beginAwaitingHandoff(nextState, `${player.name} claimed ${getCityName(config, route.from)} → ${getCityName(config, route.to)}.`);
+      appendLog(nextState, `${player.name} claimed ${route.id} for ${routePoints(route.length)} points.`);
+      recordEvent(nextState, {
+        type: "route_claimed",
+        playerId: player.id,
+        routeId: route.id,
+        points: routePoints(route.length),
+        ...(route.type === "tunnel" ? { tunnel: { cards: tunnelReveal, extraCost: tunnelExtraCost } } : {})
+      });
       return nextState;
     }
     case "draw_tickets": {
@@ -711,14 +536,14 @@ export function reduceGame(state: GameState, untrustedAction: GameAction, config
       invariant(!nextState.stations.some((station) => station.cityId === action.cityId), "A station already exists in that city.");
       invariant(config.cities.some((city) => city.id === action.cityId), "Unknown city.");
 
-      const cost = config.settings.stationsPerPlayer - player.stationsLeft + 1;
+      const cost = stationCost(config.settings.stationsPerPlayer, player.stationsLeft);
       invariant(canPay(player.hand, action.color, cost, 0), "You cannot afford that station.");
       const payment = consumeCards(player.hand, action.color, cost, 0);
       player.hand = payment.hand;
       player.stationsLeft -= 1;
       nextState.discardPile.push(
         ...payment.spent.map((color, index) => ({
-          id: `station-${action.cityId}-${index}-${nextState.logSequence ?? nextState.log.length}`,
+          id: `station-${action.cityId}-${index}-${nextState.logSequence}`,
           color
         }))
       );
@@ -726,7 +551,7 @@ export function reduceGame(state: GameState, untrustedAction: GameAction, config
         cityId: action.cityId,
         playerId: player.id
       });
-      beginAwaitingHandoff(nextState, `${player.name} built a station in ${action.cityId}.`);
+      beginAwaitingHandoff(nextState, `${player.name} built a station in ${getCityName(config, action.cityId)}.`);
       appendLog(nextState, `${player.name} built a station in ${action.cityId}.`);
       recordEvent(nextState, { type: "station_built", playerId: player.id, cityId: action.cityId });
       return nextState;
@@ -778,7 +603,7 @@ export function getAffordableRouteColors(state: GameState, config: MapConfig, ro
 
 export function getAffordableStationColors(state: GameState, config: MapConfig): TrainCardColor[] {
   const player = getPlayer(state);
-  const cost = config.settings.stationsPerPlayer - player.stationsLeft + 1;
+  const cost = stationCost(config.settings.stationsPerPlayer, player.stationsLeft);
   return trainCardColors.filter((color) => canPay(player.hand, color, cost, 0));
 }
 

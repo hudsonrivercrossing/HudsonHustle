@@ -1,0 +1,91 @@
+/* The deck and the five face-up cards: six places in a 3 by 2 block. */
+.table-supply {
+  --card-w: var(--supply-card-w);
+  display: grid;
+  grid-template-columns: repeat(3, var(--card-w));
+  gap: var(--space-stack-sm);
+  justify-content: center;
+}
+
+.table-supply__market {
+  display: contents;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.table-supply__market li {
+  display: block;
+}
+
+.table-supply__deck,
+.table-supply__card {
+  position: relative;
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-card);
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: transform var(--duration-fast) ease-out;
+}
+
+.table-supply__deck:focus-visible,
+.table-supply__card:focus-visible {
+  outline: 2px solid var(--hud-brass-light-solid);
+  outline-offset: 3px;
+}
+
+.table-supply__deck:active:not(:disabled),
+.table-supply__card:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.table-supply__deck:disabled,
+.table-supply__card:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+/* The deck reads as a pile: two more backs peek out beneath the top one. */
+.table-supply__deck .train-card {
+  box-shadow: 2px 2px 0 var(--hud-wood-light), 3px 3px 0 var(--hud-brass-dark), 5px 5px 0 var(--hud-wood-light), 6px 6px 0 var(--hud-brass-dark), 0 8px 12px var(--hud-shadow);
+}
+
+/* The deck carries the same name strip as any other card; the number printed on its back is how many are left. */
+.table-supply__deck-label {
+  position: absolute;
+  inset: auto 0 0;
+  border-radius: 0 0 var(--radius-card) var(--radius-card);
+}
+
+.table-supply__deck-count {
+  position: absolute;
+  inset: 0 0 var(--space-stack-lg);
+  display: grid;
+  place-items: center;
+  color: var(--hud-paper-bright);
+  font-family: var(--font-display);
+  font-size: var(--type-xl);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-shadow: 0 1px 2px var(--hud-shadow);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .table-supply__deck:hover:not(:disabled),
+  .table-supply__card:hover:not(:disabled) {
+    transform: translateY(-4px);
+  }
+}
+
+@media (max-width: 760px), (orientation: landscape) and (max-height: 500px) and (min-width: 560px) {
+  .table-supply {
+    grid-template-columns: repeat(6, var(--card-w));
+    justify-content: start;
+    overflow-x: auto;
+    padding-bottom: var(--space-stack-xs);
+  }
+}

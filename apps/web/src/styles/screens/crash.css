@@ -1,0 +1,58 @@
+/* Shown in place of the whole app when it crashes. */
+.crash-screen {
+  display: grid;
+  gap: var(--space-stack-lg);
+  align-content: center;
+  justify-items: start;
+  max-width: 34rem;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: var(--space-stack-xl) var(--space-stack-lg);
+  color: var(--ink);
+}
+
+.crash-screen__title {
+  font-size: var(--type-display);
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.crash-screen__copy {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: var(--type-md);
+  line-height: 1.5;
+}
+
+.crash-screen__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-stack-sm);
+}
+
+.crash-screen__discard {
+  min-height: var(--hit-target-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-soft);
+  font-size: var(--type-sm);
+  text-align: left;
+  text-decoration: underline;
+}
+
+.crash-screen__discard:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.crash-screen__details {
+  max-width: 100%;
+  color: var(--ink-soft);
+  font-size: var(--type-xs);
+}
+
+.crash-screen__details pre {
+  overflow-x: auto;
+  white-space: pre-wrap;
+}

@@ -8,12 +8,16 @@ interface TimerPickerProps {
 
 export function TimerPicker({ value, onChange, step = 15 }: TimerPickerProps): JSX.Element {
   return (
-    <div className="timer-picker">
-      <Button onClick={() => onChange(Math.max(0, value - step))}>-{step}</Button>
+    <div className="timer-picker" role="group" aria-label="Turn timer">
+      <Button aria-label={`${step} seconds less`} onClick={() => onChange(Math.max(0, value - step))}>
+        −{step}
+      </Button>
       <output className="timer-picker__value" aria-live="polite">
         {value === 0 ? "Untimed" : `${value}s`}
       </output>
-      <Button onClick={() => onChange(value + step)}>+{step}</Button>
+      <Button aria-label={`${step} seconds more`} onClick={() => onChange(value + step)}>
+        +{step}
+      </Button>
     </div>
   );
 }

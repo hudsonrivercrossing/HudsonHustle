@@ -21,9 +21,11 @@ This file is the source of truth for humans and agents working in this repo.
 - Gameplay changes must update player-facing docs in the same task when behavior changes.
 
 ## 4. Codebase Shape
-- `apps/web`: React + TypeScript + SVG client for local play.
+- `apps/web`: React + TypeScript + SVG client for local and online play.
+- `apps/server`: Fastify + Socket.IO room server, Postgres through Drizzle.
 - `packages/game-core`: deterministic rules engine, scoring, serialization, validation.
-- `packages/game-data`: board layout, route definitions, tickets, and balancing constants.
+- `packages/game-data`: map loading and checks, board geometry, and the config registry.
+- `configs/hudson-hustle/`: versioned map snapshots (stations, routes, tickets, rules, visuals).
 - `docs/`: PRD, tech spec, design system, and player documentation.
 - `.codex/skills/`: repo-local skills for roadmap management and balance review.
 

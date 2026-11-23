@@ -3,11 +3,21 @@ import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
 import postgres from "postgres";
-import { gameEventsTable, gameHistoryCheckpointsTable, gameSnapshotsTable, roomsTable, roomSeatsTable } from "../db/schema.js";
-import type { RoomRepository, SaveRoomOptions, StoredGameHistory, StoredGameHistoryUpdate, StoredRoomRecord } from "./types.js";
+import { restoreGameState, type GameState } from "@hudson-hustle/game-core";
+import { gameSnapshotsTable, roomsTable, roomSeatsTable } from "../db/schema.js";
+import type { RoomRepository, StoredRoomRecord } from "./types.js";
 
 /** `drizzle/` sits beside `src/` in development and beside `dist/` once built. */
 const migrationsFolder = fileURLToPath(new URL("../../drizzle", import.meta.url));
+
+/** A stored game is checked on the way in; one this server cannot read fails loudly instead of mid-turn. */
+function readStoredGame(roomCode: string, stored: unknown): GameState {
+  const game = restoreGameState(stored);
+  if (!game) {
+    throw new Error(`Room ${roomCode} has a stored game this server cannot read.`);
+  }
+  return game;
+}
 
 export class PostgresRoomRepository implements RoomRepository {
   private readonly sql: postgres.Sql;
@@ -28,7 +38,7 @@ export class PostgresRoomRepository implements RoomRepository {
     return this.ready;
   }
 
-  async saveRoom(record: StoredRoomRecord, historyUpdate?: StoredGameHistoryUpdate, options?: SaveRoomOptions): Promise<void> {
+  async saveRoom(record: StoredRoomRecord): Promise<void> {
     await this.ready;
     const updatedAt = new Date(record.updatedAt);
     const createdAt = new Date(record.createdAt);
@@ -108,38 +118,6 @@ export class PostgresRoomRepository implements RoomRepository {
       } else {
         await tx.delete(gameSnapshotsTable).where(eq(gameSnapshotsTable.roomCode, record.roomCode));
       }
-
-      if (options?.replaceHistory) {
-        await tx.delete(gameEventsTable).where(eq(gameEventsTable.roomCode, record.roomCode));
-        await tx.delete(gameHistoryCheckpointsTable).where(eq(gameHistoryCheckpointsTable.roomCode, record.roomCode));
-      }
-
-      if (historyUpdate && historyUpdate.events.length > 0) {
-        await tx.insert(gameEventsTable).values(
-          historyUpdate.events.map((event) => ({
-            roomCode: event.roomCode,
-            sequence: event.sequence,
-            eventType: event.eventType,
-            payload: event.payload,
-            createdAt: new Date(event.createdAt)
-          }))
-        );
-      }
-
-      if (historyUpdate && historyUpdate.checkpoints.length > 0) {
-        for (const checkpoint of historyUpdate.checkpoints) {
-          await tx
-            .insert(gameHistoryCheckpointsTable)
-            .values({
-              roomCode: checkpoint.roomCode,
-              snapshotVersion: checkpoint.snapshotVersion,
-              checkpointType: checkpoint.checkpointType,
-              snapshot: checkpoint.snapshot,
-              createdAt: new Date(checkpoint.createdAt)
-            })
-            .onConflictDoNothing();
-        }
-      }
     });
   }
 
@@ -168,7 +146,7 @@ export class PostgresRoomRepository implements RoomRepository {
       updatedAt: room.updatedAt.toISOString(),
       deadlineAt: room.deadlineAt ? room.deadlineAt.toISOString() : null,
       snapshotVersion: snapshot?.snapshotVersion ?? 0,
-      game: (snapshot?.snapshot ?? null) as StoredRoomRecord["game"],
+      game: snapshot ? readStoredGame(roomCode, snapshot.snapshot) : null,
       seats: seats.map((seat) => ({
         seatId: seat.seatId,
         playerId: seat.playerId,
@@ -186,38 +164,6 @@ export class PostgresRoomRepository implements RoomRepository {
         joinedAt: seat.joinedAt.toISOString(),
         updatedAt: seat.updatedAt.toISOString()
       }))
-    };
-  }
-
-  async getGameHistory(roomCode: string): Promise<StoredGameHistory> {
-    await this.ready;
-
-    const events = await this.db.select().from(gameEventsTable).where(eq(gameEventsTable.roomCode, roomCode));
-    const checkpoints = await this.db
-      .select()
-      .from(gameHistoryCheckpointsTable)
-      .where(eq(gameHistoryCheckpointsTable.roomCode, roomCode));
-
-    return {
-      events: events
-        .filter((event) => event.eventType !== "room_saved")
-        .sort((left, right) => left.sequence - right.sequence || left.id - right.id)
-        .map((event) => ({
-          roomCode: event.roomCode,
-          sequence: event.sequence,
-          eventType: event.eventType as StoredGameHistory["events"][number]["eventType"],
-          payload: event.payload as StoredGameHistory["events"][number]["payload"],
-          createdAt: event.createdAt.toISOString()
-        })),
-      checkpoints: checkpoints
-        .sort((left, right) => left.snapshotVersion - right.snapshotVersion)
-        .map((checkpoint) => ({
-          roomCode: checkpoint.roomCode,
-          snapshotVersion: checkpoint.snapshotVersion,
-          checkpointType: checkpoint.checkpointType as StoredGameHistory["checkpoints"][number]["checkpointType"],
-          snapshot: checkpoint.snapshot as StoredGameHistory["checkpoints"][number]["snapshot"],
-          createdAt: checkpoint.createdAt.toISOString()
-        }))
     };
   }
 

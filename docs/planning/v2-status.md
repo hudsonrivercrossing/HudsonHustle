@@ -1,3 +1,5 @@
+> Historical status from April 2026. The `develop` branch and the staging environment it describes were retired in November 2026: there is one branch, `main`, and merging to it deploys production. See `docs/product/v2/v2-deployment.md`.
+
 # V2 Status
 
 ## Summary

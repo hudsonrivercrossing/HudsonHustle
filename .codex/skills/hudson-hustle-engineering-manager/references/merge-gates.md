@@ -1,29 +1,19 @@
 # Merge Gates
 
-Use this reference when deciding whether a Hudson Hustle branch is ready for `develop` or `main`.
+Use this reference when deciding whether a Hudson Hustle branch is ready for `main`.
 
-## `develop` Gate
-A branch is usually ready for `develop` when:
-- the intended code change is complete enough to validate on staging
-- local targeted tests pass
-- local build passes
-- a findings-first code review has been done
-- affected docs have been updated or intentionally deferred with a reason
-
-After merge to `develop`, verify:
-- `Vercel` preview / `develop`
-- `Railway` `api-develop`
-- staging `/health`
-
-If the change affects runtime multiplayer behavior, prefer a staging smoke pass before promoting further.
+There is one long-lived branch. Merging to `main` deploys production; there is no staging step.
 
 ## `main` Gate
-A branch is usually ready for `main` only after:
-- the corresponding `develop` result is trusted
-- staging smoke has passed for the relevant behavior
-- any staging-only regressions are resolved
+A branch is usually ready for `main` only when:
+- the intended change is complete
+- `pnpm typecheck`, `pnpm test` and `pnpm css:debt` pass locally, and the end-to-end tests when a flow changed
+- the local build passes
+- the pull request preview has been smoked in a real browser for any visible change
+- server and database changes have been run against a disposable Postgres, because the preview uses the production API and does not exercise them
+- any migration in the change has been read and its effect on stored data is understood
 - a findings-first code review has been done
-- affected docs are aligned with shipped behavior
+- affected docs are aligned with what ships
 
 After merge to `main`, verify:
 - `Vercel` production
@@ -33,7 +23,7 @@ After merge to `main`, verify:
 Prefer at least one real browser or remote multiplayer validation before calling a release stable.
 
 ## Docs Review Rule
-Before merge to either `develop` or `main`, review whether the change should update:
+Before merge, review whether the change should update:
 - `docs/product/`
 - `docs/gameplay/`
 - `docs/config/`

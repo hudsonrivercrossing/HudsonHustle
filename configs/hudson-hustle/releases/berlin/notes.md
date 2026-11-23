@@ -86,3 +86,14 @@
 - Station authority metadata uses `station-proxy` references in draft one.
 - Some inactive candidates may prove stronger than current active nodes after playtest.
 - Berlin-specific backdrop and palette work is intentionally deferred until the graph and ticket structure stabilize.
+
+## 2026-11-23 Layout Pass
+- No station, route, length, colour or locomotive cost was added or removed; saved games on this map still load.
+- `Brandenburger Tor` and `Potsdamer Platz` sat exactly on the wall. Both are now just inside East Berlin, where the stations were.
+- Every route typed `Border Crossing` now crosses the wall on the board. Two did not and are typed `normal`: `friedrichstrasse-brandenburger-tor` and `potsdamer-platz-brandenburger-tor` (neither had a locomotive cost).
+- Hauptbahnhof, Friedrichstrasse, Alexanderplatz and Frankfurter Allee moved a little so the core routes no longer stack; `frankfurter-allee-ostkreuz` bends east so it no longer covers the sector lettering.
+- Station names are written in full with umlauts on both the board and the tickets.
+- Basemap `berlin-cold-war-reference-v5.webp`: the same picture as v4 with the dark vignette at the edges mostly lifted and the whole sheet a little lighter, so it sits closer to the New York board.
+- Short routes are drawn with a curve so their spaces are closer in size to the rest: Spandau to Jungfernheide, Neukölln to Flughafen BER, Neukölln to Tempelhof, Schöneberg to Westkreuz, Schönhauser Allee to Pankow and Potsdamer Platz to Brandenburger Tor. Zoologischer Garten and Tempelhof moved slightly to even out their neighbours. Lengths are unchanged; a space is now between about 52 and 143 map units long, from 45 to 153.
+- Second pass on space sizes: Hauptbahnhof, Potsdamer Platz, Ostkreuz and Wannsee moved slightly, all on their own side of the wall. The longest space is now about 112 map units, the shortest about 52.
+- Border crossings are typed `ferry`, the type the rules know, and the map's `typeLabelOverrides` names them "Border Crossing" on screen. They used to be typed with the display name itself, which no check caught.

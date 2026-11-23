@@ -98,7 +98,13 @@ export function createRateLimiter(limit: number, windowMs: number) {
 
 export async function createServerApp() {
   const env = readServerEnv();
-  const app = Fastify({ logger: true, bodyLimit: MAX_REQUEST_BYTES });
+  const app = Fastify({
+    logger: true,
+    bodyLimit: MAX_REQUEST_BYTES,
+    // The server runs behind the host's proxy. Without this every request appears to come from the proxy,
+    // and the per-address room limit would be shared by everyone.
+    trustProxy: true
+  });
   const corsOrigins = env.corsOrigin
     .split(",")
     .map((origin) => origin.trim())
@@ -232,14 +238,6 @@ export async function createServerApp() {
       throw new RoomServiceError("A seat snapshot requires room credentials.", 400, "missing_credentials");
     }
     return roomService.getSnapshot(request.params.roomCode, { seatId, playerSecret });
-  });
-
-  app.post<{ Params: { roomCode: string }; Body: { seatId?: string; playerSecret?: string } }>("/rooms/:roomCode/history", async (request) => {
-    const { seatId, playerSecret } = request.body ?? {};
-    if (!seatId || !playerSecret) {
-      throw new RoomServiceError("History review requires room credentials.", 400, "missing_credentials");
-    }
-    return roomService.getReviewHistory(request.params.roomCode, { seatId, playerSecret });
   });
 
   await app.ready();

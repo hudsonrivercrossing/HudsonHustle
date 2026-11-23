@@ -1,0 +1,3 @@
+# Room pages are private invitations, not pages to list.
+User-agent: *
+Disallow: /room/

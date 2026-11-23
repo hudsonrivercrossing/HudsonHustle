@@ -1,0 +1,555 @@
+/* The game screen is a table: the board in the middle, each kind of piece in its own place around it.
+   Nothing here is a titled panel; position says what a thing is. */
+.tabletop {
+  --rail: clamp(208px, 19vw, 296px);
+  --card-w: clamp(54px, 4.3vw, 66px);
+  /* Three cards across a rail, with two gaps between them. */
+  --supply-card-w: min(calc((var(--rail) - 2 * var(--space-stack-sm)) / 3), 84px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--space-stack-sm);
+  height: 100dvh;
+  min-height: 0;
+  max-height: 100dvh;
+  padding: max(var(--space-stack-sm), env(safe-area-inset-top)) max(var(--space-stack-md), env(safe-area-inset-right)) max(var(--space-stack-md), env(safe-area-inset-bottom)) max(var(--space-stack-md), env(safe-area-inset-left));
+  background: radial-gradient(ellipse at 50% 42%, var(--hud-wood-light), var(--hud-wood) 72%);
+}
+
+.tabletop__top {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto auto;
+  gap: var(--space-stack-md);
+  align-items: center;
+  min-height: var(--hit-target-min);
+}
+
+/* The last thing that happened at the table, said once in the bar instead of popping up over the board. */
+.tabletop__news {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--hud-paper-soft);
+  font-size: var(--type-sm);
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The bar sits above the table, so what opens from it (the scoring note) is not covered by the board or the cards. */
+.tabletop > .tabletop__top {
+  z-index: var(--z-chrome);
+}
+
+.tabletop__seats {
+  min-width: 0;
+}
+
+.tabletop__menu {
+  position: relative;
+  display: flex;
+  gap: var(--space-stack-xs);
+  align-items: center;
+}
+
+/* Menu items are quiet words, not plates: the table's own pieces carry the weight. */
+.tabletop .tabletop__menu-button.system-button,
+.tabletop .tabletop__menu-item .score-guide__trigger.system-button {
+  min-width: 0;
+  min-height: var(--hit-target-min);
+  padding: 0 var(--space-stack-md);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  box-shadow: none;
+  clip-path: none;
+  color: var(--hud-paper-soft);
+  font-size: var(--type-sm);
+  font-weight: var(--weight-semibold);
+  text-shadow: none;
+  transition: color var(--duration-fast) var(--easing-standard), background-color var(--duration-fast) var(--easing-standard);
+}
+
+/* On a wide screen the menu is three words in a row; the button that folds them away is for phones. */
+.tabletop .tabletop__menu-toggle.system-button,
+.tabletop__map-tools {
+  display: none;
+}
+
+.tabletop__menu-items {
+  display: contents;
+}
+
+/* A menu item that is only a mark: square, the size of a fingertip. */
+.tabletop .tabletop__menu-button--icon.system-button {
+  display: grid;
+  place-items: center;
+  width: var(--hit-target-min);
+  padding: 0;
+}
+
+.home-screen-steps {
+  display: grid;
+  gap: var(--space-stack-sm);
+  margin: 0;
+  padding-left: var(--space-stack-xl);
+  padding-bottom: var(--space-stack-lg);
+  text-align: left;
+}
+
+/* A long name shortens; it never takes a second line from the board. */
+.tabletop .turn-indicator {
+  min-width: 0;
+}
+
+.tabletop .turn-indicator__name {
+  overflow: hidden;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tabletop .tabletop__menu-button.system-button::before,
+.tabletop .tabletop__menu-button.system-button::after,
+.tabletop .tabletop__menu-item .score-guide__trigger.system-button::before,
+.tabletop .tabletop__menu-item .score-guide__trigger.system-button::after {
+  content: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tabletop .tabletop__menu-button.system-button:hover,
+  .tabletop .tabletop__menu-item .score-guide__trigger.system-button:hover {
+    background: color-mix(in oklch, var(--hud-paper-solid) 10%, transparent);
+    color: var(--hud-paper-bright);
+  }
+}
+
+/* Said for as long as the room connection is down; it sits over the board, clear of the bar. */
+.tabletop__connection {
+  position: fixed;
+  top: max(64px, calc(env(safe-area-inset-top) + 64px));
+  left: 50%;
+  z-index: var(--z-toast);
+  margin: 0;
+  padding: var(--space-stack-sm) var(--space-stack-lg);
+  border-radius: var(--radius-pill);
+  background: var(--hud-paper-bright);
+  box-shadow: 0 8px 24px var(--hud-shadow);
+  color: var(--hud-ink);
+  font-size: var(--type-sm);
+  font-weight: var(--weight-bold);
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+/* The table takes focus only by script, after a dialog closes; it is a place to start from, not a control. */
+.tabletop__table:focus {
+  outline: none;
+}
+
+.tabletop__table {
+  display: grid;
+  grid-template-columns: var(--rail) minmax(0, 1fr) var(--rail);
+  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "left board right"
+    "left hand right";
+  gap: var(--space-stack-sm) var(--space-stack-md);
+  min-height: 0;
+}
+
+.tabletop__left {
+  grid-area: left;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.tabletop__right {
+  grid-area: right;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--space-stack-md);
+  min-height: 0;
+}
+
+.tabletop__side {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.tabletop__side > .panel {
+  height: auto;
+  max-height: 100%;
+  padding: var(--space-stack-sm) 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+/* The chat keeps its frame, so it needs its own inset. */
+.tabletop .tabletop__side > .chat-panel-dock {
+  padding: var(--space-stack-md);
+}
+
+.tabletop__board {
+  grid-area: board;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+}
+
+.tabletop .tabletop__board .board-shell {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.tabletop .tabletop__board .board-map {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 14px 22px var(--hud-shadow));
+}
+
+.tabletop__hand {
+  grid-area: hand;
+  display: grid;
+  place-items: center;
+  min-height: calc(var(--card-w) * 1.4 + var(--space-stack-lg));
+  padding-bottom: var(--space-stack-xs);
+}
+
+.tabletop__tabs {
+  display: none;
+}
+
+/* Phones: the board keeps most of the screen and pans under the finger. Cards and tickets share
+   one tray below it, and the hand stays pinned at the bottom. */
+@media (max-width: 760px), (orientation: landscape) and (max-height: 500px) and (min-width: 560px) {
+  .tabletop {
+    --card-w: 56px;
+    --supply-card-w: 56px;
+    /* The table never scrolls the page, so Safari keeps its toolbar up; after a scrolled screen it can
+       still report the taller, toolbar-less height. The small viewport is the one that is always on screen. */
+    height: 100svh;
+    max-height: 100svh;
+    grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+    grid-template-areas:
+      "top"
+      "board"
+      "tabs"
+      "tray"
+      "hand";
+    gap: var(--space-stack-xs);
+    padding: max(var(--space-stack-xs), env(safe-area-inset-top)) max(var(--space-stack-sm), env(safe-area-inset-right)) max(var(--space-stack-sm), env(safe-area-inset-bottom)) max(var(--space-stack-sm), env(safe-area-inset-left));
+  }
+
+  .tabletop__top {
+    grid-area: top;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-stack-xs);
+  }
+
+  /* A phone has no spare line in the bar, so there the news still pops up. */
+  .tabletop__news {
+    display: none;
+  }
+
+  .tabletop__seats {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    overflow-x: auto;
+  }
+
+  .tabletop .tabletop__menu-button.system-button,
+  .tabletop .tabletop__menu-item .score-guide__trigger.system-button {
+    padding: 0 var(--space-stack-sm);
+  }
+
+  .tabletop__table {
+    display: contents;
+  }
+
+  .tabletop__board {
+    overflow: auto;
+    overscroll-behavior: contain;
+    touch-action: pan-x pan-y pinch-zoom;
+    border-radius: var(--radius-sm);
+  }
+
+  .tabletop .tabletop__board .board-shell {
+    display: block;
+    width: 760px;
+    height: auto;
+  }
+
+  .tabletop .tabletop__board .board-map {
+    height: auto;
+    filter: none;
+  }
+
+  .tabletop__left,
+  .tabletop__right {
+    grid-area: tray;
+    max-height: 26svh;
+    overflow-y: auto;
+  }
+
+  /* The cards tray scrolls as one piece, so the chat under the cards keeps its full height and its input. */
+  .tabletop__right {
+    display: block;
+  }
+
+  .tabletop__side {
+    margin-top: var(--space-stack-sm);
+    overflow: visible;
+  }
+
+  .tabletop__side > .panel {
+    max-height: none;
+  }
+
+  .tabletop__left,
+  .tabletop__right,
+  .tabletop__hand,
+  .tabletop__seats {
+    overscroll-behavior: contain;
+  }
+
+  /* With a chat under the cards the tray is given more room, so the input shows without scrolling. */
+  .tabletop__right:has(.chat-panel) {
+    max-height: 38svh;
+  }
+
+  /* Choosing tickets needs room for four of them and the button. */
+  .tabletop__left:has(.ticket-choice) {
+    max-height: 46svh;
+  }
+
+  .tabletop[data-tray="cards"] .tabletop__left,
+  .tabletop[data-tray="tickets"] .tabletop__right {
+    display: none;
+  }
+
+  .tabletop__hand {
+    grid-area: hand;
+    overflow-x: auto;
+    place-items: center start;
+  }
+
+  .tabletop__tabs {
+    grid-area: tabs;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-stack-xs);
+  }
+
+  .tabletop__tabs button {
+    min-height: var(--hit-target-min);
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: color-mix(in oklch, var(--hud-paper-solid) 8%, transparent);
+    color: var(--hud-paper-soft);
+    font: inherit;
+    font-weight: var(--weight-bold);
+  }
+
+  .tabletop__tabs button[aria-pressed="true"] {
+    background: var(--hud-paper);
+    color: var(--hud-ink);
+  }
+  /* Three words do not fit beside the turn on a phone: they fold into one. */
+  .tabletop .tabletop__menu-toggle.system-button {
+    display: inline-flex;
+  }
+
+  .tabletop__menu-items {
+    position: absolute;
+    top: calc(100% + var(--space-stack-xs));
+    right: 0;
+    z-index: var(--z-dropdown);
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    min-width: 176px;
+    padding: var(--space-stack-xs);
+    border-radius: var(--radius-card);
+    background: var(--hud-wood-light);
+    box-shadow: 0 12px 28px var(--hud-shadow);
+  }
+
+  .tabletop__menu[data-open="true"] .tabletop__menu-items {
+    display: flex;
+    animation: table-menu-in var(--duration-fast) var(--easing-enter) both;
+  }
+
+  .tabletop .tabletop__menu-items .tabletop__menu-button.system-button,
+  .tabletop .tabletop__menu-items .score-guide__trigger.system-button {
+    justify-content: flex-start;
+    width: 100%;
+    padding: 0 var(--space-stack-md);
+  }
+
+  .tabletop__menu-items .score-guide {
+    width: 100%;
+  }
+
+  /* The tip card and the cards themselves already say what a turn is. */
+  .turn-panel__note--idle {
+    display: none;
+  }
+
+  /* Over the lower right corner of the board: one button to see the whole map, and a word about dragging. */
+  .tabletop__map-tools {
+    grid-area: board;
+    place-self: end;
+    z-index: var(--z-raised);
+    display: flex;
+    gap: var(--space-stack-xs);
+    align-items: center;
+    margin: var(--space-stack-xs);
+    pointer-events: none;
+  }
+
+  .tabletop__map-toggle,
+  .tabletop__pan-hint {
+    margin: 0;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: color-mix(in oklch, var(--hud-wood) 84%, transparent);
+    color: var(--hud-paper-bright);
+    font: inherit;
+    font-size: var(--type-sm);
+  }
+
+  .tabletop__map-toggle {
+    min-height: var(--hit-target-min);
+    padding: 0 var(--space-stack-md);
+    font-weight: var(--weight-bold);
+    pointer-events: auto;
+    transition: transform var(--duration-fast) var(--easing-standard);
+  }
+
+  .tabletop__map-toggle:active,
+  .tabletop__tabs button:active {
+    transform: scale(0.97);
+  }
+
+  .tabletop__tabs button {
+    transition: transform var(--duration-fast) var(--easing-standard);
+  }
+
+  .tabletop__pan-hint {
+    padding: var(--space-stack-xs) var(--space-stack-md);
+    color: var(--hud-paper-soft);
+    animation: table-menu-in var(--duration-slow) var(--easing-enter) both;
+  }
+
+  /* The whole map at once: small, for planning; names are drawn larger so they can still be read. */
+  .tabletop[data-map="whole"] .tabletop__board .board-shell {
+    width: 100%;
+  }
+
+  .tabletop[data-map="whole"] .board-label {
+    font-size: calc(var(--type-board-lg) * 1.4);
+  }
+}
+
+/* With the keyboard up the board has almost no height left, and nothing to float a button over. */
+@media (max-width: 760px) and (max-height: 520px) {
+  .tabletop__map-tools {
+    display: none;
+  }
+}
+
+@keyframes table-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tabletop__menu[data-open="true"] .tabletop__menu-items,
+  .tabletop__pan-hint {
+    animation: none;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 500px) and (min-width: 560px) {
+  .tabletop {
+    --card-w: 42px;
+    --supply-card-w: 40px;
+    grid-template-columns: minmax(0, 1fr) clamp(272px, 40vw, 344px);
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "board top"
+      "board tabs"
+      "board tray"
+      "board hand";
+    column-gap: var(--space-stack-sm);
+  }
+
+  .tabletop__board {
+    overflow: hidden;
+  }
+
+  .tabletop__map-tools {
+    display: none;
+  }
+
+  /* The rail is narrow: the menu words sit closer so the turn stays on one line. */
+  .tabletop__menu {
+    gap: 0;
+  }
+
+  .tabletop .tabletop__menu-button.system-button,
+  .tabletop .tabletop__menu-item .score-guide__trigger.system-button {
+    padding: 0 var(--space-stack-xs);
+  }
+
+  .tabletop .tabletop__board .board-shell {
+    display: grid;
+    width: 100%;
+    height: 100%;
+  }
+
+  .tabletop .tabletop__board .board-map {
+    height: 100%;
+  }
+
+  .tabletop__left,
+  .tabletop__right,
+  .tabletop__left:has(.ticket-choice),
+  .tabletop__right:has(.chat-panel) {
+    max-height: none;
+  }
+
+  /* Choosing tickets needs the room more than it needs the hand, the tabs or the seats, none of which matter meanwhile. */
+  .tabletop:has(.ticket-choice) .tabletop__hand,
+  .tabletop:has(.ticket-choice) .tabletop__tabs,
+  .tabletop:has(.ticket-choice) .tabletop__seats {
+    display: none;
+  }
+
+  .tabletop .ticket-choice__title {
+    font-size: var(--type-md);
+  }
+
+  .tabletop__hand {
+    min-height: calc(var(--card-w) * 1.4 + var(--space-stack-sm));
+    padding-bottom: 0;
+  }
+
+  /* Safari keeps a tab bar in landscape, so every row of the rail gives up a little for the cards. */
+  .tabletop__tabs button {
+    min-height: 40px;
+  }
+
+  .tabletop__side {
+    margin-top: var(--space-stack-xs);
+  }
+}

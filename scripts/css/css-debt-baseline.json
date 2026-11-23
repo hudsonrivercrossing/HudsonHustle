@@ -1,13 +1,16 @@
 {
   "undefinedTokens": 0,
   "unusedTokens": 0,
-  "important": 45,
+  "important": 33,
   "legacyColors": 0,
-  "literalColors": 594,
+  "literalColors": 377,
   "literalFontWeights": 0,
   "literalFontSizes": 0,
   "literalRadii": 0,
   "literalZIndex": 0,
-  "literalSpacing": 305,
+  "literalSpacing": 169,
+  "srgbMixes": 0,
+  "fallbackOnlyTokens": 0,
+  "duplicateSelectors": 1,
   "transitionAll": 0
 }

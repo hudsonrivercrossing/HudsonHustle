@@ -95,26 +95,32 @@
 
 .secondary-button {
   background: linear-gradient(180deg, oklch(35.17% 0.0096 229.13 / 0.74), oklch(28.08% 0.0113 237.05 / 0.78));
-  border: 1px solid color-mix(in srgb, var(--control-border) 62%, color-mix(in oklch, var(--border-warm-solid) 22%, transparent) 38%);
+  border: 1px solid color-mix(in oklch, var(--control-border) 62%, color-mix(in oklch, var(--border-warm-solid) 22%, transparent) 38%);
   color: color-mix(in oklch, var(--control-surface-solid) 90%, transparent);
   box-shadow: inset 0 1px 0 color-mix(in oklch, var(--control-surface-solid) 9%, transparent), 0 3px 0 color-mix(in oklch, var(--control-shadow-solid) 18%, transparent);
 }
 
-.system-button:hover {
-  transform: translateY(0);
-  border-color: oklch(65.91% 0.1012 73.74 / 0.42);
+@media (hover: hover) and (pointer: fine) {
+  .system-button:hover {
+    transform: translateY(0);
+    border-color: oklch(65.91% 0.1012 73.74 / 0.42);
+  }
 }
 
-.primary-button:hover {
-  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--control-surface-solid) 12%, transparent), 0 4px 0 color-mix(in oklch, var(--control-shadow-solid) 24%, transparent);
+@media (hover: hover) and (pointer: fine) {
+  .primary-button:hover {
+    box-shadow: inset 0 1px 0 color-mix(in oklch, var(--control-surface-solid) 12%, transparent), 0 4px 0 color-mix(in oklch, var(--control-shadow-solid) 24%, transparent);
+  }
 }
 
-.secondary-button:hover {
-  box-shadow: inset 0 1px 0 color-mix(in oklch, var(--control-surface-solid) 11%, transparent), 0 4px 0 color-mix(in oklch, var(--control-shadow-solid) 20%, transparent);
+@media (hover: hover) and (pointer: fine) {
+  .secondary-button:hover {
+    box-shadow: inset 0 1px 0 color-mix(in oklch, var(--control-surface-solid) 11%, transparent), 0 4px 0 color-mix(in oklch, var(--control-shadow-solid) 20%, transparent);
+  }
 }
 
 .system-button:focus-visible {
-  outline: var(--border-medium) solid oklch(53.46% 0.1192 253.15 / 0.42);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -150,10 +156,12 @@
   box-shadow: none;
 }
 
-.ghost-button:hover {
-  background: color-mix(in oklch, var(--control-ink-solid) 6%, transparent);
-  border-color: color-mix(in oklch, var(--control-ink-solid) 22%, transparent);
-  box-shadow: none;
+@media (hover: hover) and (pointer: fine) {
+  .ghost-button:hover {
+    background: color-mix(in oklch, var(--control-ink-solid) 6%, transparent);
+    border-color: color-mix(in oklch, var(--control-ink-solid) 22%, transparent);
+    box-shadow: none;
+  }
 }
 
 .ghost-button:active {
@@ -172,8 +180,8 @@
   background: transparent;
   border: none;
   min-width: 0;
-  min-height: 0;
-  padding: 4px 0;
+  min-height: var(--hit-target-min);
+  padding: 0;
   color: color-mix(in oklch, var(--control-ink-solid) 52%, transparent);
   font-size: var(--type-xs);
   letter-spacing: 0.04em;
@@ -182,9 +190,11 @@
   text-decoration: none;
 }
 
-.link-button:hover {
-  color: color-mix(in oklch, var(--control-ink-solid) 88%, transparent);
-  box-shadow: none;
+@media (hover: hover) and (pointer: fine) {
+  .link-button:hover {
+    color: color-mix(in oklch, var(--control-ink-solid) 88%, transparent);
+    box-shadow: none;
+  }
 }
 
 .link-button:active {
@@ -213,28 +223,13 @@
   text-shadow: 0 1px 0 oklch(98.03% 0.0223 87.15 / 0.34);
 }
 
-.ticket-dock__pager-button.system-button {
-  min-width: 28px;
-  width: 28px;
-  min-height: 28px;
-  padding: 0;
-  border-radius: var(--radius-control);
-  font-size: var(--type-body);
-}
-
-.app-shell--gameplay-hud .system-button {
-  border-radius: var(--radius-map-line);
-  clip-path: polygon( 7px 0, calc(100% - 7px) 0, 100% 7px, 100% calc(100% - 7px), calc(100% - 7px) 100%, 7px 100%, 0 calc(100% - 7px), 0 7px );
-}
-
+/* The table's buttons, continued. These come after the primary-button rule on purpose: the dark
+   plate below is what every button on the table wears, primary ones included. */
 .app-shell--gameplay-hud .system-button {
   border-width: 1px;
-  text-transform: none;
-  letter-spacing: 0;
-  background: linear-gradient(90deg, oklch(70.15% 0.0832 84.6 / 0.18), transparent 22%, transparent 78%, oklch(70.15% 0.0832 84.6 / 0.12)), var(--hud-grain), linear-gradient(180deg, oklch(30.13% 0.0111 167.93), oklch(19.37% 0.0097 159.03));
-}
-
-.app-shell--gameplay-hud .system-button {
   border-radius: var(--radius-xs);
+  background: linear-gradient(90deg, oklch(70.15% 0.0832 84.6 / 0.18), transparent 22%, transparent 78%, oklch(70.15% 0.0832 84.6 / 0.12)), var(--hud-grain), linear-gradient(180deg, oklch(30.13% 0.0111 167.93), oklch(19.37% 0.0097 159.03));
   clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+  letter-spacing: 0;
+  text-transform: none;
 }

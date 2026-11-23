@@ -43,7 +43,7 @@ describe("useGameNotifications", () => {
       rerender({ current: game });
       const expectedName = turn % 2 === 0 ? "Ava" : "Beau";
       expect(result.current.notifications.at(-1)?.message).toBe(`${expectedName} drew 2 cards from the deck.`);
-      act(() => vi.advanceTimersByTime(2500));
+      act(() => vi.advanceTimersByTime(4500));
       expect(result.current.notifications).toEqual([]);
     }
   });

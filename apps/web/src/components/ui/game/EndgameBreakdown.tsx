@@ -1,56 +1,60 @@
-import { summarizeEndgame, type GameState, type MapConfig } from "@hudson-hustle/game-core";
+import { signed, type EndgameLedger } from "./endgameLedger";
 
 interface EndgameBreakdownProps {
-  player: GameState["players"][number];
-  config: MapConfig;
+  ledger: EndgameLedger;
+  /** Milliseconds between one line appearing and the next. */
+  revealStepMs: number;
+  /** The beat on which totals appear, the same for every player so they land together. */
+  totalBeat: number;
 }
 
-interface EndgameBreakdownEntry {
-  key: string;
-  label: string;
-  value: string;
-  items: string[];
-  list: boolean;
-}
-
-function buildEndgameEntry(line: string): EndgameBreakdownEntry {
-  const [rawLabel, ...valueParts] = line.split(":");
-  const label = rawLabel.trim();
-  const value = valueParts.join(":").trim();
-  const list = label === "Completed tickets" || label === "Failed tickets";
-
-  return {
-    key: line,
-    label,
-    value,
-    items: list && value !== "none" ? value.split(", ").filter(Boolean) : [],
-    list
-  };
-}
-
-export function EndgameBreakdown({ player, config }: EndgameBreakdownProps): JSX.Element {
-  const entries = summarizeEndgame(player, config).map(buildEndgameEntry);
+/** The lines that make up one player's final score, ending in the total they add up to. */
+export function EndgameBreakdown({ ledger, revealStepMs, totalBeat }: EndgameBreakdownProps): JSX.Element {
+  let beat = 0;
+  const at = () => ({ animationDelay: `${(beat++) * revealStepMs}ms` });
 
   return (
-    <div className="endgame-breakdown">
-      {entries.map((entry) => (
-        <div key={entry.key} className="endgame-breakdown__row">
-          <span className="endgame-breakdown__label">{entry.label}</span>
-          {entry.list && entry.items.length > 0 ? (
-            <ul className="endgame-breakdown__list">
-              {entry.items.map((item) => (
-                <li key={item} className="endgame-breakdown__list-item">
-                  {item}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <span className={`endgame-breakdown__value ${entry.list ? "endgame-breakdown__value--empty" : ""}`}>
-              {entry.value || entry.key}
-            </span>
-          )}
+    <dl className="endgame-breakdown">
+      <div className="endgame-breakdown__row" style={at()}>
+        <dt>Routes claimed</dt>
+        <dd>{signed(ledger.routePoints)}</dd>
+      </div>
+      {ledger.completed.map((ticket) => (
+        <div key={ticket.id} className="endgame-breakdown__row endgame-breakdown__row--ticket" style={at()}>
+          <dt>
+            <span className="endgame-breakdown__mark" aria-hidden="true">✓</span>
+            {ticket.label}
+          </dt>
+          <dd>{signed(ticket.points)}</dd>
         </div>
       ))}
-    </div>
+      {ledger.failed.map((ticket) => (
+        <div key={ticket.id} className="endgame-breakdown__row endgame-breakdown__row--ticket endgame-breakdown__row--failed" style={at()}>
+          <dt>
+            <span className="endgame-breakdown__mark" aria-hidden="true">✕</span>
+            {ticket.label}
+            <span className="endgame-breakdown__note"> (not connected)</span>
+          </dt>
+          <dd>{signed(-ticket.points)}</dd>
+        </div>
+      ))}
+      <div className="endgame-breakdown__row" style={at()}>
+        <dt>
+          {ledger.stationsLeft} unused {ledger.stationsLeft === 1 ? "station" : "stations"}
+        </dt>
+        <dd>{signed(ledger.stationBonus)}</dd>
+      </div>
+      <div className="endgame-breakdown__row" style={at()}>
+        <dt>
+          Longest line
+          <span className="endgame-breakdown__note"> ({ledger.longestLength} trains)</span>
+        </dt>
+        <dd>{signed(ledger.longestBonus)}</dd>
+      </div>
+      <div className="endgame-breakdown__row endgame-breakdown__row--total" style={{ animationDelay: `${totalBeat * revealStepMs}ms` }}>
+        <dt>Total</dt>
+        <dd>{ledger.total}</dd>
+      </div>
+    </dl>
   );
 }

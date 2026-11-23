@@ -34,8 +34,8 @@ export function toPublicGameState(game: GameState): PublicGameState {
     finalRoundRemaining: game.finalRoundRemaining,
     finalRoundTriggeredBy: game.finalRoundTriggeredBy,
     log: game.log,
-    logSequence: game.logSequence ?? game.log.length,
-    events: game.events ?? [],
+    logSequence: game.logSequence,
+    events: game.events,
     moves: game.moves
   };
 }
@@ -107,8 +107,8 @@ export function fromPlayerView(game: PublicGameState, privateState: SeatPrivateS
     finalRoundRemaining: game.finalRoundRemaining,
     finalRoundTriggeredBy: game.finalRoundTriggeredBy,
     log: game.log,
-    logSequence: game.logSequence ?? game.log.length,
-    events: game.events ?? [],
+    logSequence: game.logSequence,
+    events: game.events,
     moves: game.moves
   };
 }
@@ -121,6 +121,31 @@ export function chooseBotActionForActivePlayer(game: GameState, config: MapConfi
     throw new Error("Active player is missing from the game.");
   }
   return chooseBotAction({ config, game: toPublicGameState(game), privateState, difficulty });
+}
+
+/**
+ * One action by one player, with the turn ended for them when the action finishes it. This is how a
+ * seat plays when nobody has to pass a screen along: online players, bots and the turn timer.
+ *
+ * It refuses an action from anyone but the player whose turn it is, with one exception: at the start
+ * of the game every player chooses starting tickets at once, in any order.
+ */
+export function playAction(state: GameState, playerId: string, action: GameAction, config: MapConfig): GameState {
+  let game = state;
+  if (action.type === "select_initial_tickets" && state.phase === "initialTickets") {
+    const playerIndex = state.players.findIndex((player) => player.id === playerId);
+    if (playerIndex < 0 || state.players[playerIndex].pendingTickets.length === 0) {
+      throw new Error("You do not have starting tickets to confirm right now.");
+    }
+    if (playerIndex !== state.activePlayerIndex) {
+      game = { ...state, activePlayerIndex: playerIndex };
+    }
+  } else if (getCurrentPlayer(state).id !== playerId) {
+    throw new Error("It is not your turn.");
+  }
+
+  const next = reduceGame(game, action, config);
+  return next.turn.stage === "awaitingHandoff" ? reduceGame(next, { type: "advance_turn" }, config) : next;
 }
 
 /**
@@ -138,10 +163,7 @@ export function runBotTurns(
   const actions: GameAction[] = [];
   while (actions.length < maxSteps && state.phase !== "gameOver" && isBot(getCurrentPlayer(state).id)) {
     const action = chooseBotActionForActivePlayer(state, config, difficultyOf(getCurrentPlayer(state).id));
-    state = reduceGame(state, action, config);
-    if (state.turn.stage === "awaitingHandoff") {
-      state = reduceGame(state, { type: "advance_turn" }, config);
-    }
+    state = playAction(state, getCurrentPlayer(state).id, action, config);
     actions.push(action);
   }
   return { state, actions };
