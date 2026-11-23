@@ -141,11 +141,11 @@
       "tier": "anchor",
       "lat": 52.507,
       "lon": 13.332,
-      "boardX": 440,
-      "boardY": 390,
-      "labelDx": -14,
-      "labelDy": -16,
-      "labelAnchor": "end",
+      "boardX": 410,
+      "boardY": 410,
+      "labelDx": -10,
+      "labelDy": 30,
+      "labelAnchor": "start",
       "labelPreset": "top-left-near"
     },
     {
@@ -173,9 +173,9 @@
       "lon": 13.198,
       "boardX": 80,
       "boardY": 320,
-      "labelDx": -20,
-      "labelDy": -25,
-      "labelAnchor": "start",
+      "labelDx": -12,
+      "labelDy": 6,
+      "labelAnchor": "end",
       "labelPreset": "top-near"
     },
     {
@@ -291,11 +291,11 @@
       "tier": "first-ring",
       "lat": 52.47,
       "lon": 13.385,
-      "boardX": 625,
+      "boardX": 600,
       "boardY": 701,
-      "labelDx": 0,
-      "labelDy": 18,
-      "labelAnchor": "middle",
+      "labelDx": 4,
+      "labelDy": -20,
+      "labelAnchor": "end",
       "labelPreset": "bottom-near"
     },
     {
@@ -353,8 +353,8 @@
       "lon": 13.438,
       "boardX": 808,
       "boardY": 705,
-      "labelDx": -18,
-      "labelDy": 12,
+      "labelDx": -14,
+      "labelDy": -14,
       "labelAnchor": "end",
       "labelPreset": "bottom-left-near"
     },
@@ -368,9 +368,9 @@
       "lon": 13.299,
       "boardX": 256,
       "boardY": 285,
-      "labelDx": -18,
-      "labelDy": -10,
-      "labelAnchor": "end",
+      "labelDx": 16,
+      "labelDy": 22,
+      "labelAnchor": "start",
       "labelPreset": "top-left-near"
     },
     {
@@ -633,8 +633,8 @@
       "type": "Border Crossing",
       "waypoints": [
         {
-          "x": 604,
-          "y": 500
+          "x": 616,
+          "y": 476
         }
       ]
     },
@@ -645,7 +645,12 @@
       "length": 2,
       "color": "gray",
       "type": "normal",
-      "waypoints": []
+      "waypoints": [
+        {
+          "x": 761,
+          "y": 496
+        }
+      ]
     },
     {
       "id": "potsdamer-platz-suedkreuz",
@@ -664,7 +669,12 @@
       "length": 2,
       "color": "emerald",
       "type": "normal",
-      "waypoints": []
+      "waypoints": [
+        {
+          "x": 826,
+          "y": 168
+        }
+      ]
     },
     {
       "id": "westkreuz-olympiastadion",
@@ -691,7 +701,16 @@
       "length": 4,
       "color": "rose",
       "type": "normal",
-      "waypoints": []
+      "waypoints": [
+        {
+          "x": 139,
+          "y": 248
+        },
+        {
+          "x": 197,
+          "y": 237
+        }
+      ]
     },
     {
       "id": "neukoelln-flughafen-ber",
@@ -701,7 +720,16 @@
       "color": "obsidian",
       "type": "Border Crossing",
       "locomotiveCost": 1,
-      "waypoints": []
+      "waypoints": [
+        {
+          "x": 897,
+          "y": 723
+        },
+        {
+          "x": 927,
+          "y": 774
+        }
+      ]
     },
     {
       "id": "schoenhauser-allee-frankfurter-allee",
@@ -743,7 +771,16 @@
       "length": 4,
       "color": "violet",
       "type": "normal",
-      "waypoints": []
+      "waypoints": [
+        {
+          "x": 739,
+          "y": 730
+        },
+        {
+          "x": 668,
+          "y": 728
+        }
+      ]
     },
     {
       "id": "suedkreuz-schoenberg",
@@ -761,7 +798,16 @@
       "length": 3,
       "color": "emerald",
       "type": "normal",
-      "waypoints": []
+      "waypoints": [
+        {
+          "x": 344,
+          "y": 587
+        },
+        {
+          "x": 304,
+          "y": 551
+        }
+      ]
     },
     {
       "id": "westkreuz-jungfernheide",
