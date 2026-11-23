@@ -1,196 +1,85 @@
 # Hudson Hustle
 
-![Hudson Hustle Cover 1](docs/assets/readme-cover.jpg)
+![Hudson Hustle](docs/assets/readme-cover.jpg)
 
-Hudson Hustle is an original NYC/NJ transit strategy game for laptop play.
+Hudson Hustle is a route-building board game for 2 to 4 players, set on the transit map of New York and New Jersey. Collect transit cards, claim the crossings you need before a rival does, and connect the cities on your secret tickets.
 
-`V1` is a same-laptop pass-and-play web app.
-`V2` is the long-term multiplayer version where each player joins from their own laptop through an authoritative backend.
+**[Play it in your browser](https://hudson-hustle.vercel.app)**. There is nothing to install and no account to make.
 
-The project is inspired by route-building board games, but the branding, map, copy, and visuals are original to this repo.
+## The game in one minute
 
-## At A Glance
-![Hudson Hustle Cover 2](docs/assets/readme-cover2.jpg)
-- Build a personal network across New Jersey, Manhattan, Brooklyn, and Queens.
-- Collect transit cards, claim routes, complete hidden tickets, and decide when to spend stations.
-- Use a lightweight handoff flow so players can safely share one laptop in `v1`.
-- Keep the rules engine deterministic and reusable so `v2` can add online multiplayer cleanly.
+![Players leaning over the map](docs/assets/readme-cover2.jpg)
 
-## Quick Guide
-![Hudson Hustle Cover 3](docs/assets/readme-cover3.jpg)
+Everyone starts with a hand of transit cards, a set of train pieces and a few destination tickets that only they can see. A ticket names two cities. Connect them with your own routes before the game ends and you score it. Fail and you lose the same points.
 
-### Panel 1: Gather Cards
-Draw from the face-up market or the deck. Face-up locomotives are powerful, so taking one ends that draw action immediately.
+![A three-player game in progress](docs/assets/screenshot-board.jpg)
 
-### Panel 2: Claim Routes
-Spend matching cards to take a route. Gray routes accept one color set. Ferries need locomotives. Tunnels can cost extra.
+The map is tight on purpose. There are only so many ways across the Hudson and the East River, and a route someone else has claimed is gone. Most of the game is deciding which crossing you cannot afford to lose, and taking it one turn before somebody else does.
 
-### Panel 3: Chase Tickets
-Your destination tickets are your secret goals. Connect the two endpoints before the game ends to score them.
+## Your turn
 
-### Panel 4: Pass The Laptop
-When your turn is finished, click `I'm done`. The app hides your private information and shows a neutral takeover screen. The next player clicks `I'm ready`. The final round starts when a player runs low on trains or the board has no open routes left.
+![Transit cards being played onto the map](docs/assets/readme-cover3.jpg)
 
-## Project Scope
+Do exactly one of these four things.
 
-### V1
-- Browser-based local play
-- `2-4` players on one laptop
-- SVG board
-- Tunnels, ferries, stations, hidden tickets, longest-route bonus
-- Save/resume
-- Written guide plus in-app onboarding
+**Draw transit cards.** Take two, from the five face-up cards or blind from the deck. A face-up locomotive is wild and counts as your whole draw.
 
-### V2
-- One laptop per player
-- Authoritative backend
-- Separate-device private information
-- Lobby, reconnect, and saved match support
+**Claim a route.** Pay cards that match the route's colour and length, and place your trains on it. Gray routes take any single colour. Longer routes score far more than short ones.
 
-## Quick Start
+**Draw tickets.** Take new destination tickets and keep at least one. More tickets mean more points, and more ways to lose them.
 
-### Install
+**Build a station.** Put a station in a city to borrow one neighbouring route that a rival owns, for ticket scoring only. You have three, and each one you leave unbuilt is worth points at the end.
+
+## Three kinds of route
+
+- **Ordinary routes** cost what is printed on them.
+- **Tunnels** are a gamble. When you claim one, extra cards are turned over, and each card that matches your colour raises the price by one. If you cannot pay the difference, the claim fails and the turn is gone.
+- **Ferries** need locomotives as part of the payment. The route shows how many.
+
+## How it ends
+
+When a player is down to two trains or fewer, everyone else gets one last turn. Then the scores are added up:
+
+- points for every route you claimed
+- plus each ticket you completed, minus each ticket you did not
+- plus a bonus for every station you never built
+- plus a bonus for the longest continuous line on the board
+
+The highest score wins.
+
+## Ways to play
+
+- **Around one laptop.** Pass and play with 2 to 4 people. The screen hides each hand before the next player takes over.
+- **Online.** Create a room, send the invite link, and everyone plays from their own screen.
+- **Against bots.** Fill any seat with an easy, standard or hard bot, on one laptop or online.
+
+There are two maps: the New York and New Jersey map the game is named for, and a Berlin map.
+
+After a game you can replay it move by move. If you are new, the game explains each rule the first time it comes up, and the full rulebook is one click away under **Guide**.
+
+## A few things worth knowing before your first game
+
+- Do not keep every ticket you are dealt. Two that share a corridor beat four that pull you in different directions.
+- Take the scarce crossing early. Cards come back; a claimed tunnel under the Hudson does not.
+- Never enter a tunnel with the exact price in hand unless you are ready to lose the turn.
+- A station is worth building when it rescues a big ticket, and rarely otherwise.
+
+The complete rules are in the [player guide](docs/gameplay/player-guide.md).
+
+![Hudson Hustle artwork](docs/assets/readme-cover4.jpg)
+
+Hudson Hustle is an original game. It belongs to the family of route-building board games, and its map, name, artwork and text are its own.
+
+## Running it yourself
+
+You need Node 20 or newer and `pnpm`.
+
 ```bash
 pnpm install
-```
-
-### Run Local Pass-And-Play
-```bash
-pnpm dev
-```
-
-### Run Multiplayer Locally
-Open two terminals:
-
-```bash
 pnpm dev:server
 pnpm dev:web
 ```
 
-The local multiplayer defaults are:
-- web: `http://127.0.0.1:5173`
-- server: `http://127.0.0.1:8787`
+The game opens at `http://127.0.0.1:5173`. Local play works without the server; online rooms need it.
 
-If Vite falls back to `5174`, the default local CORS examples allow that port too.
-
-### Test
-```bash
-pnpm test
-pnpm build
-pnpm test:e2e
-```
-
-If Playwright needs a browser on a new machine:
-
-```bash
-pnpm --filter @hudson-hustle/web exec playwright install chromium
-```
-
-## Tech Stack
-- `pnpm` workspace
-- `React + TypeScript + Vite` in `apps/web`
-- `SVG` board rendering
-- `Vitest` for rules tests
-- `Playwright` for end-to-end flow checks
-- Shared deterministic rules engine in `packages/game-core`
-- Shared map and balance data in `packages/game-data`
-
-Used in `v2`:
-- `Node.js`
-- `Fastify`
-- `Socket.IO`
-- `PostgreSQL`
-- `Drizzle`
-
-## Repo Layout
-```text
-apps/
-  web/           React client for local and multiplayer play
-  server/        Fastify + Socket.IO authoritative backend
-packages/
-  game-core/     deterministic rules engine
-  game-data/     cities, routes, tickets, balance data
-docs/
-  README.md
-  product/
-    prd.md
-    tech-spec.md
-    design-system.md
-    v2/
-      README.md
-      v2-mvp-architecture.md
-      v2-multiplayer-flow.md
-      v2-deployment.md
-  gameplay/
-    player-guide.md
-    onboarding-script.md
-    agent-vs-agent-playtest.md
-  map/
-    cartography-workflow.md
-    hudson-map-rubric.md
-  config/
-    config-snapshot-guide.md
-  planning/
-    v2-status.md
-  archive/       finished passes, slices, specs
-  playtests/
-    v0.4/
-    v2.0/
-  assets/
-scripts/
-  config/        snapshot switching, preview, export, release tooling
-  playtests/     seeded playtest and simulation harnesses
-.github/
-  workflows/     CI automation
-.codex/skills/
-  roadmap-manager/
-  hudson-hustle-engineering-manager/
-  game-balance/
-  transit-cartography/
-  config-snapshot-manager/
-  how-to-win-hudson-hustle/
-```
-
-## Key Docs
-- [Docs Index](docs/README.md)
-- [Product Requirements](docs/product/prd.md)
-- [Tech Spec](docs/product/tech-spec.md)
-- [V2 Docs Index](docs/product/v2/README.md)
-- [V2 MVP Architecture](docs/product/v2/v2-mvp-architecture.md)
-- [V2 Multiplayer Flow](docs/product/v2/v2-multiplayer-flow.md)
-- [V2 Deployment](docs/product/v2/v2-deployment.md)
-- [V1 Status](docs/archive/planning/v1-status.md)
-- [V2 Status](docs/planning/v2-status.md)
-- [Player Guide](docs/gameplay/player-guide.md)
-- [Onboarding Script](docs/gameplay/onboarding-script.md)
-- [Config Snapshot Guide](docs/config/config-snapshot-guide.md)
-- [Design System](docs/product/design-system.md)
-- [Map And Balance Notes](docs/archive/planning/map-balance-notes-2026-03.md)
-- [V2.0 Staging Smoke Checklist](docs/playtests/v2.0/staging-smoke-checklist.md)
-- [Agent Operating Guide](AGENTS.md)
-
-## Current Product Status
-- The current active config is the frozen release `v0.4-flushing-newark-airport`.
-- Same-laptop `v1` is playable and documented.
-- The first playable small-map station set and the first full balance/playtest pass are complete.
-- `v2` multiplayer foundation exists but is not yet complete.
-- The main remaining `v2.0` work is promotion to `main`, one more remote multiplayer validation pass, and post-promotion observation.
-
-## Branch Strategy
-- `main`
-  - stable production branch
-  - deploys production frontend and backend through platform-native Git integration
-- working branches
-  - branch off `main`
-  - open PRs into `main`; CI and a Vercel preview run on every PR
-  - merging is the release: there is no staging backend, and PR previews talk to the production API
-
-## Working In This Repo
-- Keep game rules in shared code, not in React components.
-- Treat `packages/game-core` and `packages/game-data` as shared ownership zones.
-- Update player-facing docs when gameplay behavior changes.
-- Read [AGENTS.md](AGENTS.md) before making larger changes.
-
-## Design Direction
-![Hudson Hustle Cover 4](docs/assets/readme-cover4.jpg)
-Hudson Hustle aims for a transit-nostalgia look: warm paper, tactile route pieces, and readable geography. The UI should feel like an inviting board game, not a generic dashboard.
+Everything about the code, the deployment and how to contribute lives in the [docs index](docs/README.md) and in [AGENTS.md](AGENTS.md). Work happens on short branches that are merged into `main` by pull request, and a merge to `main` is a release.
