@@ -1,5 +1,5 @@
 import type { TrainCardFace as Face } from "@hudson-hustle/game-core";
-import { formatCardLabel } from "./CardSlot";
+import { formatCardLabel } from "./formatCardLabel";
 import { ColorMark, colorMarkInk } from "./ColorMark";
 
 interface TrainCardFaceProps {

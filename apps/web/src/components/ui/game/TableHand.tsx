@@ -1,5 +1,5 @@
 import { paymentSpend as spendByRule, trainCardColors, type TrainCard, type TrainCardColor, type TrainCardFace as Face } from "@hudson-hustle/game-core";
-import { formatCardLabel } from "./CardSlot";
+import { formatCardLabel } from "./formatCardLabel";
 import { LOCOMOTIVE_COLOR, TrainCardFace } from "./TrainCardFace";
 
 interface TableHandProps {

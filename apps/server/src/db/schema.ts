@@ -43,6 +43,9 @@ export const gameSnapshotsTable = pgTable("game_snapshots", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull()
 });
 
+// The two tables below held a server-side game history that nothing read. The server no longer
+// writes or reads them. They stay defined, and stay in the database, until a migration drops them:
+// that deletes stored rows, so it is a decision to take on purpose.
 export const gameEventsTable = pgTable(
   "game_events",
   {

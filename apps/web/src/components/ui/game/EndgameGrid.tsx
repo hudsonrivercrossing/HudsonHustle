@@ -1,4 +1,5 @@
-import { EndgameBreakdown, type EndgameLedger } from "../ui/game";
+import { EndgameBreakdown } from "./EndgameBreakdown";
+import type { EndgameLedger } from "./endgameLedger";
 
 interface EndgameGridProps {
   ledgers: EndgameLedger[];

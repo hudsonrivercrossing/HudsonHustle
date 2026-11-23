@@ -81,7 +81,6 @@ export function OnlineGameScreen({ room, snapshot, playerId, notices, onLeave }:
       }}
       onPlayAgain={() => void room.restartRoom()}
       onLeave={onLeave}
-      leaveOfferedAtGameOver
     />
   );
 }

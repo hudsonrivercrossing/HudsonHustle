@@ -198,8 +198,16 @@ function drawTickets(state: GameState, count: number, bucket: "regular" | "long"
   return drawn;
 }
 
+const cityLookups = new WeakMap<MapConfig, Map<string, CityDef>>();
+
+/** A map's cities by id, built once per map. */
 function cityLookup(config: MapConfig): Map<string, CityDef> {
-  return new Map(config.cities.map((city) => [city.id, city]));
+  let lookup = cityLookups.get(config);
+  if (!lookup) {
+    lookup = new Map(config.cities.map((city) => [city.id, city]));
+    cityLookups.set(config, lookup);
+  }
+  return lookup;
 }
 
 function evaluateTickets(player: PlayerState, state: GameState, config: MapConfig): { total: number; completed: string[]; failed: string[] } {

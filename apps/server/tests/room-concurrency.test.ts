@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import { hudsonHustleReleasedConfigs } from "@hudson-hustle/game-data";
 import { MemoryRoomRepository } from "../src/persistence/memory-room-repository";
-import type { SaveRoomOptions, StoredGameHistoryUpdate, StoredRoomRecord } from "../src/persistence/types";
+import type { StoredRoomRecord } from "../src/persistence/types";
+import { SystemTurnClock } from "../src/turn-clock";
 import { RoomService } from "../src/room-service";
 
 const CONFIG_ID = "v0.4-flushing-newark-airport";
@@ -13,14 +14,14 @@ class SlowRepository extends MemoryRoomRepository {
   loads = 0;
   delayMs = 5;
 
-  override async saveRoom(record: StoredRoomRecord, historyUpdate?: StoredGameHistoryUpdate, options?: SaveRoomOptions): Promise<void> {
+  override async saveRoom(record: StoredRoomRecord): Promise<void> {
     const active = (this.activeSaves.get(record.roomCode) ?? 0) + 1;
     this.activeSaves.set(record.roomCode, active);
     if (active > 1) {
       this.overlappingSaves += 1;
     }
     await new Promise((resolve) => setTimeout(resolve, this.delayMs));
-    await super.saveRoom(record, historyUpdate, options);
+    await super.saveRoom(record);
     this.activeSaves.set(record.roomCode, (this.activeSaves.get(record.roomCode) ?? 1) - 1);
   }
 
@@ -139,13 +140,12 @@ describe("RoomService idle rooms", () => {
   });
 
   it("stops every pending turn timer when disposed", async () => {
-    const service = new RoomService(new SlowRepository(), hudsonHustleReleasedConfigs);
+    const clock = new SystemTurnClock();
+    const service = new RoomService(new SlowRepository(), hudsonHustleReleasedConfigs, undefined, undefined, undefined, clock);
     const created = await service.createRoom({ hostName: "Ava", playerCount: 2, configId: CONFIG_ID, turnTimeLimitSeconds: 30, botSeatIds: ["seat-2"] });
     await service.setReady(created.roomCode, { seatId: created.seatId, playerSecret: created.playerSecret }, true);
     await service.startRoom(created.roomCode, { playerSecret: created.playerSecret });
-    const pendingBefore = (service as unknown as { timeouts: Map<string, unknown> }).timeouts.size;
     service.dispose();
-    expect(pendingBefore).toBeGreaterThanOrEqual(0);
-    expect((service as unknown as { timeouts: Map<string, unknown> }).timeouts.size).toBe(0);
+    expect(clock.pending).toBe(0);
   });
 });

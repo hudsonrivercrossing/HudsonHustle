@@ -1,5 +1,5 @@
 import type { TrainCard } from "@hudson-hustle/game-core";
-import { formatCardLabel } from "./CardSlot";
+import { formatCardLabel } from "./formatCardLabel";
 import { LOCOMOTIVE_COLOR, TrainCardFace } from "./TrainCardFace";
 
 interface TableSupplyProps {

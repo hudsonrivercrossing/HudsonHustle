@@ -240,14 +240,6 @@ export async function createServerApp() {
     return roomService.getSnapshot(request.params.roomCode, { seatId, playerSecret });
   });
 
-  app.post<{ Params: { roomCode: string }; Body: { seatId?: string; playerSecret?: string } }>("/rooms/:roomCode/history", async (request) => {
-    const { seatId, playerSecret } = request.body ?? {};
-    if (!seatId || !playerSecret) {
-      throw new RoomServiceError("History review requires room credentials.", 400, "missing_credentials");
-    }
-    return roomService.getReviewHistory(request.params.roomCode, { seatId, playerSecret });
-  });
-
   await app.ready();
   io = new SocketIOServer<ClientToServerEvents, ServerToClientEvents>(app.server, {
     cors: {

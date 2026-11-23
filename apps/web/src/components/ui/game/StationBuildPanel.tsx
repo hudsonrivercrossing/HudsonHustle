@@ -1,7 +1,7 @@
 import type { MapConfig, TrainCardColor } from "@hudson-hustle/game-core";
-import { ChoiceChipButton } from "../ui/primitives/ChoiceChipButton";
-import { SurfaceCard } from "../ui/primitives/SurfaceCard";
-import { formatCardLabel } from "../ui/game";
+import { ChoiceChipButton } from "../primitives/ChoiceChipButton";
+import { SurfaceCard } from "../primitives/SurfaceCard";
+import { formatCardLabel } from "./formatCardLabel";
 
 interface CityDef {
   id: string;

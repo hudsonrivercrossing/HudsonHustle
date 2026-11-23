@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { getEventsSince, reduceGame, startGame } from "../src/game";
 import { restoreGameState } from "../src/restore";
-import { fromPlayerView, runBotTurns, toPrivateState, toPublicGameState } from "../src/projection";
+import { fromPlayerView, playAction, runBotTurns, toPrivateState, toPublicGameState } from "../src/projection";
 import type { GameEvent, GameState } from "../src/types";
 import { hudsonHustleMap } from "../../game-data/src";
 
@@ -354,5 +354,33 @@ describe("players with no legal move", () => {
     const next = reduceGame(state, { type: "advance_turn" }, hudsonHustleMap);
     const result = runBotTurns(next, hudsonHustleMap, (playerId) => playerId === "player-2", 1);
     expect(result.actions[0]).toMatchObject({ type: "build_station", color: "cobalt" });
+  });
+});
+
+describe("playAction", () => {
+  it("refuses a move from a player whose turn it is not", () => {
+    const state = mainPhaseState();
+    const waiting = state.players[(state.activePlayerIndex + 1) % state.players.length];
+    expect(() => playAction(state, waiting.id, { type: "draw_card", source: "deck" }, hudsonHustleMap)).toThrow("It is not your turn.");
+  });
+
+  it("ends the turn for the player once their action finishes it", () => {
+    const state = mainPhaseState();
+    const mover = state.players[state.activePlayerIndex];
+    const afterOne = playAction(state, mover.id, { type: "draw_card", source: "deck" }, hudsonHustleMap);
+    expect(afterOne.players[afterOne.activePlayerIndex].id).toBe(mover.id);
+    const afterTwo = playAction(afterOne, mover.id, { type: "draw_card", source: "deck" }, hudsonHustleMap);
+    expect(afterTwo.players[afterTwo.activePlayerIndex].id).not.toBe(mover.id);
+    expect(afterTwo.turn.stage).toBe("idle");
+  });
+
+  it("lets players choose their starting tickets in any order, once each", () => {
+    const state = startGame(hudsonHustleMap, { playerNames: ["A", "B"], seed: 7 });
+    const second = state.players[1];
+    const keep = second.pendingTickets.slice(0, 2).map((ticket) => ticket.id);
+    const next = playAction(state, second.id, { type: "select_initial_tickets", keptTicketIds: keep }, hudsonHustleMap);
+    expect(next.players[1].tickets.map((ticket) => ticket.id)).toEqual(keep);
+    expect(next.players[0].pendingTickets.length).toBeGreaterThan(0);
+    expect(() => playAction(next, second.id, { type: "select_initial_tickets", keptTicketIds: keep }, hudsonHustleMap)).toThrow();
   });
 });

@@ -14,11 +14,14 @@ import {
 import type { getHudsonHustleVisualsByConfigId } from "@hudson-hustle/game-data";
 import {
   BoardMap,
+  EndgameGrid,
   FloatingBuildPanel,
   GameOverLayer,
   LOCOMOTIVE_COLOR,
   NotificationPipe,
+  RouteBuildPanel,
   ScoreGuide,
+  StationBuildPanel,
   TableHand,
   TableSeats,
   TableSupply,
@@ -30,15 +33,14 @@ import {
   buildEndgameLedgers,
   describeMargin,
   describeWinner,
+  shuffleAvatars,
   type GameplayNotification
 } from "../../ui/game";
-import { EndgameGrid, RouteBuildPanel, StationBuildPanel, shuffleAvatars } from "../../local";
 import { CoachHint } from "../../shared/CoachHint";
 import { pickCoachMoment, resetTips } from "../../shared/coachHints";
 import { Button } from "../../ui/primitives/Button";
 import { ModalShell } from "../../ui/primitives/ModalShell";
 import { SectionHeader } from "../../ui/primitives/SectionHeader";
-import { StatusBanner } from "../../ui/primitives/StatusBanner";
 import { GuidebookScreen } from "../GuidebookScreen";
 import { ReplayScreen } from "../replay/ReplayScreen";
 import { canDrawCards, describeRouteCost, getRouteUnavailableReason } from "./routeAvailability";
@@ -74,7 +76,6 @@ export interface GameplayScreenProps {
   notifications: GameplayNotification[];
   /** Online only: shown for as long as the room connection is down. */
   connectionNotice?: string | null;
-  error?: string | null;
   onAction: (action: GameAction) => void;
   copy: {
     initialTicketsTitle: string;
@@ -84,8 +85,6 @@ export interface GameplayScreenProps {
   };
   onPlayAgain: () => void;
   onLeave: () => void;
-  /** Offer leaving next to "Play again" once the game is over. */
-  leaveOfferedAtGameOver?: boolean;
   /** Sweep a banner across the table when the turn reaches this screen. Off where a handoff screen already says so. */
   announceTurn?: boolean;
   /** Mode-specific layers drawn above the board, such as the pass-and-play handoff. */
@@ -106,12 +105,10 @@ export function GameplayScreen({
   sidePanel,
   notifications,
   connectionNotice = null,
-  error = null,
   onAction,
   copy,
   onPlayAgain,
   onLeave,
-  leaveOfferedAtGameOver = false,
   announceTurn = true,
   children
 }: GameplayScreenProps): JSX.Element {
@@ -372,7 +369,6 @@ export function GameplayScreen({
                   onPaymentPreviewLeave={() => setPaymentPreview(null)}
                 />
               ) : null}
-              {error ? <StatusBanner tone="warning" eyebrow="Action error" headline={error} /> : null}
             </FloatingBuildPanel>
           ) : null}
         </div>
@@ -424,9 +420,7 @@ export function GameplayScreen({
             <>
               <Button variant="primary" onClick={onPlayAgain}>Play again</Button>
               <Button onClick={() => setReplayOpen(true)}>Replay</Button>
-              {leaveOfferedAtGameOver ? (
-                <Button onClick={() => setShowLeaveConfirm(true)}>{copy.leaveLabel}</Button>
-              ) : null}
+              <Button onClick={() => setShowLeaveConfirm(true)}>{copy.leaveLabel}</Button>
             </>
           }
         >

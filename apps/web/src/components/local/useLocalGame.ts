@@ -29,7 +29,6 @@ interface UseLocalGameOptions {
 export function useLocalGame({ onProblem }: UseLocalGameOptions) {
   const [session, setSession] = useState<LocalSession | null>(null);
   const [gameNumber, setGameNumber] = useState(0);
-  const [error, setError] = useState<string | null>(null);
   const [hasSavedGame, setHasSavedGame] = useState(() => typeof window !== "undefined" && readSavedSession() !== null);
   const [turnStartedAt, setTurnStartedAt] = useState(() => Date.now());
   const [now, setNow] = useState(() => Date.now());
@@ -37,7 +36,6 @@ export function useLocalGame({ onProblem }: UseLocalGameOptions) {
   const begin = useCallback((next: LocalSession) => {
     setSession(next);
     setGameNumber((current) => current + 1);
-    setError(null);
   }, []);
 
   useEffect(() => {
@@ -72,10 +70,8 @@ export function useLocalGame({ onProblem }: UseLocalGameOptions) {
     const timeout = window.setTimeout(() => {
       try {
         setSession(playBotTurns(session));
-        setError(null);
-      } catch (caught) {
+          } catch (caught) {
         const message = caught instanceof Error ? caught.message : "Local bot could not complete its turn.";
-        setError(message);
         onProblem(message);
         setSession(showHand(session));
       }
@@ -87,7 +83,6 @@ export function useLocalGame({ onProblem }: UseLocalGameOptions) {
     session,
     /** Changes with every new game, so per-game screen state can reset. */
     gameNumber,
-    error,
     hasSavedGame,
     secondsRemaining: timeLimit > 0 ? Math.max(0, Math.ceil(timeLimit - (now - turnStartedAt) / 1000)) : null,
     start: (setup: LocalStartSetup) => begin(startSession(setup)),
@@ -108,18 +103,15 @@ export function useLocalGame({ onProblem }: UseLocalGameOptions) {
       clearSavedSession();
       setHasSavedGame(false);
       setSession(null);
-      setError(null);
-    },
+      },
     act: (action: GameAction) => {
       if (!session) {
         return;
       }
       try {
         setSession(actInSession(session, action));
-        setError(null);
-      } catch (caught) {
+          } catch (caught) {
         const message = caught instanceof Error ? caught.message : "Something went wrong.";
-        setError(message);
         onProblem(message);
       }
     },

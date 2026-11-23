@@ -1,19 +1,8 @@
-import type { MapConfig, TrainCardColor } from "@hudson-hustle/game-core";
+import type { MapConfig, RouteDef, TrainCardColor } from "@hudson-hustle/game-core";
 import { getCityName } from "@hudson-hustle/game-core";
-import { ChoiceChipButton } from "../ui/primitives/ChoiceChipButton";
-import { SurfaceCard } from "../ui/primitives/SurfaceCard";
-import { formatCardLabel } from "../ui/game";
-
-interface RouteDef {
-  id: string;
-  from: string;
-  to: string;
-  length: number;
-  type: string;
-  color: string;
-  locomotiveCost?: number;
-  twinGroup?: string;
-}
+import { ChoiceChipButton } from "../primitives/ChoiceChipButton";
+import { SurfaceCard } from "../primitives/SurfaceCard";
+import { formatCardLabel } from "./formatCardLabel";
 
 interface RouteBuildPanelProps {
   route: RouteDef;

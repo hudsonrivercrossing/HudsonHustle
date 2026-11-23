@@ -80,7 +80,6 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
       announceTurn={game.players.length - session.botPlayerIds.length === 1}
       sidePanel={visibility === "visible" && game.phase !== "gameOver" ? <TurnPanel state={turnPanelState} /> : <div />}
       notifications={notifications}
-      error={local.error}
       onAction={local.act}
       copy={{
         initialTicketsTitle: `${activePlayer.name}, choose starting tickets`,
@@ -90,7 +89,6 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
       }}
       onPlayAgain={local.rematch}
       onLeave={local.leave}
-      leaveOfferedAtGameOver
     >
       {visibility === "handoff" && game.phase !== "gameOver" ? (
         <HandoffModal playerName={activePlayer.name} previousTurnSummary={session.previousTurnSummary} onReady={local.ready} />

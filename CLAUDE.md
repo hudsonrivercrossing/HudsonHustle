@@ -35,9 +35,9 @@ A rule lives in the file of the component that is doing the styling. `.supply-do
 | Folder | What lives here |
 |---|---|
 | `ui/primitives/` | Game-agnostic primitives: Button, Panel, Badge, FormField, ModalShell, SectionHeader, StateSurface, StatusBanner, SurfaceCard, ChoiceChipButton, TimerPicker |
-| `ui/game/` | Game-domain pieces: BoardMap (with the score track), TableSeats, TableTickets, TableSupply, TableHand, TrainCardFace, TurnAnnouncement, TunnelRevealMoment, TurnPanel… |
+| `ui/game/` | Game-domain pieces: BoardMap (with the score track), TableSeats, TableTickets, TableSupply, TableHand, TrainCardFace, TurnAnnouncement, TunnelRevealMoment, TurnPanel, the route and station build panels, EndgameGrid… |
 | `screens/` | Full screens — `screens/gameplay/` is shared by local and online play |
-| `local/` | Local-play panels and storage helpers |
+| `local/` | Pass-and-play: the local session (`localSession.ts`, `useLocalGame.ts`), the handoff dialog and storage helpers |
 | `online/` | Online flows (create and join a room) and `useOnlineRoom` |
 | `setup/` | Setup pieces shared by local and online setup |
 | `shared/` | Cross-cutting: ErrorBoundary, CoachHint (tips shown at the moment they apply) |

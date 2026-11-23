@@ -1,8 +1,11 @@
 export { BoardMap } from "./BoardMap";
 export { ChatPanel } from "./ChatPanel";
 export { FloatingBuildPanel } from "./FloatingBuildPanel";
-export { BoardStage } from "./BoardStage";
-export { formatCardLabel } from "./CardSlot";
+export { EndgameGrid } from "./EndgameGrid";
+export { formatCardLabel } from "./formatCardLabel";
+export { RouteBuildPanel } from "./RouteBuildPanel";
+export { shuffleAvatars } from "./seatAvatars";
+export { StationBuildPanel } from "./StationBuildPanel";
 export { EndgameBreakdown } from "./EndgameBreakdown";
 export { buildEndgameLedgers, describeMargin, describeWinner, type EndgameLedger } from "./endgameLedger";
 export { GameOverPanel } from "./GameOverPanel";

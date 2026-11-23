@@ -11,6 +11,7 @@ import { Badge } from "../ui/primitives/Badge";
 import { Button } from "../ui/primitives/Button";
 import { InviteLinkButton } from "../online/InviteLinkButton";
 import { StateSurface } from "../ui/primitives/StateSurface";
+import { shuffleAvatars } from "../ui/game";
 
 interface LobbyScreenProps {
   room: RoomSummary;
@@ -61,32 +62,6 @@ function describeLobby(room: RoomSummary, localSeat: RoomSeatSummary | undefined
     return { headline: `Waiting for ${waitingOn.join(" and ")}.`, copy: "The game can start once every seat is ready." };
   }
   return { headline: "Waiting for the host to start.", copy: "Every seat is ready." };
-}
-
-const AVATAR_NAMES = [
-  "Conductor", "Milo", "Engineer", "Rosa", "Switchman",
-  "Jack", "Dispatcher", "Lily", "Caboose", "Nellie"
-];
-
-function seededRandom(seed: string): () => number {
-  let h = 0;
-  for (let i = 0; i < seed.length; i++) h = ((h << 5) - h + seed.charCodeAt(i)) | 0;
-  return () => {
-    h = (h ^ (h >>> 16)) * 0x45d9f3b | 0;
-    h = (h ^ (h >>> 16)) * 0x45d9f3b | 0;
-    h ^= h >>> 16;
-    return (h >>> 0) / 4294967296;
-  };
-}
-
-function shuffleAvatars(seed: string, count: number): string[] {
-  const rng = seededRandom(seed);
-  const pool = [...AVATAR_NAMES];
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [pool[i], pool[j]] = [pool[j], pool[i]];
-  }
-  return pool.slice(0, count);
 }
 
 export function LobbyScreen({

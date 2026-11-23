@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import type { GameState, MapConfig } from "@hudson-hustle/game-core";
 import type { getHudsonHustleVisualsByConfigId } from "@hudson-hustle/game-data";
-import { BoardMap, BoardStage } from "../../ui/game";
+import { BoardMap } from "../../ui/game";
+import { Panel } from "../../ui/primitives/Panel";
 import { Button } from "../../ui/primitives/Button";
 import { buildReplaySteps } from "./replaySteps";
 
@@ -61,7 +62,8 @@ export function ReplayScreen({ game, config, visuals, onClose }: ReplayScreenPro
         <Button onClick={onClose}>Back to results</Button>
       </header>
 
-      <BoardStage className="board-panel replay-screen__board">
+      <Panel variant="neutral" className="board-stage board-panel replay-screen__board">
+        <div className="board-stage__map">
         <BoardMap
           config={config}
           backdrop={visuals.backdrop}
@@ -82,7 +84,8 @@ export function ReplayScreen({ game, config, visuals, onClose }: ReplayScreenPro
           onSelectRoute={() => undefined}
           onSelectCity={() => undefined}
         />
-      </BoardStage>
+        </div>
+      </Panel>
 
       <footer className="replay-screen__controls">
         <p className="replay-screen__caption" aria-live="polite">

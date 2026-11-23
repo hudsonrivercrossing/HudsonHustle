@@ -2,7 +2,7 @@ import type { MapConfig } from "@hudson-hustle/game-core";
 import { projectGeoDiagramCities } from "./cartography.js";
 import type { BoardPoint, GeoDiagramCitySeed } from "./cartography.js";
 import { activeHudsonHustleConfig, hudsonHustleConfigRegistry, hudsonHustleCurrentPointer } from "./config-registry.js";
-import type { BoardBackdrop, SnapshotMeta, StationAuthorityRef } from "./config-types.js";
+import type { BoardBackdrop, StationAuthorityRef } from "./config-types.js";
 import { findSnapshotProblems } from "./map-validation.js";
 
 export interface HudsonHustleReleasedConfigSummary {
@@ -133,12 +133,6 @@ export function getHudsonHustleVisualsByConfigId(configId: string) {
 const activeStations = activeHudsonHustleConfig.map.stations.filter((station) => station.active);
 
 export const hudsonHustleCurrentConfigId = hudsonHustleCurrentPointer.activeConfigId;
-export const hudsonHustleCurrentConfigPath = hudsonHustleCurrentPointer.activeConfigPath;
-export const hudsonHustleAvailableConfigIds = Object.keys(hudsonHustleConfigRegistry);
-export const hudsonHustleCurrentConfigMeta: SnapshotMeta = activeHudsonHustleConfig.meta;
-export const hudsonHustleCurrentTheme = activeHudsonHustleConfig.visuals.theme;
-export const hudsonHustleCurrentBackdropMode = activeHudsonHustleConfig.visuals.backdropMode;
-export const hudsonHustleCurrentBoardLabelMode = activeHudsonHustleConfig.visuals.boardLabelMode;
 
 export const hudsonHustleBoardFrame = {
   width: activeHudsonHustleConfig.map.board.width,
@@ -178,12 +172,6 @@ export const hudsonHustleGeoCities: GeoDiagramCitySeed[] = activeStations.map((s
   labelAnchor: station.labelAnchor
 }));
 
-const { cities: hudsonHustleCities, bounds: hudsonHustleGeoBounds } = projectGeoDiagramCities(
-  hudsonHustleGeoCities,
-  hudsonHustleBoardFrame
-);
-
-export { hudsonHustleGeoBounds };
 export const hudsonHustleBackdrop: BoardBackdrop = activeHudsonHustleConfig.visuals.backdrop;
 
 export const hudsonHustleMap: MapConfig = getHudsonHustleMapByConfigId(activeHudsonHustleConfig.configId);
@@ -192,21 +180,7 @@ export const cardColorPalette: Record<string, string> = activeHudsonHustleConfig
 
 export const playerColorPalette: Record<string, string> = activeHudsonHustleConfig.visuals.palettes.players;
 
-// ghost and blocked are reserved for future use (tutorial highlights, double-route locks)
-export type RouteDisplayState = "unclaimed" | "mine" | "opponent" | "ghost" | "blocked";
-
-export function resolveRouteDisplayState(
-  routeId: string,
-  viewerPlayerId: string | null,
-  routeClaims: ReadonlyArray<{ routeId: string; playerId: string }>
-): RouteDisplayState {
-  const claim = routeClaims.find((c) => c.routeId === routeId);
-  if (!claim) return "unclaimed";
-  if (!viewerPlayerId) return "opponent";
-  return claim.playerId === viewerPlayerId ? "mine" : "opponent";
-}
-
-export { createGeoProjector, projectGeoDiagramCities } from "./cartography.js";
+export { projectGeoDiagramCities } from "./cartography.js";
 export { buildBasemapProtectedZones } from "./basemap-protection.js";
 export { findSnapshotProblems } from "./map-validation.js";
 export { labelAnchorPoint, labelBox, pathLength, pathNormal, pointAlong, routePath, routeSpaces } from "./board-geometry.js";

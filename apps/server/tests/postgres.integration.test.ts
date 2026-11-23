@@ -79,8 +79,6 @@ describe.skipIf(!serverUrl)("PostgresRoomRepository against a real database", ()
     expect(rejoined.snapshot.privateState?.hand).toHaveLength(4);
     expect((await restarted.getSnapshot(roomCode, host)).privateState?.hand).toHaveLength(6);
 
-    const history = await restarted.getGameHistory(roomCode);
-    expect(history.events.length).toBeGreaterThanOrEqual(4);
     restarted.dispose();
     firstServer.dispose();
   });
