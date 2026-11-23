@@ -61,7 +61,7 @@
 }
 
 .table-seat__counts {
-  font-size: var(--type-2xs);
+  font-size: var(--type-xs);
   font-variant-numeric: tabular-nums;
   line-height: 1.3;
   white-space: nowrap;

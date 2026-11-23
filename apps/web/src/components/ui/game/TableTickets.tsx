@@ -52,8 +52,10 @@ export function TableTickets({
                   <span className="ticket-stub__city">{getCityName(config, ticket.from)}</span>
                   <span className="ticket-stub__city">{getCityName(config, ticket.to)}</span>
                 </span>
-                <span className="ticket-stub__points">{ticket.points}</span>
-                {completed ? <span className="ticket-stub__stamp">Connected</span> : null}
+                <span className="ticket-stub__end">
+                  <span className="ticket-stub__points">{ticket.points}</span>
+                  {completed ? <span className="ticket-stub__stamp">Done</span> : null}
+                </span>
               </button>
             </li>
           );
@@ -116,8 +118,10 @@ export function TicketChoice({ title, tickets, config, minimumKeep, selectedIds,
                   <span className="ticket-stub__city">{getCityName(config, ticket.from)}</span>
                   <span className="ticket-stub__city">{getCityName(config, ticket.to)}</span>
                 </span>
-                <span className="ticket-stub__points">{ticket.points}</span>
-                <span className="ticket-stub__stamp">{selected ? "Keep" : "Return"}</span>
+                <span className="ticket-stub__end">
+                  <span className="ticket-stub__points">{ticket.points}</span>
+                  <span className="ticket-stub__stamp">{selected ? "Keep" : "Return"}</span>
+                </span>
               </button>
             </li>
           );

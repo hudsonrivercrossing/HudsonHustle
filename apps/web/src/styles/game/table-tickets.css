@@ -15,9 +15,9 @@
 .ticket-stub {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) 64px;
   width: 100%;
-  min-height: 64px;
+  min-height: 68px;
   padding: 0;
   overflow: hidden;
   border: 0;
@@ -46,10 +46,9 @@
 
 .ticket-stub__city {
   font-family: var(--font-display);
-  font-size: var(--type-sm);
+  font-size: var(--type-body);
   font-weight: var(--weight-bold);
   line-height: 1.2;
-  text-wrap: balance;
 }
 
 /* The second city hangs under the first with a short rule: "from, to" without the word. */
@@ -59,14 +58,20 @@
   font-family: var(--font-body);
 }
 
-.ticket-stub__points {
+/* The tear-off end: the points, and under them the stamp that says what happens to this ticket. */
+.ticket-stub__end {
   display: grid;
-  place-items: center;
-  min-width: 44px;
-  padding: 0 var(--space-stack-sm);
+  gap: var(--space-stack-xs);
+  align-content: center;
+  justify-items: center;
+  padding: var(--space-stack-sm);
+}
+
+.ticket-stub__points {
   font-family: var(--font-display);
   font-size: var(--type-xl);
   font-variant-numeric: tabular-nums;
+  line-height: 1;
 }
 
 .ticket-stub--connected {
@@ -74,8 +79,6 @@
 }
 
 .ticket-stub__stamp {
-  position: absolute;
-  inset: auto 52px 4px auto;
   padding: 1px 5px;
   border: 1.5px solid var(--hud-status-connected);
   border-radius: var(--radius-map-tile);
@@ -83,8 +86,8 @@
   font-size: var(--type-2xs);
   font-weight: var(--weight-bold);
   letter-spacing: var(--ls-caps);
+  line-height: 1.3;
   text-transform: uppercase;
-  transform: rotate(-4deg);
 }
 
 /* The pile to draw from: a ticket back with two more beneath it. */
@@ -135,8 +138,14 @@
 .ticket-choice__rule {
   margin: 0;
   color: var(--hud-paper-soft);
-  font-size: var(--type-xs);
-  line-height: 1.4;
+  font-size: var(--type-sm);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+/* Room on the tear-off end for the longer stamp, the same on every ticket so the perforations line up. */
+.ticket-stub--choice {
+  grid-template-columns: minmax(0, 1fr) 80px;
 }
 
 /* A ticket being returned lies flatter and paler than one being kept. */
@@ -169,4 +178,19 @@
 .ticket-choice__confirm:focus-visible {
   outline: 2px solid var(--hud-paper-bright);
   outline-offset: 2px;
+}
+
+/* On a phone four tickets and the button share less than half the screen. */
+@media (max-width: 760px) {
+  .ticket-stub {
+    min-height: 56px;
+  }
+
+  .ticket-stub__city {
+    font-size: var(--type-sm);
+  }
+
+  .ticket-choice {
+    gap: var(--space-stack-sm);
+  }
 }

@@ -246,7 +246,7 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
       turnLabel={`${activePlayer.name}'s turn`}
       timerLabel={liveTimerSecondsRemaining === null ? null : `${liveTimerSecondsRemaining}s left`}
       announceTurn={game.players.length - localBotPlayerIds.length === 1}
-      sidePanel={visibility === "visible" && game.phase !== "gameOver" ? <TurnPanel playerName={activePlayer.name} state={turnPanelState} /> : <div />}
+      sidePanel={visibility === "visible" && game.phase !== "gameOver" ? <TurnPanel state={turnPanelState} /> : <div />}
       notifications={notifications}
       error={error}
       onAction={applyAction}

@@ -1,12 +1,14 @@
 /* Turn guide (pass-and-play): sits where the chat does online */
 
+/* A note beside the table, not a panel: no frame and no heading. The top bar already says whose turn it is. */
+.turn-panel {
+  display: grid;
+  gap: var(--space-stack-md);
+}
+
 .app-shell--gameplay-hud .turn-panel__body {
-  flex: 1 1 auto;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-stack-sm);
-  overflow-y: auto;
+  display: grid;
+  gap: var(--space-stack-xs);
   color: color-mix(in oklch, var(--hud-paper-solid) 76%, transparent);
   font-size: var(--type-sm);
   line-height: var(--lh-normal);

@@ -16,11 +16,20 @@ interface TableSupplyProps {
 export function TableSupply({ market, deckCount, cardPalette, disabled, isMarketCardDisabled, onDrawFromMarket, onDrawFromDeck }: TableSupplyProps): JSX.Element {
   return (
     <section className="table-supply" aria-label="Cards to draw">
-      <button type="button" className="table-supply__deck" disabled={disabled || deckCount === 0} onClick={onDrawFromDeck} data-draw-source="deck">
+      <button
+        type="button"
+        className="table-supply__deck"
+        disabled={disabled || deckCount === 0}
+        onClick={onDrawFromDeck}
+        aria-label={`Draw from deck, ${deckCount} left`}
+        data-draw-source="deck"
+      >
         <TrainCardFace face="locomotive" color={LOCOMOTIVE_COLOR} back />
-        <span className="table-supply__deck-label">
-          Draw from deck
-          <span className="table-supply__deck-count"> ({deckCount} left)</span>
+        <span className="table-supply__deck-count" aria-hidden="true">
+          {deckCount}
+        </span>
+        <span className="train-card__name table-supply__deck-label" aria-hidden="true">
+          Deck
         </span>
       </button>
       <ul className="table-supply__market">

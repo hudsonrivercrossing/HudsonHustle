@@ -21,7 +21,6 @@
   position: relative;
   display: flex;
   align-items: end;
-  padding-bottom: var(--space-stack-lg);
 }
 
 /* Cards in a stack overlap so each shows a sliver of the one beneath. */
@@ -33,19 +32,26 @@
   margin-left: calc(var(--card-w) * -0.68);
 }
 
+/* How many are in the stack, as a counter on its corner. A single card needs no number. */
 .table-hand__count {
   position: absolute;
-  inset: auto 0 0;
-  color: var(--hud-paper-soft);
+  inset: -8px -8px auto auto;
+  min-width: 22px;
+  padding: 0 var(--space-stack-xs);
+  border-radius: var(--radius-pill);
+  background: var(--hud-paper-bright);
+  box-shadow: 0 1px 3px var(--hud-shadow);
+  color: var(--hud-ink);
   font-size: var(--type-xs);
   font-variant-numeric: tabular-nums;
   font-weight: var(--weight-bold);
+  line-height: 22px;
   text-align: center;
   white-space: nowrap;
 }
 
-.table-hand__stack--paying .table-hand__count {
-  color: var(--hud-paper-bright);
+.table-hand__count--paying {
+  background: var(--hud-brass-light-solid);
 }
 
 /* The stack a card was just added to settles once, so the eye finds it. */

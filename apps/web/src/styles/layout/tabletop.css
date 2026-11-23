@@ -1,8 +1,10 @@
 /* The game screen is a table: the board in the middle, each kind of piece in its own place around it.
    Nothing here is a titled panel; position says what a thing is. */
 .tabletop {
-  --rail: clamp(196px, 16vw, 248px);
-  --card-w: 54px;
+  --rail: clamp(208px, 19vw, 296px);
+  --card-w: clamp(54px, 4.3vw, 66px);
+  /* Three cards across a rail, with two gaps between them. */
+  --supply-card-w: min(calc((var(--rail) - 2 * var(--space-stack-sm)) / 3), 84px);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   gap: var(--space-stack-sm);
@@ -29,20 +31,37 @@
   align-items: center;
 }
 
-.tabletop__menu-button.system-button,
-.tabletop__menu-item .score-guide__trigger.system-button {
+/* Menu items are quiet words, not plates: the table's own pieces carry the weight. */
+.tabletop .tabletop__menu-button.system-button,
+.tabletop .tabletop__menu-item .score-guide__trigger.system-button {
+  min-width: 0;
   min-height: var(--hit-target-min);
   padding: 0 var(--space-stack-md);
   border: 0;
+  border-radius: var(--radius-sm);
   background: transparent;
   box-shadow: none;
+  clip-path: none;
   color: var(--hud-paper-soft);
   font-size: var(--type-sm);
   font-weight: var(--weight-semibold);
+  text-shadow: none;
+  transition: color var(--duration-fast) var(--easing-standard), background-color var(--duration-fast) var(--easing-standard);
 }
 
-.tabletop__menu-button--leave.system-button {
-  color: var(--color-status-danger, var(--hud-paper-soft));
+.tabletop .tabletop__menu-button.system-button::before,
+.tabletop .tabletop__menu-button.system-button::after,
+.tabletop .tabletop__menu-item .score-guide__trigger.system-button::before,
+.tabletop .tabletop__menu-item .score-guide__trigger.system-button::after {
+  content: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tabletop .tabletop__menu-button.system-button:hover,
+  .tabletop .tabletop__menu-item .score-guide__trigger.system-button:hover {
+    background: color-mix(in oklch, var(--hud-paper-solid) 10%, transparent);
+    color: var(--hud-paper-bright);
+  }
 }
 
 .tabletop__table {
@@ -113,6 +132,7 @@
   display: grid;
   place-items: center;
   min-height: calc(var(--card-w) * 1.4 + var(--space-stack-lg));
+  padding-bottom: var(--space-stack-xs);
 }
 
 .tabletop__tabs {
@@ -124,6 +144,7 @@
 @media (max-width: 760px) {
   .tabletop {
     --card-w: 56px;
+    --supply-card-w: 56px;
     grid-template-rows: auto minmax(0, 1fr) auto auto auto;
     grid-template-areas:
       "top"
@@ -147,8 +168,8 @@
     overflow-x: auto;
   }
 
-  .tabletop__menu-button.system-button,
-  .tabletop__menu-item .score-guide__trigger.system-button {
+  .tabletop .tabletop__menu-button.system-button,
+  .tabletop .tabletop__menu-item .score-guide__trigger.system-button {
     padding: 0 var(--space-stack-sm);
   }
 

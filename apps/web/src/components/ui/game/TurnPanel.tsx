@@ -1,6 +1,4 @@
 import { Button } from "../primitives/Button";
-import { Panel } from "../primitives/Panel";
-import { SectionHeader } from "../primitives/SectionHeader";
 
 export type TurnPanelState =
   | { kind: "tickets"; minimumKeep: number }
@@ -10,22 +8,15 @@ export type TurnPanelState =
   | { kind: "waiting"; activePlayerName: string };
 
 interface TurnPanelProps {
-  playerName: string;
   state: TurnPanelState;
   className?: string;
 }
 
 /** Tells the player at the screen what they can do right now, and ends their turn when it is over. */
-export function TurnPanel({ playerName, state, className = "" }: TurnPanelProps): JSX.Element {
+export function TurnPanel({ state, className = "" }: TurnPanelProps): JSX.Element {
   return (
-    <Panel variant="private" className={["chat-panel-dock", "turn-panel", className].filter(Boolean).join(" ")}>
-      <SectionHeader title={state.kind === "waiting" ? `${state.activePlayerName} is playing` : `${playerName}'s turn`} variant="compact" />
+    <div className={["turn-panel", className].filter(Boolean).join(" ")}>
       <div className="turn-panel__body" aria-live="polite">
-        {state.kind === "tickets" ? (
-          <p className="turn-panel__lead">
-            Choose at least {state.minimumKeep === 1 ? "one ticket" : `${state.minimumKeep} tickets`} to keep.
-          </p>
-        ) : null}
         {state.kind === "idle" ? (
           <p className="turn-panel__note">Draw cards, claim a route, build a station, or draw tickets.</p>
         ) : null}
@@ -35,7 +26,7 @@ export function TurnPanel({ playerName, state, className = "" }: TurnPanelProps)
             <p className="turn-panel__note">A face-up locomotive cannot be your second card.</p>
           </>
         ) : null}
-        {state.kind === "waiting" ? <p className="turn-panel__lead">The board updates as they move.</p> : null}
+        {state.kind === "waiting" ? <p className="turn-panel__note">{state.activePlayerName} is playing. The board updates as they move.</p> : null}
         {state.kind === "finished" ? (
           <>
             <p className="turn-panel__lead">{state.summary ?? "Your action is locked in."}</p>
@@ -48,6 +39,6 @@ export function TurnPanel({ playerName, state, className = "" }: TurnPanelProps)
           End turn — pass to {state.nextPlayerName}
         </Button>
       ) : null}
-    </Panel>
+    </div>
   );
 }
