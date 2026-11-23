@@ -1255,3 +1255,92 @@ Action rows */
   font-size: var(--type-xs);
   color: color-mix(in oklch, var(--control-ink-solid) 64%, transparent);
 }
+
+/* The room-code slip on the join screen. */
+/* physical game card title — display font for printed-card artifact aesthetic */
+
+/* TicketChoiceSheet: covers the right column (chat + market) when shown */
+
+/* Pointer target reaches 44px tall; sideways it stops halfway into the gap so
+   neighbouring targets never overlap. */
+
+/* TicketDock fills the bottom half; layout: header / scroll / draw button */
+
+/* Unified Draw button style for both Ticket Dock and Supply Dock */
+
+/* Original angular clip-path retained as reference but neutralised
+Inner-border decoration disabled — pseudo-element neutralised */
+
+/* Executed critique checklist: make every HUD family use a different physical shape. */
+
+/* Right rail market is an inserted tray, not a nested panel */
+
+/* Force ticket status font size across all HUD contexts */
+
+/* Preserve 4-row footprint even though only 3 tickets render per page —
+   creates extra breathing room between the 3rd ticket and the Draw Tickets button. */
+
+/* ── D3: Ticket-Desk Overlay — printed transit ticket lift ──
+ticket route: uppercase printed label, tight cap spacing */
+
+/* arrow: warmer, lighter — printed rule divider feel */
+
+/* points badge: punched-hole stamp */
+
+/* (Old angular clip-path removed for visual consistency across panels.)
+   Disabled by overriding with `none` below.
+Supply dock: divider + distinct buttons
+TicketChoiceSheet: fills right panel, tickets match HUD left dock
+TicketChoiceSheet panel — envelope inset decorative border */
+
+/* TicketDock pager buttons — ghost/subdued treatment */
+
+/* (Old angular clip-path removed for visual consistency across panels.)
+   Disabled by overriding with `none` below.
+Build tab claim buttons: show actual card colors
+Ticket dock: extra bottom padding so last ticket doesn't clip
+─── Final unified panel treatment ───────────────────────────────────────
+   All in-game container panels — roster, ticket dock, hand rail, chat,
+   market, plus the privacy "hidden" panel during handoff — render with the
+   same dark brass envelope so they read as one set.
+─── Unify outer padding on the 3 bottom panels so their bottom edges land
+   at the same Y when columns are equal height. */
+
+.ticket-slip {
+  display: grid;
+  gap: 8px;
+  place-items: center;
+  min-height: 128px;
+  border-radius: var(--radius-ticket);
+  border: 1px dashed oklch(94.28% 0.0234 82.12 / 0.2);
+  background: linear-gradient(180deg, oklch(82.64% 0.0282 83.53 / 0.16), oklch(82.64% 0.0282 83.53 / 0.08)), oklch(98.38% 0.0159 82.79 / 0.06);
+}
+
+.ticket-slip--active {
+  border-style: solid;
+  border-color: oklch(83.23% 0.0894 82.33 / 0.34);
+  background: oklch(65.91% 0.1012 73.74 / 0.12);
+}
+
+.ticket-slip--disabled {
+  opacity: 0.62;
+}
+
+.ticket-slip span {
+  color: oklch(94.28% 0.0234 82.12 / 0.58);
+  font-size: var(--type-2xs);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.ticket-slip strong {
+  color: oklch(98.4% 0.0147 80.71 / 0.92);
+  font-size: var(--type-display);
+  letter-spacing: 0.12em;
+}
+
+.ticket-slip em {
+  color: oklch(94.28% 0.0234 82.12 / 0.72);
+  font-style: normal;
+}

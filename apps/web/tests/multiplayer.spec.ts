@@ -141,7 +141,7 @@ test("multiplayer room lifecycle covers connected badges, private state, reconne
   await clearInitialTicketChoice(guestPage);
 
   await expect(hostPage.getByTestId("turn-status-banner")).toContainText("Your turn");
-  await expect(hostPage.locator(".player-roster")).toBeVisible();
+  await expect(hostPage.locator(".table-seats")).toBeVisible();
   await expect(hostPage.getByRole("button", { name: "Guide" })).toBeVisible();
   await expect(hostPage.getByRole("button", { name: "Score" })).toBeVisible();
   await expect(hostPage.getByRole("button", { name: "Leave room" })).toBeVisible();
@@ -269,19 +269,19 @@ test("initial multiplayer ticket choices can be confirmed independently without 
   await guestPage.getByRole("button", { name: "Mark ready" }).click();
   await hostPage.getByRole("button", { name: "Start game" }).click();
 
-  const guestTickets = guestPage.locator(".ticket-row--choice");
+  const guestTickets = guestPage.locator(".ticket-stub--choice");
   await expect(guestTickets).toHaveCount(4);
   await guestTickets.nth(2).click();
   await guestTickets.nth(1).click();
-  await expect(guestTickets.nth(0)).toHaveClass(/ticket-row--selected/);
-  await expect(guestTickets.nth(1)).not.toHaveClass(/ticket-row--selected/);
-  await expect(guestTickets.nth(2)).toHaveClass(/ticket-row--selected/);
+  await expect(guestTickets.nth(0)).toHaveClass(/ticket-stub--kept/);
+  await expect(guestTickets.nth(1)).not.toHaveClass(/ticket-stub--kept/);
+  await expect(guestTickets.nth(2)).toHaveClass(/ticket-stub--kept/);
 
   await hostPage.getByRole("button", { name: /Keep 2 tickets/ }).click();
   await expect(hostPage.getByRole("button", { name: /Keep 2 tickets/ })).toHaveCount(0);
-  await expect(guestTickets.nth(0)).toHaveClass(/ticket-row--selected/);
-  await expect(guestTickets.nth(1)).not.toHaveClass(/ticket-row--selected/);
-  await expect(guestTickets.nth(2)).toHaveClass(/ticket-row--selected/);
+  await expect(guestTickets.nth(0)).toHaveClass(/ticket-stub--kept/);
+  await expect(guestTickets.nth(1)).not.toHaveClass(/ticket-stub--kept/);
+  await expect(guestTickets.nth(2)).toHaveClass(/ticket-stub--kept/);
 
   await guestPage.getByRole("button", { name: /Keep 2 tickets/ }).click();
   await expect(hostPage.getByTestId("turn-status-banner")).toContainText("Your turn");
@@ -342,7 +342,7 @@ test("drawing tickets in multiplayer offers no cancel path and still requires a 
   await expect(hostPage.getByRole("button", { name: "Back" })).toHaveCount(0);
   await expect(hostPage.getByRole("button", { name: /Keep 1 ticket/ })).toBeVisible();
 
-  const pickerCards = hostPage.locator(".ticket-row--choice");
+  const pickerCards = hostPage.locator(".ticket-stub--choice");
   await expect(pickerCards).toHaveCount(3);
   await pickerCards.nth(0).click();
   await expect(hostPage.getByRole("button", { name: /Keep 0 tickets/ })).toBeDisabled();
@@ -543,7 +543,7 @@ test("guidebook opens from gateway and local setup without old tutorial chrome",
   await page.getByRole("button", { name: "Guide" }).click();
   await expect(page.getByTestId("guidebook-screen")).toBeVisible();
   await page.getByRole("button", { name: "Back" }).click();
-  await expect(page.locator(".player-roster")).toBeVisible();
+  await expect(page.locator(".table-seats")).toBeVisible();
 
   await context.close();
 });

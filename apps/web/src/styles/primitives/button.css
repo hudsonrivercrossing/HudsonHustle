@@ -213,15 +213,6 @@
   text-shadow: 0 1px 0 oklch(98.03% 0.0223 87.15 / 0.34);
 }
 
-.ticket-dock__pager-button.system-button {
-  min-width: 28px;
-  width: 28px;
-  min-height: 28px;
-  padding: 0;
-  border-radius: var(--radius-control);
-  font-size: var(--type-body);
-}
-
 .app-shell--gameplay-hud .system-button {
   border-radius: var(--radius-map-line);
   clip-path: polygon( 7px 0, calc(100% - 7px) 0, 100% 7px, 100% calc(100% - 7px), calc(100% - 7px) 100%, 7px 100%, 0 calc(100% - 7px), 0 7px );

@@ -245,15 +245,14 @@ export function LocalPlayScreen({ onReturnToGateway }: LocalPlayScreenProps): JS
       avatarSeed={game.players.map((player) => player.id).join("|")}
       turnLabel={`${activePlayer.name}'s turn`}
       timerLabel={liveTimerSecondsRemaining === null ? null : `${liveTimerSecondsRemaining}s left`}
+      announceTurn={game.players.length - localBotPlayerIds.length === 1}
       sidePanel={visibility === "visible" && game.phase !== "gameOver" ? <TurnPanel playerName={activePlayer.name} state={turnPanelState} /> : <div />}
       notifications={notifications}
       error={error}
       onAction={applyAction}
       copy={{
         initialTicketsTitle: `${activePlayer.name}, choose starting tickets`,
-        initialTicketsSubtitle: "Keep at least two. Anything you return is gone for this game.",
         drawnTicketsTitle: `${activePlayer.name}, keep new tickets`,
-        drawnTicketsSubtitle: "Keep at least one. This counts as your full turn.",
         leaveLabel: "Leave game",
         leaveBody: "Your local match will return to setup."
       }}

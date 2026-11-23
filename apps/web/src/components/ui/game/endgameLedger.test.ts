@@ -44,6 +44,13 @@ describe("buildEndgameLedgers", () => {
     ]);
   });
 
+  it("remembers where each player sat", () => {
+    expect(ledgers.map((ledger) => [ledger.name, ledger.seat])).toEqual([
+      ["Cy", 1],
+      ["Ada", 0]
+    ]);
+  });
+
   it("names tickets by their cities, never by id", () => {
     expect(ledgers[1].completed).toEqual([{ id: "t-a-b", label: "Alpha → Beta", points: 9 }]);
     expect(ledgers[1].failed).toEqual([{ id: "t-b-c", label: "Beta → Gamma", points: 5 }]);

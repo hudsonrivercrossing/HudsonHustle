@@ -1,0 +1,95 @@
+/* The deck and the five face-up cards: six places in a 3 by 2 block. */
+.table-supply {
+  display: grid;
+  grid-template-columns: repeat(3, var(--card-w));
+  gap: var(--space-stack-md) var(--space-stack-sm);
+  justify-content: center;
+}
+
+.table-supply__market {
+  display: contents;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.table-supply__market li {
+  display: block;
+}
+
+.table-supply__deck,
+.table-supply__card {
+  position: relative;
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-card);
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: transform var(--duration-fast) ease-out;
+}
+
+.table-supply__deck:focus-visible,
+.table-supply__card:focus-visible {
+  outline: 2px solid var(--hud-brass-light-solid);
+  outline-offset: 3px;
+}
+
+.table-supply__deck:active:not(:disabled),
+.table-supply__card:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.table-supply__deck:disabled,
+.table-supply__card:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+/* The deck reads as a pile: two more backs peek out beneath the top one. */
+.table-supply__deck .train-card {
+  box-shadow: 2px 2px 0 var(--hud-wood-light), 3px 3px 0 var(--hud-brass-dark), 5px 5px 0 var(--hud-wood-light), 6px 6px 0 var(--hud-brass-dark), 0 8px 12px var(--hud-shadow);
+}
+
+.table-supply__deck-label {
+  position: absolute;
+  inset: calc(100% + 8px) auto auto 0;
+  width: calc(var(--card-w) * 3 + var(--space-stack-sm) * 2);
+  color: var(--hud-paper-soft);
+  font-size: var(--type-xs);
+  font-weight: var(--weight-semibold);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.table-supply__deck-count {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--weight-regular, 400);
+}
+
+/* Room for the deck label, which hangs under the first row. */
+.table-supply__market li:nth-child(n + 3) {
+  margin-top: var(--space-stack-md);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .table-supply__deck:hover:not(:disabled),
+  .table-supply__card:hover:not(:disabled) {
+    transform: translateY(-4px);
+  }
+}
+
+@media (max-width: 760px) {
+  .table-supply {
+    grid-template-columns: repeat(6, var(--card-w));
+    justify-content: start;
+    overflow-x: auto;
+    padding-bottom: var(--space-stack-lg);
+  }
+
+  .table-supply__market li:nth-child(n + 3) {
+    margin-top: 0;
+  }
+}

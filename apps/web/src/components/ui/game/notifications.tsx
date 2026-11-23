@@ -14,9 +14,14 @@ interface GameOverLayerProps {
   title: string;
   subtitle: string;
   actions: ReactNode;
+  headlineDelayMs: number;
   children: ReactNode;
 }
 
-export function GameOverLayer({ title, subtitle, actions, children }: GameOverLayerProps): JSX.Element {
-  return <GameOverPanel title={title} subtitle={subtitle} actions={actions}>{children}</GameOverPanel>;
+export function GameOverLayer({ title, subtitle, actions, headlineDelayMs, children }: GameOverLayerProps): JSX.Element {
+  return (
+    <GameOverPanel title={title} subtitle={subtitle} actions={actions} headlineDelayMs={headlineDelayMs}>
+      {children}
+    </GameOverPanel>
+  );
 }

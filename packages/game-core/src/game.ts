@@ -640,7 +640,7 @@ export function reduceGame(state: GameState, untrustedAction: GameAction, config
         if (!canPay(player.hand, action.color, route.length + tunnelExtraCost, route.locomotiveCost ?? 0)) {
           beginAwaitingHandoff(nextState, `${player.name} could not cover the tunnel surcharge.`);
           appendLog(nextState, `${player.name} failed to claim ${route.id} after a tunnel reveal.`);
-          recordEvent(nextState, { type: "tunnel_failed", playerId: player.id, routeId: route.id });
+          recordEvent(nextState, { type: "tunnel_failed", playerId: player.id, routeId: route.id, tunnel: { cards: tunnelReveal, extraCost: tunnelExtraCost } });
           return nextState;
         }
       } else {
@@ -667,7 +667,13 @@ export function reduceGame(state: GameState, untrustedAction: GameAction, config
       maybeTriggerFinalRound(nextState, config, player);
       beginAwaitingHandoff(nextState, `${player.name} claimed ${route.id}.`);
       appendLog(nextState, `${player.name} claimed ${route.id} for ${routeScoreTable[route.length] ?? route.length * 2} points.`);
-      recordEvent(nextState, { type: "route_claimed", playerId: player.id, routeId: route.id, points: routeScoreTable[route.length] ?? route.length * 2 });
+      recordEvent(nextState, {
+        type: "route_claimed",
+        playerId: player.id,
+        routeId: route.id,
+        points: routeScoreTable[route.length] ?? route.length * 2,
+        ...(route.type === "tunnel" ? { tunnel: { cards: tunnelReveal, extraCost: tunnelExtraCost } } : {})
+      });
       return nextState;
     }
     case "draw_tickets": {

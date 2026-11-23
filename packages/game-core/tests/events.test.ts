@@ -228,6 +228,23 @@ describe("tunnels when the deck runs dry", () => {
     expect(state.routeClaims).toHaveLength(1);
   });
 
+  it("puts the reveal on the claim event so every screen can show it", () => {
+    const other = tunnel.color === "ivory" ? "rose" : "ivory";
+    const state = reduceGame(
+      readyToClaim([{ id: "last", color: other }], []),
+      { type: "claim_route", routeId: tunnel.id, color: tunnel.color as never },
+      hudsonHustleMap
+    );
+    expect(state.events?.find((event) => event.type === "route_claimed")).toMatchObject({ routeId: tunnel.id, tunnel: { cards: [other], extraCost: 0 } });
+  });
+
+  it("puts the reveal on the failure event when the surcharge cannot be paid", () => {
+    const matching = [1, 2, 3].map((index) => ({ id: `m${index}`, color: tunnel.color as never }));
+    const state = reduceGame(readyToClaim(matching, []), { type: "claim_route", routeId: tunnel.id, color: tunnel.color as never }, hudsonHustleMap);
+    expect(state.routeClaims).toHaveLength(0);
+    expect(state.events?.find((event) => event.type === "tunnel_failed")).toMatchObject({ routeId: tunnel.id, tunnel: { extraCost: 3 } });
+  });
+
   it("still reshuffles the discard pile to reveal three when it can", () => {
     const other = tunnel.color === "ivory" ? "rose" : "ivory";
     const discard = [1, 2, 3, 4].map((index) => ({ id: `d${index}`, color: other as never }));

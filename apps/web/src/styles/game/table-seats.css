@@ -1,0 +1,100 @@
+.table-seats {
+  display: flex;
+  gap: var(--space-stack-sm);
+  align-items: stretch;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A name plate. The frame round the portrait is this player's colour on the board. */
+.table-seat {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--space-stack-sm);
+  align-items: center;
+  min-width: 0;
+  padding: var(--space-stack-xs) var(--space-stack-md) var(--space-stack-xs) var(--space-stack-xs);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--hud-paper-soft);
+}
+
+.table-seat--active {
+  border-color: var(--seat-color);
+  background: color-mix(in oklch, var(--seat-color) 20%, transparent);
+  color: var(--hud-paper-bright);
+}
+
+.table-seat__token {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  padding: 3px;
+  border-radius: var(--radius-control);
+  background: var(--seat-color);
+}
+
+.table-seat__token img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: calc(var(--radius-control) - 3px);
+  object-fit: cover;
+}
+
+.table-seat__who {
+  display: grid;
+  min-width: 0;
+}
+
+.table-seat__name {
+  overflow: hidden;
+  font-size: var(--type-sm);
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.table-seat__you {
+  font-weight: var(--weight-regular, 400);
+}
+
+.table-seat__counts {
+  font-size: var(--type-2xs);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+
+.table-seat__score {
+  min-width: 2ch;
+  font-family: var(--font-display);
+  font-size: var(--type-xl);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: right;
+}
+
+.table-seats__final {
+  align-self: center;
+  padding: var(--space-stack-xs) var(--space-stack-sm);
+  border-radius: var(--radius-pill);
+  background: var(--hud-brass-light-solid);
+  color: var(--hud-ink);
+  font-size: var(--type-xs);
+  font-weight: var(--weight-bold);
+  white-space: nowrap;
+}
+
+@media (max-width: 1180px) {
+  .table-seat__counts {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .table-seat {
+    flex: none;
+  }
+}

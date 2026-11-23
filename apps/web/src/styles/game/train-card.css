@@ -1,0 +1,57 @@
+/* One transit card. Its colour comes from --card-color; its name is printed on a paper strip so it
+   reads the same on a dark card and a light one, and without colour vision. */
+.train-card {
+  position: relative;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  flex: none;
+  width: var(--card-w, 54px);
+  aspect-ratio: 5 / 7;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklch, var(--card-color) 55%, black);
+  border-radius: var(--radius-card);
+  background: linear-gradient(155deg, color-mix(in oklch, var(--card-color) 82%, white), var(--card-color));
+  box-shadow: inset 0 1px 0 color-mix(in oklch, white 40%, transparent), 0 2px 5px var(--hud-shadow);
+}
+
+.train-card__pip {
+  display: grid;
+  place-items: center;
+  color: var(--hud-paper-bright);
+  font-size: var(--type-lg);
+}
+
+.train-card__name {
+  padding: 3px 2px;
+  overflow: hidden;
+  background: var(--hud-paper-bright);
+  color: var(--hud-ink);
+  font-size: var(--type-2xs);
+  font-weight: var(--weight-bold);
+  line-height: 1.1;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.train-card--locomotive {
+  background: linear-gradient(135deg, oklch(66% 0.13 28), oklch(80% 0.13 88), oklch(70% 0.11 155), oklch(66% 0.1 250), oklch(60% 0.12 315));
+}
+
+.train-card--back {
+  border-color: var(--hud-brass-dark);
+  background: repeating-linear-gradient(45deg, var(--hud-brass-dark) 0 5px, var(--hud-wood-light) 5px 10px);
+}
+
+/* A copy of a drawn card on its way to the hand; positioned and moved by useCardFlight. */
+.train-card--flying {
+  position: fixed;
+  z-index: var(--z-toast);
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* Cards a payment would take lift out of the stack. */
+.train-card--leaving {
+  transform: translateY(-12px);
+}

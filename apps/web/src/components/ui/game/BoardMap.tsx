@@ -1,6 +1,7 @@
-import type { KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { getCityName, type MapConfig, type RouteDef } from "@hudson-hustle/game-core";
 import type { BoardBackdrop, SnapshotVisuals } from "@hudson-hustle/game-data";
+import { TRACK_CELLS, TRACK_MARGIN, placeTokens, trackCell } from "./scoreTrack";
 
 interface PathPoint {
   x: number;
@@ -167,6 +168,8 @@ interface BoardMapProps {
   selectedRouteId: string | null;
   selectedCityId: string | null;
   highlightedCityIds?: string[];
+  /** Draws the score track around the board with one marker per player. Left out, the board has no frame. */
+  scores?: Array<{ playerId: string; score: number }>;
   onSelectRoute: (routeId: string, position?: { x: number; y: number }) => void;
   onSelectCity: (cityId: string, position?: { x: number; y: number }) => void;
 }
@@ -193,6 +196,7 @@ export function BoardMap({
   selectedRouteId,
   selectedCityId,
   highlightedCityIds = [],
+  scores,
   onSelectRoute,
   onSelectCity
 }: BoardMapProps): JSX.Element {
@@ -220,16 +224,63 @@ export function BoardMap({
         : backdrop.regionLabels;
   const regionLabelClassSuffix = boardLabelMode === "minimal-region-labels" ? " region-label--minimal" : "";
   const highlightedCitySet = new Set(highlightedCityIds);
+  const frame = scores ? TRACK_MARGIN : 0;
+  const tokens = scores ? placeTokens(scores, boardWidth, boardHeight) : [];
+
+  // Routes claimed since this board was first drawn: their trains are set down one by one.
+  // Claims already on the board when it appears are not replayed.
+  const knownClaims = useRef<Set<string> | null>(null);
+  const [freshRouteIds, setFreshRouteIds] = useState<string[]>([]);
+  const claimKey = game.routeClaims.map((claim) => claim.routeId).join("|");
+  useEffect(() => {
+    const current = game.routeClaims.map((claim) => claim.routeId);
+    if (knownClaims.current === null) {
+      knownClaims.current = new Set(current);
+      return;
+    }
+    const added = current.filter((routeId) => !knownClaims.current!.has(routeId));
+    knownClaims.current = new Set(current);
+    if (added.length === 0) {
+      return;
+    }
+    setFreshRouteIds(added);
+    const timeout = window.setTimeout(() => setFreshRouteIds([]), 1200);
+    return () => window.clearTimeout(timeout);
+  }, [claimKey]);
 
   return (
     <div className="board-shell">
       <svg
         className={`board-map board-map--${backdropMode}`}
-        viewBox={`0 0 ${boardWidth} ${boardHeight}`}
+        viewBox={`${-frame} ${-frame} ${boardWidth + frame * 2} ${boardHeight + frame * 2}`}
         role="group"
         aria-label="Board map: routes and stations"
       >
-        <rect x="0" y="0" width={boardWidth} height={boardHeight} rx="12" fill="#d9c8a6" />
+        {scores ? (
+          <g className="score-track" aria-hidden="true">
+            <rect x={-frame} y={-frame} width={boardWidth + frame * 2} height={boardHeight + frame * 2} rx="18" className="score-track__frame" />
+            {Array.from({ length: TRACK_CELLS }, (_, index) => {
+              const cell = trackCell(index, boardWidth, boardHeight);
+              const milestone = index % 5 === 0;
+              return (
+                <g key={index}>
+                  <rect
+                    x={cell.x + 1.5}
+                    y={cell.y + 1.5}
+                    width={cell.width - 3}
+                    height={cell.height - 3}
+                    rx="5"
+                    className={milestone ? "score-track__cell score-track__cell--milestone" : "score-track__cell"}
+                  />
+                  <text x={cell.x + cell.width / 2} y={cell.y + cell.height / 2} className={milestone ? "score-track__number score-track__number--milestone" : "score-track__number"}>
+                    {index}
+                  </text>
+                </g>
+              );
+            })}
+          </g>
+        ) : null}
+        <rect x="0" y="0" width={boardWidth} height={boardHeight} rx={scores ? 4 : 12} fill="#d9c8a6" />
 
         {backdropOpacityScale > 0 && backdrop.image ? (
           <image
@@ -382,7 +433,11 @@ export function BoardMap({
               />
 
               {segments.map((segment, index) => (
-                <g key={`${route.id}-${index}`}>
+                <g
+                  key={`${route.id}-${index}`}
+                  className={freshRouteIds.includes(route.id) ? "route-car route-car--landing" : "route-car"}
+                  style={freshRouteIds.includes(route.id) ? { animationDelay: `${index * 60}ms` } : undefined}
+                >
                   {/* Outer dark cable jacket */}
                   <path
                     d={segment.pathD}
@@ -571,7 +626,28 @@ export function BoardMap({
             </g>
           );
         })}
+        {tokens.map((token) => {
+          const player = game.players.find((item) => item.id === token.playerId);
+          return (
+            <g key={token.playerId} className="score-token" style={{ transform: `translate(${token.x}px, ${token.y}px)` }}>
+              <title>{player?.name}</title>
+              <circle r="13" className="score-token__disc" fill={player ? playerPalette[player.color] : "#f0d78e"} />
+              <text className="score-token__label" dy="4.5">
+                {token.laps > 0 ? `+${token.laps * TRACK_CELLS}` : player?.name.trim().charAt(0).toUpperCase()}
+              </text>
+            </g>
+          );
+        })}
       </svg>
+      {scores ? (
+        <ul className="visually-hidden">
+          {scores.map(({ playerId, score }) => (
+            <li key={playerId}>
+              {game.players.find((item) => item.id === playerId)?.name}: {score} points
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </div>
   );
 }

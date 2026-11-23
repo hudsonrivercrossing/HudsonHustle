@@ -13,6 +13,8 @@ export interface EndgameLedger {
   playerId: string;
   name: string;
   color: Player["color"];
+  /** Position at the table, so the count can be shown in seating order without giving the result away. */
+  seat: number;
   rank: number;
   isWinner: boolean;
   total: number;
@@ -45,6 +47,7 @@ export function buildEndgameLedgers(players: Player[], config: MapConfig): Endga
       playerId: player.id,
       name: player.name,
       color: player.color,
+      seat: players.indexOf(player),
       rank: ordered.filter((other) => other.score > player.score).length + 1,
       isWinner: player.score === topScore,
       total: player.score,

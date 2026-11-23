@@ -3,32 +3,37 @@ import { EndgameBreakdown, type EndgameLedger } from "../ui/game";
 interface EndgameGridProps {
   ledgers: EndgameLedger[];
   playerPalette: Record<string, string>;
+  revealStepMs: number;
+  totalBeat: number;
 }
 
 const ordinals = ["1st", "2nd", "3rd", "4th"];
 
-/** Final standings, best score first. */
-export function EndgameGrid({ ledgers, playerPalette }: EndgameGridProps): JSX.Element {
+/** Final scores in seating order, so nothing gives the result away while the lines are read out; ranks land with the totals. */
+export function EndgameGrid({ ledgers, playerPalette, revealStepMs, totalBeat }: EndgameGridProps): JSX.Element {
+  const finale = { animationDelay: `${totalBeat * revealStepMs}ms` };
   return (
     <ol className="endgame-grid">
-      {ledgers.map((ledger) => (
+      {[...ledgers].sort((left, right) => left.seat - right.seat).map((ledger) => (
         <li
           key={ledger.playerId}
           className={`endgame-card ${ledger.isWinner ? "endgame-card--winner" : ""}`}
-          style={{ ["--seat-color" as string]: playerPalette[ledger.color] }}
+          style={{ ["--seat-color" as string]: playerPalette[ledger.color], ...finale }}
         >
           <header className="endgame-card__header">
-            <span className="endgame-card__rank">{ledger.isWinner ? "Winner" : ordinals[ledger.rank - 1] ?? `${ledger.rank}th`}</span>
+            <span className="endgame-card__rank" style={finale}>
+              {ledger.isWinner ? "Winner" : ordinals[ledger.rank - 1] ?? `${ledger.rank}th`}
+            </span>
             <h3 className="endgame-card__name">
               <span className="endgame-card__chip" aria-hidden="true" />
               {ledger.name}
             </h3>
-            <p className="endgame-score">
+            <p className="endgame-score" style={finale}>
               {ledger.total}
               <span className="endgame-score__label"> points</span>
             </p>
           </header>
-          <EndgameBreakdown ledger={ledger} />
+          <EndgameBreakdown ledger={ledger} revealStepMs={revealStepMs} totalBeat={totalBeat} />
         </li>
       ))}
     </ol>

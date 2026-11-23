@@ -72,9 +72,7 @@ export function OnlineGameScreen({ room, snapshot, playerId, notices, onLeave }:
       onAction={room.sendGameAction}
       copy={{
         initialTicketsTitle: "Choose starting tickets",
-        initialTicketsSubtitle: "Keep at least two. There is no timer on this choice.",
         drawnTicketsTitle: "Keep new tickets",
-        drawnTicketsSubtitle: "Keep at least one. This counts as your full turn.",
         leaveLabel: "Leave room",
         leaveBody: "You will return to setup and clear this room from the current browser."
       }}

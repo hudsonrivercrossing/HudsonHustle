@@ -1,8 +1,4 @@
 /* Turn guide (pass-and-play): sits where the chat does online */
-.app-shell--gameplay-hud .right-col .turn-panel {
-  gap: var(--space-stack-sm);
-  padding: var(--space-stack-sm) var(--space-stack-md);
-}
 
 .app-shell--gameplay-hud .turn-panel__body {
   flex: 1 1 auto;
